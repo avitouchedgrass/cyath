@@ -39,9 +39,10 @@ in vec2 vUv;
 out vec4 fragColor;
 
 void main() {
-  // Zoom in towards center to make plate huge and eliminate PNG outer margin
+  // Center-anchored zoom to make food plate huge and trim outer transparent margins
   vec2 uv = (vUv - 0.5) / uZoom + 0.5;
 
+  // Clamped bounds
   if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
     fragColor = vec4(0.0);
     return;
@@ -50,12 +51,12 @@ void main() {
   vec2 center = vec2(0.5, 0.5);
   float dist = length(uv - center);
 
-  // Keep outer ceramic rim stationary; only ripple inner food
+  // Keep outer ceramic plate stationary; only ripple inner food
   float foodMask = smoothstep(0.38, 0.20, dist);
 
   // Subtle organic shimmer (islands.study micro-wave)
-  float waveX = sin(uv.y * 18.0 + uTime * 1.3) * cos(uv.x * 14.0 + uTime * 1.0) * 0.0035 * foodMask;
-  float waveY = cos(uv.x * 16.0 + uTime * 1.2) * sin(uv.y * 16.0 + uTime * 0.9) * 0.0035 * foodMask;
+  float waveX = sin(uv.y * 18.0 + uTime * 1.3) * cos(uv.x * 14.0 + uTime * 1.0) * 0.004 * foodMask;
+  float waveY = cos(uv.x * 16.0 + uTime * 1.2) * sin(uv.y * 16.0 + uTime * 0.9) * 0.004 * foodMask;
 
   vec2 displacedUv = clamp(uv + vec2(waveX, waveY), 0.0, 1.0);
 
@@ -64,13 +65,13 @@ void main() {
   if (uIsScanning > 0.5 && uHasPrev > 0.5) {
     vec4 colPrev = texture(uTexturePrev, displacedUv);
     
-    // Determine laser sweep position
+    // 1.0 = Horizontal (left to right), 0.0 = Vertical (top to bottom)
     float pos = (uScanDirection > 0.5) ? vUv.x : (1.0 - vUv.y);
     float scanEdge = uScanProgress;
 
-    // Laser beam shine
+    // Glowing laser beam shine
     float lineDist = abs(pos - scanEdge);
-    float beam = (1.0 - smoothstep(0.0, 0.015, lineDist)) * 2.2;
+    float beam = (1.0 - smoothstep(0.0, 0.016, lineDist)) * 2.2;
     
     vec4 result = (pos <= scanEdge) ? colCurrent : colPrev;
     
@@ -97,8 +98,7 @@ export function PixelWaveDish({
   const containerRef = useRef<HTMLDivElement>(null);
   const uniformsRef = useRef<any>(null);
   const texturesMapRef = useRef<{ [key: string]: Texture }>({});
-  const glRef = useRef<any>(null);
-  const [loadedCount, setLoadedCount] = useState(0);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -107,25 +107,15 @@ export function PixelWaveDish({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, dpr });
     const gl = renderer.gl;
-    glRef.current = gl;
     gl.clearColor(0, 0, 0, 0);
 
+    // OGL's Triangle geometry has built-in valid positions and UVs
     const geometry = new Triangle(gl);
-    geometry.addAttribute('uv', {
-      size: 2,
-      data: new Float32Array([
-        -1, -1,
-        3, -1,
-        -1, 3
-      ])
-    });
 
-    // Transparent placeholder texture
+    // 1x1 transparent canvas as default texture
     const transparentCanvas = document.createElement('canvas');
     transparentCanvas.width = 2;
     transparentCanvas.height = 2;
-    const ctx = transparentCanvas.getContext('2d');
-    if (ctx) ctx.clearRect(0, 0, 2, 2);
 
     const defaultTex = new Texture(gl, {
       image: transparentCanvas,
@@ -146,7 +136,7 @@ export function PixelWaveDish({
         uScanProgress: { value: 0 },
         uScanDirection: { value: 0 },
         uIsScanning: { value: 0 },
-        uZoom: { value: 1.42 } // Scales up plate to eliminate transparent border whitespace
+        uZoom: { value: 1.38 } // 1.38x zoom to make the food plate large and remove whitespace
       }
     });
     uniformsRef.current = program.uniforms;
@@ -157,7 +147,8 @@ export function PixelWaveDish({
     gl.canvas.style.height = '100%';
     container.appendChild(gl.canvas);
 
-    // Preload all 5 dish textures into GPU memory upfront
+    // Preload all dish textures into GPU memory
+    let loaded = 0;
     dishImages.forEach((src) => {
       const img = new window.Image();
       img.crossOrigin = 'anonymous';
@@ -171,7 +162,15 @@ export function PixelWaveDish({
           premultiplyAlpha: true
         });
         texturesMapRef.current[src] = tex;
-        setLoadedCount((prev) => prev + 1);
+        loaded++;
+        if (loaded >= 1) {
+          setIsReady(true);
+          // Set initial current texture
+          const initialSrc = dishImages[currentIndex];
+          if (texturesMapRef.current[initialSrc] && uniformsRef.current) {
+            uniformsRef.current.uTextureCurrent.value = texturesMapRef.current[initialSrc];
+          }
+        }
       };
     });
 
@@ -186,7 +185,7 @@ export function PixelWaveDish({
     resize();
 
     let rafId: number;
-    let startTime = performance.now();
+    const startTime = performance.now();
 
     const renderLoop = () => {
       rafId = requestAnimationFrame(renderLoop);
@@ -208,7 +207,7 @@ export function PixelWaveDish({
     };
   }, []);
 
-  // Update active and previous textures when indices change
+  // Update textures on dish index change
   useEffect(() => {
     if (!uniformsRef.current) return;
 
@@ -228,7 +227,7 @@ export function PixelWaveDish({
     } else {
       uniformsRef.current.uHasPrev.value = 0.0;
     }
-  }, [currentIndex, prevIndex, loadedCount, dishImages]);
+  }, [currentIndex, prevIndex, isReady, dishImages]);
 
   // Update scan uniforms
   useEffect(() => {
@@ -241,7 +240,7 @@ export function PixelWaveDish({
   return (
     <div 
       ref={containerRef} 
-      className={`relative w-full h-full transition-opacity duration-700 ${loadedCount > 0 ? 'opacity-100' : 'opacity-0'} ${className}`}
+      className={`relative w-full h-full ${className}`}
     />
   );
 }

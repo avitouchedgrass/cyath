@@ -26,13 +26,13 @@ export function PixelShowcase() {
     setPrevIndex(currentIndex);
     setCurrentIndex(next);
     
-    // Toggle strictly between horizontal and vertical scan transitions
+    // Alternates strictly between horizontal and vertical laser scans
     setScanDirection((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
     setIsScanning(true);
     setScanProgress(0);
 
     const startTime = performance.now();
-    const duration = 1200; // 1.2s smooth scan sweep
+    const duration = 1200; // 1.2s smooth scan transition
 
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
@@ -67,13 +67,13 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Massive Food Showcase Arena */}
-      <div className="relative w-full max-w-[650px] sm:max-w-[720px] lg:max-w-[800px] aspect-square flex items-center justify-center">
+      {/* Huge Food Arena (Dominates right side) */}
+      <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
         {/* Ambient subtle backglow */}
         <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        {/* Preloaded WebGL Pixel-Wave Dish with Zoom & Alternating Scans */}
+        {/* Preloaded WebGL Pixel-Wave Dish */}
         <PixelWaveDish
           currentIndex={currentIndex}
           prevIndex={prevIndex}

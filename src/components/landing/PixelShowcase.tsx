@@ -72,22 +72,37 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Integrated Food Arena with Subtle Radial Glow & Glass Shell */}
+      {/* Food Arena with Visible Subtle Radial Glow & Glass Halo */}
       <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
-        {/* Extremely subtle integrated radial glow */}
-        <div className="absolute inset-0 bg-radial from-white/[0.04] via-white/[0.01] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Visible Subtle Radial Glow Aura */}
+        <div 
+          className="absolute inset-[-5%] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.025) 50%, transparent 75%)',
+            filter: 'blur(36px)',
+            zIndex: 0
+          }}
+        />
+
+        {/* Subtle Ambient Glass Shell Halo Ring */}
+        <div 
+          className="absolute inset-[3%] rounded-full border border-white/[0.08] bg-white/[0.015] backdrop-blur-[2px] shadow-[0_0_90px_rgba(255,255,255,0.06)] pointer-events-none"
+          style={{ zIndex: 0 }}
+        />
 
         {/* 60fps Hardware-Accelerated Dish with Invisible Wipe & Organic Pixel Wave */}
-        <PixelWaveDish
-          currentIndex={currentIndex}
-          prevIndex={prevIndex}
-          isScanning={isScanning}
-          scanDirection={scanDirection}
-          scanProgress={scanProgress}
-          dishImages={DISH_IMAGES}
-          className="w-full h-full"
-        />
+        <div className="relative w-full h-full z-10">
+          <PixelWaveDish
+            currentIndex={currentIndex}
+            prevIndex={prevIndex}
+            isScanning={isScanning}
+            scanDirection={scanDirection}
+            scanProgress={scanProgress}
+            dishImages={DISH_IMAGES}
+            className="w-full h-full"
+          />
+        </div>
 
       </div>
     </div>

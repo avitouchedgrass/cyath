@@ -17,18 +17,23 @@ export function PixelShowcase() {
   const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
+
+  const currentIndexRef = useRef(0);
+  const isScanningRef = useRef(false);
   const animFrameRef = useRef<number | null>(null);
 
   const triggerNextDish = () => {
-    if (isScanning) return;
-    const next = (currentIndex + 1) % DISH_IMAGES.length;
-
-    setPrevIndex(currentIndex);
-    setCurrentIndex(next);
-    
-    // Alternates strictly between horizontal and vertical laser scans
-    setScanDirection((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
+    if (isScanningRef.current) return;
+    isScanningRef.current = true;
     setIsScanning(true);
+
+    const prev = currentIndexRef.current;
+    const next = (prev + 1) % DISH_IMAGES.length;
+
+    setPrevIndex(prev);
+    setCurrentIndex(next);
+    currentIndexRef.current = next;
+    setScanDirection((dir) => (dir === 'horizontal' ? 'vertical' : 'horizontal'));
     setScanProgress(0);
 
     const startTime = performance.now();
@@ -37,8 +42,6 @@ export function PixelShowcase() {
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1.0);
-      
-      // Smooth cubic-out easing
       const eased = 1 - Math.pow(1 - progress, 3);
       setScanProgress(eased);
 
@@ -46,6 +49,7 @@ export function PixelShowcase() {
         animFrameRef.current = requestAnimationFrame(animateScan);
       } else {
         setIsScanning(false);
+        isScanningRef.current = false;
         setPrevIndex(null);
         setScanProgress(1.0);
       }
@@ -55,25 +59,26 @@ export function PixelShowcase() {
   };
 
   useEffect(() => {
+    // Deterministic 4-second cycling timer
     const interval = setInterval(() => {
       triggerNextDish();
-    }, 4500);
+    }, 4000);
 
     return () => {
       clearInterval(interval);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [currentIndex, isScanning]);
+  }, []);
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Huge Food Arena (Dominates right side) */}
+      {/* Massive Food Arena */}
       <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
         {/* Ambient subtle backglow */}
         <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        {/* Preloaded WebGL Pixel-Wave Dish */}
+        {/* 60fps Hardware-Accelerated Dish with Invisible Wipe & Organic Pixel Wave */}
         <PixelWaveDish
           currentIndex={currentIndex}
           prevIndex={prevIndex}

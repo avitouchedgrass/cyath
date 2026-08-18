@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Renderer, Program, Mesh, Triangle, Texture, OGLRenderingContext } from 'ogl';
+import { Renderer, Program, Mesh, Triangle, Texture } from 'ogl';
 
 interface PixelWaveDishProps {
   currentIndex: number;
@@ -39,7 +39,7 @@ in vec2 vUv;
 out vec4 fragColor;
 
 void main() {
-  // 1.08 ensures 100% of the plate corners and drop-shadows are fully intact without clipping
+  // 1.06 keeps 100% of the plate and its drop-shadow completely unclipped
   vec2 uv = (vUv - 0.5) / uZoom + 0.5;
 
   if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
@@ -50,7 +50,7 @@ void main() {
   vec2 center = vec2(0.5, 0.5);
   float dist = length(uv - center);
 
-  // Outer ceramic plate stays still; only ripple food
+  // Outer ceramic plate stays still; only ripple inner food
   float foodMask = smoothstep(0.42, 0.22, dist);
 
   // Subtle organic shimmer (islands.study micro-wave)
@@ -68,17 +68,8 @@ void main() {
     float pos = (uScanDirection > 0.5) ? vUv.x : (1.0 - vUv.y);
     float scanEdge = uScanProgress;
 
-    // Glowing laser beam
-    float lineDist = abs(pos - scanEdge);
-    float beam = (1.0 - smoothstep(0.0, 0.016, lineDist)) * 2.2;
-    
-    vec4 result = (pos <= scanEdge) ? colCurrent : colPrev;
-    
-    if (result.a > 0.02) {
-      result.rgb += vec3(beam * 1.0);
-    }
-    
-    fragColor = result;
+    // Invisible line transition (Laser line is completely invisible, pure seamless reveal)
+    fragColor = (pos <= scanEdge) ? colCurrent : colPrev;
   } else {
     fragColor = colCurrent;
   }
@@ -96,18 +87,14 @@ export function PixelWaveDish({
 }: PixelWaveDishProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const uniformsRef = useRef<any>(null);
-  const glRef = useRef<OGLRenderingContext | null>(null);
   const texCurrentRef = useRef<Texture | null>(null);
   const texPrevRef = useRef<Texture | null>(null);
-  const imageElementsRef = useRef<{ [key: string]: HTMLImageElement }>({});
+  const loadedImagesRef = useRef<{ [key: string]: HTMLImageElement }>({});
 
-  const uploadImageToTexture = (gl: OGLRenderingContext, tex: Texture, img: HTMLImageElement) => {
-    gl.bindTexture(gl.TEXTURE_2D, tex.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  const applyImageToTexture = (tex: Texture | null, img: HTMLImageElement) => {
+    if (!tex) return;
+    tex.image = img;
+    tex.needsUpdate = true;
   };
 
   useEffect(() => {
@@ -117,12 +104,11 @@ export function PixelWaveDish({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, dpr });
     const gl = renderer.gl;
-    glRef.current = gl;
     gl.clearColor(0, 0, 0, 0);
 
     const geometry = new Triangle(gl);
 
-    // 2x2 transparent canvas
+    // Baseline transparent canvas
     const transparentCanvas = document.createElement('canvas');
     transparentCanvas.width = 2;
     transparentCanvas.height = 2;
@@ -155,7 +141,7 @@ export function PixelWaveDish({
         uScanProgress: { value: 0 },
         uScanDirection: { value: 0 },
         uIsScanning: { value: 0 },
-        uZoom: { value: 1.08 }
+        uZoom: { value: 1.06 }
       }
     });
     uniformsRef.current = program.uniforms;
@@ -167,15 +153,15 @@ export function PixelWaveDish({
     canvas.style.height = '100%';
     container.appendChild(canvas);
 
-    // Preload all HTML images
+    // Preload all dish images
     dishImages.forEach((src, idx) => {
       const img = new window.Image();
       img.crossOrigin = 'anonymous';
       img.src = src;
       img.onload = () => {
-        imageElementsRef.current[src] = img;
-        if (idx === currentIndex && texCurrentRef.current && glRef.current) {
-          uploadImageToTexture(glRef.current, texCurrentRef.current, img);
+        loadedImagesRef.current[src] = img;
+        if (idx === currentIndex && texCurrentRef.current) {
+          applyImageToTexture(texCurrentRef.current, img);
         }
       };
     });
@@ -213,34 +199,31 @@ export function PixelWaveDish({
     };
   }, []);
 
-  // Update textures on dish index change
+  // Update textures when currentIndex or prevIndex changes
   useEffect(() => {
-    const gl = glRef.current;
     const texCurrent = texCurrentRef.current;
     const texPrev = texPrevRef.current;
-    if (!gl || !texCurrent || !texPrev || !uniformsRef.current) return;
+    if (!texCurrent || !texPrev || !uniformsRef.current) return;
 
     const currentSrc = dishImages[currentIndex];
-    const currentImg = imageElementsRef.current[currentSrc];
+    const currentImg = loadedImagesRef.current[currentSrc];
     if (currentImg) {
-      uploadImageToTexture(gl, texCurrent, currentImg);
+      applyImageToTexture(texCurrent, currentImg);
     } else {
       const img = new window.Image();
       img.crossOrigin = 'anonymous';
       img.src = currentSrc;
       img.onload = () => {
-        imageElementsRef.current[currentSrc] = img;
-        if (glRef.current && texCurrentRef.current) {
-          uploadImageToTexture(glRef.current, texCurrentRef.current, img);
-        }
+        loadedImagesRef.current[currentSrc] = img;
+        applyImageToTexture(texCurrentRef.current, img);
       };
     }
 
     if (prevIndex !== null && prevIndex !== undefined) {
       const prevSrc = dishImages[prevIndex];
-      const prevImg = imageElementsRef.current[prevSrc];
+      const prevImg = loadedImagesRef.current[prevSrc];
       if (prevImg) {
-        uploadImageToTexture(gl, texPrev, prevImg);
+        applyImageToTexture(texPrev, prevImg);
         uniformsRef.current.uHasPrev.value = 1.0;
       } else {
         uniformsRef.current.uHasPrev.value = 0.0;

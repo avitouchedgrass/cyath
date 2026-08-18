@@ -38,12 +38,12 @@ export default function Home() {
       <main className="relative z-10 flex-1 flex flex-col justify-center px-6 lg:px-12 pt-28 sm:pt-32 lg:pt-36 pb-20">
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Hero Left Column: Deep Liquid Glass Container (6 cols) */}
+          {/* Hero Left Column: True Frosted Glass Container (6 cols) */}
           <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
-            <div className="w-full max-w-2xl backdrop-blur-3xl bg-gradient-to-b from-white/[0.08] via-white/[0.02] to-white/[0.05] border border-white/[0.18] rounded-[36px] p-8 sm:p-12 lg:p-14 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),inset_0_-1px_2px_rgba(0,0,0,0.5),0_30px_70px_rgba(0,0,0,0.85)] flex flex-col items-start relative overflow-hidden">
+            <div className="w-full max-w-2xl backdrop-blur-xl bg-white/[0.03] border border-white/10 shadow-2xl rounded-3xl p-8 sm:p-12 lg:p-14 flex flex-col items-start relative overflow-hidden">
               
-              {/* Liquid glass top specular reflection */}
-              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
+              {/* Subtle top specular line */}
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
 
               {/* Headline with Typewriter */}
               <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] leading-[1.08] text-white min-h-[110px] sm:min-h-[135px]">
@@ -71,9 +71,9 @@ export default function Home() {
               <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <SpecularButton 
                   size="lg" 
-                  radius={22} 
-                  intensity={1.35} 
-                  blur={18}
+                  radius={20} 
+                  intensity={1.3} 
+                  blur={16}
                   onClick={() => handleOpenAuth('signup')}
                   className="w-full sm:w-auto text-sm sm:text-base font-semibold"
                 >
@@ -82,19 +82,19 @@ export default function Home() {
 
                 <Link 
                   href="/recipes"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[22px] backdrop-blur-md bg-white/[0.04] border border-white/15 hover:bg-white/[0.09] hover:border-white/30 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
                 >
                   Browse Recipes
                 </Link>
               </div>
 
-              {/* High-Value Live Product Micro-Widgets (Replaces Generic Stats) */}
+              {/* Strict Monochrome Product Micro-Widgets */}
               <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
                 
                 {/* Micro-Widget 1: Streak Heatmap Preview */}
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
                   <div className="flex items-center gap-1.5 mb-2">
-                    {[1, 0.8, 0.9, 1, 0.7, 1, 1].map((opacity, i) => (
+                    {[1, 0.75, 0.9, 1, 0.6, 1, 1].map((opacity, i) => (
                       <span 
                         key={i} 
                         className="h-3 w-3 rounded-xs bg-white" 
@@ -119,9 +119,9 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Micro-Widget 3: Energy Rating Preview */}
+                {/* Micro-Widget 3: Energy Rating Preview (Strict Monochrome) */}
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
-                  <div className="font-mono text-xs font-bold text-emerald-400 tracking-tight mb-2 flex items-center gap-1">
+                  <div className="font-mono text-xs font-bold text-white tracking-tight mb-2 flex items-center gap-1.5">
                     <span>9.2 / 10</span>
                     <span className="text-[10px] text-neutral-400 font-sans font-normal">Focus Index</span>
                   </div>
@@ -155,7 +155,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="backdrop-blur-xl bg-[#121212]/70 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Flame className="h-5 w-5" />
               </div>
@@ -165,7 +165,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="backdrop-blur-xl bg-[#121212]/70 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Activity className="h-5 w-5" />
               </div>
@@ -175,7 +175,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="backdrop-blur-xl bg-[#121212]/70 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.04] transition-all">
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Sparkles className="h-5 w-5" />
               </div>

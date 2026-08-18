@@ -59,7 +59,7 @@ export function PixelShowcase() {
   };
 
   useEffect(() => {
-    // Deterministic 4-second cycling timer
+    // 4-second cycling timer
     const interval = setInterval(() => {
       triggerNextDish();
     }, 4000);
@@ -72,11 +72,11 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Massive Food Arena */}
+      {/* Integrated Food Arena with Subtle Radial Glow & Glass Shell */}
       <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
-        {/* Ambient subtle backglow */}
-        <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Extremely subtle integrated radial glow */}
+        <div className="absolute inset-0 bg-radial from-white/[0.04] via-white/[0.01] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
         {/* 60fps Hardware-Accelerated Dish with Invisible Wipe & Organic Pixel Wave */}
         <PixelWaveDish

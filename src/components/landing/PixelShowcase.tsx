@@ -74,16 +74,14 @@ export function PixelShowcase() {
     setPrevIndex(currentIndex);
     setCurrentIndex(next);
     
-    // Pick next scan animation pattern in rotation
     const nextScan = SCAN_TYPES[(currentIndex + 1) % SCAN_TYPES.length];
     setScanType(nextScan);
     setIsScanning(true);
 
-    // Duration of scanner animation before settling
     setTimeout(() => {
       setIsScanning(false);
       setPrevIndex(null);
-    }, 1100);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -107,40 +105,40 @@ export function PixelShowcase() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Ambient background glow behind the giant plate */}
-      <div className="absolute inset-0 bg-radial from-white/[0.04] via-transparent to-transparent blur-3xl pointer-events-none -z-10" />
+      {/* Top Floating Highlight Tag */}
+      <div className="w-full max-w-[460px] flex justify-end mb-2 pr-2">
+        <div className="backdrop-blur-xl bg-[#141414]/80 border border-white/15 px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-mono text-[11px] text-neutral-300 tracking-wider uppercase">
+            {isScanning ? `SCANNING [${scanType.toUpperCase()}]` : activeDish.highlight}
+          </span>
+        </div>
+      </div>
 
-      {/* Main Plate Display Arena - Covers the right side */}
-      <div className="relative w-full max-w-[500px] lg:max-w-[580px] aspect-square flex items-center justify-center">
+      {/* Main Plate Display Arena */}
+      <div className="relative w-full max-w-[460px] aspect-square flex items-center justify-center">
         
-        {/* Previous Dish (Fading out / Underneath scanner) */}
+        {/* Subtle circular plate background glow */}
+        <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-2xl pointer-events-none -z-10" />
+
+        {/* Previous Dish (Beneath scanner) */}
         {prevDish && isScanning && (
           <div className="absolute inset-0 flex items-center justify-center animate-pixel-float pointer-events-none">
-            <div className="relative w-[90%] h-[90%]">
+            <div className="relative w-[92%] h-[92%]">
               <Image
                 src={prevDish.image}
                 alt={prevDish.name}
                 fill
                 className="pixel-art object-contain"
-                sizes="(max-width: 768px) 100vw, 550px"
+                sizes="(max-width: 768px) 100vw, 460px"
                 priority
               />
             </div>
           </div>
         )}
 
-        {/* Current Active Dish (With Scanning Clip Reveal) */}
-        <div 
-          className="absolute inset-0 flex items-center justify-center animate-pixel-float pointer-events-none"
-          style={{
-            zIndex: 5,
-            clipPath: isScanning
-              ? scanType === 'vertical'
-                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
-                : undefined
-              : undefined
-          }}
-        >
+        {/* Current Active Dish */}
+        <div className="absolute inset-0 flex items-center justify-center animate-pixel-float pointer-events-none z-10">
           <motion.div 
             key={`${activeDish.id}-${scanType}`}
             initial={
@@ -158,31 +156,31 @@ export function PixelShowcase() {
                   ? 'polygon(0 0, 200% 0, 200% 200%, 0 200%)'
                   : 'circle(150% at 50% 50%)'
             }}
-            transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-[90%] h-[90%]"
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-[92%] h-[92%]"
           >
             <Image
               src={activeDish.image}
               alt={activeDish.name}
               fill
               className="pixel-art object-contain"
-              sizes="(max-width: 768px) 100vw, 550px"
+              sizes="(max-width: 768px) 100vw, 460px"
               priority
             />
           </motion.div>
         </div>
 
-        {/* Laser Scanner Beam Overlay Line */}
+        {/* Scanner Laser Sweep Beam Line */}
         {isScanning && (
-          <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center">
+          <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center">
             {scanType === 'vertical' && (
               <motion.div
-                initial={{ top: '5%' }}
-                animate={{ top: '95%' }}
-                transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute left-[5%] right-[5%] h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_20px_#ffffff,0_0_8px_#ffffff]"
+                initial={{ top: '2%' }}
+                animate={{ top: '98%' }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute left-[4%] right-[4%] h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_16px_#ffffff,0_0_6px_#ffffff]"
               >
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-3 bg-white/20 blur-sm rounded-full" />
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-3 bg-white/25 blur-sm rounded-full" />
               </motion.div>
             )}
 
@@ -190,8 +188,8 @@ export function PixelShowcase() {
               <motion.div
                 initial={{ top: '-10%', left: '-10%', transform: 'rotate(-45deg)' }}
                 animate={{ top: '110%', left: '110%', transform: 'rotate(-45deg)' }}
-                transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute w-[140%] h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_20px_#ffffff,0_0_8px_#ffffff]"
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute w-[140%] h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_16px_#ffffff,0_0_6px_#ffffff]"
               />
             )}
 
@@ -199,78 +197,67 @@ export function PixelShowcase() {
               <motion.div
                 initial={{ rotate: 0 }}
                 animate={{ rotate: 360 }}
-                transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute w-[80%] h-[80%] rounded-full border border-white/10 flex items-center justify-center"
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute w-[82%] h-[82%] rounded-full border border-white/15 flex items-center justify-center"
               >
-                {/* Rotating radar sweep ray */}
-                <div className="absolute top-1/2 left-1/2 w-[50%] h-[2px] bg-gradient-to-r from-white to-transparent origin-left shadow-[0_0_15px_#ffffff]" />
+                <div className="absolute top-1/2 left-1/2 w-[50%] h-[2px] bg-gradient-to-r from-white to-transparent origin-left shadow-[0_0_14px_#ffffff]" />
               </motion.div>
             )}
           </div>
         )}
+      </div>
 
-        {/* HUD Scanner Badge (Top-Right Floating Tag) */}
-        <div className="absolute top-4 right-4 z-20">
-          <div className="backdrop-blur-xl bg-black/60 border border-white/15 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-mono text-[11px] text-slate-300 tracking-wider uppercase">
-              {isScanning ? `TRANSFORMING [${scanType}]` : activeDish.highlight}
-            </span>
-          </div>
-        </div>
+      {/* Floating Macro HUD Box (Cleanly Anchored Under Plate) */}
+      <div className="w-full max-w-[460px] mt-4 z-20">
+        <div className="backdrop-blur-2xl bg-[#121212]/90 border border-white/15 rounded-2xl p-4 sm:p-5 shadow-[0_20px_40px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center justify-between mb-3.5">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={activeDish.id}
+                initial={{ opacity: 0, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -3 }}
+                transition={{ duration: 0.18 }}
+                className="text-sm sm:text-base font-serif font-semibold text-white truncate max-w-[260px]"
+              >
+                {activeDish.name}
+              </motion.span>
+            </AnimatePresence>
 
-        {/* Floating Macro HUD Card (Bottom of Plate) */}
-        <div className="absolute -bottom-6 sm:-bottom-4 left-1/2 -translate-x-1/2 z-20 w-[95%] max-w-md">
-          <div className="backdrop-blur-2xl bg-black/70 border border-white/15 rounded-2xl p-4 shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
-            <div className="flex items-center justify-between mb-3">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={activeDish.id}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-sm sm:text-base font-serif font-semibold text-white truncate max-w-[240px]"
-                >
-                  {activeDish.name}
-                </motion.span>
-              </AnimatePresence>
-
-              {/* Interactive Clickable Slide Indicator Dots */}
-              <div className="flex items-center gap-1.5">
-                {DISHES.map((dish, idx) => (
-                  <button
-                    key={dish.id}
-                    onClick={() => triggerNextDish(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                      idx === currentIndex 
-                        ? 'w-5 bg-white' 
-                        : 'w-2 bg-white/25 hover:bg-white/50'
-                    }`}
-                    aria-label={`Show ${dish.name}`}
-                  />
-                ))}
-              </div>
+            {/* Clickable Slide Indicator Dots */}
+            <div className="flex items-center gap-1.5">
+              {DISHES.map((dish, idx) => (
+                <button
+                  key={dish.id}
+                  onClick={() => triggerNextDish(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === currentIndex 
+                      ? 'w-5 bg-white' 
+                      : 'w-2 bg-white/20 hover:bg-white/50'
+                  }`}
+                  aria-label={`Show ${dish.name}`}
+                />
+              ))}
             </div>
+          </div>
 
-            {/* Macro Stats Grid */}
-            <div className="grid grid-cols-4 gap-2">
-              <div className="bg-white/[0.04] rounded-lg py-1.5 px-2 text-center border border-white/5">
-                <div className="text-[9px] text-slate-400 uppercase tracking-widest font-mono">PRO</div>
-                <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.protein}</div>
-              </div>
-              <div className="bg-white/[0.04] rounded-lg py-1.5 px-2 text-center border border-white/5">
-                <div className="text-[9px] text-slate-400 uppercase tracking-widest font-mono">CARB</div>
-                <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.carbs}</div>
-              </div>
-              <div className="bg-white/[0.04] rounded-lg py-1.5 px-2 text-center border border-white/5">
-                <div className="text-[9px] text-slate-400 uppercase tracking-widest font-mono">FAT</div>
-                <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.fats}</div>
-              </div>
-              <div className="bg-white/[0.04] rounded-lg py-1.5 px-2 text-center border border-white/5">
-                <div className="text-[9px] text-slate-400 uppercase tracking-widest font-mono">KCAL</div>
-                <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.cals}</div>
-              </div>
+          {/* Macro Stats */}
+          <div className="grid grid-cols-4 gap-2">
+            <div className="bg-white/[0.03] rounded-xl py-2 px-2 text-center border border-white/5">
+              <div className="text-[9px] text-neutral-400 uppercase tracking-widest font-mono mb-0.5">PRO</div>
+              <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.protein}</div>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl py-2 px-2 text-center border border-white/5">
+              <div className="text-[9px] text-neutral-400 uppercase tracking-widest font-mono mb-0.5">CARB</div>
+              <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.carbs}</div>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl py-2 px-2 text-center border border-white/5">
+              <div className="text-[9px] text-neutral-400 uppercase tracking-widest font-mono mb-0.5">FAT</div>
+              <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.fats}</div>
+            </div>
+            <div className="bg-white/[0.03] rounded-xl py-2 px-2 text-center border border-white/5">
+              <div className="text-[9px] text-neutral-400 uppercase tracking-widest font-mono mb-0.5">KCAL</div>
+              <div className="text-white font-mono text-xs sm:text-sm font-semibold">{activeDish.macros.cals}</div>
             </div>
           </div>
         </div>

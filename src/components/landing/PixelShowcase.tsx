@@ -32,7 +32,7 @@ export function PixelShowcase() {
     setScanProgress(0);
 
     const startTime = performance.now();
-    const duration = 1200; // 1.2s smooth laser scan transition
+    const duration = 1200; // 1.2s smooth scan sweep
 
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
@@ -67,19 +67,20 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Huge Food Arena (Dominates the right side) */}
-      <div className="relative w-full max-w-[600px] sm:max-w-[680px] lg:max-w-[760px] aspect-square flex items-center justify-center">
+      {/* Massive Food Showcase Arena */}
+      <div className="relative w-full max-w-[650px] sm:max-w-[720px] lg:max-w-[800px] aspect-square flex items-center justify-center">
         
-        {/* Subtle ambient backglow */}
-        <div className="absolute inset-0 bg-radial from-white/[0.03] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Ambient subtle backglow */}
+        <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        {/* WebGL Pixel-Wave Dish (Stationary plate, gentle food wave, horizontal/vertical scan) */}
+        {/* Preloaded WebGL Pixel-Wave Dish with Zoom & Alternating Scans */}
         <PixelWaveDish
-          currentImage={DISH_IMAGES[currentIndex]}
-          prevImage={prevIndex !== null ? DISH_IMAGES[prevIndex] : null}
+          currentIndex={currentIndex}
+          prevIndex={prevIndex}
           isScanning={isScanning}
           scanDirection={scanDirection}
           scanProgress={scanProgress}
+          dishImages={DISH_IMAGES}
           className="w-full h-full"
         />
 

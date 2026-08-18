@@ -38,11 +38,11 @@ export default function Home() {
       <main className="relative z-10 flex-1 flex flex-col justify-center px-6 lg:px-12 pt-28 sm:pt-32 lg:pt-36 pb-20">
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Hero Left Column: Bigger Liquid Glass Container (6 cols) */}
+          {/* Hero Left Column: Deep Liquid Glass Container (6 cols) */}
           <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
             <div className="w-full max-w-2xl backdrop-blur-3xl bg-gradient-to-b from-white/[0.08] via-white/[0.02] to-white/[0.05] border border-white/[0.18] rounded-[36px] p-8 sm:p-12 lg:p-14 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),inset_0_-1px_2px_rgba(0,0,0,0.5),0_30px_70px_rgba(0,0,0,0.85)] flex flex-col items-start relative overflow-hidden">
               
-              {/* Liquid glass top specular reflection highlight */}
+              {/* Liquid glass top specular reflection */}
               <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
               {/* Headline with Typewriter */}
@@ -88,26 +88,55 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Proof Stat Row */}
-              <div className="mt-8 sm:mt-12 grid grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
-                <div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-white">100%</div>
-                  <div className="text-[11px] text-neutral-400 mt-0.5 font-sans">Monochrome Focus</div>
+              {/* High-Value Live Product Micro-Widgets (Replaces Generic Stats) */}
+              <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
+                
+                {/* Micro-Widget 1: Streak Heatmap Preview */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    {[1, 0.8, 0.9, 1, 0.7, 1, 1].map((opacity, i) => (
+                      <span 
+                        key={i} 
+                        className="h-3 w-3 rounded-xs bg-white" 
+                        style={{ opacity }} 
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <div className="text-white text-xs font-semibold">Streak Heatmaps</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5">Monochrome consistency</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-white">0 Ads</div>
-                  <div className="text-[11px] text-neutral-400 mt-0.5 font-sans">Distraction-Free</div>
+
+                {/* Micro-Widget 2: Macro Fueling Preview */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="font-mono text-xs font-bold text-white tracking-tight mb-2">
+                    42g <span className="text-neutral-500 font-normal">PRO</span> · 510 <span className="text-neutral-500 font-normal">KCAL</span>
+                  </div>
+                  <div>
+                    <div className="text-white text-xs font-semibold">Macro-Fueling</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5">16-bit whole food meals</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-white">&lt; 30s</div>
-                  <div className="text-[11px] text-neutral-400 mt-0.5 font-sans">Daily Check-In</div>
+
+                {/* Micro-Widget 3: Energy Rating Preview */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                  <div className="font-mono text-xs font-bold text-emerald-400 tracking-tight mb-2 flex items-center gap-1">
+                    <span>9.2 / 10</span>
+                    <span className="text-[10px] text-neutral-400 font-sans font-normal">Focus Index</span>
+                  </div>
+                  <div>
+                    <div className="text-white text-xs font-semibold">Energy Correlation</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5">Routine × mood insights</div>
+                  </div>
                 </div>
+
               </div>
 
             </div>
           </div>
 
-          {/* Hero Right Column: Giant Pixel Showcase Arena (6 cols) */}
+          {/* Hero Right Column: Giant Food Arena (6 cols) */}
           <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
             <PixelShowcase />
           </div>

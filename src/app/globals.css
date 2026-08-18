@@ -48,7 +48,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.pixel-asset {
+.pixel-art {
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;

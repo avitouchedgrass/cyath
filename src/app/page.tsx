@@ -31,22 +31,22 @@ export default function Home() {
         }}
       />
 
-      {/* Floating Centered Navbar with Static Logo */}
+      {/* Floating Centered Navbar with Static User Logo */}
       <HeaderNav onOpenAuth={handleOpenAuth} />
 
       {/* Main Hero Container */}
       <main className="relative z-10 flex-1 flex flex-col justify-center px-6 lg:px-12 pt-28 sm:pt-32 lg:pt-36 pb-20">
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Hero Left Column: Bigger Frosted Glass Container (6 cols) */}
+          {/* Hero Left Column: Bigger Liquid Glass Container (6 cols) */}
           <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
-            <div className="w-full max-w-2xl backdrop-blur-2xl bg-[#121212]/80 border border-white/12 rounded-3xl p-8 sm:p-12 lg:p-14 shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col items-start relative overflow-hidden">
+            <div className="w-full max-w-2xl backdrop-blur-3xl bg-gradient-to-b from-white/[0.08] via-white/[0.02] to-white/[0.05] border border-white/[0.18] rounded-[36px] p-8 sm:p-12 lg:p-14 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),inset_0_-1px_2px_rgba(0,0,0,0.5),0_30px_70px_rgba(0,0,0,0.85)] flex flex-col items-start relative overflow-hidden">
               
-              {/* Top subtle specular edge */}
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+              {/* Liquid glass top specular reflection highlight */}
+              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
               {/* Headline with Typewriter */}
-              <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.6rem] leading-[1.1] text-white min-h-[110px] sm:min-h-[135px]">
+              <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] leading-[1.08] text-white min-h-[110px] sm:min-h-[135px]">
                 <TextType
                   text={[
                     "Pixel-Perfect Health.",
@@ -67,22 +67,22 @@ export default function Home() {
                 Track physical habits, log macro-balanced recipes, and unlock correlations between your routines and real energy levels.
               </p>
 
-              {/* CTA Button Group */}
+              {/* CTA Buttons */}
               <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <SpecularButton 
                   size="lg" 
-                  radius={20} 
-                  intensity={1.3} 
-                  blur={16}
+                  radius={22} 
+                  intensity={1.35} 
+                  blur={18}
                   onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto text-sm sm:text-base"
+                  className="w-full sm:w-auto text-sm sm:text-base font-semibold"
                 >
                   Get Started
                 </SpecularButton>
 
                 <Link 
                   href="/recipes"
-                  className="w-full sm:w-auto px-7 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/12 hover:bg-white/[0.08] hover:border-white/25 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[22px] backdrop-blur-md bg-white/[0.04] border border-white/15 hover:bg-white/[0.09] hover:border-white/30 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
                 >
                   Browse Recipes
                 </Link>
@@ -107,7 +107,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero Right Column: Huge Pixel-Wave Plate Arena (6 cols) */}
+          {/* Hero Right Column: Giant Pixel Showcase Arena (6 cols) */}
           <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
             <PixelShowcase />
           </div>
@@ -159,7 +159,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
+      {/* Minimal Footer */}
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">

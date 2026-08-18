@@ -14,7 +14,7 @@ const DISH_IMAGES = [
 export function PixelShowcase() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
-  const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('vertical');
+  const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const animFrameRef = useRef<number | null>(null);
@@ -26,13 +26,13 @@ export function PixelShowcase() {
     setPrevIndex(currentIndex);
     setCurrentIndex(next);
     
-    // Toggle strictly between vertical and horizontal scan
-    setScanDirection((prev) => (prev === 'vertical' ? 'horizontal' : 'vertical'));
+    // Toggle strictly between horizontal and vertical scan transitions
+    setScanDirection((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
     setIsScanning(true);
     setScanProgress(0);
 
     const startTime = performance.now();
-    const duration = 1100; // 1.1s smooth scan transition
+    const duration = 1200; // 1.2s smooth laser scan transition
 
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
@@ -67,13 +67,13 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Huge Plate Container (No floating boxes, no pills, pure food focus) */}
-      <div className="relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[660px] aspect-square flex items-center justify-center">
+      {/* Huge Food Arena (Dominates the right side) */}
+      <div className="relative w-full max-w-[600px] sm:max-w-[680px] lg:max-w-[760px] aspect-square flex items-center justify-center">
         
-        {/* Ambient subtle back glow */}
-        <div className="absolute inset-0 bg-radial from-white/[0.04] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Subtle ambient backglow */}
+        <div className="absolute inset-0 bg-radial from-white/[0.03] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        {/* WebGL Pixel-Wave Dish with Horizontal / Vertical Scan Transitions */}
+        {/* WebGL Pixel-Wave Dish (Stationary plate, gentle food wave, horizontal/vertical scan) */}
         <PixelWaveDish
           currentImage={DISH_IMAGES[currentIndex]}
           prevImage={prevIndex !== null ? DISH_IMAGES[prevIndex] : null}

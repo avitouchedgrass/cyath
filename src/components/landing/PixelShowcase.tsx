@@ -72,23 +72,27 @@ export function PixelShowcase() {
 
   return (
     <div className="relative w-full flex items-center justify-center select-none">
-      {/* Food Arena with Visible Subtle Radial Glow & Glass Halo */}
+      {/* Food Arena with Seamless, Soft Blended Atmospheric Glow */}
       <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
-        {/* Visible Subtle Radial Glow Aura */}
+        {/* Deep Atmospheric Diffuse Glow (Zero Harsh Rings) */}
         <div 
-          className="absolute inset-[-5%] rounded-full pointer-events-none"
+          className="absolute -inset-10 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.025) 50%, transparent 75%)',
-            filter: 'blur(36px)',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 45%, transparent 70%)',
+            filter: 'blur(50px)',
             zIndex: 0
           }}
         />
 
-        {/* Subtle Ambient Glass Shell Halo Ring */}
+        {/* Soft Core Radiance */}
         <div 
-          className="absolute inset-[3%] rounded-full border border-white/[0.08] bg-white/[0.015] backdrop-blur-[2px] shadow-[0_0_90px_rgba(255,255,255,0.06)] pointer-events-none"
-          style={{ zIndex: 0 }}
+          className="absolute inset-4 rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 65%)',
+            filter: 'blur(28px)',
+            zIndex: 0
+          }}
         />
 
         {/* 60fps Hardware-Accelerated Dish with Invisible Wipe & Organic Pixel Wave */}

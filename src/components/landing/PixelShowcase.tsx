@@ -75,22 +75,22 @@ export function PixelShowcase() {
       {/* Food Arena with Seamless, Soft Blended Atmospheric Glow */}
       <div className="relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center">
         
-        {/* Deep Atmospheric Diffuse Glow (Zero Harsh Rings) */}
+        {/* Deep Atmospheric Diffuse Glow (Zero Harsh Rings - Increased Intensity) */}
         <div 
-          className="absolute -inset-10 rounded-full pointer-events-none"
+          className="absolute -inset-14 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 45%, transparent 70%)',
-            filter: 'blur(50px)',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 45%, transparent 70%)',
+            filter: 'blur(55px)',
             zIndex: 0
           }}
         />
 
-        {/* Soft Core Radiance */}
+        {/* Soft Core Radiance (Increased Intensity) */}
         <div 
-          className="absolute inset-4 rounded-full pointer-events-none"
+          className="absolute inset-2 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 65%)',
-            filter: 'blur(28px)',
+            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 65%)',
+            filter: 'blur(30px)',
             zIndex: 0
           }}
         />

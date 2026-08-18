@@ -92,7 +92,7 @@ export default function Home() {
               <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
                 
                 {/* Micro-Widget 1: Streak Heatmap Preview */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
                   <div className="flex items-center gap-1.5 mb-2">
                     {[1, 0.75, 0.9, 1, 0.6, 1, 1].map((opacity, i) => (
                       <span 
@@ -108,19 +108,19 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Micro-Widget 2: Macro Fueling Preview */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                {/* Micro-Widget 2: Macro Fueling Preview (Aligned with description update) */}
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
                   <div className="font-mono text-xs font-bold text-white tracking-tight mb-2">
                     42g <span className="text-neutral-500 font-normal">PRO</span> · 510 <span className="text-neutral-500 font-normal">KCAL</span>
                   </div>
                   <div>
                     <div className="text-white text-xs font-semibold">Macro-Fueling</div>
-                    <div className="text-[11px] text-neutral-400 mt-0.5">16-bit whole food meals</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5">16-bit food, straight to your plate</div>
                   </div>
                 </div>
 
                 {/* Micro-Widget 3: Energy Rating Preview (Strict Monochrome) */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 flex flex-col justify-between">
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
                   <div className="font-mono text-xs font-bold text-white tracking-tight mb-2 flex items-center gap-1.5">
                     <span>9.2 / 10</span>
                     <span className="text-[10px] text-neutral-400 font-sans font-normal">Focus Index</span>

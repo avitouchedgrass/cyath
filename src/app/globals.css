@@ -14,10 +14,10 @@
   --color-brand: #FFFFFF;
   --color-brand-contrast: #000000;
 
-  /* Typography */
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "Inter", "Space Grotesk", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  /* Typography Font Stacks */
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
 
   /* Keyframes */
   --animate-pixel-float: pixelFloatWave 4s ease-in-out infinite;
@@ -46,6 +46,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .pixel-art {

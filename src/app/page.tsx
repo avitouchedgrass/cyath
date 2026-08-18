@@ -46,7 +46,7 @@ export default function Home() {
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
 
               {/* Headline with Typewriter */}
-              <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] leading-[1.08] text-white min-h-[110px] sm:min-h-[135px]">
+              <div className="font-serif font-normal tracking-[-0.02em] text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] leading-[1.06] text-white min-h-[110px] sm:min-h-[135px]">
                 <TextType
                   text={[
                     "Pixel-Perfect Health.",
@@ -62,7 +62,7 @@ export default function Home() {
               </div>
               
               {/* Editorial Subtext */}
-              <p className="text-neutral-400 text-sm sm:text-base lg:text-lg mt-6 leading-relaxed font-sans">
+              <p className="text-neutral-400 text-sm sm:text-base lg:text-lg mt-6 leading-relaxed font-sans font-normal tracking-normal max-w-xl">
                 A retro-minimalist framework designed to build sustainable momentum. 
                 Track physical habits, log macro-balanced recipes, and unlock correlations between your routines and real energy levels.
               </p>
@@ -75,14 +75,14 @@ export default function Home() {
                   intensity={1.3} 
                   blur={16}
                   onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto text-sm sm:text-base font-semibold"
+                  className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight"
                 >
                   Get Started
                 </SpecularButton>
 
                 <Link 
                   href="/recipes"
-                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-neutral-200 transition-all font-medium tracking-tight text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
                 >
                   Browse Recipes
                 </Link>
@@ -103,31 +103,31 @@ export default function Home() {
                     ))}
                   </div>
                   <div>
-                    <div className="text-white text-xs font-semibold">Streak Heatmaps</div>
-                    <div className="text-[11px] text-neutral-400 mt-0.5">Monochrome consistency</div>
+                    <div className="text-white text-xs font-semibold tracking-tight">Streak Heatmaps</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">Monochrome consistency</div>
                   </div>
                 </div>
 
-                {/* Micro-Widget 2: Macro Fueling Preview (Aligned with description update) */}
+                {/* Micro-Widget 2: Macro Fueling Preview */}
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
-                  <div className="font-mono text-xs font-bold text-white tracking-tight mb-2">
-                    42g <span className="text-neutral-500 font-normal">PRO</span> · 510 <span className="text-neutral-500 font-normal">KCAL</span>
+                  <div className="font-mono tabular-nums text-xs font-bold text-white tracking-tight mb-2">
+                    42g <span className="text-neutral-500 font-normal font-sans">PRO</span> · 510 <span className="text-neutral-500 font-normal font-sans">KCAL</span>
                   </div>
                   <div>
-                    <div className="text-white text-xs font-semibold">Macro-Fueling</div>
-                    <div className="text-[11px] text-neutral-400 mt-0.5">16-bit food, straight to your plate</div>
+                    <div className="text-white text-xs font-semibold tracking-tight">Macro-Fueling</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">16-bit food, straight to your plate</div>
                   </div>
                 </div>
 
-                {/* Micro-Widget 3: Energy Rating Preview (Strict Monochrome) */}
+                {/* Micro-Widget 3: Energy Rating Preview */}
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
-                  <div className="font-mono text-xs font-bold text-white tracking-tight mb-2 flex items-center gap-1.5">
+                  <div className="font-mono tabular-nums text-xs font-bold text-white tracking-tight mb-2 flex items-center gap-1.5">
                     <span>9.2 / 10</span>
-                    <span className="text-[10px] text-neutral-400 font-sans font-normal">Focus Index</span>
+                    <span className="text-[10px] text-neutral-400 font-sans font-normal uppercase tracking-wider">Focus Index</span>
                   </div>
                   <div>
-                    <div className="text-white text-xs font-semibold">Energy Correlation</div>
-                    <div className="text-[11px] text-neutral-400 mt-0.5">Routine × mood insights</div>
+                    <div className="text-white text-xs font-semibold tracking-tight">Energy Correlation</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">Routine × mood insights</div>
                   </div>
                 </div>
 
@@ -146,10 +146,10 @@ export default function Home() {
         {/* Methodology Feature Section */}
         <section id="methodology" className="w-full max-w-7xl mx-auto mt-28 sm:mt-36 pt-16 border-t border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-serif text-2xl sm:text-4xl font-semibold text-white">
+            <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-[-0.01em] text-white">
               The Architecture of Momentum
             </h2>
-            <p className="text-neutral-400 text-sm sm:text-base mt-3">
+            <p className="text-neutral-400 text-sm sm:text-base mt-3 font-sans leading-relaxed">
               Built on behavioral psychology feedback loops: frictionless inputs yield clear correlation insights.
             </p>
           </div>
@@ -159,8 +159,8 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Flame className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-semibold text-white mb-2">Monochrome Streak Heatmaps</h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Monochrome Streak Heatmaps</h3>
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Visualize continuous consistency through white-opacity shades. Zero loud streaks or gamified guilt.
               </p>
             </div>
@@ -169,8 +169,8 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Activity className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-semibold text-white mb-2">Subjective Energy Correlation</h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Subjective Energy Correlation</h3>
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Map daily hydration and protein targets against subjective mood and focus ratings on a 1–10 scale.
               </p>
             </div>
@@ -179,8 +179,8 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-semibold text-white mb-2">Pixel-Calibrated Fuel</h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Pixel-Calibrated Fuel</h3>
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Curated macro-rich recipes represented by sharp 16-bit retro sprites. Clear nutrition without guesswork.
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-white">Cyath</span>
+            <span className="font-serif font-semibold text-white">Cyath</span>
             <span>— Pixel-Perfect Health</span>
           </div>
           <div>

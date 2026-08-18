@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-[#080808] overflow-hidden flex flex-col text-neutral-100 selection:bg-white selection:text-black">
-      {/* Pure Neutral Monochrome Subtle Radial Highlights (Zero Blue Tinge) */}
+      {/* Pure Neutral Monochrome Subtle Radial Highlights */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -31,28 +31,22 @@ export default function Home() {
         }}
       />
 
-      {/* Floating Centered Navbar */}
+      {/* Floating Centered Navbar with Static Logo */}
       <HeaderNav onOpenAuth={handleOpenAuth} />
 
       {/* Main Hero Container */}
       <main className="relative z-10 flex-1 flex flex-col justify-center px-6 lg:px-12 pt-28 sm:pt-32 lg:pt-36 pb-20">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Hero Left Column: Frosted Glass Container */}
-          <div className="w-full flex justify-center lg:justify-start">
-            <div className="w-full max-w-xl backdrop-blur-2xl bg-[#121212]/80 border border-white/12 rounded-3xl p-7 sm:p-10 lg:p-11 shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col items-start relative overflow-hidden">
+          {/* Hero Left Column: Bigger Frosted Glass Container (6 cols) */}
+          <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
+            <div className="w-full max-w-2xl backdrop-blur-2xl bg-[#121212]/80 border border-white/12 rounded-3xl p-8 sm:p-12 lg:p-14 shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col items-start relative overflow-hidden">
               
-              {/* Subtle top specular border */}
+              {/* Top subtle specular edge */}
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
 
-              {/* Version Tag */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md text-xs text-neutral-300 mb-6">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono tracking-tight text-[11px] uppercase text-neutral-300">Behavioral Momentum Engine</span>
-              </div>
-
               {/* Headline with Typewriter */}
-              <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.1] text-white min-h-[110px] sm:min-h-[135px]">
+              <div className="font-serif font-medium tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-[3.6rem] leading-[1.1] text-white min-h-[110px] sm:min-h-[135px]">
                 <TextType
                   text={[
                     "Pixel-Perfect Health.",
@@ -68,13 +62,13 @@ export default function Home() {
               </div>
               
               {/* Editorial Subtext */}
-              <p className="text-neutral-400 text-sm sm:text-base mt-4 sm:mt-6 leading-relaxed font-sans">
+              <p className="text-neutral-400 text-sm sm:text-base lg:text-lg mt-6 leading-relaxed font-sans">
                 A retro-minimalist framework designed to build sustainable momentum. 
                 Track physical habits, log macro-balanced recipes, and unlock correlations between your routines and real energy levels.
               </p>
 
-              {/* CTA Buttons */}
-              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+              {/* CTA Button Group */}
+              <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <SpecularButton 
                   size="lg" 
                   radius={20} 
@@ -87,15 +81,15 @@ export default function Home() {
                 </SpecularButton>
 
                 <Link 
-                  href="/dashboard"
+                  href="/recipes"
                   className="w-full sm:w-auto px-7 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/12 hover:bg-white/[0.08] hover:border-white/25 text-neutral-200 transition-all font-medium text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
                 >
-                  Launch Guest Demo
+                  Browse Recipes
                 </Link>
               </div>
 
               {/* Proof Stat Row */}
-              <div className="mt-8 sm:mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
+              <div className="mt-8 sm:mt-12 grid grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
                 <div>
                   <div className="font-mono text-base sm:text-lg font-bold text-white">100%</div>
                   <div className="text-[11px] text-neutral-400 mt-0.5 font-sans">Monochrome Focus</div>
@@ -113,8 +107,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero Right Column: Balanced Scanner Showcase */}
-          <div className="w-full flex items-center justify-center lg:justify-end">
+          {/* Hero Right Column: Huge Pixel-Wave Plate Arena (6 cols) */}
+          <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
             <PixelShowcase />
           </div>
 

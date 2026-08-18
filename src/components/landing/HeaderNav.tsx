@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { InvertedButton } from "../ui/InvertedButton";
+import { Logo } from "../ui/Logo";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -26,14 +27,9 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-6 lg:px-12 pt-5 pb-3 pointer-events-none">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
-        {/* Left: Brand Monogram */}
-        <Link href="/" className="flex items-center gap-3 group z-10">
-          <div className="h-9 w-9 bg-white pixel-art rounded-sm animate-pixel-float flex items-center justify-center font-serif text-black font-bold text-base shadow-[0_0_20px_rgba(255,255,255,0.25)]">
-            C
-          </div>
-          <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white group-hover:text-neutral-200 transition-colors">
-            Cyath
-          </span>
+        {/* Left: Static Pixel-Wave Monogram (No Text) */}
+        <Link href="/" className="flex items-center group z-10 p-1 hover:opacity-80 transition-opacity" aria-label="Home">
+          <Logo className="w-10 h-10 sm:w-11 sm:h-11" />
         </Link>
 
         {/* Center: Truly Centered Capsule Navigation Bar */}

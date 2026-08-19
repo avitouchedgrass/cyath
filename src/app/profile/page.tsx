@@ -25,7 +25,7 @@ import {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { userSession, setUserSession, logsByDate, habits, activeProtocolIds } = useHabitStore();
+  const { userSession, setUserSession, userProfile, logsByDate, habits, activeProtocolIds } = useHabitStore();
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
@@ -60,6 +60,7 @@ export default function ProfilePage() {
 
   const isGuest = !userSession || userSession.id.startsWith('guest_');
   const userEmail = userSession?.email || (isGuest ? 'guest.session@cyath.app' : 'user@cyath.app');
+  const displayName = userProfile?.fullName || (isGuest ? 'Guest Explorer' : userEmail.split('@')[0]);
 
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
@@ -89,11 +90,11 @@ export default function ProfilePage() {
           </Link>
 
           <Link
-            href="/protocols"
-            className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 transition-all"
+            href="/onboarding?edit=true"
+            className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-sm"
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>Manage Blueprints</span>
+            <span>Edit Biometrics &amp; Goals</span>
           </Link>
         </div>
 
@@ -103,13 +104,13 @@ export default function ProfilePage() {
             
             <div className="flex items-center gap-5">
               <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-white text-xl font-mono font-bold shadow-inner">
-                {userEmail.charAt(0).toUpperCase()}
+                {displayName.charAt(0).toUpperCase()}
               </div>
               
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
-                    {isGuest ? 'Guest Explorer' : userEmail.split('@')[0]}
+                    {displayName}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
                     {isGuest ? 'Demo Mode' : 'Cloud Verified'}
@@ -143,6 +144,53 @@ export default function ProfilePage() {
 
           </div>
         </div>
+
+        {/* 1. Calibrated Biometrics & Goals Card */}
+        {userProfile && (
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 mb-10 shadow-xl">
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/5">
+              <div>
+                <h3 className="font-serif font-normal text-xl text-white tracking-tight">
+                  Calibrated Biometrics &amp; Targets
+                </h3>
+                <p className="text-neutral-400 text-xs font-sans mt-0.5">
+                  Physical baseline parameters configured during onboarding.
+                </p>
+              </div>
+
+              <Link
+                href="/onboarding?edit=true"
+                className="text-xs font-mono text-neutral-400 hover:text-white transition-colors"
+              >
+                Re-calibrate →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Height &amp; Weight</span>
+                <span className="text-sm font-mono font-semibold text-white">{userProfile.heightCm} cm / {userProfile.weightKg} kg</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Age &amp; Sex</span>
+                <span className="text-sm font-mono font-semibold text-white">{userProfile.age}y / {userProfile.sex}</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Primary Target</span>
+                <span className="text-sm font-mono font-semibold text-white capitalize">{userProfile.primaryGoal}</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-mono uppercase text-neutral-400 block mb-1">Allergies / Diet</span>
+                <span className="text-xs font-mono text-neutral-300 truncate block">
+                  {userProfile.allergies.length > 0 ? userProfile.allergies.join(', ') : 'None'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 1. Lifetime Performance Telemetry */}
         <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-4 px-1">

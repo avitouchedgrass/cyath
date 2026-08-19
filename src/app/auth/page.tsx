@@ -22,6 +22,16 @@ export default function AuthPage() {
   const [resending, setResending] = useState(false);
   const router = useRouter();
 
+  // Password Complexity Standards
+  const passwordCriteria = {
+    length: password.length >= 8,
+    hasUpper: /[A-Z]/.test(password),
+    hasLower: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSymbol: /[^A-Za-z0-9]/.test(password),
+  };
+  const isPasswordValid = Object.values(passwordCriteria).every(Boolean);
+
   // Cooldown countdown timer for resend button
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -31,19 +41,57 @@ export default function AuthPage() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
+  // Real-time Cross-Tab Verification Poller
+  useEffect(() => {
+    if (!isVerificationSent) return;
+
+    // A. Direct Supabase auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user?.id && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+        setSuccessMsg('Email verified successfully! Calibrating your account...');
+        setTimeout(() => {
+          completeAuthentication({ id: session.user.id, email: session.user.email || email });
+        }, 1200);
+      }
+    });
+
+    // B. Heartbeat polling every 2.5s in case tab wasn't focused when event fired
+    const pollTimer = setInterval(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          setSuccessMsg('Email verified successfully! Calibrating your account...');
+          clearInterval(pollTimer);
+          setTimeout(() => {
+            completeAuthentication({ id: session.user.id, email: session.user.email || email });
+          }, 1200);
+        }
+      } catch {
+        // Continue polling
+      }
+    }, 2500);
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(pollTimer);
+    };
+  }, [isVerificationSent, email]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    if (mode === 'signup' && password !== confirmPassword) {
-      setErrorMsg('Passwords do not match.');
-      return;
-    }
+    if (mode === 'signup') {
+      if (!isPasswordValid) {
+        setErrorMsg('Please satisfy all password complexity requirements.');
+        return;
+      }
 
-    if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
-      return;
+      if (password !== confirmPassword) {
+        setErrorMsg('Passwords do not match.');
+        return;
+      }
     }
 
     setLoading(true);
@@ -84,7 +132,7 @@ export default function AuthPage() {
   };
 
   const completeAuthentication = (user?: { id: string; email?: string }) => {
-    const { setUserSession, executePendingAction } = useHabitStore.getState();
+    const { setUserSession, executePendingAction, userProfile } = useHabitStore.getState();
     if (user) {
       setUserSession(user);
     } else {
@@ -92,6 +140,14 @@ export default function AuthPage() {
     }
 
     const { success, executedAction } = executePendingAction();
+    
+    // If onboarding not completed, route to onboarding wizard
+    const needsOnboarding = !userProfile || !userProfile.onboardingCompleted;
+    if (needsOnboarding) {
+      router.push('/onboarding');
+      return;
+    }
+
     if (success && executedAction) {
       const destination = executedAction.returnUrl || '/dashboard';
       router.push(destination);
@@ -358,6 +414,36 @@ export default function AuthPage() {
                   className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
                 />
               </div>
+
+              {mode === 'signup' && password.length > 0 && (
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1">
+                    Password Security
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
+                    <div className={`flex items-center gap-1.5 ${passwordCriteria.length ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                      <span>{passwordCriteria.length ? '✓' : '○'}</span>
+                      <span>8+ Characters</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasUpper ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                      <span>{passwordCriteria.hasUpper ? '✓' : '○'}</span>
+                      <span>Uppercase (A-Z)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasLower ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                      <span>{passwordCriteria.hasLower ? '✓' : '○'}</span>
+                      <span>Lowercase (a-z)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasNumber ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                      <span>{passwordCriteria.hasNumber ? '✓' : '○'}</span>
+                      <span>Number (0-9)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasSymbol ? 'text-emerald-400' : 'text-neutral-500'} col-span-2`}>
+                      <span>{passwordCriteria.hasSymbol ? '✓' : '○'}</span>
+                      <span>Special Symbol (!@#$%)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {mode === 'signup' && (
                 <div>

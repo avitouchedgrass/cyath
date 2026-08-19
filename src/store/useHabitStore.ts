@@ -27,6 +27,18 @@ export interface PendingUserAction {
   returnUrl?: string;
 }
 
+export interface UserProfile {
+  fullName: string;
+  age: number;
+  sex: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  heightCm: number;
+  weightKg: number;
+  primaryGoal: 'focus' | 'muscle' | 'sleep' | 'longevity' | 'fat_loss';
+  allergies: string[];
+  dietaryRestrictions: string[];
+  onboardingCompleted: boolean;
+}
+
 export const DEFAULT_HABITS: HabitItem[] = [
   { id: 'sunlight', title: 'Morning Sunlight & Electrolytes (15m)', category: 'morning', targetDaysPerWeek: 7 },
   { id: 'protein_target', title: 'Hit Daily Protein Target (120g+)', category: 'nutrition', targetDaysPerWeek: 7 },
@@ -44,11 +56,13 @@ export interface HabitStoreState {
   isSyncing: boolean;
   activeProtocolIds: string[];
   userSession: { id: string; email?: string } | null;
+  userProfile: UserProfile | null;
   pendingAction: PendingUserAction | null;
 
   // Actions
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
+  updateUserProfile: (profile: Partial<UserProfile>) => void;
   setPendingAction: (action: PendingUserAction | null) => void;
   clearPendingAction: () => void;
   executePendingAction: () => { success: boolean; executedAction: PendingUserAction | null };
@@ -95,11 +109,53 @@ export const useHabitStore = create<HabitStoreState>()(
       isSyncing: false,
       activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
       userSession: null,
+      userProfile: null,
       pendingAction: null,
 
       setDate: (date) => set({ currentDate: date }),
 
       setUserSession: (session) => set({ userSession: session }),
+
+      updateUserProfile: (profile) => {
+        const current = get().userProfile || {
+          fullName: '',
+          age: 25,
+          sex: 'other',
+          heightCm: 175,
+          weightKg: 70,
+          primaryGoal: 'focus',
+          allergies: [],
+          dietaryRestrictions: [],
+          onboardingCompleted: false,
+        };
+
+        const updated = { ...current, ...profile };
+        set({ userProfile: updated });
+
+        // Sync with Supabase user_profiles if user is signed in
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          (async () => {
+            try {
+              await supabase.from('user_profiles').upsert({
+                user_id: userId,
+                full_name: updated.fullName,
+                age: updated.age,
+                sex: updated.sex,
+                height_cm: updated.heightCm,
+                weight_kg: updated.weightKg,
+                primary_goal: updated.primaryGoal,
+                allergies: updated.allergies,
+                dietary_restrictions: updated.dietaryRestrictions,
+                onboarding_completed: updated.onboardingCompleted,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'user_id' });
+            } catch {
+              // Local fallback
+            }
+          })();
+        }
+      },
 
       setPendingAction: (action) => set({ pendingAction: action }),
 

@@ -148,7 +148,7 @@ export default function RecipesPage() {
       <HeaderNav />
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 sm:pt-32 pb-24">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-36 sm:pt-40 pb-24">
         
         {/* Navigation & Header Strip */}
         <div className="flex items-center justify-between mb-10">

@@ -50,7 +50,7 @@ export default function CorrelationsPage() {
       <HeaderNav />
 
       {/* Main Content Container with safe top padding */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-32 sm:pt-36 pb-24">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-36 sm:pt-40 pb-24">
         
         {/* Navigation & Header Strip */}
         <div className="flex items-center justify-between mb-8">

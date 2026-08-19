@@ -33,7 +33,7 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-center px-6 lg:px-12 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none bg-gradient-to-b from-[#080808] via-[#080808]/80 to-transparent backdrop-blur-[2px]">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
         {/* Left: Static Pixel-Wave Monogram (No Text) */}

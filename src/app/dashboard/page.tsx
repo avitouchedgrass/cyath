@@ -608,15 +608,16 @@ export default function DashboardPage() {
             </div>
 
             {/* Today's Logged Whole-Food Recipes */}
-            {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 && (
-              <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between text-xs font-mono text-neutral-400">
-                  <span>LOGGED WHOLE-FOOD DISHES</span>
-                  <Link href="/recipes" className="text-white hover:underline">
-                    Browse More →
-                  </Link>
-                </div>
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-3">
+              <div className="flex items-center justify-between text-xs font-mono text-neutral-400">
+                <span>LOGGED WHOLE-FOOD DISHES</span>
+                <Link href="/recipes" className="text-white hover:underline flex items-center gap-1">
+                  <span>Browse Catalog</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
 
+              {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   {todayLog.loggedRecipeIds.map((rId) => {
                     const recipe = RECIPES.find((r) => r.id === rId);
@@ -637,7 +638,7 @@ export default function DashboardPage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                            className="text-neutral-500 hover:text-red-400 p-1 cursor-pointer"
+                            className="text-neutral-500 hover:text-red-400 p-1 cursor-pointer transition-colors"
                             aria-label="Remove recipe"
                           >
                             <X className="w-3.5 h-3.5" />
@@ -647,8 +648,20 @@ export default function DashboardPage() {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="py-4 text-center">
+                  <p className="text-xs font-mono text-neutral-500">
+                    No whole-food dishes logged yet today.
+                  </p>
+                  <Link
+                    href="/recipes"
+                    className="mt-2 inline-block text-[11px] font-mono text-neutral-400 hover:text-white underline underline-offset-4 transition-colors"
+                  >
+                    Select a meal from Recipe Catalog →
+                  </Link>
+                </div>
+              )}
+            </div>
 
           </div>
 
@@ -684,7 +697,7 @@ export default function DashboardPage() {
                       key={amt}
                       type="button"
                       onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
+                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
                     >
                       +{amt}g
                     </button>
@@ -708,7 +721,7 @@ export default function DashboardPage() {
                       key={amt}
                       type="button"
                       onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
+                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
                     >
                       +{amt}L
                     </button>

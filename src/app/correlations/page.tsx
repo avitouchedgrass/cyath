@@ -35,6 +35,65 @@ export default function CorrelationsPage() {
 
   const activeCorrelation = correlations.find((c) => c.id === selectedCorrelationId) || correlations[0];
 
+  // Mathematically derive continuous coordinate domains and least-squares regression line
+  const { minX, maxX, minY, maxY, trendline } = useMemo(() => {
+    const pts = activeCorrelation.points;
+    if (!pts || pts.length === 0) {
+      return { minX: 0, maxX: 150, minY: 1, maxY: 10, trendline: { y1: 82, y2: 18 } };
+    }
+
+    const xs = pts.map((p) => p.x);
+    const ys = pts.map((p) => p.y);
+
+    const rawMinX = Math.min(...xs);
+    const rawMaxX = Math.max(...xs);
+    const rawMinY = Math.min(...ys);
+    const rawMaxY = Math.max(...ys);
+
+    // Range padding
+    const padX = (rawMaxX - rawMinX) * 0.12 || 5;
+    const padY = (rawMaxY - rawMinY) * 0.12 || 1;
+
+    const domainMinX = Math.max(0, rawMinX - padX);
+    const domainMaxX = rawMaxX + padX;
+    const domainMinY = Math.max(0, rawMinY - padY);
+    const domainMaxY = Math.min(10, rawMaxY + padY);
+
+    // Least squares regression: y = m*x + b
+    const n = pts.length;
+    const meanX = xs.reduce((a, b) => a + b, 0) / n;
+    const meanY = ys.reduce((a, b) => a + b, 0) / n;
+
+    let num = 0;
+    let den = 0;
+    for (let i = 0; i < n; i++) {
+      num += (xs[i] - meanX) * (ys[i] - meanY);
+      den += (xs[i] - meanX) * (xs[i] - meanX);
+    }
+    const m = den !== 0 ? num / den : 0;
+    const b = meanY - m * meanX;
+
+    const yStart = m * domainMinX + b;
+    const yEnd = m * domainMaxX + b;
+
+    const normalizePercentY = (val: number) => {
+      const clamped = Math.min(domainMaxY, Math.max(domainMinY, val));
+      return ((clamped - domainMinY) / (domainMaxY - domainMinY || 1)) * 76 + 12;
+    };
+
+    // SVG coordinates measure 0% at the top, 100% at the bottom
+    const y1 = 100 - normalizePercentY(yStart);
+    const y2 = 100 - normalizePercentY(yEnd);
+
+    return {
+      minX: domainMinX,
+      maxX: domainMaxX,
+      minY: domainMinY,
+      maxY: domainMaxY,
+      trendline: { y1: Math.min(92, Math.max(8, y1)), y2: Math.min(92, Math.max(8, y2)) },
+    };
+  }, [activeCorrelation]);
+
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
       {/* Background Ambient Radial Highlights */}
@@ -233,19 +292,21 @@ export default function CorrelationsPage() {
                   <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
                     <line
                       x1="6%"
-                      y1="82%"
+                      y1={`${trendline.y1}%`}
                       x2="94%"
-                      y2="18%"
+                      y2={`${trendline.y2}%`}
                       stroke="rgba(255, 255, 255, 0.25)"
                       strokeWidth="1.5"
                       strokeDasharray="4 4"
                     />
                   </svg>
 
-                  {/* Scatter Data Points */}
+                  {/* Scatter Data Points mapped strictly by continuous X value (Protein/Sleep/Hydration) */}
                   {activeCorrelation.points.map((pt, idx) => {
-                    const normalizedY = Math.min(85, Math.max(15, ((pt.y - 4) / 6) * 100));
-                    const normalizedX = (idx / Math.max(1, activeCorrelation.points.length - 1)) * 88 + 6;
+                    const rangeX = maxX - minX || 1;
+                    const rangeY = maxY - minY || 1;
+                    const normalizedX = Math.min(94, Math.max(6, ((pt.x - minX) / rangeX) * 88 + 6));
+                    const normalizedY = Math.min(90, Math.max(10, ((pt.y - minY) / rangeY) * 76 + 12));
 
                     return (
                       <div
@@ -267,11 +328,11 @@ export default function CorrelationsPage() {
                   })}
                 </div>
 
-                {/* Base Anchor Axis Border */}
+                {/* Base Anchor Axis Border with Real Domain Values */}
                 <div className="border-t border-neutral-800 pt-2.5 mt-2 flex justify-between text-[10px] font-mono text-neutral-500">
-                  <span>Lower Input Range</span>
-                  <span>Calculated Linear Regression Fit</span>
-                  <span>Optimal Target Zone</span>
+                  <span>Min: {Math.round(minX)}</span>
+                  <span>Linear Regression Fit (r = {activeCorrelation.coefficient})</span>
+                  <span>Max: {Math.round(maxX)}</span>
                 </div>
               </div>
 

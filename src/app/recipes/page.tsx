@@ -163,7 +163,7 @@ export default function RecipesPage() {
 
         {/* Human Editorial Header (No AI Eyebrow Pill) */}
         <div className="max-w-3xl mb-12">
-          <h1 className="font-cabinet font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+          <h1 className="font-serif font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
             Whole-Food Fuel
           </h1>
           <p className="text-neutral-400 text-sm sm:text-base mt-3 leading-relaxed font-sans max-w-2xl">
@@ -273,7 +273,7 @@ export default function RecipesPage() {
         {filteredRecipes.length === 0 ? (
           <div className="text-center py-20 bg-white/[0.01] border border-white/5 rounded-3xl p-8">
             <ChefHat className="w-10 h-10 text-neutral-600 mx-auto mb-3" />
-            <h3 className="font-cabinet font-bold text-base text-white">No matching recipes</h3>
+            <h3 className="font-serif font-bold text-base text-white">No matching recipes</h3>
             <p className="text-neutral-400 text-xs mt-1">Try clearing your search query or selecting a different category filter.</p>
             <button
               onClick={() => {
@@ -325,7 +325,7 @@ export default function RecipesPage() {
                     </div>
 
                     {/* Title & Subtitle */}
-                    <h3 className="font-cabinet font-bold text-xl text-white tracking-tight group-hover:text-neutral-200 transition-colors leading-snug mb-1">
+                    <h3 className="font-serif font-bold text-xl text-white tracking-tight group-hover:text-neutral-200 transition-colors leading-snug mb-1">
                       {recipe.name}
                     </h3>
                     <p className="text-neutral-400 text-xs font-sans leading-relaxed line-clamp-2 mb-6">
@@ -421,7 +421,7 @@ export default function RecipesPage() {
                   <span>·</span>
                   <span>{selectedRecipe.prepTimeMinutes} mins prep</span>
                 </div>
-                <h2 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mb-2">
+                <h2 className="font-serif font-bold text-2xl sm:text-3xl text-white tracking-tight mb-2">
                   {selectedRecipe.name}
                 </h2>
                 <p className="text-neutral-400 text-xs sm:text-sm font-sans leading-relaxed">
@@ -489,7 +489,7 @@ export default function RecipesPage() {
 
             {/* Ingredients Checklist */}
             <div>
-              <h3 className="font-cabinet font-bold text-base text-white mb-3">
+              <h3 className="font-serif font-bold text-base text-white mb-3">
                 Ingredients ({portionMultiplier}x portion)
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -507,7 +507,7 @@ export default function RecipesPage() {
 
             {/* Step-by-Step Instructions */}
             <div>
-              <h3 className="font-cabinet font-bold text-base text-white mb-3">
+              <h3 className="font-serif font-bold text-base text-white mb-3">
                 Method & Preparation
               </h3>
               <ol className="space-y-2.5">
@@ -550,7 +550,7 @@ export default function RecipesPage() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-cabinet font-bold text-white tracking-tight">Cyath</span>
+            <span className="font-serif font-bold text-white tracking-tight">Cyath</span>
             <span>— Pixel-Perfect Health</span>
           </div>
           <div>Built with Next.js, Supabase & Tailwind CSS</div>

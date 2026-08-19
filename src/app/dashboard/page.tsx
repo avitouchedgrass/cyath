@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 Active Protocol Telemetry {isSyncing && '· Syncing with Cloud...'}
               </span>
             </div>
-            <h1 className="font-cabinet font-bold text-2xl sm:text-4xl text-white tracking-tight">
+            <h1 className="font-serif font-bold text-2xl sm:text-4xl text-white tracking-tight">
               Behavioral Momentum Dashboard
             </h1>
           </div>
@@ -338,7 +338,7 @@ export default function DashboardPage() {
 
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="font-cabinet font-bold text-xl text-white tracking-tight">
+                  <h2 className="font-serif font-bold text-xl text-white tracking-tight">
                     Daily Routine Checklist
                   </h2>
                   <p className="text-neutral-400 text-xs mt-0.5 font-sans">
@@ -471,7 +471,7 @@ export default function DashboardPage() {
             <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="font-cabinet font-bold text-xl text-white tracking-tight">
+                  <h2 className="font-serif font-bold text-xl text-white tracking-tight">
                     Nutrition & Macro Logging
                   </h2>
                   <p className="text-neutral-400 text-xs mt-0.5 font-sans">
@@ -588,7 +588,7 @@ export default function DashboardPage() {
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
                   <Sparkles className="w-4 h-4 text-white" />
-                  <h2 className="font-cabinet font-bold text-xl text-white tracking-tight">
+                  <h2 className="font-serif font-bold text-xl text-white tracking-tight">
                     State Telemetry (1–10)
                   </h2>
                 </div>
@@ -691,7 +691,7 @@ export default function DashboardPage() {
             <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-4 h-4 text-white" />
-                <h3 className="font-cabinet font-bold text-lg text-white tracking-tight">
+                <h3 className="font-serif font-bold text-lg text-white tracking-tight">
                   Behavioral Correlation Engine
                 </h3>
               </div>
@@ -749,7 +749,7 @@ export default function DashboardPage() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-cabinet font-bold text-white tracking-tight">Cyath</span>
+            <span className="font-serif font-bold text-white tracking-tight">Cyath</span>
             <span>— Pixel-Perfect Health</span>
           </div>
           <div>Built with Next.js, Supabase & Tailwind CSS</div>

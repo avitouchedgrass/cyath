@@ -134,7 +134,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
 
           {/* Card Header & Typography */}
           <div>
-            <h2 className="font-cabinet font-bold text-3xl text-white tracking-tight">
+            <h2 className="font-serif font-bold text-3xl text-white tracking-tight">
               {mode === 'signup' ? 'Sign Up' : 'Log In'}
             </h2>
             <p className="text-neutral-400 text-sm mt-1 font-sans">

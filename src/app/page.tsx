@@ -146,7 +146,7 @@ export default function Home() {
         {/* Methodology Feature Section */}
         <section id="methodology" className="w-full max-w-7xl mx-auto mt-28 sm:mt-36 pt-16 border-t border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-cabinet text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-white">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-white">
               The Architecture of Momentum
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base mt-3 font-sans leading-relaxed">
@@ -159,7 +159,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Flame className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Monochrome Streak Heatmaps</h3>
+              <h3 className="text-lg font-serif font-bold text-white mb-2 tracking-tight">Monochrome Streak Heatmaps</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Visualize continuous consistency through white-opacity shades. Zero loud streaks or gamified guilt.
               </p>
@@ -169,7 +169,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Activity className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Subjective Energy Correlation</h3>
+              <h3 className="text-lg font-serif font-bold text-white mb-2 tracking-tight">Subjective Energy Correlation</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Map daily hydration and protein targets against subjective mood and focus ratings on a 1–10 scale.
               </p>
@@ -179,7 +179,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Pixel-Calibrated Fuel</h3>
+              <h3 className="text-lg font-serif font-bold text-white mb-2 tracking-tight">Pixel-Calibrated Fuel</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Curated macro-rich recipes represented by sharp 16-bit retro sprites. Clear nutrition without guesswork.
               </p>
@@ -192,7 +192,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-cabinet font-bold text-white tracking-tight">Cyath</span>
+            <span className="font-serif font-bold text-white tracking-tight">Cyath</span>
             <span>— Pixel-Perfect Health</span>
           </div>
           <div>

@@ -228,16 +228,24 @@ export default function CorrelationsPage() {
                 </div>
 
                 {/* Plot Area with Trendline and Scatter Dots */}
-                <div className="h-56 w-full relative border-b border-l border-white/10 flex items-end justify-between px-6 pb-2 pt-6">
-                  {/* Diagonal Guide Line */}
-                  <div className="absolute inset-0 pointer-events-none opacity-20">
-                    <div className="w-full h-full border-t border-dashed border-white transform rotate-[-18deg] origin-bottom-left" />
-                  </div>
+                <div className="h-56 w-full relative border-b border-l border-white/10 px-6 pb-2 pt-6 overflow-hidden">
+                  {/* Precise Mathematical SVG Trendline (Contained & Bounded) */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+                    <line
+                      x1="6%"
+                      y1="82%"
+                      x2="94%"
+                      y2="18%"
+                      stroke="rgba(255, 255, 255, 0.25)"
+                      strokeWidth="1.5"
+                      strokeDasharray="4 4"
+                    />
+                  </svg>
 
                   {/* Scatter Data Points */}
                   {activeCorrelation.points.map((pt, idx) => {
-                    const normalizedY = Math.min(90, Math.max(10, ((pt.y - 4) / 6) * 100));
-                    const normalizedX = (idx / Math.max(1, activeCorrelation.points.length - 1)) * 90 + 5;
+                    const normalizedY = Math.min(85, Math.max(15, ((pt.y - 4) / 6) * 100));
+                    const normalizedX = (idx / Math.max(1, activeCorrelation.points.length - 1)) * 88 + 6;
 
                     return (
                       <div

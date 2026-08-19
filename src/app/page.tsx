@@ -240,8 +240,17 @@ export default function Home() {
                 return (
                   <div
                     key={item.step}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Step ${item.step}: ${item.title}`}
                     onMouseEnter={() => setActiveStepIndex(idx)}
-                    className={`backdrop-blur-xl rounded-3xl p-8 border transition-all duration-300 relative flex flex-col justify-between cursor-pointer ${
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveStepIndex(idx);
+                      }
+                    }}
+                    className={`backdrop-blur-xl rounded-3xl p-8 border transition-all duration-300 relative flex flex-col justify-between cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none ${
                       isActive
                         ? 'bg-white/[0.04] border-white/30 shadow-2xl ring-1 ring-white/15'
                         : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.03]'
@@ -250,7 +259,7 @@ export default function Home() {
                     <div>
                       {/* Step Number & Badge */}
                       <div className="flex items-center justify-between mb-6">
-                        <span className="font-mono text-3xl font-bold text-white tracking-tight">
+                        <span className="font-mono text-3xl font-bold text-white tracking-tight tabular-nums">
                           {item.step}
                         </span>
                         <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-neutral-300">
@@ -259,17 +268,17 @@ export default function Home() {
                       </div>
 
                       {/* Title & Icon */}
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-3 mb-3 min-w-0">
                         <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
                           <Icon className="w-4 h-4" />
                         </div>
-                        <h3 className="font-serif font-normal text-xl text-white tracking-tight">
+                        <h3 className="font-serif font-normal text-xl text-white tracking-tight truncate">
                           {item.title}
                         </h3>
                       </div>
 
                       {/* Description */}
-                      <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6">
+                      <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6 break-words">
                         {item.description}
                       </p>
                     </div>
@@ -279,7 +288,7 @@ export default function Home() {
                       {item.highlights.map((point) => (
                         <div key={point} className="flex items-center gap-2 text-xs font-mono text-neutral-300">
                           <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          <span>{point}</span>
+                          <span className="truncate">{point}</span>
                         </div>
                       ))}
                     </div>
@@ -316,10 +325,10 @@ export default function Home() {
               <div className="lg:col-span-8 backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between relative overflow-hidden group">
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-5 h-5 text-emerald-400" />
-                        <h3 className="font-serif font-normal text-2xl text-white tracking-tight">
+                        <TrendingUp className="w-5 h-5 text-emerald-400 shrink-0" />
+                        <h3 className="font-serif font-normal text-2xl text-white tracking-tight truncate">
                           The Correlation Engine
                         </h3>
                       </div>
@@ -328,16 +337,16 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono shrink-0">
                       <span className="text-neutral-400">Model Fit:</span>
-                      <span className="text-emerald-400 font-bold">R² = 0.84 (+34%)</span>
+                      <span className="text-emerald-400 font-bold tabular-nums">R² = 0.84 (+34%)</span>
                     </div>
                   </div>
 
-                  {/* Interactive Scatter Simulation Area */}
+                  {/* Interactive Scatter Simulation Area with Accessible Touch Targets */}
                   <div className="h-56 sm:h-64 w-full bg-black/40 border border-white/10 rounded-2xl p-4 relative overflow-hidden mb-4">
                     {/* SVG Trendline */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
                       <line
                         x1="10%"
                         y1="82%"
@@ -349,7 +358,7 @@ export default function Home() {
                       />
                     </svg>
 
-                    {/* Scatter Points */}
+                    {/* Scatter Points with Resilient Touch/Keyboard Targets */}
                     <div className="relative w-full h-full">
                       {SAMPLE_SCATTER_POINTS.map((pt, i) => {
                         const isSelected = selectedScatterPoint === i;
@@ -360,8 +369,9 @@ export default function Home() {
                           <button
                             key={pt.label}
                             type="button"
+                            aria-label={`Data point for ${pt.x} grams protein with ${pt.y} focus rating`}
                             onClick={() => setSelectedScatterPoint(i)}
-                            className="absolute -translate-x-1/2 translate-y-1/2 cursor-pointer transition-transform hover:scale-125 focus:outline-none"
+                            className="absolute -translate-x-1/2 translate-y-1/2 p-2.5 cursor-pointer transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none rounded-full"
                             style={{ left: `${leftPct}%`, bottom: `${bottomPct}%` }}
                           >
                             <span
@@ -378,9 +388,9 @@ export default function Home() {
 
                     {/* Active point hover pill */}
                     {selectedScatterPoint !== null && (
-                      <div className="absolute top-4 left-4 p-2.5 rounded-xl bg-black/80 border border-white/15 backdrop-blur-md text-xs font-mono">
-                        <span className="text-neutral-400 block text-[10px]">SELECTED DATA POINT</span>
-                        <span className="text-white font-bold">
+                      <div className="absolute top-4 left-4 p-2.5 rounded-xl bg-black/80 border border-white/15 backdrop-blur-md text-xs font-mono shadow-lg">
+                        <span className="text-neutral-400 block text-[10px] uppercase tracking-wider">Selected Data Point</span>
+                        <span className="text-white font-bold tabular-nums">
                           {SAMPLE_SCATTER_POINTS[selectedScatterPoint].x}g Protein → {SAMPLE_SCATTER_POINTS[selectedScatterPoint].y} / 10 Focus
                         </span>
                       </div>
@@ -482,30 +492,32 @@ export default function Home() {
                     <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono">
                         <span className="text-neutral-300">Subjective Energy</span>
-                        <span className="text-white font-bold">{previewEnergy} / 10</span>
+                        <span className="text-white font-bold tabular-nums">{previewEnergy} / 10</span>
                       </div>
                       <input
                         type="range"
                         min="1"
                         max="10"
+                        aria-label="Adjust preview energy rating on 1 to 10 scale"
                         value={previewEnergy}
                         onChange={(e) => setPreviewEnergy(Number(e.target.value))}
-                        className="w-full accent-white cursor-pointer"
+                        className="w-full accent-white cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none"
                       />
                     </div>
 
                     <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono">
                         <span className="text-neutral-300">Executive Focus</span>
-                        <span className="text-white font-bold">{previewFocus} / 10</span>
+                        <span className="text-white font-bold tabular-nums">{previewFocus} / 10</span>
                       </div>
                       <input
                         type="range"
                         min="1"
                         max="10"
+                        aria-label="Adjust preview executive focus rating on 1 to 10 scale"
                         value={previewFocus}
                         onChange={(e) => setPreviewFocus(Number(e.target.value))}
-                        className="w-full accent-white cursor-pointer"
+                        className="w-full accent-white cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none"
                       />
                     </div>
                   </div>

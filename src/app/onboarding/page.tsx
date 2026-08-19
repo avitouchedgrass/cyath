@@ -187,7 +187,7 @@ function OnboardingContent() {
           <div className="flex items-center gap-3">
             <Logo className="w-9 h-9" />
             <div>
-              <div className="text-xs font-mono font-medium text-white">Cyath Protocol Calibration</div>
+              <div className="text-xs font-mono font-medium text-white">Personal Profile Setup</div>
               <div className="text-[10px] font-mono text-neutral-500">
                 Step {step} of {totalSteps}
               </div>
@@ -214,14 +214,14 @@ function OnboardingContent() {
                   Personal Identity
                 </h1>
                 <p className="text-neutral-400 text-xs sm:text-sm mt-1 font-sans">
-                  Let&apos;s calibrate your profile for customized daily protocol telemetry.
+                  We&apos;ll customize your daily protocol targets and baseline recommendations.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                    Your Name or Preferred Handle
+                    Full Name or Preferred Name
                   </label>
                   <input
                     type="text"
@@ -249,7 +249,7 @@ function OnboardingContent() {
 
                   <div>
                     <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                      Sex / Biological Profile
+                      Biological Sex / Gender
                     </label>
                     <select
                       value={sex}
@@ -545,7 +545,15 @@ function OnboardingContent() {
               onClick={nextStep}
               className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-lg flex items-center gap-2 cursor-pointer"
             >
-              <span>{step === totalSteps ? (isEditing ? 'Save Profile' : 'Finish Calibration') : 'Continue'}</span>
+              <span>
+                {step === totalSteps
+                  ? (isEditing ? 'Save Changes' : 'Complete Setup & Launch Dashboard')
+                  : step === 1
+                  ? 'Continue to Biometrics'
+                  : step === 2
+                  ? 'Continue to Health Goals'
+                  : 'Continue to Nutrition'}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

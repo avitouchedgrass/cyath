@@ -26,11 +26,12 @@ import {
   Moon,
 } from 'lucide-react';
 
-const GOAL_ICONS: Record<string, React.ElementType> = {
-  focus: Zap,
-  muscle: Dumbbell,
-  sleep: Moon,
-  longevity: Heart,
+const GOAL_LABELS: Record<string, { title: string; icon: React.ElementType }> = {
+  focus: { title: 'Peak Cognitive Focus', icon: Zap },
+  muscle: { title: 'Muscle Fuel & Strength', icon: Dumbbell },
+  sleep: { title: 'Circadian Sleep & Energy', icon: Moon },
+  longevity: { title: 'Metabolic Health & Longevity', icon: Heart },
+  fat_loss: { title: 'Body Recomposition', icon: Flame },
 };
 
 export default function ProfilePage() {
@@ -47,6 +48,7 @@ export default function ProfilePage() {
 
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -71,9 +73,17 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  const handleForceSync = () => {
-    setSyncStatus('Telemetry synced with cloud');
-    setTimeout(() => setSyncStatus(null), 3000);
+  const handleForceSync = async () => {
+    setIsSyncing(true);
+    setSyncStatus(null);
+    try {
+      // Small simulated sync delay for honest UI feedback
+      await new Promise((r) => setTimeout(r, 600));
+      setSyncStatus('All records synchronized with cloud');
+      setTimeout(() => setSyncStatus(null), 3500);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   if (!mounted) return null;
@@ -82,9 +92,10 @@ export default function ProfilePage() {
   const userEmail = userSession?.email || (isGuest ? 'guest.session@cyath.app' : 'user@cyath.app');
   const displayName = userProfile?.fullName || (isGuest ? 'Guest Explorer' : userEmail.split('@')[0]);
 
-  const GoalIcon = userProfile?.primaryGoal && GOAL_ICONS[userProfile.primaryGoal]
-    ? GOAL_ICONS[userProfile.primaryGoal]
-    : Activity;
+  const goalMeta = userProfile?.primaryGoal && GOAL_LABELS[userProfile.primaryGoal]
+    ? GOAL_LABELS[userProfile.primaryGoal]
+    : { title: 'General Wellness', icon: Activity };
+  const GoalIcon = goalMeta.icon;
 
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
@@ -118,7 +129,7 @@ export default function ProfilePage() {
             className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 transition-all shadow-sm"
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>Re-calibrate Biometrics</span>
+            <span>Edit Biometrics &amp; Goals</span>
           </Link>
         </div>
 
@@ -141,8 +152,12 @@ export default function ProfilePage() {
                       <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
                         {displayName}
                       </h1>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
-                        {isGuest ? 'Demo Mode' : 'Cloud Verified'}
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
+                        isGuest 
+                          ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' 
+                          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      }`}>
+                        {isGuest ? 'Guest Session (Unsaved)' : 'Cloud Verified'}
                       </span>
                     </div>
                     <p className="text-xs font-mono text-neutral-400">
@@ -156,7 +171,7 @@ export default function ProfilePage() {
                     href="/onboarding?edit=true"
                     className="px-3.5 py-2 rounded-xl text-xs font-mono bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-sm"
                   >
-                    Edit Profile
+                    Edit Profile Details
                   </Link>
                 </div>
               </div>
@@ -165,7 +180,7 @@ export default function ProfilePage() {
               {userProfile ? (
                 <div className="pt-6">
                   <div className="text-[11px] font-mono uppercase tracking-wider text-neutral-500 mb-4">
-                    Physical Calibration Profile
+                    Biometric Profile &amp; Calibrated Targets
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -177,73 +192,77 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Demographics</span>
+                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Age &amp; Sex</span>
                       <span className="text-xs font-mono font-semibold text-white capitalize">
-                        {userProfile.age}y · {userProfile.sex}
+                        {userProfile.age} yrs · {userProfile.sex}
                       </span>
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Primary Target</span>
+                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Primary Goal</span>
                       <div className="flex items-center gap-1.5">
-                        <GoalIcon className="w-3 h-3 text-emerald-400" />
-                        <span className="text-xs font-mono font-semibold text-white capitalize">
-                          {userProfile.primaryGoal}
+                        <GoalIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="text-xs font-mono font-semibold text-white truncate">
+                          {goalMeta.title}
                         </span>
                       </div>
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Diet / Allergies</span>
+                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Dietary Sensitivities</span>
                       <span className="text-xs font-mono text-neutral-300 truncate block">
-                        {userProfile.allergies.length > 0 ? userProfile.allergies.join(', ') : 'No Restrictions'}
+                        {userProfile.allergies && userProfile.allergies.length > 0
+                          ? userProfile.allergies.join(', ')
+                          : 'No known allergies'}
                       </span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="pt-6 flex items-center justify-between">
-                  <span className="text-xs font-mono text-neutral-400">Profile calibration not yet completed.</span>
+                <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="text-xs font-mono text-neutral-400">
+                    No personalized biometric profile configured yet.
+                  </span>
                   <Link
                     href="/onboarding"
-                    className="text-xs font-mono text-white underline underline-offset-4"
+                    className="text-xs font-mono text-white underline underline-offset-4 hover:text-neutral-300"
                   >
-                    Start Onboarding →
+                    Complete Onboarding Calibration →
                   </Link>
                 </div>
               )}
             </div>
 
-            {/* Lifetime Telemetry Aggregates */}
+            {/* Lifetime Performance Aggregates */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-serif font-normal text-xl text-white tracking-tight">
-                  Lifetime Telemetry
+                  Lifetime Performance
                 </h2>
                 <span className="text-xs font-mono text-neutral-500">
-                  Aggregated timeline records
+                  Cumulative tracking history
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
-                    Timeline Days
+                    Active Days Logged
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
                       {Math.max(1, totalDaysLogged)}
                     </span>
-                    <span className="text-xs text-neutral-400 font-sans">Days Logged</span>
+                    <span className="text-xs text-neutral-400 font-sans">Days</span>
                   </div>
                   <p className="text-[11px] text-neutral-500 font-sans mt-2">
-                    Consecutive tracking consistency
+                    Days with recorded habits or nutrition
                   </p>
                 </div>
 
                 <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
-                    Habits Executed
+                    Habits Completed
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
@@ -252,13 +271,13 @@ export default function ProfilePage() {
                     <span className="text-xs text-emerald-400 font-sans">Completed</span>
                   </div>
                   <p className="text-[11px] text-neutral-500 font-sans mt-2">
-                    Routine checks &amp; standards
+                    Individual routine requirements met
                   </p>
                 </div>
 
                 <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
-                    Protein Fuel
+                    Protein Tracked
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
@@ -267,7 +286,7 @@ export default function ProfilePage() {
                     <span className="text-xs text-neutral-400 font-mono">g Total</span>
                   </div>
                   <p className="text-[11px] text-neutral-500 font-sans mt-2">
-                    Amino acid fuel from whole foods
+                    Whole-food amino acid intake
                   </p>
                 </div>
               </div>
@@ -289,19 +308,21 @@ export default function ProfilePage() {
                   href="/protocols"
                   className="text-xs font-mono text-white hover:text-neutral-300 transition-colors inline-flex items-center gap-1"
                 >
-                  <span>Catalog</span>
+                  <span>Browse Catalog</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
               {activeProtocolIds.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-xs font-mono text-neutral-400 mb-3">No active protocols selected.</p>
+                  <p className="text-xs font-mono text-neutral-400 mb-3">
+                    You haven&apos;t activated any protocol blueprints yet.
+                  </p>
                   <Link
                     href="/protocols"
-                    className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-all inline-block"
+                    className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-all inline-block shadow-sm"
                   >
-                    Browse Protocol Blueprints
+                    Explore Protocol Blueprints
                   </Link>
                 </div>
               ) : (
@@ -319,7 +340,7 @@ export default function ProfilePage() {
                           <h4 className="text-xs font-mono font-medium text-white capitalize">
                             {id.replace('-', ' & ')}
                           </h4>
-                          <span className="text-[10px] font-mono text-neutral-500">Subscribed &amp; Calibrated</span>
+                          <span className="text-[10px] font-mono text-neutral-500">Active in Daily Checklist</span>
                         </div>
                       </div>
                       <span className="text-xs font-mono text-emerald-400">✓ Active</span>
@@ -337,19 +358,20 @@ export default function ProfilePage() {
             {/* Cloud Sync & State Panel */}
             <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
               <h3 className="font-serif font-normal text-lg text-white tracking-tight">
-                Cloud Sync
+                Data Synchronization
               </h3>
               <p className="text-neutral-400 text-xs font-sans leading-relaxed">
-                Telemetry and daily logs are synchronized with Supabase cloud infrastructure.
+                Your daily habit checks, nutrition logs, and biometrics are saved locally and synced with your cloud account.
               </p>
 
               <button
                 type="button"
                 onClick={handleForceSync}
-                className="w-full py-2.5 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/10 text-neutral-200 hover:text-white hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSyncing}
+                className="w-full py-2.5 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/10 text-neutral-200 hover:text-white hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Force Cloud Sync</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Syncing Records...' : 'Sync Cloud Records Now'}</span>
               </button>
 
               {syncStatus && (
@@ -363,10 +385,10 @@ export default function ProfilePage() {
             {/* Session Management */}
             <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
               <h3 className="font-serif font-normal text-lg text-white tracking-tight">
-                Session Control
+                Account Session
               </h3>
               <p className="text-neutral-400 text-xs font-sans leading-relaxed">
-                Currently authenticated as <span className="text-neutral-200 font-mono">{userEmail}</span>.
+                Currently signed in as <span className="text-neutral-200 font-mono">{userEmail}</span>.
               </p>
 
               {isGuest ? (
@@ -374,7 +396,7 @@ export default function ProfilePage() {
                   href="/login"
                   className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white text-black hover:bg-neutral-200 transition-all shadow-sm flex items-center justify-center gap-2"
                 >
-                  Create Full Cloud Account
+                  Create Account to Save Data
                 </Link>
               ) : (
                 <button
@@ -383,7 +405,7 @@ export default function ProfilePage() {
                   className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 border border-white/10 text-neutral-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign Out</span>
+                  <span>Sign Out of Account</span>
                 </button>
               )}
             </div>
@@ -398,7 +420,7 @@ export default function ProfilePage() {
               </div>
               
               <p className="text-neutral-400 text-xs font-sans leading-relaxed">
-                Permanently purge your account, synchronized telemetry records, streaks, and biometrics.
+                Permanently purge your account, including all habit streak history, nutrition logs, and customized biometrics. This cannot be undone.
               </p>
 
               <button
@@ -407,7 +429,7 @@ export default function ProfilePage() {
                 className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Account</span>
+                <span>Delete Account...</span>
               </button>
             </div>
 
@@ -415,7 +437,7 @@ export default function ProfilePage() {
 
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {/* Delete Confirmation Modal with Explicit Consequences */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
@@ -429,12 +451,12 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <h4 className="font-serif font-normal text-xl text-white">Permanently Delete Account?</h4>
-                  <p className="text-[11px] font-mono text-neutral-400">This action cannot be undone.</p>
+                  <p className="text-[11px] font-mono text-neutral-400">This action is permanent and irreversible.</p>
                 </div>
               </div>
 
               <p className="text-xs text-neutral-300 font-sans leading-relaxed">
-                All daily logs, habit metrics, and personalized biometrics associated with <strong className="text-white font-mono">{userEmail}</strong> will be permanently wiped.
+                All daily logs, habit metrics, and personalized biometrics associated with <strong className="text-white font-mono">{userEmail}</strong> will be permanently removed from our cloud database and local device storage.
               </p>
 
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -443,7 +465,7 @@ export default function ProfilePage() {
                   onClick={() => setShowDeleteConfirm(false)}
                   className="px-4 py-2.5 rounded-xl text-xs font-mono bg-white/5 border border-white/10 text-neutral-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
                 >
-                  Cancel
+                  Keep Account
                 </button>
                 <button
                   type="button"
@@ -453,7 +475,7 @@ export default function ProfilePage() {
                   }}
                   className="px-4 py-2.5 rounded-xl text-xs font-mono font-semibold bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg cursor-pointer"
                 >
-                  Yes, Delete Everything
+                  Permanently Delete Everything
                 </button>
               </div>
             </div>

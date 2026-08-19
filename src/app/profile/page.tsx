@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import {
   User,
   ShieldCheck,
+  ShieldAlert,
   Zap,
   Flame,
   Award,
@@ -25,9 +26,18 @@ import {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { userSession, setUserSession, userProfile, logsByDate, habits, activeProtocolIds } = useHabitStore();
+  const {
+    userSession,
+    setUserSession,
+    userProfile,
+    logsByDate,
+    habits,
+    activeProtocolIds,
+    deleteAccountData,
+  } = useHabitStore();
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -304,7 +314,7 @@ export default function ProfilePage() {
         </div>
 
         {/* 3. Account Data & Cloud Operations */}
-        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl mb-10">
           <h3 className="font-serif font-normal text-xl text-white tracking-tight mb-2">
             Data &amp; Security Controls
           </h3>
@@ -330,6 +340,73 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        {/* 4. Danger Zone */}
+        <div className="backdrop-blur-xl bg-red-950/[0.08] border border-red-500/20 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+          <div className="flex items-center gap-2.5 mb-2">
+            <ShieldAlert className="w-5 h-5 text-red-400" />
+            <h3 className="font-serif font-normal text-xl text-red-200 tracking-tight">
+              Danger Zone
+            </h3>
+          </div>
+          <p className="text-neutral-400 text-xs font-sans mb-6 max-w-xl leading-relaxed">
+            Permanently delete your account, synchronized telemetry logs, habit streak history, and calibrated physical biometrics. This action is immediate and cannot be recovered.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-5 py-2.5 rounded-xl text-xs font-mono font-semibold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete Account &amp; Wipe Data</span>
+          </button>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              onClick={() => setShowDeleteConfirm(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <div className="relative z-10 w-full max-w-md bg-[#0d0d0d] border border-red-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-serif font-normal text-xl text-white">Permanently Delete Account?</h4>
+                  <p className="text-[11px] font-mono text-neutral-400">This action cannot be undone.</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-neutral-300 font-sans leading-relaxed">
+                All daily logs, habit metrics, and personalized biometrics associated with <strong className="text-white font-mono">{userEmail}</strong> will be permanently wiped.
+              </p>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-mono bg-white/5 border border-white/10 text-neutral-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await deleteAccountData();
+                    router.push('/');
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs font-mono font-semibold bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg cursor-pointer"
+                >
+                  Yes, Delete Everything
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>

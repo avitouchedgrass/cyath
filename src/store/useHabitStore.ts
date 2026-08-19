@@ -81,6 +81,7 @@ export interface HabitStoreState {
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   getDailyLog: (date?: string) => DailyLogData;
   syncWithSupabase: (date?: string) => Promise<void>;
+  deleteAccountData: () => Promise<void>;
 }
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -410,6 +411,28 @@ export const useHabitStore = create<HabitStoreState>()(
         } finally {
           set({ isSyncing: false });
         }
+      },
+
+      deleteAccountData: async () => {
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          try {
+            await supabase.from('daily_logs').delete().eq('user_id', userId);
+            await supabase.from('user_profiles').delete().eq('user_id', userId);
+            await supabase.auth.signOut();
+          } catch (err) {
+            console.error('Failed to clear remote account data:', err);
+          }
+        }
+        set({
+          userSession: null,
+          userProfile: null,
+          logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+          habits: DEFAULT_HABITS,
+          activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+          streakCount: 0,
+          pendingAction: null,
+        });
       },
     }),
     {

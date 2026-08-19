@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const {
     currentDate,
     setDate,
@@ -41,6 +43,8 @@ export default function DashboardPage() {
     removeRecipeFromDay,
     getDailyLog,
     isSyncing,
+    userSession,
+    setPendingAction,
   } = useHabitStore();
 
   const [newHabitTitle, setNewHabitTitle] = useState('');
@@ -56,6 +60,80 @@ export default function DashboardPage() {
   // Completed count calculation
   const completedCount = habits.reduce((acc, h) => (todayLog.habitsCompleted[h.id] ? acc + 1 : acc), 0);
   const completionPercentage = habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0;
+
+  // Guarded Handlers (Auth Protection on Planner Logging)
+  const handleToggleHabit = (habitId: string) => {
+    if (!userSession) {
+      setPendingAction({
+        type: 'TOGGLE_HABIT',
+        payload: { habitId, date: currentDate },
+        returnUrl: '/dashboard',
+      });
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    toggleHabit(habitId, currentDate);
+  };
+
+  const handleAddHabitSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newHabitTitle.trim()) return;
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    addCustomHabit(newHabitTitle.trim());
+    setNewHabitTitle('');
+    setShowAddHabit(false);
+  };
+
+  const handleSetProtein = (amount: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    setProtein(amount, currentDate);
+  };
+
+  const handleSetHydration = (amount: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    setHydration(amount, currentDate);
+  };
+
+  const handleSetEnergy = (val: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    setEnergy(val, currentDate);
+  };
+
+  const handleSetMood = (val: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    setMood(val, currentDate);
+  };
+
+  const handleSetSleep = (val: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    setSleep(val, currentDate);
+  };
+
+  const handleRemoveRecipe = (recipeId: string, protein: number, calories: number) => {
+    if (!userSession) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    removeRecipeFromDay(recipeId, protein, calories, currentDate);
+  };
 
   // Date Navigation Helpers
   const formatDateDisplay = (dateStr: string) => {
@@ -73,14 +151,6 @@ export default function DashboardPage() {
     dateObj.setDate(dateObj.getDate() + days);
     const newDateStr = dateObj.toISOString().split('T')[0];
     setDate(newDateStr);
-  };
-
-  const handleAddHabitSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newHabitTitle.trim()) return;
-    addCustomHabit(newHabitTitle.trim());
-    setNewHabitTitle('');
-    setShowAddHabit(false);
   };
 
   // Dynamic 14-Day Heatmap Calculation
@@ -394,7 +464,7 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={habit.id}
-                      onClick={() => toggleHabit(habit.id, currentDate)}
+                      onClick={() => handleToggleHabit(habit.id)}
                       className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none active:scale-[0.98] ${
                         isDone
                           ? 'bg-white/[0.04] border-white/20'
@@ -507,19 +577,19 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setProtein(todayLog.totalProteinLogged + 15, currentDate)}
+                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 15)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +15g
                     </button>
                     <button
-                      onClick={() => setProtein(todayLog.totalProteinLogged + 30, currentDate)}
+                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 30)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +30g
                     </button>
                     <button
-                      onClick={() => setProtein(todayLog.totalProteinLogged + 45, currentDate)}
+                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 45)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +45g
@@ -535,19 +605,19 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setHydration(todayLog.hydrationLiters + 0.25, currentDate)}
+                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 0.25)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +250ml
                     </button>
                     <button
-                      onClick={() => setHydration(todayLog.hydrationLiters + 0.5, currentDate)}
+                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 0.5)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +500ml
                     </button>
                     <button
-                      onClick={() => setHydration(todayLog.hydrationLiters + 1.0, currentDate)}
+                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 1.0)}
                       className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +1.0L
@@ -572,8 +642,8 @@ export default function DashboardPage() {
                         >
                           <span className="text-neutral-200">{recipeObj ? recipeObj.name : recId}</span>
                           <button
-                            onClick={() => recipeObj && removeRecipeFromDay(recipeObj.id, recipeObj.protein, recipeObj.calories, currentDate)}
-                            className="text-neutral-500 hover:text-red-400"
+                            onClick={() => recipeObj && handleRemoveRecipe(recipeObj.id, recipeObj.protein, recipeObj.calories)}
+                            className="text-neutral-500 hover:text-red-400 cursor-pointer"
                             title="Remove recipe"
                           >
                             <X className="w-3 h-3" />
@@ -621,7 +691,7 @@ export default function DashboardPage() {
                     min="1"
                     max="10"
                     value={todayLog.energyLevel}
-                    onChange={(e) => setEnergy(Number(e.target.value), currentDate)}
+                    onChange={(e) => handleSetEnergy(Number(e.target.value))}
                     className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
                   />
                   <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
@@ -642,7 +712,7 @@ export default function DashboardPage() {
                     min="1"
                     max="10"
                     value={todayLog.moodScore}
-                    onChange={(e) => setMood(Number(e.target.value), currentDate)}
+                    onChange={(e) => handleSetMood(Number(e.target.value))}
                     className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
                   />
                   <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
@@ -661,7 +731,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setSleep(Math.max(4, todayLog.sleepHours - 0.5), currentDate)}
+                      onClick={() => handleSetSleep(Math.max(4, todayLog.sleepHours - 0.5))}
                       className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
                     >
                       -0.5h
@@ -672,12 +742,12 @@ export default function DashboardPage() {
                       max="11"
                       step="0.5"
                       value={todayLog.sleepHours}
-                      onChange={(e) => setSleep(Number(e.target.value), currentDate)}
+                      onChange={(e) => handleSetSleep(Number(e.target.value))}
                       className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
                     />
                     <button
                       type="button"
-                      onClick={() => setSleep(Math.min(12, todayLog.sleepHours + 0.5), currentDate)}
+                      onClick={() => handleSetSleep(Math.min(12, todayLog.sleepHours + 0.5))}
                       className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
                     >
                       +0.5h

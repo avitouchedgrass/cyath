@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { InvertedButton } from "../ui/InvertedButton";
 import { Logo } from "../ui/Logo";
+import { useHabitStore } from "@/store/useHabitStore";
+import { User } from "lucide-react";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -12,9 +14,12 @@ interface HeaderNavProps {
 
 export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { userSession } = useHabitStore();
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -76,14 +81,29 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           >
             Dashboard
           </Link>
-          <Link href="/login">
-            <InvertedButton 
-              variant="secondary" 
-              className="py-2 px-5 text-xs sm:text-sm rounded-full backdrop-blur-md cursor-pointer border-white/20 hover:bg-white/10"
+
+          {mounted && userSession ? (
+            <Link
+              href="/profile"
+              className="inline-flex items-center gap-2 py-1.5 px-3 rounded-full bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 transition-all text-xs font-mono text-white"
             >
-              Login / Signup
-            </InvertedButton>
-          </Link>
+              <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                {(userSession.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <span className="max-w-[100px] truncate hidden sm:inline">
+                {userSession.email ? userSession.email.split('@')[0] : 'Profile'}
+              </span>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <InvertedButton 
+                variant="secondary" 
+                className="py-2 px-5 text-xs sm:text-sm rounded-full backdrop-blur-md cursor-pointer border-white/20 hover:bg-white/10"
+              >
+                Login / Signup
+              </InvertedButton>
+            </Link>
+          )}
         </div>
 
       </div>

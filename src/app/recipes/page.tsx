@@ -204,7 +204,7 @@ export default function RecipesPage() {
             <button
               type="button"
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="w-full md:w-auto px-4 py-2.5 rounded-xl bg-[#111622] border border-white/10 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-3 shadow-lg cursor-pointer"
+              className="w-full md:w-auto px-4 py-2.5 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-3 shadow-lg cursor-pointer"
               aria-haspopup="listbox"
               aria-expanded={isSortOpen}
             >
@@ -220,7 +220,7 @@ export default function RecipesPage() {
 
             {/* Dropdown Menu Popup */}
             {isSortOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#111622] border border-white/15 backdrop-blur-2xl shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
+              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#121212]/95 border border-white/15 backdrop-blur-2xl shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
                 {SORT_OPTIONS.map((option) => {
                   const isSelected = sortBy === option.id;
                   return (

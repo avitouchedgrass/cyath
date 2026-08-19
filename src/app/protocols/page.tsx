@@ -218,7 +218,7 @@ export default function ProtocolsPage() {
         </div>
 
         {/* Clear, Human Hero */}
-        <div className="max-w-2xl mb-10">
+        <div className="max-w-2xl mb-8">
           <h1 className="font-serif font-normal text-3xl sm:text-4xl text-white tracking-tight">
             Daily Protocols
           </h1>
@@ -270,7 +270,7 @@ export default function ProtocolsPage() {
                       </div>
 
                       <div>
-                        <h2 className="font-serif font-normal text-xl text-white tracking-tight">
+                        <h2 className="font-serif font-normal text-xl text-white tracking-tight leading-snug">
                           {protocol.name}
                         </h2>
                         <span className="text-[11px] font-mono text-neutral-500">
@@ -294,9 +294,9 @@ export default function ProtocolsPage() {
                     {protocol.habits.map((h, idx) => (
                       <div key={idx} className="flex items-baseline gap-2.5 text-xs">
                         <span className="h-1.5 w-1.5 rounded-full bg-white/40 flex-shrink-0 mt-1.5" />
-                        <div className="flex items-baseline gap-1.5 flex-1">
+                        <div className="flex items-baseline gap-2 flex-1">
                           <span className="text-neutral-200 font-sans">{h.title}</span>
-                          <span className="text-neutral-500 font-mono text-[10px]">({h.hint})</span>
+                          <span className="text-neutral-400/80 font-mono text-[10px] tracking-tight">({h.hint})</span>
                         </div>
                       </div>
                     ))}
@@ -319,13 +319,13 @@ export default function ProtocolsPage() {
                     onClick={() => handleToggleProtocol(protocol)}
                     className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15'
+                        ? 'bg-transparent text-emerald-500 border border-neutral-800 hover:border-neutral-700 hover:bg-neutral-900/40'
                         : 'bg-white text-black hover:bg-neutral-200 shadow-sm'
                     }`}
                   >
                     {isActive ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
                         <span>Active</span>
                       </>
                     ) : (

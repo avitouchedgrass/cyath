@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelContainer } from '@/components/ui/PixelContainer';
 import { RECIPES, Recipe } from '@/lib/recipes';
@@ -29,6 +30,7 @@ const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
 ];
 
 export default function RecipesPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'protein' | 'calories' | 'time'>('protein');
@@ -41,7 +43,7 @@ export default function RecipesPage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { logRecipeToDay, getDailyLog } = useHabitStore();
+  const { logRecipeToDay, getDailyLog, userSession, setPendingAction } = useHabitStore();
   const todayLog = getDailyLog();
 
   useEffect(() => {
@@ -105,6 +107,23 @@ export default function RecipesPage() {
     e?.stopPropagation();
     const scaledProtein = Math.round(recipe.protein * multiplier);
     const scaledCalories = Math.round(recipe.calories * multiplier);
+
+    // Auth Gate: Check if user is authenticated
+    if (!userSession) {
+      setPendingAction({
+        type: 'LOG_RECIPE',
+        payload: {
+          recipeId: recipe.id,
+          recipeName: recipe.name,
+          protein: scaledProtein,
+          calories: scaledCalories,
+          portion: multiplier,
+        },
+        returnUrl: '/recipes',
+      });
+      router.push('/login?redirect=/recipes');
+      return;
+    }
 
     logRecipeToDay(recipe.id, scaledProtein, scaledCalories);
     setLoggedToast({ name: recipe.name, protein: scaledProtein, portion: multiplier });

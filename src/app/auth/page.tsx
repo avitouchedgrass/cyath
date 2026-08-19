@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
 import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw } from 'lucide-react';
 
@@ -59,26 +60,43 @@ export default function AuthPage() {
         });
         if (error) throw error;
 
-        // If session exists immediately (e.g. email confirmation disabled), go to dashboard
+        // If session exists immediately (e.g. email confirmation disabled), complete auth
         if (data.session) {
-          router.push('/dashboard');
+          completeAuthentication({ id: data.session.user.id, email: data.session.user.email || email });
         } else {
           // Email confirmation is required
           setIsVerificationSent(true);
           setResendCooldown(60);
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        router.push('/dashboard');
+        completeAuthentication({ id: data.user.id, email: data.user.email || email });
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const completeAuthentication = (user?: { id: string; email?: string }) => {
+    const { setUserSession, executePendingAction } = useHabitStore.getState();
+    if (user) {
+      setUserSession(user);
+    } else {
+      setUserSession({ id: `guest_${Date.now()}`, email: 'demo.user@cyath.health' });
+    }
+
+    const { success, executedAction } = executePendingAction();
+    if (success && executedAction) {
+      const destination = executedAction.returnUrl || '/dashboard';
+      router.push(destination);
+    } else {
+      router.push('/dashboard');
     }
   };
 
@@ -126,7 +144,7 @@ export default function AuthPage() {
   };
 
   const handleGuestAccess = () => {
-    router.push('/dashboard');
+    completeAuthentication();
   };
 
   const toggleMode = () => {

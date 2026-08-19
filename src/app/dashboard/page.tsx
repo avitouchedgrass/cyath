@@ -346,14 +346,24 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowAddHabit(!showAddHabit)}
-                  className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-neutral-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Custom Habit</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/protocols"
+                    className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-neutral-300 hover:text-white transition-all cursor-pointer hidden sm:inline-flex items-center gap-1.5"
+                  >
+                    <span>Protocols Library</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAddHabit(!showAddHabit)}
+                    className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-neutral-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Custom Habit</span>
+                  </button>
+                </div>
               </div>
 
               {/* Add Custom Habit Form */}
@@ -730,10 +740,10 @@ export default function DashboardPage() {
                   Confidence Rating: 94% (Based on last 14 logs)
                 </span>
                 <Link
-                  href="/recipes"
+                  href="/correlations"
                   className="text-xs font-mono text-neutral-300 hover:text-white flex items-center gap-1 group"
                 >
-                  <span>Explore Fuel</span>
+                  <span>Full Statistical Matrix</span>
                   <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>

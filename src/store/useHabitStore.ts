@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 export interface HabitItem {
   id: string;
   title: string;
-  category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'custom';
+  category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'mindset' | 'custom';
   targetDaysPerWeek: number;
 }
 
@@ -21,6 +21,12 @@ export interface DailyLogData {
   loggedRecipeIds: string[];
 }
 
+export interface PendingUserAction {
+  type: 'LOG_RECIPE' | 'TOGGLE_HABIT' | 'ACTIVATE_PROTOCOL';
+  payload: any;
+  returnUrl?: string;
+}
+
 export const DEFAULT_HABITS: HabitItem[] = [
   { id: 'sunlight', title: 'Morning Sunlight & Electrolytes (15m)', category: 'morning', targetDaysPerWeek: 7 },
   { id: 'protein_target', title: 'Hit Daily Protein Target (120g+)', category: 'nutrition', targetDaysPerWeek: 7 },
@@ -30,15 +36,23 @@ export const DEFAULT_HABITS: HabitItem[] = [
   { id: 'mobility', title: 'Thoracic Mobility & Cold Shower', category: 'recovery', targetDaysPerWeek: 6 },
 ];
 
-interface HabitStoreState {
+export interface HabitStoreState {
   currentDate: string; // YYYY-MM-DD
   habits: HabitItem[];
   logsByDate: Record<string, DailyLogData>;
   streakCount: number;
   isSyncing: boolean;
+  activeProtocolIds: string[];
+  userSession: { id: string; email?: string } | null;
+  pendingAction: PendingUserAction | null;
 
   // Actions
   setDate: (date: string) => void;
+  setUserSession: (session: { id: string; email?: string } | null) => void;
+  setPendingAction: (action: PendingUserAction | null) => void;
+  clearPendingAction: () => void;
+  executePendingAction: () => { success: boolean; executedAction: PendingUserAction | null };
+  activateProtocol: (protocolId: string, habitsToAdd?: HabitItem[]) => void;
   toggleHabit: (habitId: string, date?: string) => void;
   addCustomHabit: (title: string, category?: HabitItem['category']) => void;
   deleteHabit: (habitId: string) => void;
@@ -79,8 +93,60 @@ export const useHabitStore = create<HabitStoreState>()(
       },
       streakCount: 5,
       isSyncing: false,
+      activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+      userSession: null,
+      pendingAction: null,
 
       setDate: (date) => set({ currentDate: date }),
+
+      setUserSession: (session) => set({ userSession: session }),
+
+      setPendingAction: (action) => set({ pendingAction: action }),
+
+      clearPendingAction: () => set({ pendingAction: null }),
+
+      executePendingAction: () => {
+        const action = get().pendingAction;
+        if (!action) return { success: false, executedAction: null };
+
+        if (action.type === 'LOG_RECIPE') {
+          const { recipeId, protein, calories, date } = action.payload;
+          get().logRecipeToDay(recipeId, protein, calories, date);
+        } else if (action.type === 'TOGGLE_HABIT') {
+          const { habitId, date } = action.payload;
+          get().toggleHabit(habitId, date);
+        } else if (action.type === 'ACTIVATE_PROTOCOL') {
+          const { protocolId, habitsToAdd } = action.payload;
+          get().activateProtocol(protocolId, habitsToAdd);
+        }
+
+        set({ pendingAction: null });
+        return { success: true, executedAction: action };
+      },
+
+      activateProtocol: (protocolId, habitsToAdd) => {
+        const currentActive = get().activeProtocolIds;
+        const isAlreadyActive = currentActive.includes(protocolId);
+        
+        const newActive = isAlreadyActive
+          ? currentActive.filter((id) => id !== protocolId)
+          : [...currentActive, protocolId];
+
+        // If activating and habits are provided, merge any missing habits
+        let updatedHabits = [...get().habits];
+        if (!isAlreadyActive && habitsToAdd && habitsToAdd.length > 0) {
+          habitsToAdd.forEach((h) => {
+            if (!updatedHabits.some((existing) => existing.id === h.id || existing.title.toLowerCase() === h.title.toLowerCase())) {
+              updatedHabits.push(h);
+            }
+          });
+        }
+
+        set({
+          activeProtocolIds: newActive,
+          habits: updatedHabits,
+        });
+      },
 
       getDailyLog: (date) => {
         const targetDate = date || get().currentDate;
@@ -105,7 +171,6 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        // Fire-and-forget background sync
         get().syncWithSupabase(targetDate);
       },
 
@@ -157,7 +222,7 @@ export const useHabitStore = create<HabitStoreState>()(
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, hydrationLiters: Math.max(0, Number(liters.toFixed(1))) },
+            [targetDate]: { ...currentLog, hydrationLiters: Math.max(0, Math.round(liters * 100) / 100) },
           },
         }));
         get().syncWithSupabase(targetDate);
@@ -169,7 +234,7 @@ export const useHabitStore = create<HabitStoreState>()(
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, sleepHours: Math.max(0, Number(hours.toFixed(1))) },
+            [targetDate]: { ...currentLog, sleepHours: hours },
           },
         }));
         get().syncWithSupabase(targetDate);
@@ -181,7 +246,7 @@ export const useHabitStore = create<HabitStoreState>()(
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, energyLevel: Math.min(10, Math.max(1, level)) },
+            [targetDate]: { ...currentLog, energyLevel: level },
           },
         }));
         get().syncWithSupabase(targetDate);
@@ -193,7 +258,7 @@ export const useHabitStore = create<HabitStoreState>()(
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, moodScore: Math.min(10, Math.max(1, score)) },
+            [targetDate]: { ...currentLog, moodScore: score },
           },
         }));
         get().syncWithSupabase(targetDate);
@@ -260,11 +325,18 @@ export const useHabitStore = create<HabitStoreState>()(
 
         try {
           const { data: { session } } = await supabase.auth.getSession();
-          if (!session?.user?.id) return; // In guest or offline mode, local persist is authoritative
+          if (session?.user?.id) {
+            set({ userSession: { id: session.user.id, email: session.user.email } });
+          } else if (!get().userSession) {
+            return;
+          }
+
+          const userId = session?.user?.id || get().userSession?.id;
+          if (!userId) return;
 
           set({ isSyncing: true });
           await supabase.from('daily_logs').upsert({
-            user_id: session.user.id,
+            user_id: userId,
             log_date: targetDate,
             habits_completed: log.habitsCompleted,
             total_protein: log.totalProteinLogged,

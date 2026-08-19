@@ -26,9 +26,9 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
   }, []);
 
   const navItems = [
-    { name: "Protocols", href: "/dashboard" },
+    { name: "Protocols", href: "/protocols" },
     { name: "Recipes", href: "/recipes" },
-    { name: "Correlations", href: "/dashboard" },
+    { name: "Correlations", href: "/correlations" },
     { name: "Methodology", href: "/#methodology" },
   ];
 
@@ -50,7 +50,7 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           }`}
         >
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href) && item.href !== '/dashboard#correlations');
+            const isActive = pathname === item.href || (item.href !== '/' && !item.href.includes('#') && pathname.startsWith(item.href));
 
             return (
               <Link 

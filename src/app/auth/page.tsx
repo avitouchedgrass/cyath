@@ -157,7 +157,7 @@ export default function AuthPage() {
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
         <Logo className="w-7 h-7 opacity-85 group-hover:opacity-100 transition-opacity" />
-        <span className="font-serif font-bold text-sm tracking-tight text-white hidden sm:inline-block">Cyath</span>
+        <span className="font-serif font-medium text-sm tracking-tight text-white hidden sm:inline-block">Cyath</span>
       </Link>
 
       {/* Centered Auth Card */}
@@ -182,7 +182,7 @@ export default function AuthPage() {
             </div>
 
             <div>
-              <h1 className="font-serif font-bold text-2xl sm:text-3xl text-white tracking-tight">
+              <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
                 Check your inbox
               </h1>
               <p className="text-neutral-400 text-sm mt-2 font-sans leading-relaxed">
@@ -250,7 +250,7 @@ export default function AuthPage() {
           <>
             {/* Card Header & Typography (Cabinet Grotesk) */}
             <div>
-              <h1 className="font-serif font-bold text-3xl sm:text-4xl text-white tracking-tight">
+              <h1 className="font-serif font-normal text-3xl sm:text-4xl text-white tracking-tight">
                 {mode === 'signup' ? 'Sign Up' : 'Log In'}
               </h1>
               <p className="text-neutral-400 text-sm mt-1 font-sans">

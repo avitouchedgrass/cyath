@@ -49,8 +49,8 @@ export default function CorrelationsPage() {
 
       <HeaderNav />
 
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 sm:pt-32 pb-24">
+      {/* Main Content Container with safe top padding */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-32 sm:pt-36 pb-24">
         
         {/* Navigation & Header Strip */}
         <div className="flex items-center justify-between mb-8">
@@ -82,10 +82,11 @@ export default function CorrelationsPage() {
         </div>
 
         {/* Dedicated Time Horizon Selector Row */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/10 mb-6 w-fit">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.02] border border-white/10 mb-8 w-fit">
           {([7, 14, 30] as const).map((days) => (
             <button
               key={days}
+              type="button"
               onClick={() => setTimeHorizon(days)}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
                 timeHorizon === days
@@ -174,7 +175,7 @@ export default function CorrelationsPage() {
                       : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.03]'
                   }`}
                 >
-                  <div className="flex items-center justify-between w-full mb-2">
+                  <div className="flex flex-row justify-between items-center w-full mb-2">
                     <span className="text-xs font-mono text-white font-medium">
                       Pearson r = {item.coefficient}
                     </span>

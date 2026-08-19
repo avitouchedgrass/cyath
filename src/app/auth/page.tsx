@@ -242,13 +242,13 @@ export default function AuthPage() {
           </button>
         </form>
 
-        {/* 5. Guest / Offline Sandbox Mode */}
+        {/* 5. View a Demo Button */}
         <button
           type="button"
           onClick={handleGuestAccess}
           className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <span>Continue as Guest (Offline Mode)</span>
+          <span>View a Demo</span>
         </button>
 
         {/* 6. Footer Switch Link */}

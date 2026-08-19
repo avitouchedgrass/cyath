@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { InvertedButton } from "../ui/InvertedButton";
 import { Logo } from "../ui/Logo";
 
@@ -11,6 +12,7 @@ interface HeaderNavProps {
 
 export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +25,13 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navItems = [
+    { name: "Protocols", href: "/dashboard" },
+    { name: "Recipes", href: "/recipes" },
+    { name: "Correlations", href: "/dashboard" },
+    { name: "Methodology", href: "/#methodology" },
+  ];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-6 lg:px-12 pt-5 pb-3 pointer-events-none">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
@@ -34,33 +43,36 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
 
         {/* Center: Truly Centered Capsule Navigation Bar */}
         <nav 
-          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 transition-all duration-300 ease-out ${
+          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-6 transition-all duration-300 ease-out ${
             isScrolled 
-              ? "backdrop-blur-2xl bg-[#121212]/85 border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.6)] rounded-full px-8 py-2.5" 
-              : "bg-transparent border border-transparent px-8 py-2.5"
+              ? "backdrop-blur-2xl bg-[#080808]/90 border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-full px-7 py-2" 
+              : "bg-white/[0.02] border border-white/10 backdrop-blur-md rounded-full px-7 py-2"
           }`}
         >
-          {[
-            { name: "Protocols", href: "/dashboard" },
-            { name: "Recipes", href: "/recipes" },
-            { name: "Correlations", href: "/dashboard#correlations" },
-            { name: "Methodology", href: "#methodology" },
-          ].map((item) => (
-            <Link 
-              key={item.name} 
-              href={item.href}
-              className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href) && item.href !== '/dashboard#correlations');
+
+            return (
+              <Link 
+                key={item.name} 
+                href={item.href}
+                className={`text-xs font-medium transition-all px-2.5 py-1 rounded-full ${
+                  isActive
+                    ? "text-white bg-white/10 font-semibold"
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-4 z-10">
+        <div className="flex items-center gap-3.5 z-10">
           <Link
             href="/dashboard"
-            className="hidden sm:inline-flex text-xs font-semibold text-neutral-400 hover:text-white transition-colors px-2 py-1.5"
+            className="hidden sm:inline-flex text-xs font-mono text-neutral-300 hover:text-white transition-colors px-2 py-1.5"
           >
             Dashboard
           </Link>

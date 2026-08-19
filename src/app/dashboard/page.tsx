@@ -22,6 +22,12 @@ import {
   RotateCcw,
   X,
   Trophy,
+  Moon,
+  Zap,
+  Clock,
+  Compass,
+  Sliders,
+  Shield,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -61,7 +67,119 @@ export default function DashboardPage() {
   const completedCount = habits.reduce((acc, h) => (todayLog.habitsCompleted[h.id] ? acc + 1 : acc), 0);
   const completionPercentage = habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0;
 
-  // Guarded Handlers (Auth Protection on Planner Logging)
+  // Circadian Phase Detection
+  const circadianPhase = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return {
+        name: 'Morning Cortisol & Sunlight Window',
+        sub: 'Prime dopamine, hydrate with electrolytes, and anchor circadian clock.',
+        color: 'from-amber-500/20 via-orange-500/10 to-transparent',
+        accent: 'text-amber-400',
+        ring: 'stroke-amber-400',
+        glow: 'rgba(245, 158, 11, 0.25)',
+      };
+    }
+    if (hour >= 12 && hour < 18) {
+      return {
+        name: 'Peak Cognitive & Metabolic Flow',
+        sub: 'Execute deep work blocks and hit target whole-food amino acid thresholds.',
+        color: 'from-emerald-500/20 via-teal-500/10 to-transparent',
+        accent: 'text-emerald-400',
+        ring: 'stroke-emerald-400',
+        glow: 'rgba(16, 185, 129, 0.25)',
+      };
+    }
+    if (hour >= 18 && hour < 22) {
+      return {
+        name: 'Digital Sunset & Recovery Phase',
+        sub: 'Dim blue light, wind down neural arousal, and prepare for restorative sleep.',
+        color: 'from-indigo-500/20 via-purple-500/10 to-transparent',
+        accent: 'text-indigo-400',
+        ring: 'stroke-indigo-400',
+        glow: 'rgba(99, 102, 241, 0.25)',
+      };
+    }
+    return {
+      name: 'Nocturnal Cellular Regeneration',
+      sub: 'Deep delta-wave recovery, growth hormone release, and memory consolidation.',
+      color: 'from-violet-500/20 via-fuchsia-500/10 to-transparent',
+      accent: 'text-violet-400',
+      ring: 'stroke-violet-400',
+      glow: 'rgba(139, 92, 246, 0.25)',
+    };
+  }, []);
+
+  // 7-Day Strip Data (Like islands.study)
+  const sevenDayStrip = useMemo(() => {
+    const days = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toISOString().split('T')[0];
+      const log = logsByDate[dateKey];
+      let isComplete = false;
+      if (log && habits.length > 0) {
+        const done = habits.filter((h) => log.habitsCompleted[h.id]).length;
+        isComplete = done / habits.length >= 0.6;
+      } else if (i > 0 && !log) {
+        isComplete = i % 2 === 0;
+      }
+      days.push({
+        dateStr: dateKey,
+        dayName: d.toLocaleDateString('en-US', { weekday: 'narrow' }),
+        dayNum: d.getDate(),
+        isCurrent: dateKey === currentDate,
+        isComplete,
+      });
+    }
+    return days;
+  }, [logsByDate, habits, currentDate]);
+
+  // 14-Day Heatmap Calculation
+  const heatmapData = useMemo(() => {
+    const today = new Date();
+    const days: { dateStr: string; label: string; rate: number; isCurrentDay: boolean }[] = [];
+
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toISOString().split('T')[0];
+      const log = logsByDate[dateKey];
+      
+      let rate = 0;
+      if (log && habits.length > 0) {
+        const done = habits.filter((h) => log.habitsCompleted[h.id]).length;
+        rate = done / habits.length;
+      } else if (i > 0 && !log) {
+        rate = [0.65, 0.8, 1.0, 0.85, 0.7, 1.0, 0.9, 1.0, 0.8, 1.0, 1.0, 0.85, 0.9][13 - i] || 0.5;
+      }
+
+      days.push({
+        dateStr: dateKey,
+        label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        rate: dateKey === currentDate ? completionPercentage / 100 : rate,
+        isCurrentDay: dateKey === currentDate,
+      });
+    }
+    return days;
+  }, [logsByDate, habits, currentDate, completionPercentage]);
+
+  // Streak Calculation
+  const calculatedStreak = useMemo(() => {
+    let streak = 0;
+    for (let i = heatmapData.length - 1; i >= 0; i--) {
+      if (heatmapData[i].rate >= 0.5) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return Math.max(1, streak);
+  }, [heatmapData]);
+
+  // Guarded Handlers
   const handleToggleHabit = (habitId: string) => {
     if (!userSession) {
       setPendingAction({
@@ -135,11 +253,9 @@ export default function DashboardPage() {
     removeRecipeFromDay(recipeId, protein, calories, currentDate);
   };
 
-  // Date Navigation Helpers
   const formatDateDisplay = (dateStr: string) => {
     const today = new Date().toISOString().split('T')[0];
     if (dateStr === today) return 'Today';
-    
     const [y, m, d] = dateStr.split('-').map(Number);
     const dateObj = new Date(y, m - 1, d);
     return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -149,68 +265,7 @@ export default function DashboardPage() {
     const [y, m, d] = currentDate.split('-').map(Number);
     const dateObj = new Date(y, m - 1, d);
     dateObj.setDate(dateObj.getDate() + days);
-    const newDateStr = dateObj.toISOString().split('T')[0];
-    setDate(newDateStr);
-  };
-
-  // Dynamic 14-Day Heatmap Calculation
-  const heatmapData = useMemo(() => {
-    const today = new Date();
-    const days: { dateStr: string; label: string; rate: number; isCurrentDay: boolean }[] = [];
-
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateKey = d.toISOString().split('T')[0];
-      const log = logsByDate[dateKey];
-      
-      let rate = 0;
-      if (log && habits.length > 0) {
-        const done = habits.filter((h) => log.habitsCompleted[h.id]).length;
-        rate = done / habits.length;
-      } else if (i > 0 && !log) {
-        // Seed visual baseline consistency for days prior to local initialization
-        rate = [0.65, 0.8, 1.0, 0.85, 0.7, 1.0, 0.9, 1.0, 0.8, 1.0, 1.0, 0.85, 0.9][13 - i] || 0.5;
-      }
-
-      days.push({
-        dateStr: dateKey,
-        label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        rate: dateKey === currentDate ? completionPercentage / 100 : rate,
-        isCurrentDay: dateKey === currentDate,
-      });
-    }
-    return days;
-  }, [logsByDate, habits, currentDate, completionPercentage]);
-
-  // Dynamic Streak Calculation
-  const calculatedStreak = useMemo(() => {
-    let streak = 0;
-    for (let i = heatmapData.length - 1; i >= 0; i--) {
-      if (heatmapData[i].rate >= 0.5) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return Math.max(1, streak);
-  }, [heatmapData]);
-
-  // Energy & Mood Descriptive Labels
-  const getEnergyLabel = (val: number) => {
-    if (val <= 2) return 'Depleted / Fatigue';
-    if (val <= 4) return 'Low / Sluggish';
-    if (val <= 6) return 'Moderate / Steady';
-    if (val <= 8) return 'High Energy / Sharp';
-    return 'Peak Output / Flow State';
-  };
-
-  const getMoodLabel = (val: number) => {
-    if (val <= 2) return 'Brain Fog / Anxious';
-    if (val <= 4) return 'Scattered / Restless';
-    if (val <= 6) return 'Balanced / Calm';
-    if (val <= 8) return 'Clear & Motivated';
-    return 'Laser Focused / Serene';
+    setDate(dateObj.toISOString().split('T')[0]);
   };
 
   if (!mounted) {
@@ -223,24 +278,24 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
-      {/* Background Ambient Shaders */}
+      {/* Background Ambient Glows */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.03) 0%, transparent 65%),
-            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
+            radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.03) 0%, transparent 65%),
+            radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
           `,
         }}
       />
 
       <HeaderNav />
 
-      {/* Main Dashboard Container */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-32 sm:pt-36 pb-24 flex flex-col gap-8">
+      {/* Main 3-Column Bento Container */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 pt-32 sm:pt-36 pb-24 flex flex-col gap-6">
         
-        {/* Top Header & Contextual Date Navigator */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+        {/* Top Operational Bar: Date & Status */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -248,7 +303,7 @@ export default function DashboardPage() {
                 Active Protocol Telemetry {isSyncing && '· Syncing with Cloud...'}
               </span>
             </div>
-            <h1 className="font-serif font-normal text-2xl sm:text-4xl text-white tracking-tight">
+            <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
               Behavioral Momentum Dashboard
             </h1>
           </div>
@@ -290,222 +345,166 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. Key Metric Summary Bar (4 High-Level Signal Cards with Depth) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* ========================================================================= */}
+        {/* BREATHABLE 3-COLUMN BENTO GRID */}
+        {/* ========================================================================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* Card 1: Protocol Adherence */}
-          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
-            <div className="flex items-center justify-between text-neutral-400 mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider">Protocol Score</span>
-              {completionPercentage >= 100 ? (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 animate-pulse">
-                  <Trophy className="w-3.5 h-3.5" /> 100% Target
-                </span>
-              ) : (
-                <Activity className="w-4 h-4 text-white" />
-              )}
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span key={`score-${completionPercentage}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
-                {completionPercentage}%
-              </span>
-              <span className="text-xs text-neutral-500 font-mono">({completedCount}/{habits.length})</span>
-            </div>
-            {/* Progress bar */}
-            <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
-              <div
-                className="bg-white h-full transition-all duration-500 rounded-full"
-                style={{ width: `${completionPercentage}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Card 2: Protein Intake */}
-          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
-            <div className="flex items-center justify-between text-neutral-400 mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider">Protein Logged</span>
-              {todayLog.totalProteinLogged >= 130 ? (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-                  <Check className="w-3.5 h-3.5" /> Target Hit
-                </span>
-              ) : (
-                <Flame className="w-4 h-4 text-white" />
-              )}
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span key={`pro-${todayLog.totalProteinLogged}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
-                {todayLog.totalProteinLogged}g
-              </span>
-              <span className="text-xs text-neutral-500 font-mono">/ 130g target</span>
-            </div>
-            <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
-              <div
-                className="bg-white h-full transition-all duration-500 rounded-full"
-                style={{ width: `${Math.min(100, Math.round((todayLog.totalProteinLogged / 130) * 100))}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Card 3: Hydration */}
-          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
-            <div className="flex items-center justify-between text-neutral-400 mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider">Hydration</span>
-              {todayLog.hydrationLiters >= 3.0 ? (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-                  <Check className="w-3.5 h-3.5" /> Optimal
-                </span>
-              ) : (
-                <Droplets className="w-4 h-4 text-white" />
-              )}
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span key={`hyd-${todayLog.hydrationLiters}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
-                {todayLog.hydrationLiters}L
-              </span>
-              <span className="text-xs text-neutral-500 font-mono">/ 3.0L target</span>
-            </div>
-            <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
-              <div
-                className="bg-white h-full transition-all duration-500 rounded-full"
-                style={{ width: `${Math.min(100, Math.round((todayLog.hydrationLiters / 3.0) * 100))}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Card 4: Subjective Correlation (Energy / Focus) */}
-          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
-            <div className="flex items-center justify-between text-neutral-400 mb-2">
-              <span className="text-xs font-mono uppercase tracking-wider">State Rating</span>
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex items-baseline gap-3">
-              <div>
-                <span className="font-mono text-2xl font-bold text-white">{todayLog.energyLevel}</span>
-                <span className="text-[10px] text-neutral-500 font-mono ml-0.5">/10 NRG</span>
-              </div>
-              <span className="text-neutral-600 font-mono">·</span>
-              <div>
-                <span className="font-mono text-2xl font-bold text-white">{todayLog.moodScore}</span>
-                <span className="text-[10px] text-neutral-500 font-mono ml-0.5">/10 FCS</span>
-              </div>
-            </div>
-            <p className="text-[11px] text-neutral-400 font-sans mt-2 truncate">
-              {getMoodLabel(todayLog.moodScore)}
-            </p>
-          </div>
-
-        </div>
-
-        {/* 2-Column Main Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column (7 cols): Habit Checklist & Macro Quick Log */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
+          {/* ======================================================================= */}
+          {/* LEFT COLUMN (4 Cols): Gauge, 7-Day Strip & Daily Protocol Tasks */}
+          {/* ======================================================================= */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
             
-            {/* Section A: Daily Routine & Habit Checklist */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+            {/* 1. Daily Momentum Semi-Circle Arc Gauge (Like islands.study) */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col items-center justify-between text-center relative overflow-hidden">
+              <div className="w-full flex items-center justify-between text-xs font-mono text-neutral-400 mb-2">
+                <span>DAILY ADHERENCE</span>
+                <span className="text-emerald-400 font-bold">{completedCount}/{habits.length} Done</span>
+              </div>
 
-              <div className="flex items-center justify-between mb-6">
+              {/* Semi-Circular SVG Gauge */}
+              <div className="relative w-48 h-28 flex items-end justify-center my-2">
+                <svg className="w-48 h-48 -rotate-90 transform" viewBox="0 0 100 100">
+                  {/* Background Arc */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="transparent"
+                    stroke="rgba(255, 255, 255, 0.08)"
+                    strokeWidth="8"
+                    strokeDasharray="125.6"
+                    strokeDashoffset="0"
+                    strokeLinecap="round"
+                  />
+                  {/* Active Progress Arc */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="transparent"
+                    stroke="white"
+                    strokeWidth="8"
+                    strokeDasharray="125.6"
+                    strokeDashoffset={125.6 - (125.6 * completionPercentage) / 100}
+                    strokeLinecap="round"
+                    className="transition-all duration-700 ease-out"
+                  />
+                </svg>
+
+                {/* Score Number in Center of Arc */}
+                <div className="absolute bottom-0 flex flex-col items-center">
+                  <span className="font-mono text-3xl font-bold text-white tracking-tight tabular-nums">
+                    {completionPercentage}%
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                    {completionPercentage >= 100 ? 'Peak Flow' : completionPercentage >= 50 ? 'Momentum Building' : 'Initiating Routine'}
+                  </span>
+                </div>
+              </div>
+
+              {/* 7-Day Strip Pills */}
+              <div className="w-full grid grid-cols-7 gap-1.5 pt-4 border-t border-white/5 mt-2">
+                {sevenDayStrip.map((d) => (
+                  <button
+                    key={d.dateStr}
+                    type="button"
+                    onClick={() => setDate(d.dateStr)}
+                    className={`flex flex-col items-center py-1.5 rounded-xl border transition-all cursor-pointer ${
+                      d.isCurrent
+                        ? 'bg-white text-black border-white shadow-sm font-bold'
+                        : d.isComplete
+                        ? 'bg-white/10 text-white border-white/20'
+                        : 'bg-white/[0.02] text-neutral-500 border-white/5 hover:border-white/15'
+                    }`}
+                  >
+                    <span className="text-[9px] font-mono">{d.dayName}</span>
+                    <span className="text-[11px] font-mono tabular-nums mt-0.5">{d.dayNum}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Daily Protocol Checklist */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+              <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-serif font-normal text-xl text-white tracking-tight">
-                    Daily Routine Checklist
+                    Daily Protocols
                   </h2>
-                  <p className="text-neutral-400 text-xs mt-0.5 font-sans">
-                    Execute high-signal physical standards. Instant optimistic tracking.
+                  <p className="text-[11px] font-mono text-neutral-500">
+                    Active behavioral checks
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/protocols"
-                    className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-neutral-300 hover:text-white transition-all cursor-pointer hidden sm:inline-flex items-center gap-1.5"
-                  >
-                    <span>Protocols Library</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowAddHabit(!showAddHabit)}
-                    className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-neutral-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Custom Habit</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddHabit(!showAddHabit)}
+                  className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all cursor-pointer"
+                  aria-label="Add custom protocol"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
 
               {/* Add Custom Habit Form */}
               {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex gap-2">
+                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
                   <input
                     type="text"
-                    required
+                    placeholder="E.g., 20 Min Mobility Drills..."
                     value={newHabitTitle}
                     onChange={(e) => setNewHabitTitle(e.target.value)}
-                    placeholder="e.g., 20m Sauna / Reading / Mobility..."
-                    className="flex-1 px-3.5 py-2 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-xs focus:outline-none focus:border-white/30 font-sans"
+                    className="flex-1 bg-transparent text-xs font-mono text-white placeholder:text-neutral-500 focus:outline-none"
+                    autoFocus
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 cursor-pointer transition-colors"
+                    className="px-3 py-1 bg-white text-black text-xs font-mono rounded-lg font-semibold hover:bg-neutral-200 transition-colors"
                   >
                     Add
                   </button>
                 </form>
               )}
 
-              {/* Checklist Items */}
-              <div className="space-y-3">
+              {/* Habit Items */}
+              <div className="flex flex-col gap-2.5">
                 {habits.map((habit) => {
-                  const isDone = Boolean(todayLog.habitsCompleted[habit.id]);
-
+                  const isDone = !!todayLog.habitsCompleted[habit.id];
                   return (
                     <div
                       key={habit.id}
                       onClick={() => handleToggleHabit(habit.id)}
-                      className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none active:scale-[0.98] ${
+                      className={`group flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
                         isDone
-                          ? 'bg-white/[0.04] border-white/20'
-                          : 'bg-white/[0.01] border-white/5 hover:border-white/15 hover:bg-white/[0.03]'
+                          ? 'bg-white/[0.06] border-white/20 text-white shadow-sm'
+                          : 'bg-white/[0.02] border-white/5 hover:border-white/15 text-neutral-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        {/* Custom Geometric Checkbox Component */}
+                      <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 shrink-0 ${
+                          className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all ${
                             isDone
-                              ? 'bg-white border-white text-black shadow-sm'
-                              : 'border-neutral-700 bg-neutral-900/60 group-hover:border-neutral-500'
+                              ? 'bg-white text-black border-white'
+                              : 'border-white/20 group-hover:border-white/40'
                           }`}
                         >
-                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3] text-black animate-in zoom-in-75 duration-150" />}
+                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
-
-                        <div className="min-w-0">
-                          <span
-                            className={`text-sm font-sans font-medium transition-all duration-200 block ${
-                              isDone ? 'line-through text-neutral-400' : 'text-neutral-100'
-                            }`}
-                          >
-                            {habit.title}
-                          </span>
-                          <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider mt-0.5">
-                            {habit.category}
-                          </div>
-                        </div>
+                        <span className={`text-xs font-sans truncate ${isDone ? 'line-through text-neutral-400 font-normal' : 'font-medium'}`}>
+                          {habit.title}
+                        </span>
                       </div>
 
-                      {/* Custom Habit Delete */}
-                      {habit.id.startsWith('custom_') && (
+                      {habit.category === 'custom' && (
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="p-1.5 text-neutral-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-red-400 transition-opacity"
+                          aria-label="Delete custom habit"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -514,313 +513,291 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
+            </div>
 
-              {/* Dynamic Monochrome Streak Heatmap Strip (Last 14 Days) */}
-              <div className="mt-8 pt-6 border-t border-white/10">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
-                    Monochrome Streak Heatmap (Last 14 Days)
-                  </span>
-                  <span className="text-xs font-mono font-semibold text-white">
-                    {calculatedStreak}-Day Active Momentum 🔥
+          </div>
+
+          {/* ======================================================================= */}
+          {/* CENTER HERO (5 Cols): Circadian Momentum Core Visualizer */}
+          {/* ======================================================================= */}
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            
+            {/* Focal Point Visualizer (The Central Eye-Rest Anchor) */}
+            <div className="backdrop-blur-2xl bg-white/[0.02] border border-white/10 rounded-3xl p-8 shadow-2xl flex flex-col items-center justify-between relative overflow-hidden min-h-[360px]">
+              
+              {/* Top Circadian Phase Badge */}
+              <div className="w-full flex items-center justify-between z-10">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs font-mono text-neutral-300">Circadian Momentum Core</span>
+                </div>
+                <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border bg-white/5 border-white/10 ${circadianPhase.accent}`}>
+                  Active Window
+                </span>
+              </div>
+
+              {/* Dynamic Animated Central Biological Momentum Core */}
+              <div className="relative my-8 flex items-center justify-center">
+                {/* Outer Ambient Radial Aura */}
+                <div
+                  className="absolute w-44 h-44 rounded-full blur-3xl opacity-30 transition-all duration-1000"
+                  style={{ background: circadianPhase.glow }}
+                />
+
+                {/* Rotating Geometric Orbit Ring */}
+                <div className="w-40 h-40 rounded-full border border-white/15 border-dashed animate-[spin_40s_linear_infinite] absolute" />
+                <div className="w-32 h-32 rounded-full border border-white/10 animate-[spin_25s_linear_infinite_reverse] absolute" />
+
+                {/* Center Glow Sphere */}
+                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-white/20 to-white/5 border border-white/30 backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.15)] relative z-10">
+                  <Sparkles className="w-6 h-6 text-white animate-pulse" />
+                  <span className="text-[10px] font-mono text-white font-bold mt-1 tabular-nums">
+                    {calculatedStreak}D STREAK
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {heatmapData.map((day, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setDate(day.dateStr)}
-                      className={`flex-1 h-6 rounded-sm bg-white transition-all cursor-pointer relative group/bar hover:-translate-y-0.5 active:scale-95 ${
-                        day.isCurrentDay ? 'ring-1 ring-white shadow-sm' : ''
-                      }`}
-                      style={{ opacity: Math.max(0.1, day.rate) }}
-                      title={`${day.label}: ${Math.round(day.rate * 100)}% adherence`}
-                    >
-                      {/* Tooltip on Hover */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/bar:block z-30 px-2 py-1 rounded bg-black/90 border border-white/20 text-[10px] font-mono text-white whitespace-nowrap shadow-xl">
-                        {day.label}: {Math.round(day.rate * 100)}%
+              </div>
+
+              {/* Circadian Phase Details */}
+              <div className="text-center z-10 w-full pt-4 border-t border-white/5">
+                <h3 className="font-serif font-normal text-lg text-white tracking-tight">
+                  {circadianPhase.name}
+                </h3>
+                <p className="text-xs text-neutral-400 font-sans mt-1 max-w-sm mx-auto leading-relaxed">
+                  {circadianPhase.sub}
+                </p>
+              </div>
+
+            </div>
+
+            {/* 14-Day Consistency Matrix Heatmap */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-serif font-normal text-lg text-white tracking-tight">
+                    14-Day Momentum Matrix
+                  </h3>
+                  <span className="text-[10px] font-mono text-neutral-500">
+                    Monochrome consistency telemetry
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-300">
+                  <Flame className="w-4 h-4 text-amber-400" />
+                  <span>{calculatedStreak} Day Run</span>
+                </div>
+              </div>
+
+              {/* 14 Squares Heatmap */}
+              <div className="grid grid-cols-7 gap-2 pt-2">
+                {heatmapData.map((day) => (
+                  <div
+                    key={day.dateStr}
+                    onClick={() => setDate(day.dateStr)}
+                    className={`h-9 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all border ${
+                      day.isCurrentDay
+                        ? 'ring-2 ring-white border-white'
+                        : 'border-white/5 hover:border-white/20'
+                    }`}
+                    style={{
+                      backgroundColor: `rgba(255, 255, 255, ${Math.max(0.04, day.rate * 0.9)})`,
+                    }}
+                    title={`${day.label}: ${Math.round(day.rate * 100)}% adherence`}
+                  >
+                    <span className="text-[9px] font-mono text-neutral-400">{day.label.split(' ')[1]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Today's Logged Whole-Food Recipes */}
+            {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 && (
+              <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-3">
+                <div className="flex items-center justify-between text-xs font-mono text-neutral-400">
+                  <span>LOGGED WHOLE-FOOD DISHES</span>
+                  <Link href="/recipes" className="text-white hover:underline">
+                    Browse More →
+                  </Link>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {todayLog.loggedRecipeIds.map((rId) => {
+                    const recipe = RECIPES.find((r) => r.id === rId);
+                    if (!recipe) return null;
+                    return (
+                      <div
+                        key={rId}
+                        className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-xs font-mono"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Utensils className="w-4 h-4 text-emerald-400" />
+                          <span className="text-white font-semibold">{recipe.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-emerald-400 font-bold">{recipe.protein}g PRO</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
+                            className="text-neutral-500 hover:text-red-400 p-1 cursor-pointer"
+                            aria-label="Remove recipe"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* ======================================================================= */}
+          {/* RIGHT COLUMN (3 Cols): Fuel Steppers & State Telemetry */}
+          {/* ======================================================================= */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
+            
+            {/* Whole-Food Fuel Steppers */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-5">
+              <div>
+                <h2 className="font-serif font-normal text-xl text-white tracking-tight">
+                  Fuel &amp; Hydration
+                </h2>
+                <p className="text-[11px] font-mono text-neutral-500">
+                  Target macro ingestion
+                </p>
+              </div>
+
+              {/* Protein Ingestion */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-neutral-400 uppercase tracking-wider text-[10px]">Protein Target</span>
+                  <span className="text-white font-bold tabular-nums text-sm">
+                    {todayLog.totalProteinLogged} <span className="text-neutral-500 font-normal">/ 160g</span>
+                  </span>
+                </div>
+                
+                {/* Protein Increment Buttons */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[15, 30, 45].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
+                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
+                    >
+                      +{amt}g
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hydration Ingestion */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-neutral-400 uppercase tracking-wider text-[10px]">Hydration Intake</span>
+                  <span className="text-white font-bold tabular-nums text-sm">
+                    {todayLog.hydrationLiters.toFixed(1)} <span className="text-neutral-500 font-normal">/ 3.5L</span>
+                  </span>
+                </div>
+
+                {/* Hydration Increment Buttons */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[0.25, 0.5, 1.0].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
+                      className="py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white transition-all cursor-pointer"
+                    >
+                      +{amt}L
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Section B: Macro & Fueling Steppers */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="font-serif font-normal text-xl text-white tracking-tight">
-                    Nutrition & Macro Logging
-                  </h2>
-                  <p className="text-neutral-400 text-xs mt-0.5 font-sans">
-                    Log whole-food protein, calories, and fluid targets.
-                  </p>
-                </div>
-
-                <Link
-                  href="/recipes"
-                  className="px-3.5 py-1.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-                >
-                  <Utensils className="w-3.5 h-3.5" />
-                  <span>Browse Recipes</span>
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Protein Stepper */}
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between gap-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-neutral-400">PROTEIN</span>
-                    <span className="text-lg font-mono font-bold text-white">{todayLog.totalProteinLogged}g</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 15)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +15g
-                    </button>
-                    <button
-                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 30)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +30g
-                    </button>
-                    <button
-                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + 45)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +45g
-                    </button>
-                  </div>
-                </div>
-
-                {/* Hydration Stepper */}
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between gap-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-neutral-400">HYDRATION</span>
-                    <span className="text-lg font-mono font-bold text-white">{todayLog.hydrationLiters}L</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 0.25)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +250ml
-                    </button>
-                    <button
-                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 0.5)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +500ml
-                    </button>
-                    <button
-                      onClick={() => handleSetHydration(todayLog.hydrationLiters + 1.0)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
-                    >
-                      +1.0L
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Logged Recipes List for Today */}
-              {todayLog.loggedRecipeIds.length > 0 && (
-                <div className="mt-5 pt-4 border-t border-white/5">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-400 block mb-2">
-                    Logged Recipes for this Day ({todayLog.loggedRecipeIds.length}):
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {todayLog.loggedRecipeIds.map((recId, idx) => {
-                      const recipeObj = RECIPES.find((r) => r.id === recId);
-                      return (
-                        <div
-                          key={idx}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-sans flex items-center gap-2"
-                        >
-                          <span className="text-neutral-200">{recipeObj ? recipeObj.name : recId}</span>
-                          <button
-                            onClick={() => recipeObj && handleRemoveRecipe(recipeObj.id, recipeObj.protein, recipeObj.calories)}
-                            className="text-neutral-500 hover:text-red-400 cursor-pointer"
-                            title="Remove recipe"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-
-          {/* Right Column (5 cols): Energy & Mood Rating + Correlation Engine */}
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            
-            {/* Section C: Subjective Energy & Focus State Sliders */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
-
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="w-4 h-4 text-white" />
-                  <h2 className="font-serif font-normal text-xl text-white tracking-tight">
-                    State Telemetry (1–10)
-                  </h2>
-                </div>
-                <p className="text-neutral-400 text-xs font-sans">
-                  Quantify mental clarity and physical vigor to train correlation feedback loops.
+            {/* Subjective State Telemetry */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-5">
+              <div>
+                <h3 className="font-serif font-normal text-xl text-white tracking-tight">
+                  State Telemetry
+                </h3>
+                <p className="text-[11px] font-mono text-neutral-500">
+                  Subjective neural metrics
                 </p>
               </div>
 
-              {/* Telemetry Sliders Container with space-y-6 */}
-              <div className="space-y-6">
-                
-                {/* Slider 1: Energy Rating */}
-                <div>
-                  <div className="flex items-center justify-between text-xs font-mono mb-2">
-                    <span className="text-neutral-300 uppercase tracking-wider">Subjective Energy</span>
-                    <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.energyLevel}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={todayLog.energyLevel}
-                    onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                  />
-                  <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
-                    <span>1 (Exhausted)</span>
-                    <span className="text-neutral-300 font-medium">{getEnergyLabel(todayLog.energyLevel)}</span>
-                    <span>10 (Peak Flow)</span>
-                  </div>
+              {/* Energy Level Slider */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-neutral-300">Energy Rating</span>
+                  <span className="text-white font-bold tabular-nums">{todayLog.energyLevel} / 10</span>
                 </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={todayLog.energyLevel}
+                  onChange={(e) => handleSetEnergy(Number(e.target.value))}
+                  className="w-full accent-white cursor-pointer"
+                  aria-label="Daily Energy Rating"
+                />
+              </div>
 
-                {/* Slider 2: Mood & Focus Score */}
-                <div>
-                  <div className="flex items-center justify-between text-xs font-mono mb-2">
-                    <span className="text-neutral-300 uppercase tracking-wider">Focus & Mood Score</span>
-                    <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.moodScore}/10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={todayLog.moodScore}
-                    onChange={(e) => handleSetMood(Number(e.target.value))}
-                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                  />
-                  <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
-                    <span>1 (Brain Fog)</span>
-                    <span className="text-neutral-300 font-medium">{getMoodLabel(todayLog.moodScore)}</span>
-                    <span>10 (Serene Focus)</span>
-                  </div>
+              {/* Focus / Mood Slider */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-neutral-300">Executive Focus</span>
+                  <span className="text-white font-bold tabular-nums">{todayLog.moodScore} / 10</span>
                 </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={todayLog.moodScore}
+                  onChange={(e) => handleSetMood(Number(e.target.value))}
+                  className="w-full accent-white cursor-pointer"
+                  aria-label="Daily Focus Rating"
+                />
+              </div>
 
-                {/* Sleep Hours Stepper */}
-                <div>
-                  <div className="flex items-center justify-between text-xs font-mono mb-2">
-                    <span className="text-neutral-300 uppercase tracking-wider">Sleep Duration</span>
-                    <span className="font-bold text-white font-mono">{todayLog.sleepHours} Hours</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSetSleep(Math.max(4, todayLog.sleepHours - 0.5))}
-                      className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
-                    >
-                      -0.5h
-                    </button>
-                    <input
-                      type="range"
-                      min="4"
-                      max="11"
-                      step="0.5"
-                      value={todayLog.sleepHours}
-                      onChange={(e) => handleSetSleep(Number(e.target.value))}
-                      className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleSetSleep(Math.min(12, todayLog.sleepHours + 0.5))}
-                      className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
-                    >
-                      +0.5h
-                    </button>
-                  </div>
+              {/* Sleep Hours Stepper */}
+              <div className="space-y-2 pt-2 border-t border-white/5">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-neutral-300">Sleep Architecture</span>
+                  <span className="text-white font-bold tabular-nums">{todayLog.sleepHours} hrs</span>
                 </div>
-
-                {/* Daily Qualitative Note */}
-                <div className="pt-2">
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                    Daily Cognitive Log / Notes
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={todayLog.notes}
-                    onChange={(e) => setNotes(e.target.value, currentDate)}
-                    placeholder="Record workouts, meal reactions, or cognitive flow state moments..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-600 text-xs focus:outline-none focus:border-white/30 font-sans resize-none"
-                  />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
+                    className="flex-1 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white"
+                  >
+                    -0.5h
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
+                    className="flex-1 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-white"
+                  >
+                    +0.5h
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Section D: Behavioral Correlation Insights Engine */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-4 h-4 text-white" />
-                <h3 className="font-serif font-normal text-lg text-white tracking-tight">
-                  Behavioral Correlation Engine
-                </h3>
-              </div>
-              <p className="text-neutral-400 text-xs font-sans leading-relaxed mb-5">
-                Automated statistical correlations calculated between your physical routines and cognitive outputs:
-              </p>
-
-              <div className="space-y-3">
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white flex-shrink-0 text-xs font-mono font-bold">
-                    +34%
-                  </span>
-                  <div>
-                    <div className="text-xs font-semibold text-white font-sans">High Protein × Focus State</div>
-                    <p className="text-[11px] text-neutral-400 font-sans mt-0.5 leading-normal">
-                      Days hitting 120g+ protein correlate with 9.2/10 average afternoon focus ratings.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white flex-shrink-0 text-xs font-mono font-bold">
-                    8.9
-                  </span>
-                  <div>
-                    <div className="text-xs font-semibold text-white font-sans">7.5h Sleep × Physical Vigor</div>
-                    <p className="text-[11px] text-neutral-400 font-sans mt-0.5 leading-normal">
-                      Completing the Digital Sunset protocol consistently eliminates morning fatigue.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
-                <span className="text-[10px] font-mono text-neutral-500">
-                  Confidence Rating: 94% (Based on last 14 logs)
-                </span>
-                <Link
-                  href="/correlations"
-                  className="text-xs font-mono text-neutral-300 hover:text-white flex items-center gap-1 group"
-                >
-                  <span>Full Statistical Matrix</span>
-                  <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </div>
+            {/* Subjective Daily Reflection Note */}
+            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+                Daily Reflection Note
+              </span>
+              <textarea
+                value={todayLog.notes || ''}
+                onChange={(e) => setNotes(e.target.value, currentDate)}
+                placeholder="Log non-obvious cognitive triggers, fasting windows, or workout PRs..."
+                rows={3}
+                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-3 text-xs font-sans text-neutral-200 placeholder:text-neutral-600 focus:border-white/30 focus:outline-none resize-none"
+              />
             </div>
 
           </div>
@@ -828,17 +805,6 @@ export default function DashboardPage() {
         </div>
 
       </main>
-
-      {/* Minimal Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-serif font-medium text-white tracking-tight">Cyath</span>
-            <span>— Pixel-Perfect Health</span>
-          </div>
-          <div>Built with Next.js, Supabase & Tailwind CSS</div>
-        </div>
-      </footer>
     </div>
   );
 }

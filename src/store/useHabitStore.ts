@@ -81,6 +81,7 @@ export interface HabitStoreState {
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   getDailyLog: (date?: string) => DailyLogData;
   syncWithSupabase: (date?: string) => Promise<void>;
+  initDemoSession: () => void;
   deleteAccountData: () => Promise<void>;
 }
 
@@ -380,17 +381,20 @@ export const useHabitStore = create<HabitStoreState>()(
         const log = get().logsByDate[targetDate];
         if (!log) return;
 
+        const currentSession = get().userSession;
+        if (!currentSession || currentSession.id.startsWith('guest_')) {
+          return; // Demo sessions do not sync to Supabase
+        }
+
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user?.id) {
             set({ userSession: { id: session.user.id, email: session.user.email } });
-          } else if (!get().userSession) {
+          } else {
             return;
           }
 
-          const userId = session?.user?.id || get().userSession?.id;
-          if (!userId) return;
-
+          const userId = session.user.id;
           set({ isSyncing: true });
           await supabase.from('daily_logs').upsert({
             user_id: userId,
@@ -411,6 +415,48 @@ export const useHabitStore = create<HabitStoreState>()(
         } finally {
           set({ isSyncing: false });
         }
+      },
+
+      initDemoSession: () => {
+        const today = getTodayString();
+        set({
+          userSession: { id: `guest_${Date.now()}`, email: 'demo.user@cyath.health' },
+          userProfile: {
+            fullName: 'Alex Vance (Demo)',
+            age: 28,
+            sex: 'male',
+            heightCm: 178,
+            weightKg: 74,
+            primaryGoal: 'focus',
+            allergies: [],
+            dietaryRestrictions: ['High-Protein Omnivore'],
+            onboardingCompleted: true,
+          },
+          habits: DEFAULT_HABITS,
+          activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+          logsByDate: {
+            [today]: {
+              habitsCompleted: {
+                sunlight: true,
+                protein_target: false,
+                movement: true,
+                hydration: false,
+                digital_sunset: false,
+                mobility: false,
+              },
+              totalProteinLogged: 45,
+              totalCaloriesLogged: 620,
+              hydrationLiters: 1.2,
+              sleepHours: 8.0,
+              energyLevel: 8,
+              moodScore: 8,
+              notes: 'Demo sandbox session initialized.',
+              loggedRecipeIds: ['steak-eggs-skillet'],
+            },
+          },
+          streakCount: 3,
+          pendingAction: null,
+        });
       },
 
       deleteAccountData: async () => {

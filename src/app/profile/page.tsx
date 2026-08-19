@@ -250,7 +250,7 @@ export default function ProfilePage() {
                     Active Days Logged
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {Math.max(1, totalDaysLogged)}
                     </span>
                     <span className="text-xs text-neutral-400 font-sans">Days</span>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
                     Habits Completed
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {totalHabitsCompleted}
                     </span>
                     <span className="text-xs text-emerald-400 font-sans">Completed</span>
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                     Protein Tracked
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {totalProteinLogged}
                     </span>
                     <span className="text-xs text-neutral-400 font-mono">g Total</span>

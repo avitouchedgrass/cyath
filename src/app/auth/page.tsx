@@ -108,6 +108,13 @@ export default function AuthPage() {
         });
         if (error) throw error;
 
+        // If user identities array is empty, the account already exists in Supabase
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          setErrorMsg('An account with this email address already exists. Please log in instead.');
+          setLoading(false);
+          return;
+        }
+
         // If session exists immediately (e.g. email confirmation disabled), complete auth
         if (data.session) {
           completeAuthentication({ id: data.session.user.id, email: data.session.user.email || email });
@@ -125,7 +132,17 @@ export default function AuthPage() {
         completeAuthentication({ id: data.user.id, email: data.user.email || email });
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
+      const msg = err.message || '';
+      if (
+        msg.toLowerCase().includes('already registered') ||
+        msg.toLowerCase().includes('already exists') ||
+        msg.toLowerCase().includes('user already exists') ||
+        msg.toLowerCase().includes('duplicate')
+      ) {
+        setErrorMsg('An account with this email address already exists. Please log in instead.');
+      } else {
+        setErrorMsg(msg || 'Authentication failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -136,7 +153,9 @@ export default function AuthPage() {
     if (user) {
       setUserSession(user);
     } else {
-      setUserSession({ id: `guest_${Date.now()}`, email: 'demo.user@cyath.health' });
+      useHabitStore.getState().initDemoSession();
+      router.push('/dashboard');
+      return;
     }
 
     const { success, executedAction } = executePendingAction();
@@ -200,7 +219,13 @@ export default function AuthPage() {
   };
 
   const handleGuestAccess = () => {
-    completeAuthentication();
+    useHabitStore.getState().initDemoSession();
+    const { success, executedAction } = useHabitStore.getState().executePendingAction();
+    if (success && executedAction?.returnUrl) {
+      router.push(executedAction.returnUrl);
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const toggleMode = () => {

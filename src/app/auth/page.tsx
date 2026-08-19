@@ -137,15 +137,14 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0B0F17] px-4 py-12 selection:bg-white selection:text-black">
-      {/* Background Ambient Shaders */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#080808] px-4 py-12 selection:bg-white selection:text-black">
+      {/* Strict Neutral Monochrome Ambient Highlights (Zero Blue Tinge) */}
       <div 
         className="absolute inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.25) 0%, transparent 70%),
-            radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-            radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 50%)
+            radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 65%),
+            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
           `
         }}
       />
@@ -153,7 +152,7 @@ export default function AuthPage() {
       {/* Brand Link (Top Left) */}
       <Link 
         href="/"
-        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2.5 text-slate-400 hover:text-white transition-all group"
+        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2.5 text-neutral-400 hover:text-white transition-all group"
         aria-label="Back to home"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
@@ -162,7 +161,7 @@ export default function AuthPage() {
       </Link>
 
       {/* Centered Auth Card */}
-      <div className="w-full max-w-[420px] rounded-3xl backdrop-blur-xl bg-white/[0.03] border border-white/10 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col gap-6 relative z-10">
+      <div className="w-full max-w-[420px] rounded-3xl backdrop-blur-xl bg-white/[0.03] border border-white/10 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-6 relative z-10">
         
         {/* Subtle Card Highlight Line */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
@@ -186,7 +185,7 @@ export default function AuthPage() {
               <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight">
                 Check your inbox
               </h1>
-              <p className="text-slate-400 text-sm mt-2 font-sans leading-relaxed">
+              <p className="text-neutral-400 text-sm mt-2 font-sans leading-relaxed">
                 We sent a verification link to <span className="text-white font-mono font-medium">{email}</span>. Click the link to activate your Cyath protocol.
               </p>
             </div>
@@ -209,7 +208,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resendCooldown > 0 || resending}
-                className="w-full py-3 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
                   <Loader2 className="w-4 h-4 animate-spin text-black" />
@@ -226,7 +225,7 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={handleGuestAccess}
-                className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-neutral-400 hover:text-neutral-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View a Demo (Skip to Dashboard)</span>
               </button>
@@ -239,7 +238,7 @@ export default function AuthPage() {
                     setErrorMsg(null);
                     setSuccessMsg(null);
                   }}
-                  className="text-xs text-slate-400 hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
+                  className="text-xs text-neutral-400 hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
                 >
                   Use a different email address
                 </button>
@@ -254,7 +253,7 @@ export default function AuthPage() {
               <h1 className="font-cabinet font-bold text-3xl sm:text-4xl text-white tracking-tight">
                 {mode === 'signup' ? 'Sign Up' : 'Log In'}
               </h1>
-              <p className="text-slate-400 text-sm mt-1 font-sans">
+              <p className="text-neutral-400 text-sm mt-1 font-sans">
                 {mode === 'signup'
                   ? 'Calibrate habits and unlock correlation telemetry.'
                   : 'Access your saved routines and streak logs.'}
@@ -278,7 +277,7 @@ export default function AuthPage() {
               type="button"
               onClick={handleGoogleAuth}
               disabled={googleLoading || loading}
-              className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-slate-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+              className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-neutral-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               {googleLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -308,14 +307,14 @@ export default function AuthPage() {
             {/* 2. Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">or</span>
+              <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">or</span>
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
             {/* 3. Input Fields & Form */}
             <form onSubmit={handleEmailAuth} className="flex flex-col gap-4">
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                   Email Address
                 </label>
                 <input
@@ -324,12 +323,12 @@ export default function AuthPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                   Password
                 </label>
                 <input
@@ -338,13 +337,13 @@ export default function AuthPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
                 />
               </div>
 
               {mode === 'signup' && (
                 <div>
-                  <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                  <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                     Confirm Password
                   </label>
                   <input
@@ -353,7 +352,7 @@ export default function AuthPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
                   />
                 </div>
               )}
@@ -362,7 +361,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={loading || googleLoading}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
                 <span>{mode === 'signup' ? 'Sign Up' : 'Log In'}</span>
@@ -373,7 +372,7 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={handleGuestAccess}
-              className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-neutral-400 hover:text-neutral-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>View a Demo</span>
             </button>
@@ -383,7 +382,7 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={toggleMode}
-                className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="text-xs text-neutral-400 hover:text-white transition-colors cursor-pointer"
               >
                 {mode === 'signup' ? (
                   <span>

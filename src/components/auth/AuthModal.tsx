@@ -118,7 +118,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 15 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="w-full max-w-[420px] rounded-3xl backdrop-blur-xl bg-[#0B0F17]/95 border border-white/10 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col gap-6 relative z-10"
+          className="w-full max-w-[420px] rounded-3xl backdrop-blur-xl bg-[#080808]/95 border border-white/10 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-6 relative z-10"
         >
           {/* Top subtle highlight */}
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
@@ -126,7 +126,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute right-5 top-5 rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+            className="absolute right-5 top-5 rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="h-5 w-5" />
@@ -134,10 +134,10 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
 
           {/* Card Header & Typography */}
           <div>
-            <h2 className="font-serif font-medium text-3xl text-white tracking-tight">
+            <h2 className="font-cabinet font-bold text-3xl text-white tracking-tight">
               {mode === 'signup' ? 'Sign Up' : 'Log In'}
             </h2>
-            <p className="text-slate-400 text-sm mt-1 font-sans">
+            <p className="text-neutral-400 text-sm mt-1 font-sans">
               {mode === 'signup'
                 ? 'Calibrate habits and unlock correlation telemetry.'
                 : 'Access your saved routines and streak logs.'}
@@ -161,7 +161,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             type="button"
             onClick={handleGoogleAuth}
             disabled={googleLoading || loading}
-            className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-slate-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+            className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-neutral-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
           >
             {googleLoading ? (
               <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -191,14 +191,14 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
           {/* 2. Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">or</span>
+            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">or</span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
           {/* 3. Input Fields & Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                 Email Address
               </label>
               <input
@@ -207,12 +207,12 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
               />
             </div>
 
             <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+              <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                 Password
               </label>
               <input
@@ -221,13 +221,13 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
               />
             </div>
 
             {mode === 'signup' && (
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5 block">
                   Confirm Password
                 </label>
                 <input
@@ -236,7 +236,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
                 />
               </div>
             )}
@@ -245,7 +245,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
               <span>{mode === 'signup' ? 'Sign Up' : 'Log In'}</span>
@@ -256,7 +256,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
           <button
             type="button"
             onClick={handleDemoAccess}
-            className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-neutral-400 hover:text-neutral-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>View a Demo</span>
           </button>
@@ -266,7 +266,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             <button
               type="button"
               onClick={toggleMode}
-              className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="text-xs text-neutral-400 hover:text-white transition-colors cursor-pointer"
             >
               {mode === 'signup' ? (
                 <span>

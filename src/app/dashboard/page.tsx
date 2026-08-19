@@ -167,7 +167,7 @@ export default function DashboardPage() {
       <HeaderNav />
 
       {/* Main Dashboard Container */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 sm:pt-32 pb-24 flex flex-col gap-8">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-32 sm:pt-36 pb-24 flex flex-col gap-8">
         
         {/* Top Header & Contextual Date Navigator */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
@@ -220,11 +220,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. Key Metric Summary Bar (4 High-Level Signal Cards) */}
+        {/* 1. Key Metric Summary Bar (4 High-Level Signal Cards with Depth) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Protocol Adherence */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
+          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Protocol Score</span>
               {completionPercentage >= 100 ? (
@@ -251,7 +251,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 2: Protein Intake */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
+          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Protein Logged</span>
               {todayLog.totalProteinLogged >= 130 ? (
@@ -277,7 +277,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 3: Hydration */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
+          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Hydration</span>
               {todayLog.hydrationLiters >= 3.0 ? (
@@ -303,7 +303,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 4: Subjective Correlation (Energy / Focus) */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg">
+          <div className="backdrop-blur-xl bg-neutral-950/60 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-neutral-700 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">State Rating</span>
               <Sparkles className="w-4 h-4 text-white" />
@@ -401,21 +401,21 @@ export default function DashboardPage() {
                           : 'bg-white/[0.01] border-white/5 hover:border-white/15 hover:bg-white/[0.03]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
-                        {/* Custom Monochrome Checkbox with animated scale pop */}
+                      <div className="flex items-center gap-3">
+                        {/* Custom Geometric Checkbox Component */}
                         <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 shrink-0 ${
                             isDone
-                              ? 'bg-white border-white text-black scale-105'
-                              : 'border-white/20 bg-transparent group-hover:border-white/40 group-hover:scale-105'
+                              ? 'bg-white border-white text-black shadow-sm'
+                              : 'border-neutral-700 bg-neutral-900/60 group-hover:border-neutral-500'
                           }`}
                         >
-                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3] animate-in zoom-in-75 duration-150" />}
+                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3] text-black animate-in zoom-in-75 duration-150" />}
                         </div>
 
-                        <div>
+                        <div className="min-w-0">
                           <span
-                            className={`text-sm font-sans font-medium transition-all duration-200 ${
+                            className={`text-sm font-sans font-medium transition-all duration-200 block ${
                               isDone ? 'line-through text-neutral-400' : 'text-neutral-100'
                             }`}
                           >
@@ -607,93 +607,97 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              {/* Slider 1: Energy Rating */}
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-neutral-300 uppercase tracking-wider">Subjective Energy</span>
-                  <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.energyLevel}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayLog.energyLevel}
-                  onChange={(e) => setEnergy(Number(e.target.value), currentDate)}
-                  className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                />
-                <div className="flex justify-between text-[10px] font-mono text-neutral-500">
-                  <span>1 (Exhausted)</span>
-                  <span className="text-neutral-300 font-medium">{getEnergyLabel(todayLog.energyLevel)}</span>
-                  <span>10 (Peak Flow)</span>
-                </div>
-              </div>
-
-              {/* Slider 2: Mood & Focus Score */}
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-neutral-300 uppercase tracking-wider">Focus & Mood Score</span>
-                  <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.moodScore}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayLog.moodScore}
-                  onChange={(e) => setMood(Number(e.target.value), currentDate)}
-                  className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
-                />
-                <div className="flex justify-between text-[10px] font-mono text-neutral-500">
-                  <span>1 (Brain Fog)</span>
-                  <span className="text-neutral-300 font-medium">{getMoodLabel(todayLog.moodScore)}</span>
-                  <span>10 (Serene Focus)</span>
-                </div>
-              </div>
-
-              {/* Sleep Hours Stepper */}
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-neutral-300 uppercase tracking-wider">Sleep Duration</span>
-                  <span className="font-bold text-white font-mono">{todayLog.sleepHours} Hours</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSleep(Math.max(4, todayLog.sleepHours - 0.5), currentDate)}
-                    className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors"
-                  >
-                    -0.5h
-                  </button>
+              {/* Telemetry Sliders Container with space-y-6 */}
+              <div className="space-y-6">
+                
+                {/* Slider 1: Energy Rating */}
+                <div>
+                  <div className="flex items-center justify-between text-xs font-mono mb-2">
+                    <span className="text-neutral-300 uppercase tracking-wider">Subjective Energy</span>
+                    <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.energyLevel}/10</span>
+                  </div>
                   <input
                     type="range"
-                    min="4"
-                    max="11"
-                    step="0.5"
-                    value={todayLog.sleepHours}
-                    onChange={(e) => setSleep(Number(e.target.value), currentDate)}
-                    className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
+                    min="1"
+                    max="10"
+                    value={todayLog.energyLevel}
+                    onChange={(e) => setEnergy(Number(e.target.value), currentDate)}
+                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setSleep(Math.min(12, todayLog.sleepHours + 0.5), currentDate)}
-                    className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors"
-                  >
-                    +0.5h
-                  </button>
+                  <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
+                    <span>1 (Exhausted)</span>
+                    <span className="text-neutral-300 font-medium">{getEnergyLabel(todayLog.energyLevel)}</span>
+                    <span>10 (Peak Flow)</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Daily Qualitative Note */}
-              <div className="pt-2">
-                <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                  Daily Cognitive Log / Notes
-                </label>
-                <textarea
-                  rows={3}
-                  value={todayLog.notes}
-                  onChange={(e) => setNotes(e.target.value, currentDate)}
-                  placeholder="Record workouts, meal reactions, or cognitive flow state moments..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-600 text-xs focus:outline-none focus:border-white/30 font-sans resize-none"
-                />
+                {/* Slider 2: Mood & Focus Score */}
+                <div>
+                  <div className="flex items-center justify-between text-xs font-mono mb-2">
+                    <span className="text-neutral-300 uppercase tracking-wider">Focus & Mood Score</span>
+                    <span className="font-bold text-white px-2 py-0.5 rounded bg-white/10 text-sm">{todayLog.moodScore}/10</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={todayLog.moodScore}
+                    onChange={(e) => setMood(Number(e.target.value), currentDate)}
+                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
+                  />
+                  <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-1.5">
+                    <span>1 (Brain Fog)</span>
+                    <span className="text-neutral-300 font-medium">{getMoodLabel(todayLog.moodScore)}</span>
+                    <span>10 (Serene Focus)</span>
+                  </div>
+                </div>
+
+                {/* Sleep Hours Stepper */}
+                <div>
+                  <div className="flex items-center justify-between text-xs font-mono mb-2">
+                    <span className="text-neutral-300 uppercase tracking-wider">Sleep Duration</span>
+                    <span className="font-bold text-white font-mono">{todayLog.sleepHours} Hours</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSleep(Math.max(4, todayLog.sleepHours - 0.5), currentDate)}
+                      className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
+                    >
+                      -0.5h
+                    </button>
+                    <input
+                      type="range"
+                      min="4"
+                      max="11"
+                      step="0.5"
+                      value={todayLog.sleepHours}
+                      onChange={(e) => setSleep(Number(e.target.value), currentDate)}
+                      className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSleep(Math.min(12, todayLog.sleepHours + 0.5), currentDate)}
+                      className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-white transition-colors cursor-pointer"
+                    >
+                      +0.5h
+                    </button>
+                  </div>
+                </div>
+
+                {/* Daily Qualitative Note */}
+                <div className="pt-2">
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                    Daily Cognitive Log / Notes
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={todayLog.notes}
+                    onChange={(e) => setNotes(e.target.value, currentDate)}
+                    placeholder="Record workouts, meal reactions, or cognitive flow state moments..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-600 text-xs focus:outline-none focus:border-white/30 font-sans resize-none"
+                  />
+                </div>
               </div>
             </div>
 

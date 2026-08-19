@@ -95,12 +95,12 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <div className="h-7 w-7 rounded bg-white text-black font-serif font-bold text-sm flex items-center justify-center pixel-art">
+              <div className="h-7 w-7 rounded bg-white text-black font-cabinet font-bold text-sm flex items-center justify-center pixel-art">
                 C
               </div>
-              <span className="font-serif text-lg font-bold text-white tracking-tight">Cyath</span>
+              <span className="font-cabinet text-lg font-bold text-white tracking-tight">Cyath</span>
             </div>
-            <h2 className="font-serif text-2xl font-semibold text-white">
+            <h2 className="font-cabinet text-2xl font-bold text-white">
               {mode === 'signup' ? 'Create your protocol' : 'Welcome back'}
             </h2>
             <p className="text-sm text-slate-400 mt-1">

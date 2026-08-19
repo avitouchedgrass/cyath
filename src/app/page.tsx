@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { HeaderNav } from "@/components/landing/HeaderNav";
-import { PixelShowcase } from "@/components/landing/PixelShowcase";
+import { PixelShowcase, DISH_ITEMS, DishData } from "@/components/landing/PixelShowcase";
 import { TextType } from "@/components/reactbits/TextType";
 import { SpecularButton } from "@/components/reactbits/SpecularButton";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -12,6 +12,7 @@ import { Activity, Flame, Sparkles } from "lucide-react";
 export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
 
   const handleOpenAuth = (mode: 'login' | 'signup' = 'signup') => {
     setAuthMode(mode);
@@ -63,8 +64,7 @@ export default function Home() {
               
               {/* Editorial Subtext */}
               <p className="text-neutral-400 text-sm sm:text-base lg:text-lg mt-6 leading-relaxed font-sans font-normal tracking-normal max-w-xl">
-                A retro-minimalist framework designed to build sustainable momentum. 
-                Track physical habits, log macro-balanced recipes, and unlock correlations between your routines and real energy levels.
+                Log whole-food fuel, track daily recipes, and let our correlation engine uncover what drives your peak energy days.
               </p>
 
               {/* CTA Buttons */}
@@ -72,12 +72,13 @@ export default function Home() {
                 <SpecularButton 
                   size="lg" 
                   radius={20} 
-                  intensity={1.3} 
+                  intensity={1.8} 
+                  shineFade={30}
                   blur={16}
                   onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight"
+                  className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight active:scale-95"
                 >
-                  Get Started
+                  Start Calibration — Free
                 </SpecularButton>
 
                 <Link 
@@ -89,15 +90,15 @@ export default function Home() {
               </div>
 
               {/* Strict Monochrome Product Micro-Widgets */}
-              <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 w-full">
+              <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t border-white/10 w-full">
                 
                 {/* Micro-Widget 1: Streak Heatmap Preview */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
-                  <div className="flex items-center gap-1.5 mb-2">
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px]">
+                  <div className="flex items-center gap-1 mb-2">
                     {[1, 0.75, 0.9, 1, 0.6, 1, 1].map((opacity, i) => (
                       <span 
                         key={i} 
-                        className="h-3 w-3 rounded-xs bg-white" 
+                        className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-xs bg-white" 
                         style={{ opacity }} 
                       />
                     ))}
@@ -109,9 +110,12 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Widget 2: Macro Fueling Preview */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
-                  <div className="font-mono tabular-nums text-xs font-bold text-white tracking-tight mb-2">
-                    42g <span className="text-neutral-500 font-normal font-sans">PRO</span> · 510 <span className="text-neutral-500 font-normal font-sans">KCAL</span>
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px] overflow-hidden">
+                  <div 
+                    key={currentDish.id}
+                    className="font-mono tabular-nums text-[11px] font-bold text-white tracking-tight mb-2 whitespace-nowrap animate-stat-flip"
+                  >
+                    {currentDish.protein} <span className="text-neutral-500 font-normal font-sans text-[10px]">PRO</span> · {currentDish.calories} <span className="text-neutral-500 font-normal font-sans text-[10px]">KCAL</span>
                   </div>
                   <div>
                     <div className="text-white text-xs font-semibold tracking-tight">Macro-Fueling</div>
@@ -120,10 +124,13 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Widget 3: Energy Rating Preview */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col justify-between min-h-[110px]">
-                  <div className="font-mono tabular-nums text-xs font-bold text-white tracking-tight mb-2 flex items-center gap-1.5">
-                    <span>9.2 / 10</span>
-                    <span className="text-[10px] text-neutral-400 font-sans font-normal uppercase tracking-wider">Focus Index</span>
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px] overflow-hidden">
+                  <div 
+                    key={`focus-${currentDish.id}`}
+                    className="font-mono tabular-nums text-[11px] font-bold text-white tracking-tight mb-2 flex items-center gap-1.5 whitespace-nowrap animate-stat-flip"
+                  >
+                    <span>{currentDish.focus}</span>
+                    <span className="text-[9.5px] text-neutral-400 font-sans font-normal uppercase tracking-wider">Focus Index</span>
                   </div>
                   <div>
                     <div className="text-white text-xs font-semibold tracking-tight">Energy Correlation</div>
@@ -138,7 +145,7 @@ export default function Home() {
 
           {/* Hero Right Column: Giant Food Arena (6 cols) */}
           <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
-            <PixelShowcase />
+            <PixelShowcase onDishChange={(dish) => setCurrentDish(dish)} />
           </div>
 
         </div>
@@ -146,7 +153,7 @@ export default function Home() {
         {/* Methodology Feature Section */}
         <section id="methodology" className="w-full max-w-7xl mx-auto mt-28 sm:mt-36 pt-16 border-t border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-[-0.01em] text-white">
+            <h2 className="font-cabinet text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-white">
               The Architecture of Momentum
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base mt-3 font-sans leading-relaxed">
@@ -159,7 +166,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Flame className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Monochrome Streak Heatmaps</h3>
+              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Monochrome Streak Heatmaps</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Visualize continuous consistency through white-opacity shades. Zero loud streaks or gamified guilt.
               </p>
@@ -169,7 +176,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Activity className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Subjective Energy Correlation</h3>
+              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Subjective Energy Correlation</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Map daily hydration and protein targets against subjective mood and focus ratings on a 1–10 scale.
               </p>
@@ -179,7 +186,7 @@ export default function Home() {
               <div className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2 tracking-tight">Pixel-Calibrated Fuel</h3>
+              <h3 className="text-lg font-cabinet font-bold text-white mb-2 tracking-tight">Pixel-Calibrated Fuel</h3>
               <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-sans">
                 Curated macro-rich recipes represented by sharp 16-bit retro sprites. Clear nutrition without guesswork.
               </p>
@@ -192,7 +199,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-semibold text-white">Cyath</span>
+            <span className="font-cabinet font-bold text-white tracking-tight">Cyath</span>
             <span>— Pixel-Perfect Health</span>
           </div>
           <div>

@@ -1,3 +1,4 @@
+@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@100,200,300,400,500,700,800,900&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -16,11 +17,14 @@
 
   /* Typography Font Stacks */
   --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-cabinet: "Cabinet Grotesk", var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: "Cabinet Grotesk", var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
 
   /* Keyframes */
   --animate-pixel-float: pixelFloatWave 4s ease-in-out infinite;
+  --animate-stat-flip: statFlip 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 
   @keyframes pixelFloatWave {
     0% {
@@ -31,6 +35,17 @@
     }
     100% {
       transform: translateY(0px) rotate(0deg);
+    }
+  }
+
+  @keyframes statFlip {
+    0% {
+      opacity: 0;
+      transform: translateY(3px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
 }

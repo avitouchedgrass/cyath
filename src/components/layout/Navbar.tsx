@@ -8,10 +8,10 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
           {/* Pixel-wave monogram placeholder */}
-          <div className="h-8 w-8 bg-white pixel-asset rounded-sm animate-pixel-float flex items-center justify-center font-serif text-black font-bold">
+          <div className="h-8 w-8 bg-white pixel-asset rounded-sm animate-pixel-float flex items-center justify-center font-cabinet text-black font-extrabold">
             C
           </div>
-          <span className="font-serif text-xl font-bold tracking-tight text-white">
+          <span className="font-cabinet text-xl font-bold tracking-tight text-white">
             Cyath
           </span>
         </Link>

@@ -53,7 +53,7 @@ export default function CorrelationsPage() {
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 sm:pt-32 pb-24">
         
         {/* Navigation & Header Strip */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-8">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white transition-colors group"
@@ -62,42 +62,40 @@ export default function CorrelationsPage() {
             <span>Back to Home</span>
           </Link>
 
-          <div className="flex items-center gap-3">
-            {/* Time Horizon Selector */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
-              {([7, 14, 30] as const).map((days) => (
-                <button
-                  key={days}
-                  onClick={() => setTimeHorizon(days)}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                    timeHorizon === days
-                      ? 'bg-white text-black font-semibold shadow-sm'
-                      : 'text-neutral-400 hover:text-white'
-                  }`}
-                >
-                  {days}D Window
-                </button>
-              ))}
-            </div>
-
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-mono px-4 py-1.5 rounded-full border border-white/10 bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-sm"
-            >
-              <span>Daily Console</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs font-mono px-4 py-1.5 rounded-full border border-white/10 bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-sm"
+          >
+            <span>Daily Console</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         {/* Hero Section Header */}
-        <div className="max-w-3xl mb-12">
+        <div className="max-w-3xl mb-6">
           <h1 className="font-serif font-normal text-3xl sm:text-5xl text-white tracking-tight leading-tight">
             Behavioral Correlations
           </h1>
           <p className="text-neutral-400 text-sm sm:text-base mt-3 leading-relaxed font-sans max-w-2xl">
             Mathematical Pearson correlation analysis calculated between your physical routines and subjective cognitive outputs. Reveal the high-leverage drivers behind your energy.
           </p>
+        </div>
+
+        {/* Dedicated Time Horizon Selector Row */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/10 mb-6 w-fit">
+          {([7, 14, 30] as const).map((days) => (
+            <button
+              key={days}
+              onClick={() => setTimeHorizon(days)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                timeHorizon === days
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'bg-transparent text-neutral-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {days}D Window
+            </button>
+          ))}
         </div>
 
         {/* 1. Primary Highlight Stats Banner (4 Key Signals) */}
@@ -176,11 +174,11 @@ export default function CorrelationsPage() {
                       : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.03]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between w-full mb-2">
                     <span className="text-xs font-mono text-white font-medium">
                       Pearson r = {item.coefficient}
                     </span>
-                    <span className="text-[10px] font-mono text-neutral-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                    <span className="text-[10px] font-mono text-neutral-400 bg-white/5 px-2 py-0.5 rounded border border-white/5 shrink-0">
                       {item.impactScore}
                     </span>
                   </div>
@@ -260,7 +258,8 @@ export default function CorrelationsPage() {
                   })}
                 </div>
 
-                <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-2">
+                {/* Base Anchor Axis Border */}
+                <div className="border-t border-neutral-800 pt-2.5 mt-2 flex justify-between text-[10px] font-mono text-neutral-500">
                   <span>Lower Input Range</span>
                   <span>Calculated Linear Regression Fit</span>
                   <span>Optimal Target Zone</span>

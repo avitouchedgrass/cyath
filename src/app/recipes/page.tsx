@@ -116,13 +116,12 @@ export default function RecipesPage() {
 
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
-      {/* Background Ambient Radial Highlights */}
+      {/* Ambient subtle glow background */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 65%),
-            radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
+            radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)
           `,
         }}
       />
@@ -132,8 +131,8 @@ export default function RecipesPage() {
       {/* Main Content */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 sm:pt-32 pb-24">
         
-        {/* Breadcrumb & Navigation Link */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Navigation & Header Strip */}
+        <div className="flex items-center justify-between mb-10">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white transition-colors group"
@@ -145,7 +144,7 @@ export default function RecipesPage() {
           {/* Dashboard Mini-Progress Button */}
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-3 text-xs font-mono px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-neutral-300 hover:text-white transition-all shadow-md group"
+            className="inline-flex items-center gap-3 text-xs font-mono px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-neutral-300 hover:text-white transition-all shadow-sm group"
           >
             <div className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-white" />
@@ -162,124 +161,119 @@ export default function RecipesPage() {
           </Link>
         </div>
 
-        {/* Hero Section Header */}
-        <div className="max-w-3xl mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs font-mono text-neutral-400 mb-4">
-            <ChefHat className="w-3.5 h-3.5 text-white" />
-            <span>Macro-Calibrated Engine</span>
-          </div>
+        {/* Human Editorial Header (No AI Eyebrow Pill) */}
+        <div className="max-w-3xl mb-12">
           <h1 className="font-cabinet font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
-            Pixel-Calibrated Fuel
+            Whole-Food Fuel
           </h1>
           <p className="text-neutral-400 text-sm sm:text-base mt-3 leading-relaxed font-sans max-w-2xl">
             Whole-food meals calibrated for energy retention. One click logs macros directly to your daily protocol.
           </p>
         </div>
 
-        {/* Control Bar: Search Input & Bespoke Dark Frosted-Glass Dropdown */}
-        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-3.5 sm:p-4 mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between z-20 relative">
+        {/* Clean Flat Control Row (No Nested Glass Container Slop) */}
+        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between mb-8">
           
-          {/* Search Bar with '/' keyboard accelerator */}
-          <div className="relative flex-1 md:max-w-md min-w-[240px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search recipes, ingredients, or tags..."
-              className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-white/30 transition-all font-sans"
-            />
-            {!searchQuery && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-500 border border-white/10 px-1.5 py-0.5 rounded bg-white/5 pointer-events-none">
-                /
-              </span>
-            )}
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+          {/* Category Filter Pills */}
+          <div className="overflow-x-auto pb-1 scrollbar-none">
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
+              {CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-white text-black font-semibold shadow-sm'
+                        : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* 1. Bespoke Dark Frosted-Glass Custom Dropdown Menu */}
-          <div className="relative" ref={sortDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setIsSortOpen(!isSortOpen)}
-              className="w-full md:w-auto px-4 py-2.5 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-3 shadow-lg cursor-pointer"
-              aria-haspopup="listbox"
-              aria-expanded={isSortOpen}
-            >
-              <div className="flex items-center gap-2">
+          {/* Search Bar & Custom Sort Dropdown */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-500" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search recipes..."
+                className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-neutral-500 text-xs focus:outline-none focus:border-white/30 transition-all font-sans"
+              />
+              {!searchQuery && (
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-500 border border-white/10 px-1 py-0.5 rounded bg-white/5 pointer-events-none">
+                  /
+                </span>
+              )}
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Custom Dropdown */}
+            <div className="relative" ref={sortDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="px-3.5 py-2 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-2.5 shadow-sm cursor-pointer whitespace-nowrap"
+                aria-haspopup="listbox"
+                aria-expanded={isSortOpen}
+              >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="text-neutral-400">Sort:</span>
                 <span className="text-white font-medium">
                   {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
                 </span>
-              </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
-            </button>
+                <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            {/* Dropdown Menu Popup */}
-            {isSortOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#121212]/95 border border-white/15 backdrop-blur-2xl shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
-                {SORT_OPTIONS.map((option) => {
-                  const isSelected = sortBy === option.id;
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => {
-                        setSortBy(option.id);
-                        setIsSortOpen(false);
-                      }}
-                      className={`w-full px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-white/10 text-white font-semibold'
-                          : 'text-neutral-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <span>{option.label}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 5. Single Segmented Monospace Pill Filter Bar */}
-        <div className="mb-10 overflow-x-auto pb-2 scrollbar-none">
-          <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md">
-            {CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-white text-black font-bold shadow-md'
-                      : 'text-neutral-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+              {/* Dropdown Menu Popup */}
+              {isSortOpen && (
+                <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#121212] border border-white/15 backdrop-blur-2xl shadow-2xl p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
+                  {SORT_OPTIONS.map((option) => {
+                    const isSelected = sortBy === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => {
+                          setSortBy(option.id);
+                          setIsSortOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-white/10 text-white font-semibold'
+                            : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <span>{option.label}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Recipe Cards Grid */}
         {filteredRecipes.length === 0 ? (
-          <div className="text-center py-20 backdrop-blur-xl bg-white/[0.02] border border-white/5 rounded-3xl p-8">
-            <ChefHat className="w-12 h-12 text-neutral-600 mx-auto mb-4" />
-            <h3 className="font-cabinet font-bold text-lg text-white">No matching recipes found</h3>
+          <div className="text-center py-20 bg-white/[0.01] border border-white/5 rounded-3xl p-8">
+            <ChefHat className="w-10 h-10 text-neutral-600 mx-auto mb-3" />
+            <h3 className="font-cabinet font-bold text-base text-white">No matching recipes</h3>
             <p className="text-neutral-400 text-xs mt-1">Try clearing your search query or selecting a different category filter.</p>
             <button
               onClick={() => {
@@ -300,27 +294,23 @@ export default function RecipesPage() {
                 <div
                   key={recipe.id}
                   onClick={() => openRecipeModal(recipe)}
-                  className="group cursor-pointer backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/25 hover:bg-white/[0.04] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] active:scale-[0.99] flex flex-col justify-between shadow-xl relative overflow-hidden"
+                  className="group cursor-pointer bg-white/[0.02] border border-white/10 hover:border-white/25 hover:bg-white/[0.04] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.99] flex flex-col justify-between"
                 >
-                  {/* Top Subtle Specular Line */}
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
-
                   {/* Card Body */}
                   <div>
-                    {/* Header Badges & Focus Telemetry */}
+                    {/* Header Badges & Focus Score */}
                     <div className="flex items-center justify-between mb-4">
-                      <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono uppercase tracking-wider text-neutral-300">
+                      <span className="text-[11px] font-mono uppercase text-neutral-400">
                         {recipe.category}
                       </span>
                       
-                      {/* Focus Score wrapped in a low-opacity monochrome chip */}
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-neutral-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
-                        <Sparkles className="w-3 h-3 text-neutral-400" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400">
+                        <Sparkles className="w-3 h-3 text-neutral-500" />
                         <span>Focus {recipe.focusScore}</span>
                       </span>
                     </div>
 
-                    {/* 2 & 4. Unique Pixel Art Dish with Smooth Image Scale Hover */}
+                    {/* Pixel Art Dish Presentation */}
                     <div className="w-full flex items-center justify-center py-4 mb-4">
                       <div className="w-44 h-44 relative flex items-center justify-center">
                         <PixelContainer
@@ -334,48 +324,46 @@ export default function RecipesPage() {
                       </div>
                     </div>
 
-                    {/* Title & Description */}
+                    {/* Title & Subtitle */}
                     <h3 className="font-cabinet font-bold text-xl text-white tracking-tight group-hover:text-neutral-200 transition-colors leading-snug mb-1">
                       {recipe.name}
                     </h3>
-                    <p className="text-neutral-400 text-xs font-sans leading-relaxed line-clamp-2 mb-5">
+                    <p className="text-neutral-400 text-xs font-sans leading-relaxed line-clamp-2 mb-6">
                       {recipe.subtitle}
                     </p>
                   </div>
 
-                  {/* 4. Monospace Telemetry Row & Footer (Consolidated Macro Grid) */}
+                  {/* Card Footer & Macro Tag */}
                   <div>
-                    {/* Monospace Telemetry Summary Tag `[48g PRO | 520 KCAL | 20M]` */}
-                    <div className="flex items-center justify-center py-1 mb-4">
-                      <span className="w-full text-center text-xs font-mono font-medium text-neutral-300 bg-white/5 py-2.5 rounded-xl border border-white/10 tracking-wider">
-                        [{recipe.protein}G PRO | {recipe.calories} KCAL | {recipe.prepTimeMinutes}M]
+                    {/* Monospace Macro Summary Tag */}
+                    <div className="flex items-center justify-center mb-3">
+                      <span className="w-full text-center text-xs font-mono font-medium text-neutral-300 bg-white/5 py-2 rounded-xl border border-white/5 tracking-wider">
+                        [{recipe.protein}G PRO · {recipe.calories} KCAL · {recipe.prepTimeMinutes}M]
                       </span>
                     </div>
 
-                    {/* Actions: Log Button */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => handleQuickLog(recipe, 1.0, e)}
-                        className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                          isLogged
-                            ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15 active:scale-95'
-                            : 'bg-white text-black hover:bg-neutral-200 active:scale-95 shadow-md'
-                        }`}
-                      >
-                        {isLogged ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Logged to Today</span>
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Log to Today</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                    {/* Log Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleQuickLog(recipe, 1.0, e)}
+                      className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        isLogged
+                          ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15 active:scale-95'
+                          : 'bg-white text-black hover:bg-neutral-200 active:scale-95 shadow-sm'
+                      }`}
+                    >
+                      {isLogged ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Logged to Today</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Log to Today</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               );
@@ -428,7 +416,7 @@ export default function RecipesPage() {
               </div>
 
               <div className="flex-1 text-center sm:text-left">
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono uppercase text-neutral-300 mb-2">
+                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase text-neutral-400 mb-2">
                   <span>{selectedRecipe.category}</span>
                   <span>·</span>
                   <span>{selectedRecipe.prepTimeMinutes} mins prep</span>
@@ -502,7 +490,7 @@ export default function RecipesPage() {
             {/* Ingredients Checklist */}
             <div>
               <h3 className="font-cabinet font-bold text-base text-white mb-3">
-                Calibrated Ingredients ({portionMultiplier}x portion)
+                Ingredients ({portionMultiplier}x portion)
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {selectedRecipe.ingredients.map((ing, idx) => (
@@ -520,7 +508,7 @@ export default function RecipesPage() {
             {/* Step-by-Step Instructions */}
             <div>
               <h3 className="font-cabinet font-bold text-base text-white mb-3">
-                Culinary Protocol Steps
+                Method & Preparation
               </h3>
               <ol className="space-y-2.5">
                 {selectedRecipe.instructions.map((step, idx) => (
@@ -532,15 +520,6 @@ export default function RecipesPage() {
                   </li>
                 ))}
               </ol>
-            </div>
-
-            {/* Focus Score Explainer Box */}
-            <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3 text-xs font-sans text-neutral-400">
-              <Sparkles className="w-4 h-4 text-white flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="text-white font-semibold font-mono">Cognitive Bioavailability ({selectedRecipe.focusScore}): </span>
-                Calibrated based on steady amino-acid plasma release, low glycemic index fluctuations, and dietary choline for maximum sustained mental output.
-              </div>
             </div>
 
             {/* Modal Bottom Log Action */}
@@ -558,7 +537,7 @@ export default function RecipesPage() {
               >
                 <Plus className="w-4 h-4" />
                 <span>
-                  Log to Protocol (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
+                  Log to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g Protein · {portionMultiplier}x)
                 </span>
               </button>
             </div>

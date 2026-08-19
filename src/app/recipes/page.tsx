@@ -174,7 +174,7 @@ export default function RecipesPage() {
         <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-3.5 sm:p-4 mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between z-20 relative">
           
           {/* Search Bar with '/' keyboard accelerator */}
-          <div className="relative flex-1 min-w-[240px]">
+          <div className="relative flex-1 md:max-w-md min-w-[240px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
             <input
               ref={searchInputRef}
@@ -307,13 +307,11 @@ export default function RecipesPage() {
                         {recipe.category}
                       </span>
                       
-                      {/* Focus Score with info trigger */}
-                      <div className="relative group/focus">
-                        <span className="flex items-center gap-1 text-[11px] font-mono font-medium text-neutral-300 hover:text-white transition-colors">
-                          <Sparkles className="w-3 h-3 text-neutral-400" />
-                          <span>Focus {recipe.focusScore}</span>
-                        </span>
-                      </div>
+                      {/* Focus Score wrapped in a low-opacity monochrome chip */}
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-neutral-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+                        <Sparkles className="w-3 h-3 text-neutral-400" />
+                        <span>Focus {recipe.focusScore}</span>
+                      </span>
                     </div>
 
                     {/* 2 & 4. Unique Pixel Art Dish with Smooth Image Scale Hover */}
@@ -339,31 +337,11 @@ export default function RecipesPage() {
                     </p>
                   </div>
 
-                  {/* 4. Monospace Telemetry Row & Footer */}
+                  {/* 4. Monospace Telemetry Row & Footer (Consolidated Macro Grid) */}
                   <div>
-                    {/* Itemized Macro Telemetry Grid */}
-                    <div className="grid grid-cols-4 gap-2 py-2.5 px-3 rounded-2xl bg-white/[0.02] border border-white/5 font-mono mb-3 text-center">
-                      <div>
-                        <div className="text-[10px] text-neutral-500 uppercase">PRO</div>
-                        <div className="text-xs sm:text-sm font-bold text-white tracking-tight">{recipe.protein}g</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-neutral-500 uppercase">CARB</div>
-                        <div className="text-xs sm:text-sm font-bold text-neutral-300 tracking-tight">{recipe.carbs}g</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-neutral-500 uppercase">FAT</div>
-                        <div className="text-xs sm:text-sm font-bold text-neutral-300 tracking-tight">{recipe.fats}g</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-neutral-500 uppercase">KCAL</div>
-                        <div className="text-xs sm:text-sm font-bold text-white tracking-tight">{recipe.calories}</div>
-                      </div>
-                    </div>
-
                     {/* Monospace Telemetry Summary Tag `[48g PRO | 520 KCAL | 20M]` */}
-                    <div className="flex items-center justify-center py-1 mb-3">
-                      <span className="text-[11px] font-mono font-medium text-neutral-400 bg-white/[0.02] px-3 py-1 rounded-full border border-white/5 tracking-wider">
+                    <div className="flex items-center justify-center py-1 mb-4">
+                      <span className="w-full text-center text-xs font-mono font-medium text-neutral-300 bg-white/5 py-2.5 rounded-xl border border-white/10 tracking-wider">
                         [{recipe.protein}G PRO | {recipe.calories} KCAL | {recipe.prepTimeMinutes}M]
                       </span>
                     </div>
@@ -387,7 +365,7 @@ export default function RecipesPage() {
                         ) : (
                           <>
                             <Plus className="w-3.5 h-3.5" />
-                            <span>Log (+{recipe.protein}g PRO)</span>
+                            <span>Log to Today</span>
                           </>
                         )}
                       </button>

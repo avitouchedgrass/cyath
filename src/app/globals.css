@@ -22,9 +22,12 @@
   --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
 
-  /* Keyframes */
+  /* Keyframe Animations */
   --animate-pixel-float: pixelFloatWave 4s ease-in-out infinite;
   --animate-stat-flip: statFlip 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-count-pop: countPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-card-enter: cardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-glow: pulseGlow 3s ease-in-out infinite;
 
   @keyframes pixelFloatWave {
     0% {
@@ -48,6 +51,40 @@
       transform: translateY(0) scale(1);
     }
   }
+
+  @keyframes countPop {
+    0% {
+      transform: scale(0.96) translateY(2px);
+    }
+    50% {
+      transform: scale(1.06) translateY(-1px);
+    }
+    100% {
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes cardEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(12px) scale(0.99);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.04);
+    }
+  }
 }
 
 :root {
@@ -69,4 +106,14 @@ body {
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+/* Accessibility: Intentional graceful reduced-motion alternatives */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    scroll-behavior: auto !important;
+  }
 }

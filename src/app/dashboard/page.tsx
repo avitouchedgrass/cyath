@@ -224,11 +224,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Protocol Adherence */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg">
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Protocol Score</span>
               {completionPercentage >= 100 ? (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
+                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 animate-pulse">
                   <Trophy className="w-3.5 h-3.5" /> 100% Target
                 </span>
               ) : (
@@ -236,7 +236,9 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-3xl font-bold text-white tracking-tight">{completionPercentage}%</span>
+              <span key={`score-${completionPercentage}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
+                {completionPercentage}%
+              </span>
               <span className="text-xs text-neutral-500 font-mono">({completedCount}/{habits.length})</span>
             </div>
             {/* Progress bar */}
@@ -249,7 +251,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 2: Protein Intake */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg">
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Protein Logged</span>
               {todayLog.totalProteinLogged >= 130 ? (
@@ -261,7 +263,9 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-3xl font-bold text-white tracking-tight">{todayLog.totalProteinLogged}g</span>
+              <span key={`pro-${todayLog.totalProteinLogged}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
+                {todayLog.totalProteinLogged}g
+              </span>
               <span className="text-xs text-neutral-500 font-mono">/ 130g target</span>
             </div>
             <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
@@ -273,7 +277,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 3: Hydration */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg">
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-lg hover:border-white/20 transition-colors">
             <div className="flex items-center justify-between text-neutral-400 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider">Hydration</span>
               {todayLog.hydrationLiters >= 3.0 ? (
@@ -285,7 +289,9 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-3xl font-bold text-white tracking-tight">{todayLog.hydrationLiters}L</span>
+              <span key={`hyd-${todayLog.hydrationLiters}`} className="inline-block animate-count-pop font-mono text-3xl font-bold text-white tracking-tight">
+                {todayLog.hydrationLiters}L
+              </span>
               <span className="text-xs text-neutral-500 font-mono">/ 3.0L target</span>
             </div>
             <div className="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
@@ -379,27 +385,27 @@ export default function DashboardPage() {
                     <div
                       key={habit.id}
                       onClick={() => toggleHabit(habit.id, currentDate)}
-                      className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none ${
+                      className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none active:scale-[0.98] ${
                         isDone
                           ? 'bg-white/[0.04] border-white/20'
                           : 'bg-white/[0.01] border-white/5 hover:border-white/15 hover:bg-white/[0.03]'
                       }`}
                     >
                       <div className="flex items-center gap-3.5">
-                        {/* Custom Monochrome Checkbox */}
+                        {/* Custom Monochrome Checkbox with animated scale pop */}
                         <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
                             isDone
-                              ? 'bg-white border-white text-black'
-                              : 'border-white/20 bg-transparent group-hover:border-white/40'
+                              ? 'bg-white border-white text-black scale-105'
+                              : 'border-white/20 bg-transparent group-hover:border-white/40 group-hover:scale-105'
                           }`}
                         >
-                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3] animate-in zoom-in-75 duration-150" />}
                         </div>
 
                         <div>
                           <span
-                            className={`text-sm font-sans font-medium transition-all ${
+                            className={`text-sm font-sans font-medium transition-all duration-200 ${
                               isDone ? 'line-through text-neutral-400' : 'text-neutral-100'
                             }`}
                           >
@@ -419,7 +425,7 @@ export default function DashboardPage() {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="p-1.5 text-neutral-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1.5 text-neutral-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -445,7 +451,7 @@ export default function DashboardPage() {
                       key={idx}
                       type="button"
                       onClick={() => setDate(day.dateStr)}
-                      className={`flex-1 h-6 rounded-sm bg-white transition-all cursor-pointer relative group/bar ${
+                      className={`flex-1 h-6 rounded-sm bg-white transition-all cursor-pointer relative group/bar hover:-translate-y-0.5 active:scale-95 ${
                         day.isCurrentDay ? 'ring-1 ring-white shadow-sm' : ''
                       }`}
                       style={{ opacity: Math.max(0.1, day.rate) }}
@@ -475,7 +481,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/recipes"
-                  className="px-3.5 py-1.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <Utensils className="w-3.5 h-3.5" />
                   <span>Browse Recipes</span>
@@ -492,19 +498,19 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setProtein(todayLog.totalProteinLogged + 15, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +15g
                     </button>
                     <button
                       onClick={() => setProtein(todayLog.totalProteinLogged + 30, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +30g
                     </button>
                     <button
                       onClick={() => setProtein(todayLog.totalProteinLogged + 45, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +45g
                     </button>
@@ -520,19 +526,19 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setHydration(todayLog.hydrationLiters + 0.25, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +250ml
                     </button>
                     <button
                       onClick={() => setHydration(todayLog.hydrationLiters + 0.5, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +500ml
                     </button>
                     <button
                       onClick={() => setHydration(todayLog.hydrationLiters + 1.0, currentDate)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-neutral-200 transition-colors"
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-xs font-mono text-neutral-200 transition-all cursor-pointer"
                     >
                       +1.0L
                     </button>

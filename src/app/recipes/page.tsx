@@ -245,7 +245,7 @@ export default function RecipesPage() {
                 <div
                   key={recipe.id}
                   onClick={() => openRecipeModal(recipe)}
-                  className="group cursor-pointer backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/20 hover:bg-white/[0.04] rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between shadow-xl relative overflow-hidden"
+                  className="group cursor-pointer backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/25 hover:bg-white/[0.04] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] active:scale-[0.99] flex flex-col justify-between shadow-xl relative overflow-hidden"
                 >
                   {/* Top Subtle Specular Line */}
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
@@ -318,8 +318,8 @@ export default function RecipesPage() {
                         onClick={(e) => handleQuickLog(recipe, 1.0, e)}
                         className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                           isLogged
-                            ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15'
-                            : 'bg-white text-black hover:bg-neutral-200 active:scale-[0.98]'
+                            ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15 active:scale-95'
+                            : 'bg-white text-black hover:bg-neutral-200 active:scale-95'
                         }`}
                       >
                         {isLogged ? (

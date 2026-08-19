@@ -64,13 +64,14 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           >
             Dashboard
           </Link>
-          <InvertedButton 
-            variant="secondary" 
-            onClick={() => onOpenAuth ? onOpenAuth('login') : null}
-            className="py-2 px-5 text-xs sm:text-sm rounded-full backdrop-blur-md cursor-pointer border-white/20 hover:bg-white/10"
-          >
-            Login / Signup
-          </InvertedButton>
+          <Link href="/login">
+            <InvertedButton 
+              variant="secondary" 
+              className="py-2 px-5 text-xs sm:text-sm rounded-full backdrop-blur-md cursor-pointer border-white/20 hover:bg-white/10"
+            >
+              Login / Signup
+            </InvertedButton>
+          </Link>
         </div>
 
       </div>

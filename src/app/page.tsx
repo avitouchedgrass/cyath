@@ -5,19 +5,11 @@ import { HeaderNav } from "@/components/landing/HeaderNav";
 import { PixelShowcase, DISH_ITEMS, DishData } from "@/components/landing/PixelShowcase";
 import { TextType } from "@/components/reactbits/TextType";
 import { SpecularButton } from "@/components/reactbits/SpecularButton";
-import { AuthModal } from "@/components/auth/AuthModal";
 import Link from "next/link";
 import { Activity, Flame, Sparkles } from "lucide-react";
 
 export default function Home() {
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
-
-  const handleOpenAuth = (mode: 'login' | 'signup' = 'signup') => {
-    setAuthMode(mode);
-    setAuthModalOpen(true);
-  };
 
   return (
     <div className="relative min-h-screen bg-[#080808] overflow-hidden flex flex-col text-neutral-100 selection:bg-white selection:text-black">
@@ -33,7 +25,7 @@ export default function Home() {
       />
 
       {/* Floating Centered Navbar with Static User Logo */}
-      <HeaderNav onOpenAuth={handleOpenAuth} />
+      <HeaderNav />
 
       {/* Main Hero Container */}
       <main className="relative z-10 flex-1 flex flex-col justify-center px-6 lg:px-12 pt-28 sm:pt-32 lg:pt-36 pb-20">
@@ -69,17 +61,18 @@ export default function Home() {
 
               {/* CTA Buttons */}
               <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                <SpecularButton 
-                  size="lg" 
-                  radius={20} 
-                  intensity={1.8} 
-                  shineFade={30}
-                  blur={16}
-                  onClick={() => handleOpenAuth('signup')}
-                  className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight active:scale-95"
-                >
-                  Start Calibration — Free
-                </SpecularButton>
+                <Link href="/auth" className="w-full sm:w-auto">
+                  <SpecularButton 
+                    size="lg" 
+                    radius={20} 
+                    intensity={1.8} 
+                    shineFade={30}
+                    blur={16}
+                    className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight active:scale-95"
+                  >
+                    Start Calibration — Free
+                  </SpecularButton>
+                </Link>
 
                 <Link 
                   href="/recipes"
@@ -207,13 +200,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      {/* Interactive Auth Modal */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
-      />
     </div>
   );
 }

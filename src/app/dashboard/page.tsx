@@ -364,29 +364,23 @@ export default function DashboardPage() {
 
               {/* Semi-Circular SVG Gauge */}
               <div className="relative w-48 h-28 flex items-end justify-center my-2">
-                <svg className="w-48 h-48 -rotate-90 transform" viewBox="0 0 100 100">
+                <svg className="w-48 h-28" viewBox="0 0 120 70">
                   {/* Background Arc */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
+                  <path
+                    d="M 15,60 A 45,45 0 0,1 105,60"
+                    fill="none"
                     stroke="rgba(255, 255, 255, 0.08)"
                     strokeWidth="8"
-                    strokeDasharray="125.6"
-                    strokeDashoffset="0"
                     strokeLinecap="round"
                   />
                   {/* Active Progress Arc */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
+                  <path
+                    d="M 15,60 A 45,45 0 0,1 105,60"
+                    fill="none"
                     stroke="white"
                     strokeWidth="8"
-                    strokeDasharray="125.6"
-                    strokeDashoffset={125.6 - (125.6 * completionPercentage) / 100}
+                    strokeDasharray="141.37"
+                    strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
                     strokeLinecap="round"
                     className="transition-all duration-700 ease-out"
                   />
@@ -527,10 +521,7 @@ export default function DashboardPage() {
               
               {/* Top Circadian Phase Badge */}
               <div className="w-full flex items-center justify-between z-10">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-neutral-400" />
-                  <span className="text-xs font-mono text-neutral-300">Circadian Momentum Core</span>
-                </div>
+                <span className="text-xs font-mono text-neutral-300">Circadian Momentum Core</span>
                 <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border bg-white/5 border-white/10 ${circadianPhase.accent}`}>
                   Active Window
                 </span>
@@ -548,11 +539,13 @@ export default function DashboardPage() {
                 <div className="w-40 h-40 rounded-full border border-white/15 border-dashed animate-[spin_40s_linear_infinite] absolute" />
                 <div className="w-32 h-32 rounded-full border border-white/10 animate-[spin_25s_linear_infinite_reverse] absolute" />
 
-                {/* Center Glow Sphere */}
-                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-white/20 to-white/5 border border-white/30 backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.15)] relative z-10">
-                  <Sparkles className="w-6 h-6 text-white animate-pulse" />
-                  <span className="text-[10px] font-mono text-white font-bold mt-1 tabular-nums">
-                    {calculatedStreak}D STREAK
+                {/* Center Glow Sphere (Clean Typography, No SVG icon) */}
+                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-white/15 to-white/5 border border-white/20 backdrop-blur-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] relative z-10">
+                  <span className="font-mono text-2xl font-bold text-white tracking-tight tabular-nums leading-none">
+                    {calculatedStreak}D
+                  </span>
+                  <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-widest mt-1">
+                    Streak
                   </span>
                 </div>
               </div>
@@ -569,7 +562,7 @@ export default function DashboardPage() {
 
             </div>
 
-            {/* 14-Day Consistency Matrix Heatmap */}
+            {/* 14-Day Consistency Matrix Heatmap (High Contrast & Clear Readability) */}
             <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -577,7 +570,7 @@ export default function DashboardPage() {
                     14-Day Momentum Matrix
                   </h3>
                   <span className="text-[10px] font-mono text-neutral-500">
-                    Monochrome consistency telemetry
+                    Daily adherence telemetry
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-300">
@@ -586,23 +579,29 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 14 Squares Heatmap */}
+              {/* 14 High-Visibility Squares */}
               <div className="grid grid-cols-7 gap-2 pt-2">
                 {heatmapData.map((day) => (
                   <div
                     key={day.dateStr}
                     onClick={() => setDate(day.dateStr)}
-                    className={`h-9 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all border ${
+                    className={`h-11 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all border ${
                       day.isCurrentDay
-                        ? 'ring-2 ring-white border-white'
-                        : 'border-white/5 hover:border-white/20'
+                        ? 'bg-white text-black border-white shadow-md font-bold'
+                        : day.rate >= 0.8
+                        ? 'bg-white/15 text-white border-white/30 hover:bg-white/20'
+                        : day.rate >= 0.4
+                        ? 'bg-white/[0.06] text-neutral-200 border-white/15 hover:bg-white/10'
+                        : 'bg-white/[0.02] text-neutral-500 border-white/5 hover:border-white/10'
                     }`}
-                    style={{
-                      backgroundColor: `rgba(255, 255, 255, ${Math.max(0.04, day.rate * 0.9)})`,
-                    }}
                     title={`${day.label}: ${Math.round(day.rate * 100)}% adherence`}
                   >
-                    <span className="text-[9px] font-mono text-neutral-400">{day.label.split(' ')[1]}</span>
+                    <span className={`text-[9px] font-mono ${day.isCurrentDay ? 'text-black font-semibold' : 'text-neutral-400'}`}>
+                      {day.label.split(' ')[0]}
+                    </span>
+                    <span className="text-xs font-mono font-bold tabular-nums">
+                      {day.label.split(' ')[1]}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -625,14 +624,16 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={rId}
-                        className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-xs font-mono"
+                        className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-xs font-mono gap-3"
                       >
-                        <div className="flex items-center gap-2.5">
-                          <Utensils className="w-4 h-4 text-emerald-400" />
-                          <span className="text-white font-semibold">{recipe.name}</span>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="text-emerald-400 shrink-0">●</span>
+                          <span className="text-white font-semibold truncate">{recipe.name}</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-emerald-400 font-bold">{recipe.protein}g PRO</span>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-emerald-400 font-bold whitespace-nowrap tabular-nums">
+                            {recipe.protein}g PRO
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}

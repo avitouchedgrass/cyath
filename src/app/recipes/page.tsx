@@ -9,7 +9,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import {
   Search,
   SlidersHorizontal,
-  Clock,
+  ChevronDown,
   Sparkles,
   Check,
   Plus,
@@ -17,44 +17,60 @@ import {
   X,
   ChefHat,
   Zap,
-  Info,
-  HelpCircle,
 } from 'lucide-react';
 
 const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
 
+const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
+  { id: 'protein', label: 'Highest Protein' },
+  { id: 'calories', label: 'Lowest Calories' },
+  { id: 'time', label: 'Quickest Prep' },
+];
+
 export default function RecipesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'protein' | 'calories' | 'time'>('protein');
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [portionMultiplier, setPortionMultiplier] = useState<number>(1.0);
-  const [showFocusTooltip, setShowFocusTooltip] = useState(false);
   const [loggedToast, setLoggedToast] = useState<{ name: string; protein: number; portion: number } | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   const { logRecipeToDay, getDailyLog } = useHabitStore();
   const todayLog = getDailyLog();
 
-  // Keyboard shortcut listener: Press '/' to focus search
+  // Close custom dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setIsSortOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Keyboard shortcut listener: Press '/' to focus search, 'Escape' to dismiss modals/dropdowns
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/' && document.activeElement !== searchInputRef.current) {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
-      if (e.key === 'Escape' && selectedRecipe) {
-        setSelectedRecipe(null);
+      if (e.key === 'Escape') {
+        if (selectedRecipe) setSelectedRecipe(null);
+        if (isSortOpen) setIsSortOpen(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedRecipe]);
+  }, [selectedRecipe, isSortOpen]);
 
-  // Reset portion multiplier when opening a new recipe
   const openRecipeModal = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
     setPortionMultiplier(1.0);
@@ -141,7 +157,7 @@ export default function RecipesPage() {
         </div>
 
         {/* Hero Section Header */}
-        <div className="max-w-3xl mb-12">
+        <div className="max-w-3xl mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs font-mono text-neutral-400 mb-4">
             <ChefHat className="w-3.5 h-3.5 text-white" />
             <span>Macro-Calibrated Engine</span>
@@ -150,12 +166,12 @@ export default function RecipesPage() {
             Pixel-Calibrated Fuel
           </h1>
           <p className="text-neutral-400 text-sm sm:text-base mt-3 leading-relaxed font-sans max-w-2xl">
-            Whole-food, high-bioavailability recipes designed for metabolic consistency and mental clarity. One click logs macros directly to your daily protocol.
+            Whole-food meals calibrated for energy retention. One click logs macros directly to your daily protocol.
           </p>
         </div>
 
-        {/* Filter, Search & Sort Control Bar */}
-        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-4 sm:p-5 mb-10 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+        {/* Control Bar: Search Input & Bespoke Dark Frosted-Glass Dropdown */}
+        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-3.5 sm:p-4 mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between z-20 relative">
           
           {/* Search Bar with '/' keyboard accelerator */}
           <div className="relative flex-1 min-w-[240px]">
@@ -168,7 +184,6 @@ export default function RecipesPage() {
               placeholder="Search recipes, ingredients, or tags..."
               className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-white/30 transition-all font-sans"
             />
-            {/* Keyboard shortcut indicator */}
             {!searchQuery && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-500 border border-white/10 px-1.5 py-0.5 rounded bg-white/5 pointer-events-none">
                 /
@@ -177,47 +192,81 @@ export default function RecipesPage() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* Sort Selection */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <SlidersHorizontal className="w-4 h-4 text-neutral-400" />
-            <span className="text-xs font-mono text-neutral-400 hidden sm:inline-block">Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-neutral-200 text-xs font-mono focus:outline-none focus:border-white/30 cursor-pointer"
+          {/* 1. Bespoke Dark Frosted-Glass Custom Dropdown Menu */}
+          <div className="relative" ref={sortDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsSortOpen(!isSortOpen)}
+              className="w-full md:w-auto px-4 py-2.5 rounded-xl bg-[#111622] border border-white/10 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-3 shadow-lg cursor-pointer"
+              aria-haspopup="listbox"
+              aria-expanded={isSortOpen}
             >
-              <option value="protein" className="bg-[#121212] text-white">Highest Protein</option>
-              <option value="calories" className="bg-[#121212] text-white">Lowest Calories</option>
-              <option value="time" className="bg-[#121212] text-white">Quickest Prep</option>
-            </select>
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="text-neutral-400">Sort:</span>
+                <span className="text-white font-medium">
+                  {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
+                </span>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu Popup */}
+            {isSortOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#111622] border border-white/15 backdrop-blur-2xl shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
+                {SORT_OPTIONS.map((option) => {
+                  const isSelected = sortBy === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => {
+                        setSortBy(option.id);
+                        setIsSortOpen(false);
+                      }}
+                      className={`w-full px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-white/10 text-white font-semibold'
+                          : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span>{option.label}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
-          {CATEGORIES.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-white text-black font-semibold shadow-md'
-                    : 'bg-white/[0.02] border border-white/10 text-neutral-400 hover:text-white hover:bg-white/[0.06]'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
+        {/* 5. Single Segmented Monospace Pill Filter Bar */}
+        <div className="mb-10 overflow-x-auto pb-2 scrollbar-none">
+          <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md">
+            {CATEGORIES.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-white text-black font-bold shadow-md'
+                      : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Recipe Cards Grid */}
@@ -267,7 +316,7 @@ export default function RecipesPage() {
                       </div>
                     </div>
 
-                    {/* Pixel Art Dish Presentation */}
+                    {/* 2 & 4. Unique Pixel Art Dish with Smooth Image Scale Hover */}
                     <div className="w-full flex items-center justify-center py-4 mb-4">
                       <div className="w-44 h-44 relative flex items-center justify-center">
                         <PixelContainer
@@ -276,7 +325,7 @@ export default function RecipesPage() {
                           width={170}
                           height={170}
                           withGlow
-                          className="w-full h-full"
+                          className="w-full h-full group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </div>
@@ -290,36 +339,44 @@ export default function RecipesPage() {
                     </p>
                   </div>
 
-                  {/* Macro Telemetry Grid */}
+                  {/* 4. Monospace Telemetry Row & Footer */}
                   <div>
-                    <div className="grid grid-cols-4 gap-2 py-3 px-3.5 rounded-2xl bg-white/[0.02] border border-white/5 font-mono mb-4 text-center">
+                    {/* Itemized Macro Telemetry Grid */}
+                    <div className="grid grid-cols-4 gap-2 py-2.5 px-3 rounded-2xl bg-white/[0.02] border border-white/5 font-mono mb-3 text-center">
                       <div>
                         <div className="text-[10px] text-neutral-500 uppercase">PRO</div>
-                        <div className="text-sm font-bold text-white tracking-tight">{recipe.protein}g</div>
+                        <div className="text-xs sm:text-sm font-bold text-white tracking-tight">{recipe.protein}g</div>
                       </div>
                       <div>
                         <div className="text-[10px] text-neutral-500 uppercase">CARB</div>
-                        <div className="text-sm font-bold text-neutral-300 tracking-tight">{recipe.carbs}g</div>
+                        <div className="text-xs sm:text-sm font-bold text-neutral-300 tracking-tight">{recipe.carbs}g</div>
                       </div>
                       <div>
                         <div className="text-[10px] text-neutral-500 uppercase">FAT</div>
-                        <div className="text-sm font-bold text-neutral-300 tracking-tight">{recipe.fats}g</div>
+                        <div className="text-xs sm:text-sm font-bold text-neutral-300 tracking-tight">{recipe.fats}g</div>
                       </div>
                       <div>
                         <div className="text-[10px] text-neutral-500 uppercase">KCAL</div>
-                        <div className="text-sm font-bold text-white tracking-tight">{recipe.calories}</div>
+                        <div className="text-xs sm:text-sm font-bold text-white tracking-tight">{recipe.calories}</div>
                       </div>
                     </div>
 
-                    {/* Actions: Log Button & Inspect */}
-                    <div className="flex items-center gap-2.5">
+                    {/* Monospace Telemetry Summary Tag `[48g PRO | 520 KCAL | 20M]` */}
+                    <div className="flex items-center justify-center py-1 mb-3">
+                      <span className="text-[11px] font-mono font-medium text-neutral-400 bg-white/[0.02] px-3 py-1 rounded-full border border-white/5 tracking-wider">
+                        [{recipe.protein}G PRO | {recipe.calories} KCAL | {recipe.prepTimeMinutes}M]
+                      </span>
+                    </div>
+
+                    {/* Actions: Log Button */}
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={(e) => handleQuickLog(recipe, 1.0, e)}
-                        className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                           isLogged
                             ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15 active:scale-95'
-                            : 'bg-white text-black hover:bg-neutral-200 active:scale-95'
+                            : 'bg-white text-black hover:bg-neutral-200 active:scale-95 shadow-md'
                         }`}
                       >
                         {isLogged ? (
@@ -334,11 +391,6 @@ export default function RecipesPage() {
                           </>
                         )}
                       </button>
-
-                      <div className="flex items-center gap-1 text-xs font-mono text-neutral-500 px-2 py-2">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{recipe.prepTimeMinutes}m</span>
-                      </div>
                     </div>
                   </div>
                 </div>

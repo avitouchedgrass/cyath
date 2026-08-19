@@ -1,36 +1,291 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { supabase } from '@/lib/supabase';
 
-interface HabitState {
-  date: string;
-  habitsCompleted: Record<string, boolean>;
-  totalProteinLogged: number;
-  sleepHours: number;
-  energyLevel: number;
-  moodScore: number;
-  
-  toggleHabit: (habitId: string) => void;
-  setProtein: (amount: number) => void;
-  setSleep: (hours: number) => void;
-  setEnergy: (level: number) => void;
-  setMood: (score: number) => void;
+export interface HabitItem {
+  id: string;
+  title: string;
+  category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'custom';
+  targetDaysPerWeek: number;
 }
 
-export const useHabitStore = create<HabitState>((set) => ({
-  date: new Date().toISOString().split('T')[0],
+export interface DailyLogData {
+  habitsCompleted: Record<string, boolean>;
+  totalProteinLogged: number;
+  totalCaloriesLogged: number;
+  hydrationLiters: number;
+  sleepHours: number;
+  energyLevel: number; // 1 - 10
+  moodScore: number;   // 1 - 10
+  notes: string;
+  loggedRecipeIds: string[];
+}
+
+export const DEFAULT_HABITS: HabitItem[] = [
+  { id: 'sunlight', title: 'Morning Sunlight & Electrolytes (15m)', category: 'morning', targetDaysPerWeek: 7 },
+  { id: 'protein_target', title: 'Hit Daily Protein Target (120g+)', category: 'nutrition', targetDaysPerWeek: 7 },
+  { id: 'movement', title: 'Zone 2 Cardio or Heavy Resistance', category: 'movement', targetDaysPerWeek: 5 },
+  { id: 'hydration', title: 'Hydration Target (2.5L+ Pure Water)', category: 'nutrition', targetDaysPerWeek: 7 },
+  { id: 'digital_sunset', title: 'Digital Sunset & 8h Dark Sleep', category: 'recovery', targetDaysPerWeek: 7 },
+  { id: 'mobility', title: 'Thoracic Mobility & Cold Shower', category: 'recovery', targetDaysPerWeek: 6 },
+];
+
+interface HabitStoreState {
+  currentDate: string; // YYYY-MM-DD
+  habits: HabitItem[];
+  logsByDate: Record<string, DailyLogData>;
+  streakCount: number;
+  isSyncing: boolean;
+
+  // Actions
+  setDate: (date: string) => void;
+  toggleHabit: (habitId: string, date?: string) => void;
+  addCustomHabit: (title: string, category?: HabitItem['category']) => void;
+  deleteHabit: (habitId: string) => void;
+  setProtein: (amount: number, date?: string) => void;
+  setCalories: (amount: number, date?: string) => void;
+  setHydration: (liters: number, date?: string) => void;
+  setSleep: (hours: number, date?: string) => void;
+  setEnergy: (level: number, date?: string) => void;
+  setMood: (score: number, date?: string) => void;
+  setNotes: (notes: string, date?: string) => void;
+  logRecipeToDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
+  removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
+  getDailyLog: (date?: string) => DailyLogData;
+  syncWithSupabase: (date?: string) => Promise<void>;
+}
+
+const getTodayString = () => new Date().toISOString().split('T')[0];
+
+const createEmptyDailyLog = (): DailyLogData => ({
   habitsCompleted: {},
   totalProteinLogged: 0,
-  sleepHours: 0,
-  energyLevel: 5,
-  moodScore: 5,
+  totalCaloriesLogged: 0,
+  hydrationLiters: 0,
+  sleepHours: 7.5,
+  energyLevel: 7,
+  moodScore: 8,
+  notes: '',
+  loggedRecipeIds: [],
+});
 
-  toggleHabit: (habitId) => set((state) => ({
-    habitsCompleted: {
-      ...state.habitsCompleted,
-      [habitId]: !state.habitsCompleted[habitId]
+export const useHabitStore = create<HabitStoreState>()(
+  persist(
+    (set, get) => ({
+      currentDate: getTodayString(),
+      habits: DEFAULT_HABITS,
+      logsByDate: {
+        [getTodayString()]: createEmptyDailyLog(),
+      },
+      streakCount: 5,
+      isSyncing: false,
+
+      setDate: (date) => set({ currentDate: date }),
+
+      getDailyLog: (date) => {
+        const targetDate = date || get().currentDate;
+        return get().logsByDate[targetDate] || createEmptyDailyLog();
+      },
+
+      toggleHabit: (habitId, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const updatedHabits = {
+          ...currentLog.habitsCompleted,
+          [habitId]: !currentLog.habitsCompleted[habitId],
+        };
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              habitsCompleted: updatedHabits,
+            },
+          },
+        }));
+
+        // Fire-and-forget background sync
+        get().syncWithSupabase(targetDate);
+      },
+
+      addCustomHabit: (title, category = 'custom') => {
+        const newHabit: HabitItem = {
+          id: `custom_${Date.now()}`,
+          title,
+          category,
+          targetDaysPerWeek: 7,
+        };
+        set((state) => ({
+          habits: [...state.habits, newHabit],
+        }));
+      },
+
+      deleteHabit: (habitId) => {
+        set((state) => ({
+          habits: state.habits.filter((h) => h.id !== habitId),
+        }));
+      },
+
+      setProtein: (amount, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, totalProteinLogged: Math.max(0, amount) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setCalories: (amount, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, totalCaloriesLogged: Math.max(0, amount) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setHydration: (liters, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, hydrationLiters: Math.max(0, Number(liters.toFixed(1))) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setSleep: (hours, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, sleepHours: Math.max(0, Number(hours.toFixed(1))) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setEnergy: (level, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, energyLevel: Math.min(10, Math.max(1, level)) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setMood: (score, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, moodScore: Math.min(10, Math.max(1, score)) },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      setNotes: (notes, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: { ...currentLog, notes },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      logRecipeToDay: (recipeId, protein, calories, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const updatedRecipes = [...currentLog.loggedRecipeIds, recipeId];
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              totalProteinLogged: currentLog.totalProteinLogged + protein,
+              totalCaloriesLogged: currentLog.totalCaloriesLogged + calories,
+              loggedRecipeIds: updatedRecipes,
+            },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      removeRecipeFromDay: (recipeId, protein, calories, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const index = currentLog.loggedRecipeIds.indexOf(recipeId);
+        if (index === -1) return;
+
+        const updatedRecipes = [...currentLog.loggedRecipeIds];
+        updatedRecipes.splice(index, 1);
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              totalProteinLogged: Math.max(0, currentLog.totalProteinLogged - protein),
+              totalCaloriesLogged: Math.max(0, currentLog.totalCaloriesLogged - calories),
+              loggedRecipeIds: updatedRecipes,
+            },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      syncWithSupabase: async (date) => {
+        const targetDate = date || get().currentDate;
+        const log = get().logsByDate[targetDate];
+        if (!log) return;
+
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user?.id) return; // In guest or offline mode, local persist is authoritative
+
+          set({ isSyncing: true });
+          await supabase.from('daily_logs').upsert({
+            user_id: session.user.id,
+            log_date: targetDate,
+            habits_completed: log.habitsCompleted,
+            total_protein: log.totalProteinLogged,
+            total_calories: log.totalCaloriesLogged,
+            hydration_liters: log.hydrationLiters,
+            sleep_hours: log.sleepHours,
+            energy_level: log.energyLevel,
+            mood_score: log.moodScore,
+            notes: log.notes,
+            logged_recipes: log.loggedRecipeIds,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,log_date' });
+        } catch {
+          // Graceful fallback to local persistence
+        } finally {
+          set({ isSyncing: false });
+        }
+      },
+    }),
+    {
+      name: 'cyath-habit-store-v2',
     }
-  })),
-  setProtein: (amount) => set({ totalProteinLogged: amount }),
-  setSleep: (hours) => set({ sleepHours: hours }),
-  setEnergy: (level) => set({ energyLevel: level }),
-  setMood: (score) => set({ moodScore: score }),
-}));
+  )
+);

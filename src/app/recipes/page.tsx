@@ -36,12 +36,17 @@ export default function RecipesPage() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [portionMultiplier, setPortionMultiplier] = useState<number>(1.0);
   const [loggedToast, setLoggedToast] = useState<{ name: string; protein: number; portion: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   const { logRecipeToDay, getDailyLog } = useHabitStore();
   const todayLog = getDailyLog();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close custom dropdown when clicking outside
   useEffect(() => {
@@ -106,7 +111,8 @@ export default function RecipesPage() {
     setTimeout(() => setLoggedToast(null), 3000);
   };
 
-  const proteinProgress = Math.min(100, Math.round((todayLog.totalProteinLogged / 130) * 100));
+  const currentProtein = mounted ? todayLog.totalProteinLogged : 0;
+  const proteinProgress = mounted ? Math.min(100, Math.round((todayLog.totalProteinLogged / 130) * 100)) : 0;
 
   return (
     <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
@@ -143,7 +149,7 @@ export default function RecipesPage() {
           >
             <div className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-white" />
-              <span>Dashboard ({todayLog.totalProteinLogged}g / 130g)</span>
+              <span suppressHydrationWarning>Dashboard ({currentProtein}g / 130g)</span>
             </div>
 
             {/* Mini Progress Bar */}
@@ -288,7 +294,7 @@ export default function RecipesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRecipes.map((recipe) => {
-              const isLogged = todayLog.loggedRecipeIds.includes(recipe.id);
+              const isLogged = mounted && todayLog.loggedRecipeIds.includes(recipe.id);
 
               return (
                 <div

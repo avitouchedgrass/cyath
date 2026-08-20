@@ -80,6 +80,12 @@ function OnboardingContent() {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
+  useEffect(() => {
+    if (isEditing && (!userSession || userSession.id.startsWith('guest_'))) {
+      router.push('/login?redirect=/onboarding?edit=true');
+    }
+  }, [isEditing, userSession, router]);
+
   // Form State initialized from store or defaults
   const [fullName, setFullName] = useState(userProfile?.fullName || '');
   const [age, setAge] = useState(userProfile?.age || 26);

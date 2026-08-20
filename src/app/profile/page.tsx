@@ -7,7 +7,6 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { supabase } from '@/lib/supabase';
 import {
-  User,
   ShieldAlert,
   ArrowLeft,
   ChevronRight,
@@ -18,12 +17,12 @@ import {
   Sliders,
   Sparkles,
   Flame,
-  Scale,
   Activity,
   Heart,
   Zap,
   Dumbbell,
   Moon,
+  Lock,
 } from 'lucide-react';
 
 const GOAL_LABELS: Record<string, { title: string; icon: React.ElementType }> = {
@@ -41,7 +40,6 @@ export default function ProfilePage() {
     setUserSession,
     userProfile,
     logsByDate,
-    habits,
     activeProtocolIds,
     deleteAccountData,
   } = useHabitStore();
@@ -77,7 +75,6 @@ export default function ProfilePage() {
     setIsSyncing(true);
     setSyncStatus(null);
     try {
-      // Small simulated sync delay for honest UI feedback
       await new Promise((r) => setTimeout(r, 600));
       setSyncStatus('All records synchronized with cloud');
       setTimeout(() => setSyncStatus(null), 3500);
@@ -104,7 +101,7 @@ export default function ProfilePage() {
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.03) 0%, transparent 60%)
+            radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.025) 0%, transparent 60%)
           `,
         }}
       />
@@ -118,29 +115,39 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/[0.06]">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white transition-colors group"
+            className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             <span>Return to Daily Planner</span>
           </Link>
 
-          <Link
-            href="/onboarding?edit=true"
-            className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 transition-all shadow-sm"
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>Edit Biometrics &amp; Goals</span>
-          </Link>
+          {isGuest ? (
+            <Link
+              href="/login?redirect=/onboarding?edit=true"
+              className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all shadow-sm"
+            >
+              <Lock className="w-3.5 h-3.5 text-slate-400" />
+              <span>Sign In to Edit Biometrics</span>
+            </Link>
+          ) : (
+            <Link
+              href="/onboarding?edit=true"
+              className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all shadow-sm"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Edit Biometrics &amp; Goals</span>
+            </Link>
+          )}
         </div>
 
-        {/* 2-Column Asymmetric Grid Layout (Operate Mode) */}
+        {/* 2-Column Asymmetric Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT / MAIN COLUMN (8 cols): Identity, Biometrics & Subscribed Protocols */}
           <div className="lg:col-span-8 space-y-8">
             
             {/* Unified Identity & Biometrics Panel */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-white/5">
                 <div className="flex items-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-white text-xl font-mono font-bold shadow-inner shrink-0">
@@ -149,85 +156,109 @@ export default function ProfilePage() {
                   
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
+                      <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight">
                         {displayName}
                       </h1>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
-                        isGuest 
-                          ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' 
-                          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                      }`}>
-                        {isGuest ? 'Guest Session (Unsaved)' : 'Cloud Verified'}
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-white/[0.04] border-white/10 text-slate-300 uppercase tracking-wider">
+                        {isGuest ? 'Local Sandbox' : 'Cloud Verified'}
                       </span>
                     </div>
-                    <p className="text-xs font-mono text-neutral-400">
+                    <p className="text-xs font-mono text-slate-400">
                       {userEmail}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Link
-                    href="/onboarding?edit=true"
-                    className="px-3.5 py-2 rounded-xl text-xs font-mono bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-sm"
-                  >
-                    Edit Profile Details
-                  </Link>
+                  {isGuest ? (
+                    <Link
+                      href="/login?redirect=/onboarding?edit=true"
+                      className="px-3.5 py-2 rounded-xl text-xs font-mono bg-white text-black font-semibold hover:bg-slate-200 transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Sign In to Configure</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/onboarding?edit=true"
+                      className="px-3.5 py-2 rounded-xl text-xs font-mono bg-white text-black font-semibold hover:bg-slate-200 transition-all shadow-sm"
+                    >
+                      Edit Profile Details
+                    </Link>
+                  )}
                 </div>
               </div>
 
               {/* Physical Biometrics Matrix */}
               {userProfile ? (
                 <div className="pt-6">
-                  <div className="text-[11px] font-mono uppercase tracking-wider text-neutral-500 mb-4">
+                  <div className="text-[10px] font-mono tracking-widest uppercase text-slate-500 mb-4">
                     Biometric Profile &amp; Calibrated Targets
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Height &amp; Weight</span>
-                      <span className="text-xs font-mono font-semibold text-white">
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block mb-1">Height &amp; Weight</span>
+                      <span className="text-xs font-mono font-semibold text-white tabular-nums">
                         {userProfile.heightCm} cm · {userProfile.weightKg} kg
                       </span>
                     </div>
 
-                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Age &amp; Sex</span>
-                      <span className="text-xs font-mono font-semibold text-white capitalize">
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block mb-1">Age &amp; Sex</span>
+                      <span className="text-xs font-mono font-semibold text-white capitalize tabular-nums">
                         {userProfile.age} yrs · {userProfile.sex}
                       </span>
                     </div>
 
-                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Primary Goal</span>
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block mb-1">Primary Goal</span>
                       <div className="flex items-center gap-1.5">
-                        <GoalIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <GoalIcon className="w-3.5 h-3.5 text-white shrink-0" />
                         <span className="text-xs font-mono font-semibold text-white truncate">
                           {goalMeta.title}
                         </span>
                       </div>
                     </div>
 
-                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <span className="text-[10px] font-mono text-neutral-400 block mb-1">Dietary Sensitivities</span>
-                      <span className="text-xs font-mono text-neutral-300 truncate block">
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block mb-1">Dietary Sensitivities</span>
+                      <span className="text-xs font-mono text-slate-300 truncate block">
                         {userProfile.allergies && userProfile.allergies.length > 0
                           ? userProfile.allergies.join(', ')
                           : 'No known allergies'}
                       </span>
                     </div>
                   </div>
+
+                  {/* Demo User Gate Notice */}
+                  {isGuest && (
+                    <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-xs font-mono text-slate-400">
+                          Demo Sandbox Mode · Sign in to calibrate and persist your personal biometrics.
+                        </span>
+                      </div>
+                      <Link
+                        href="/login?redirect=/onboarding?edit=true"
+                        className="text-xs font-mono text-white underline underline-offset-4 hover:text-slate-200 font-semibold shrink-0"
+                      >
+                        Sign In to Configure →
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-xs font-mono text-neutral-400">
+                  <span className="text-xs font-mono text-slate-400">
                     No personalized biometric profile configured yet.
                   </span>
                   <Link
-                    href="/onboarding"
-                    className="text-xs font-mono text-white underline underline-offset-4 hover:text-neutral-300"
+                    href={isGuest ? "/login?redirect=/onboarding" : "/onboarding"}
+                    className="text-xs font-mono text-white underline underline-offset-4 hover:text-slate-200 font-semibold"
                   >
-                    Complete Onboarding Calibration →
+                    {isGuest ? "Sign In to Calibrate Biometrics →" : "Complete Onboarding Calibration →"}
                   </Link>
                 </div>
               )}
@@ -236,56 +267,61 @@ export default function ProfilePage() {
             {/* Lifetime Performance Aggregates */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-serif font-normal text-xl text-white tracking-tight">
-                  Lifetime Performance
-                </h2>
-                <span className="text-xs font-mono text-neutral-500">
-                  Cumulative tracking history
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                    Aggregated Metrics
+                  </span>
+                  <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
+                    Lifetime Performance
+                  </h2>
+                </div>
+                <span className="text-xs font-mono text-slate-500">
+                  Cumulative history
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-5 shadow-lg">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 block mb-1">
                     Active Days Logged
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {Math.max(1, totalDaysLogged)}
                     </span>
-                    <span className="text-xs text-neutral-400 font-sans">Days</span>
+                    <span className="text-xs text-slate-400 font-sans">Days</span>
                   </div>
-                  <p className="text-[11px] text-neutral-500 font-sans mt-2">
+                  <p className="text-[11px] text-slate-500 font-sans mt-2">
                     Days with recorded habits or nutrition
                   </p>
                 </div>
 
-                <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-5 shadow-lg">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 block mb-1">
                     Habits Completed
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {totalHabitsCompleted}
                     </span>
-                    <span className="text-xs text-emerald-400 font-sans">Completed</span>
+                    <span className="text-xs text-slate-400 font-sans">Done</span>
                   </div>
-                  <p className="text-[11px] text-neutral-500 font-sans mt-2">
+                  <p className="text-[11px] text-slate-500 font-sans mt-2">
                     Individual routine requirements met
                   </p>
                 </div>
 
-                <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-2xl p-5 shadow-lg">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-5 shadow-lg">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 block mb-1">
                     Protein Tracked
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                       {totalProteinLogged}
                     </span>
-                    <span className="text-xs text-neutral-400 font-mono">g Total</span>
+                    <span className="text-xs text-slate-400 font-mono">g Total</span>
                   </div>
-                  <p className="text-[11px] text-neutral-500 font-sans mt-2">
+                  <p className="text-[11px] text-slate-500 font-sans mt-2">
                     Whole-food amino acid intake
                   </p>
                 </div>
@@ -293,20 +329,20 @@ export default function ProfilePage() {
             </div>
 
             {/* Subscribed Protocol Blueprints */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
               <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/5">
                 <div>
-                  <h3 className="font-serif font-normal text-xl text-white tracking-tight">
-                    Active Protocol Blueprints
+                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                    Protocol Blueprints
+                  </span>
+                  <h3 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
+                    Active Subscriptions
                   </h3>
-                  <p className="text-neutral-400 text-xs font-sans mt-0.5">
-                    Routines currently active in your daily checklist.
-                  </p>
                 </div>
 
                 <Link
                   href="/protocols"
-                  className="text-xs font-mono text-white hover:text-neutral-300 transition-colors inline-flex items-center gap-1"
+                  className="text-xs font-mono text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1"
                 >
                   <span>Browse Catalog</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -315,12 +351,12 @@ export default function ProfilePage() {
 
               {activeProtocolIds.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-xs font-mono text-neutral-400 mb-3">
+                  <p className="text-xs font-mono text-slate-400 mb-3">
                     You haven&apos;t activated any protocol blueprints yet.
                   </p>
                   <Link
                     href="/protocols"
-                    className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-all inline-block shadow-sm"
+                    className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-slate-200 transition-all inline-block shadow-sm"
                   >
                     Explore Protocol Blueprints
                   </Link>
@@ -330,20 +366,20 @@ export default function ProfilePage() {
                   {activeProtocolIds.map((id) => (
                     <div
                       key={id}
-                      className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between hover:border-white/15 transition-all"
+                      className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between hover:border-white/15 transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400 shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
                           <Sparkles className="w-4 h-4" />
                         </div>
                         <div>
                           <h4 className="text-xs font-mono font-medium text-white capitalize">
                             {id.replace('-', ' & ')}
                           </h4>
-                          <span className="text-[10px] font-mono text-neutral-500">Active in Daily Checklist</span>
+                          <span className="text-[10px] font-mono text-slate-500">Active in Checklist</span>
                         </div>
                       </div>
-                      <span className="text-xs font-mono text-emerald-400">✓ Active</span>
+                      <span className="text-xs font-mono text-white font-medium">✓ Active</span>
                     </div>
                   ))}
                 </div>
@@ -356,11 +392,16 @@ export default function ProfilePage() {
           <div className="lg:col-span-4 space-y-6">
             
             {/* Cloud Sync & State Panel */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
-              <h3 className="font-serif font-normal text-lg text-white tracking-tight">
-                Data Synchronization
-              </h3>
-              <p className="text-neutral-400 text-xs font-sans leading-relaxed">
+            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Data Persistence
+                </span>
+                <h3 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
+                  Cloud Synchronization
+                </h3>
+              </div>
+              <p className="text-slate-400 text-xs font-sans leading-relaxed">
                 Your daily habit checks, nutrition logs, and biometrics are saved locally and synced with your cloud account.
               </p>
 
@@ -368,14 +409,14 @@ export default function ProfilePage() {
                 type="button"
                 onClick={handleForceSync}
                 disabled={isSyncing}
-                className="w-full py-2.5 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/10 text-neutral-200 hover:text-white hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/10 text-slate-200 hover:text-white hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>{isSyncing ? 'Syncing Records...' : 'Sync Cloud Records Now'}</span>
               </button>
 
               {syncStatus && (
-                <div className="text-xs font-mono text-emerald-400 flex items-center gap-1.5 justify-center pt-1">
+                <div className="text-xs font-mono text-white flex items-center gap-1.5 justify-center pt-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>{syncStatus}</span>
                 </div>
@@ -383,18 +424,23 @@ export default function ProfilePage() {
             </div>
 
             {/* Session Management */}
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
-              <h3 className="font-serif font-normal text-lg text-white tracking-tight">
-                Account Session
-              </h3>
-              <p className="text-neutral-400 text-xs font-sans leading-relaxed">
-                Currently signed in as <span className="text-neutral-200 font-mono">{userEmail}</span>.
+            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Authentication
+                </span>
+                <h3 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
+                  Account Session
+                </h3>
+              </div>
+              <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                Currently signed in as <span className="text-slate-200 font-mono">{userEmail}</span>.
               </p>
 
               {isGuest ? (
                 <Link
                   href="/login"
-                  className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white text-black hover:bg-neutral-200 transition-all shadow-sm flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white text-black hover:bg-slate-200 transition-all shadow-sm flex items-center justify-center gap-2"
                 >
                   Create Account to Save Data
                 </Link>
@@ -402,7 +448,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 border border-white/10 text-neutral-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out of Account</span>
@@ -411,15 +457,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Danger Zone */}
-            <div className="backdrop-blur-xl bg-red-950/[0.08] border border-red-500/20 rounded-3xl p-6 shadow-xl space-y-4">
+            <div className="backdrop-blur-xl bg-red-950/[0.08] border border-red-500/20 rounded-2xl p-6 shadow-xl space-y-4">
               <div className="flex items-center gap-2 text-red-400">
                 <ShieldAlert className="w-4 h-4" />
-                <h3 className="font-serif font-normal text-base text-red-200 tracking-tight">
+                <h3 className="font-cabinet font-semibold text-base text-red-200 tracking-tight">
                   Danger Zone
                 </h3>
               </div>
               
-              <p className="text-neutral-400 text-xs font-sans leading-relaxed">
+              <p className="text-slate-400 text-xs font-sans leading-relaxed">
                 Permanently purge your account, including all habit streak history, nutrition logs, and customized biometrics. This cannot be undone.
               </p>
 
@@ -437,25 +483,25 @@ export default function ProfilePage() {
 
         </div>
 
-        {/* Delete Confirmation Modal with Explicit Consequences */}
+        {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
               onClick={() => setShowDeleteConfirm(false)}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
-            <div className="relative z-10 w-full max-w-md bg-[#0d0d0d] border border-red-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="relative z-10 w-full max-w-md bg-[#0d0d0d] border border-red-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                   <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-serif font-normal text-xl text-white">Permanently Delete Account?</h4>
-                  <p className="text-[11px] font-mono text-neutral-400">This action is permanent and irreversible.</p>
+                  <h4 className="font-cabinet font-bold text-xl text-white">Permanently Delete Account?</h4>
+                  <p className="text-[11px] font-mono text-slate-400">This action is permanent and irreversible.</p>
                 </div>
               </div>
 
-              <p className="text-xs text-neutral-300 font-sans leading-relaxed">
+              <p className="text-xs text-slate-300 font-sans leading-relaxed">
                 All daily logs, habit metrics, and personalized biometrics associated with <strong className="text-white font-mono">{userEmail}</strong> will be permanently removed from our cloud database and local device storage.
               </p>
 
@@ -463,7 +509,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-mono bg-white/5 border border-white/10 text-neutral-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl text-xs font-mono bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
                 >
                   Keep Account
                 </button>

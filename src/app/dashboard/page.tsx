@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
-import { useHabitStore, HabitItem } from '@/store/useHabitStore';
+import { useHabitStore } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import {
@@ -12,11 +12,6 @@ import {
   Plus,
   ArrowRight,
   Flame,
-  Calendar,
-  Sparkles,
-  Zap,
-  Moon,
-  Sun,
   X,
   Trash2,
 } from 'lucide-react';
@@ -49,8 +44,6 @@ export default function DashboardPage() {
     isSyncing,
   } = useHabitStore();
 
-  const isLight = themeMode === 'light';
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -67,7 +60,7 @@ export default function DashboardPage() {
     return Math.round((completedCount / habits.length) * 100);
   }, [completedCount, habits.length]);
 
-  // Current routine time window based on current hour
+  // Routine time window based on current hour
   const routineWindow = useMemo(() => {
     const hour = new Date().getHours();
     if (hour < 11) {
@@ -264,16 +257,14 @@ export default function DashboardPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#111914] flex items-center justify-center text-[#F4F0EA] font-mono text-xs">
+      <div className="min-h-screen bg-[#131916] flex items-center justify-center text-[#F4F0EA] font-mono text-xs">
         Loading Daily Planner...
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
-    }`}>
+    <div className={`${themeMode === 'dark' ? 'dark' : ''} min-h-screen bg-[#F4F0EA] dark:bg-[#131916] text-[#1B2A24] dark:text-[#F4F0EA] transition-colors duration-300 flex flex-col`}>
       <HeaderNav 
         themeMode={themeMode} 
         onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
@@ -286,37 +277,27 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider ${
-                isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
-              }`}>
+              <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24] dark:bg-[#1D2622] dark:border-[#F4F0EA] dark:text-[#D9A036]">
                 Daily Planner · {currentDate} {isSyncing && '· Syncing...'}
               </span>
             </div>
-            <h1 className={`font-fraunces font-black text-3xl md:text-4xl tracking-tight ${
-              isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-            }`}>
+            <h1 className="font-fraunces font-black text-3xl md:text-4xl tracking-tight text-[#1B2A24] dark:text-[#F4F0EA]">
               Your Daily Planner &amp; Habits
             </h1>
           </div>
 
-          {/* Reserved Shadow for Top Streak Badge */}
-          <div className={`self-start sm:self-auto px-4 py-2 rounded-2xl border-2 font-mono font-bold text-xs flex items-center gap-2 ${
-            isLight 
-              ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]' 
-              : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
-          }`}>
-            <Flame className={`w-4 h-4 ${isLight ? 'text-[#1A3629]' : 'text-[#D9A036]'}`} />
+          {/* Reserved Tactile Shadow for Top Streak Badge */}
+          <div className="self-start sm:self-auto px-4 py-1.5 rounded-full border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] text-[#1B2A24] dark:text-[#F4F0EA] font-mono font-bold text-xs flex items-center gap-2 shadow-[3px_3px_0px_#D9A036]">
+            <Flame className="w-4 h-4 text-[#D9A036]" />
             <span>{calculatedStreak} Day Streak</span>
           </div>
         </div>
 
-        {/* 1. 28-Day Consistency Matrix (Flat Container, No Shadow, Crisp border-2) */}
-        <div className={`border-2 rounded-2xl p-6 sm:p-7 transition-all ${
-          isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-        }`}>
+        {/* 1. 28-Day Consistency Matrix (Flat Bento Box, 2px border, No Shadow) */}
+        <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block mb-1">
                 28-Day Consistency Matrix
               </span>
               <h2 className="font-fraunces font-bold text-xl tracking-tight">
@@ -324,10 +305,10 @@ export default function DashboardPage() {
               </h2>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-mono font-bold opacity-80">
-              <span>Total Actions: <strong>{totalHeatmapActions}</strong></span>
+            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1B2A24]/70 dark:text-[#F4F0EA]/70">
+              <span>Total Actions: <strong className="text-[#1B2A24] dark:text-[#F4F0EA]">{totalHeatmapActions}</strong></span>
               <span>·</span>
-              <span>Daily Pace: <strong>{avgDailyActions}/day</strong></span>
+              <span>Daily Pace: <strong className="text-[#1B2A24] dark:text-[#F4F0EA]">{avgDailyActions}/day</strong></span>
             </div>
           </div>
 
@@ -336,21 +317,14 @@ export default function DashboardPage() {
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
               
-              const levelClasses = isLight
-                ? {
-                    0: 'bg-transparent border border-transparent text-[#1A3629]/40 hover:bg-[#1A3629]/5',
-                    1: 'bg-[#E8E0D2] border border-[#1A3629]/30 text-[#1A3629]',
-                    2: 'bg-[#C2D7C7] border border-[#1A3629]/60 text-[#1A3629] font-bold',
-                    3: 'bg-[#6D9F80] border border-[#1A3629] text-[#FFFDF9] font-bold',
-                    4: 'bg-[#1A3629] border border-[#1A3629] text-[#FFFDF9] font-black',
-                  }[day.level]
-                : {
-                    0: 'bg-transparent border border-transparent text-[#8F9E8B] hover:bg-white/5',
-                    1: 'bg-[#1D2B22] border border-[#F4F0EA]/30 text-[#F4F0EA]',
-                    2: 'bg-[#3A5643] border border-[#F4F0EA]/60 text-[#F4F0EA] font-bold',
-                    3: 'bg-[#7AA884] border border-[#F4F0EA] text-[#111914] font-bold',
-                    4: 'bg-[#D9A036] border border-[#F4F0EA] text-[#111914] font-black',
-                  }[day.level];
+              // Only active/completed days get borders/fills. Inactive = no borders/backgrounds
+              const levelClasses = {
+                0: 'bg-transparent border border-transparent text-[#1B2A24]/40 dark:text-[#F4F0EA]/40 hover:bg-black/5 dark:hover:bg-white/5',
+                1: 'bg-[#E8E0D2] border border-[#1B2A24]/30 text-[#1B2A24] dark:bg-[#1D2B22] dark:border-[#F4F0EA]/30 dark:text-[#F4F0EA]',
+                2: 'bg-[#C2D7C7] border border-[#1B2A24]/60 text-[#1B2A24] font-bold dark:bg-[#3A5643] dark:border-[#F4F0EA]/60 dark:text-[#F4F0EA]',
+                3: 'bg-[#6D9F80] border border-[#1B2A24] text-[#FFFDF9] font-bold dark:bg-[#7AA884] dark:border-[#F4F0EA] dark:text-[#131916]',
+                4: 'bg-[#D9A036] border border-[#1B2A24] text-[#1B2A24] font-black dark:bg-[#D9A036] dark:border-[#F4F0EA] dark:text-[#131916]',
+              }[day.level];
 
               return (
                 <div key={day.dateStr} className="relative group">
@@ -362,7 +336,7 @@ export default function DashboardPage() {
                     }}
                     className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
                       isSelected
-                        ? 'ring-2 ring-current scale-105 font-bold'
+                        ? 'ring-2 ring-[#D9A036] scale-105 font-bold'
                         : 'hover:scale-105'
                     }`}
                   >
@@ -379,36 +353,35 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 2. 3-Column Dashboard Bento (Flat Containers, No Shadows, Crisp border-2) */}
+        {/* 2. 3-Column Dashboard Bento (Flat Bento Boxes, 2px border, No Shadows) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
           {/* COLUMN 1: Habit Checklist */}
           <div className="flex flex-col gap-6">
             
-            {/* Today's Score Dial (Calibrated Precision Dial) */}
-            <div className={`border-2 rounded-2xl p-6 text-center transition-all flex flex-col items-center ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Daily Progress Arc (Calibrated Technical Dial) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 text-center transition-all flex flex-col items-center">
               <div className="w-full flex items-center justify-between text-xs font-mono font-bold mb-3">
-                <span className="text-[10px] uppercase tracking-widest opacity-70">DAILY PROGRESS</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">DAILY PROGRESS</span>
                 <span>{completedCount} / {habits.length} DONE</span>
               </div>
 
-              {/* Thinned-Out Calibrated Progress Gauge (strokeWidth 4.5) */}
+              {/* Thinned 50% Calibrated Progress Gauge (strokeWidth 4) */}
               <div className="relative w-40 h-24 flex items-end justify-center my-1">
                 <svg className="w-40 h-24" viewBox="0 0 120 70">
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke={isLight ? '#E5DDD0' : 'rgba(244, 240, 234, 0.12)'}
-                    strokeWidth="4.5"
+                    stroke="currentColor"
+                    className="text-[#1B2A24]/15 dark:text-[#F4F0EA]/15"
+                    strokeWidth="4"
                     strokeLinecap="round"
                   />
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke={isLight ? '#1A3629' : '#D9A036'}
-                    strokeWidth="4.5"
+                    stroke="#D9A036"
+                    strokeWidth="4"
                     strokeDasharray="141.37"
                     strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
                     strokeLinecap="round"
@@ -417,20 +390,18 @@ export default function DashboardPage() {
                 </svg>
 
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="font-mono text-3xl font-black tabular-nums">
+                  <span className="font-mono text-3xl font-bold tabular-nums text-[#1B2A24] dark:text-[#F4F0EA]">
                     {completionPercentage}%
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Habit Checklist (Flat List Items with Subtle Separation) */}
-            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Habit Checklist (Flat Bento Box) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
                     Routine Checklist
                   </span>
                   <h2 className="font-fraunces font-bold text-lg">
@@ -438,69 +409,57 @@ export default function DashboardPage() {
                   </h2>
                 </div>
 
-                {/* Primary Action Button with subtle offset shadow */}
+                {/* Primary CTA (+ Add) with Tactile Shadow & Active Click Depression */}
                 <button
                   type="button"
                   onClick={() => setShowAddHabit(!showAddHabit)}
-                  className={`px-3 py-1.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center gap-1 transition-all cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none ${
-                    isLight 
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]' 
-                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="px-3.5 py-1.5 rounded-xl border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-mono font-bold flex items-center gap-1 shadow-[4px_4px_0px_#1B2A24] dark:shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1B2A24] dark:hover:shadow-[6px_6px_0px_#D9A036] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none transition-all cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add</span>
+                  <span>+ Add</span>
                 </button>
               </div>
 
               {/* Add Custom Habit Form */}
               {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className={`flex gap-2 p-2.5 rounded-xl border ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]/40' : 'bg-[#111914] border-[#F4F0EA]/40'
-                }`}>
+                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-2.5 rounded-xl border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/60 dark:bg-[#131916]/60">
                   <input
                     type="text"
                     placeholder="E.g., 20 Min Morning Walk..."
                     value={newHabitTitle}
                     onChange={(e) => setNewHabitTitle(e.target.value)}
-                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none"
+                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none placeholder-[#1B2A24]/40 dark:placeholder-[#F4F0EA]/40"
                     autoFocus
                   />
                   <button
                     type="submit"
-                    className={`px-3 py-1 rounded-lg border text-xs font-mono font-bold cursor-pointer ${
-                      isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
-                    }`}
+                    className="px-3 py-1 rounded-lg border border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-mono font-bold cursor-pointer"
                   >
                     Save
                   </button>
                 </form>
               )}
 
-              {/* Flattened Habit Checklist Items */}
-              <div className="flex flex-col divide-y divide-current/10">
+              {/* Flat Habit Items with Subtle Background Hover */}
+              <div className="flex flex-col gap-1">
                 {habits.map((habit) => {
                   const isDone = !!todayLog.habitsCompleted[habit.id];
                   return (
                     <div
                       key={habit.id}
                       onClick={() => handleToggleHabit(habit.id)}
-                      className="group flex items-center justify-between py-3 px-1.5 transition-colors cursor-pointer hover:bg-current/5 rounded-lg"
+                      className="group flex items-center justify-between py-2.5 px-3 rounded-lg bg-transparent hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
                           isDone
-                            ? isLight
-                              ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
-                              : 'bg-[#D9A036] text-[#111914] border-[#D9A036]'
-                            : isLight
-                              ? 'border-[#1A3629]/60'
-                              : 'border-[#F4F0EA]/60'
+                            ? 'bg-[#D9A036] text-[#1B2A24] border-[#D9A036]'
+                            : 'border-[#1B2A24]/40 dark:border-[#F4F0EA]/40 group-hover:border-[#1B2A24] dark:group-hover:border-[#F4F0EA]'
                         }`}>
                           {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
                         <span className={`text-xs font-cabinet font-bold truncate ${
-                          isDone ? 'line-through opacity-60' : ''
+                          isDone ? 'line-through opacity-50' : 'text-[#1B2A24] dark:text-[#F4F0EA]'
                         }`}>
                           {habit.title}
                         </span>
@@ -513,7 +472,7 @@ export default function DashboardPage() {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-opacity cursor-pointer ml-2"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:text-red-600 transition-opacity cursor-pointer ml-2"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -529,35 +488,29 @@ export default function DashboardPage() {
           {/* COLUMN 2: Daily Focus & Food Journal */}
           <div className="flex flex-col gap-6">
             
-            {/* Daily Phase (Flat Container, No Shadow) */}
-            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Daily Phase (Flat Bento Box, 2px border, No Shadow) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
                     Routine Stage
                   </span>
                   <h2 className="font-fraunces font-bold text-lg">
                     {routineWindow.title}
                   </h2>
                 </div>
-                <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold uppercase ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-                }`}>
+                <span className="px-2.5 py-0.5 rounded-full border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/80 dark:bg-[#131916]/80 text-[10px] font-mono font-bold uppercase">
                   {routineWindow.badge}
                 </span>
               </div>
 
-              <p className={`text-xs font-cabinet font-medium leading-relaxed ${
-                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-              }`}>
+              <p className="text-xs font-cabinet font-medium leading-relaxed text-[#1B2A24]/75 dark:text-[#F4F0EA]/75">
                 {routineWindow.description}
               </p>
 
               {/* Reflection Notes */}
-              <div className="pt-2 border-t border-current/10 flex flex-col gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70">
+              <div className="pt-2 border-t border-[#1B2A24]/10 dark:border-[#F4F0EA]/10 flex flex-col gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">
                   Daily Notes &amp; Observations
                 </span>
                 <textarea
@@ -565,22 +518,16 @@ export default function DashboardPage() {
                   onChange={(e) => setNotes(e.target.value, currentDate)}
                   placeholder="Note energy peaks, workout notes, or meals..."
                   rows={3}
-                  className={`w-full p-3 rounded-xl border text-xs font-cabinet font-medium focus:outline-none resize-none ${
-                    isLight 
-                      ? 'bg-[#F4F0EA] border-[#1A3629]/40 text-[#1A3629] placeholder-[#2C4A3B]/60' 
-                      : 'bg-[#111914] border-[#F4F0EA]/40 text-[#F4F0EA] placeholder-[#C2CDBF]/60'
-                  }`}
+                  className="w-full p-3 rounded-xl border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/50 dark:bg-[#131916]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1B2A24]/40 dark:placeholder-[#F4F0EA]/40"
                 />
               </div>
             </div>
 
-            {/* Logged Whole-Food Meals (Flat Container, No Shadow) */}
-            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Logged Whole-Food Meals (Flat Bento Box, 2px border, No Shadow) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
                     Nutrition Fuel
                   </span>
                   <h2 className="font-fraunces font-bold text-lg">
@@ -589,7 +536,7 @@ export default function DashboardPage() {
                 </div>
                 <Link 
                   href="/recipes" 
-                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1"
+                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1 text-[#1B2A24] dark:text-[#D9A036]"
                 >
                   <span>Catalog</span>
                   <ArrowRight className="w-3 h-3" />
@@ -604,9 +551,7 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={rId}
-                        className={`flex items-center justify-between p-3 rounded-xl border gap-3 ${
-                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                        }`}
+                        className="flex items-center justify-between p-3 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 gap-3"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
@@ -618,7 +563,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex flex-col min-w-0">
                             <span className="text-xs font-cabinet font-bold truncate">{recipe.name}</span>
-                            <span className="text-[11px] font-mono font-bold opacity-80 mt-0.5">
+                            <span className="text-[11px] font-mono font-bold opacity-75 mt-0.5">
                               [{recipe.protein}g PRO · {recipe.calories} KCAL]
                             </span>
                           </div>
@@ -627,7 +572,7 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-500 transition-colors cursor-pointer"
                           aria-label="Remove meal"
                         >
                           <X className="w-4 h-4" />
@@ -637,17 +582,15 @@ export default function DashboardPage() {
                   })}
                 </div>
               ) : (
-                <div className={`p-6 text-center rounded-xl border border-dashed flex flex-col items-center justify-center gap-3 ${
-                  isLight ? 'bg-[#F4F0EA]/40 border-[#1A3629]/20' : 'bg-[#111914]/40 border-[#F4F0EA]/20'
-                }`}>
-                  <p className="text-xs font-cabinet font-medium opacity-80">
+                <div className="p-6 text-center rounded-xl border border-dashed border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/30 dark:bg-[#131916]/30 flex flex-col items-center justify-center gap-3">
+                  <p className="text-xs font-cabinet font-medium text-[#1B2A24]/70 dark:text-[#F4F0EA]/70">
                     No whole-food meals logged yet today.
                   </p>
+                  
+                  {/* Primary CTA with Tactile Shadow & Active Depression */}
                   <Link
                     href="/recipes"
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-cabinet font-bold cursor-pointer transition-all ${
-                      isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
-                    }`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-cabinet font-bold shadow-[4px_4px_0px_#1B2A24] dark:shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1B2A24] dark:hover:shadow-[6px_6px_0px_#D9A036] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Browse Recipe Catalog</span>
@@ -661,12 +604,10 @@ export default function DashboardPage() {
           {/* COLUMN 3: Daily Metrics & Telemetry */}
           <div className="flex flex-col gap-6">
             
-            {/* Nutrition & Water Card (Flat Container, Secondary Button Styling) */}
-            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Nutrition & Water Card (Flat Bento Box, 2px border, Flat Secondary Action Pills) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-5 transition-all">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
                   Daily Fuel
                 </span>
                 <h2 className="font-fraunces font-bold text-lg">
@@ -675,28 +616,22 @@ export default function DashboardPage() {
               </div>
 
               {/* Protein Steppers */}
-              <div className={`p-4 rounded-xl border space-y-3 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-              }`}>
+              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] opacity-70">Protein Target</span>
+                  <span className="uppercase text-[10px] text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">Protein Target</span>
                   <span>
-                    {todayLog.totalProteinLogged}g <span className="opacity-60">/ 160g</span>
+                    {todayLog.totalProteinLogged}g <span className="opacity-50">/ 160g</span>
                   </span>
                 </div>
 
-                {/* Flat Secondary Action Buttons */}
+                {/* Flat Secondary Action Pills */}
                 <div className="grid grid-cols-3 gap-2">
                   {[15, 30, 45].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className={`border py-1.5 rounded-lg text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
-                        isLight 
-                          ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
-                          : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
-                      }`}
+                      className="border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
                     >
                       +{amt}g
                     </button>
@@ -705,28 +640,22 @@ export default function DashboardPage() {
               </div>
 
               {/* Hydration Steppers */}
-              <div className={`p-4 rounded-xl border space-y-3 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-              }`}>
+              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] opacity-70">Water Intake</span>
+                  <span className="uppercase text-[10px] text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">Water Intake</span>
                   <span>
-                    {todayLog.hydrationLiters.toFixed(1)}L <span className="opacity-60">/ 3.5L</span>
+                    {todayLog.hydrationLiters.toFixed(1)}L <span className="opacity-50">/ 3.5L</span>
                   </span>
                 </div>
 
-                {/* Flat Secondary Action Buttons */}
+                {/* Flat Secondary Action Pills */}
                 <div className="grid grid-cols-3 gap-2">
                   {[0.25, 0.5, 1.0].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className={`border py-1.5 rounded-lg text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
-                        isLight 
-                          ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
-                          : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
-                      }`}
+                      className="border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
                     >
                       +{amt}L
                     </button>
@@ -735,12 +664,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Energy & Focus Dials (Flat Container, Secondary Button Styling) */}
-            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-            }`}>
+            {/* Energy & Focus Dials (Flat Bento Box, 2px border) */}
+            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-5 transition-all">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
                   Daily Check-in
                 </span>
                 <h2 className="font-fraunces font-bold text-lg">
@@ -749,9 +676,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Energy Level */}
-              <div className={`p-4 rounded-xl border space-y-2 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-              }`}>
+              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
                   <span>Energy Rating</span>
                   <span>{todayLog.energyLevel} / 10</span>
@@ -762,14 +687,12 @@ export default function DashboardPage() {
                   max="10"
                   value={todayLog.energyLevel}
                   onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                  className="w-full accent-current h-1.5 rounded-full cursor-pointer"
+                  className="w-full accent-[#D9A036] h-1.5 rounded-full cursor-pointer"
                 />
               </div>
 
               {/* Sleep Duration */}
-              <div className={`p-4 rounded-xl border space-y-3 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-              }`}>
+              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
                   <span>Sleep Duration</span>
                   <span>{todayLog.sleepHours} hrs</span>
@@ -780,22 +703,14 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                    className={`flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
-                      isLight 
-                        ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
-                        : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
-                    }`}
+                    className="flex-1 py-1.5 rounded-lg border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
                   >
                     -0.5h
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                    className={`flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
-                      isLight 
-                        ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
-                        : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
-                    }`}
+                    className="flex-1 py-1.5 rounded-lg border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
                   >
                     +0.5h
                   </button>

@@ -562,64 +562,81 @@ export default function Home() {
           <div className="w-full max-w-5xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono uppercase tracking-widest text-neutral-300 mb-4 inline-block">
+              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-4 inline-block">
                 The Difference
               </span>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.02em] text-white">
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-white">
                 Why Legacy Trackers Fail You
               </h2>
-              <p className="text-neutral-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
+              <p className="text-slate-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
                 Most health platforms are built like bloated spreadsheets. Cyath is engineered for speed, cognitive clarity, and quantitative insight.
               </p>
             </div>
 
-            {/* Comparison Table Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Comparison Table Grid: Asymmetric Obsolete vs. Premium Illuminated */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               
-              {/* Legacy Trackers */}
-              <div className="backdrop-blur-xl bg-red-950/[0.05] border border-red-500/15 rounded-3xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2 text-red-400 mb-2">
-                  <X className="w-5 h-5" />
-                  <h3 className="font-serif font-normal text-xl text-red-200">Traditional Calorie &amp; Habit Apps</h3>
+              {/* Legacy Trackers (Obsolete & Dull) */}
+              <div className="bg-transparent border border-dashed border-white/10 opacity-70 rounded-2xl p-8 flex flex-col justify-between h-full space-y-6">
+                <div>
+                  <div className="flex items-center gap-2.5 mb-5">
+                    <span className="font-mono text-xs text-slate-600 select-none">[x]</span>
+                    <h3 className="font-cabinet font-semibold text-lg text-slate-500 tracking-tight">
+                      Traditional Calorie &amp; Habit Apps
+                    </h3>
+                  </div>
+                  
+                  <ul className="space-y-4 text-xs sm:text-sm text-slate-500 font-sans leading-relaxed">
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-slate-600 mt-0.5 shrink-0 select-none">[-]</span>
+                      <span>10+ minutes spent scanning barcodes, weighing individual grams, and guessing restaurant dishes.</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-slate-600 mt-0.5 shrink-0 select-none">[-]</span>
+                      <span>Aggressive red sirens and guilt-inducing notifications that punish you for missing a single day.</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-slate-600 mt-0.5 shrink-0 select-none">[-]</span>
+                      <span>No correlation intelligence: you log data for months and learn nothing about what actually drives your energy.</span>
+                    </li>
+                  </ul>
                 </div>
-                
-                <ul className="space-y-3 text-xs sm:text-sm text-neutral-400 font-sans">
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-red-400 mt-0.5">✕</span>
-                    <span>10+ minutes spent scanning barcodes, weighing individual grams, and guessing restaurant dishes.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-red-400 mt-0.5">✕</span>
-                    <span>Aggressive red banners and guilt-inducing notifications that punish you for missing a single day.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-red-400 mt-0.5">✕</span>
-                    <span>No correlation intelligence: you log data for months and learn nothing about what actually drives your energy.</span>
-                  </li>
-                </ul>
+
+                <div className="pt-4 border-t border-white/5 font-mono text-[11px] text-slate-600">
+                  Legacy Paradigm · High Friction
+                </div>
               </div>
 
-              {/* The Cyath Standard */}
-              <div className="backdrop-blur-xl bg-emerald-950/[0.05] border border-emerald-500/20 rounded-3xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2 text-emerald-400 mb-2">
-                  <Check className="w-5 h-5" />
-                  <h3 className="font-serif font-normal text-xl text-white">The Cyath Protocol</h3>
+              {/* The Cyath Protocol (Illuminated & Premium) */}
+              <div className="backdrop-blur-xl bg-white/[0.04] border border-white/20 border-t-white/40 shadow-[0_0_30px_rgba(255,255,255,0.03)] relative overflow-hidden rounded-2xl p-8 flex flex-col justify-between h-full space-y-6">
+                <div>
+                  <div className="flex items-center gap-2.5 mb-5">
+                    <span className="font-mono text-xs text-white select-none">[+]</span>
+                    <h3 className="font-cabinet font-semibold text-lg text-white tracking-tight">
+                      The Cyath Protocol
+                    </h3>
+                  </div>
+                  
+                  <ul className="space-y-4 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-white mt-0.5 shrink-0 select-none">[+]</span>
+                      <span>30-second rapid logging with one-tap whole-food macro increments (+15g/30g/45g).</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-white mt-0.5 shrink-0 select-none">[+]</span>
+                      <span>Monochrome streak heatmaps that celebrate long-term momentum without gamified anxiety.</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="font-mono text-xs text-white mt-0.5 shrink-0 select-none">[+]</span>
+                      <span>Continuous scatter plot regression revealing exactly how protein and hydration unlock peak flow.</span>
+                    </li>
+                  </ul>
                 </div>
-                
-                <ul className="space-y-3 text-xs sm:text-sm text-neutral-300 font-sans">
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-emerald-400 mt-0.5">✓</span>
-                    <span>30-second rapid logging with one-tap whole-food macro increments (+15g/30g/45g).</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-emerald-400 mt-0.5">✓</span>
-                    <span>Monochrome streak heatmaps that celebrate long-term momentum without gamified anxiety.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="text-emerald-400 mt-0.5">✓</span>
-                    <span>Continuous scatter plot regression revealing exactly how protein and hydration unlock peak flow.</span>
-                  </li>
-                </ul>
+
+                <div className="pt-4 border-t border-white/10 font-mono text-[11px] text-slate-400 flex items-center justify-between">
+                  <span>Engineered Standard</span>
+                  <span className="text-white font-semibold">Zero-Guilt Feedback →</span>
+                </div>
               </div>
 
             </div>

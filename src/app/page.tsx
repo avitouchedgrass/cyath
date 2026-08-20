@@ -317,44 +317,46 @@ export default function Home() {
           <div className="w-full max-w-7xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono uppercase tracking-widest text-neutral-300 mb-4 inline-block">
+              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-4 inline-block">
                 Feature Architecture
               </span>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.02em] text-white">
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-white">
                 Engineered for High Agency
               </h2>
-              <p className="text-neutral-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
+              <p className="text-slate-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
                 Everything you need to sustain physical energy and deep cognitive focus, calibrated into one unified system.
               </p>
             </div>
 
-            {/* Bento Grid (Asymmetric Layout) */}
+            {/* Bento Grid (Asymmetric Layout with Unified Tokens) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* BENTO 1: Real-Time Correlation Engine (8 Cols) */}
-              <div className="lg:col-span-8 backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between relative overflow-hidden group">
+              <div className="lg:col-span-8 backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/20 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between relative overflow-hidden transition-colors duration-300 group">
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <h3 className="font-serif font-normal text-2xl text-white tracking-tight truncate">
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 shrink-0">
+                          <TrendingUp className="w-4 h-4" />
+                        </div>
+                        <h3 className="font-cabinet font-bold text-lg sm:text-xl text-slate-100 tracking-tight">
                           The Correlation Engine
                         </h3>
                       </div>
-                      <p className="text-xs sm:text-sm text-neutral-400 font-sans">
-                        Least-squares mathematical regression mapping protein fueling vs. peak focus ratings.
+                      <p className="text-xs sm:text-sm text-slate-400 font-sans">
+                        Least-squares mathematical regression mapping whole-food fueling vs. peak focus ratings.
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono shrink-0">
-                      <span className="text-neutral-400">Model Fit:</span>
-                      <span className="text-emerald-400 font-bold tabular-nums">R² = 0.84 (+34%)</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono shrink-0">
+                      <span className="text-slate-400">Model Fit:</span>
+                      <span className="text-slate-200 font-bold tabular-nums">R² = 0.84 (+34%)</span>
                     </div>
                   </div>
 
                   {/* Interactive Scatter Simulation Area with Accessible Touch Targets */}
-                  <div className="h-56 sm:h-64 w-full bg-black/40 border border-white/10 rounded-2xl p-4 relative overflow-hidden mb-4">
+                  <div className="h-56 sm:h-64 w-full bg-black/40 border border-white/10 rounded-xl p-4 relative overflow-hidden mb-4">
                     {/* SVG Trendline */}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
                       <line
@@ -362,7 +364,7 @@ export default function Home() {
                         y1="82%"
                         x2="90%"
                         y2="18%"
-                        stroke="rgba(255, 255, 255, 0.4)"
+                        stroke="rgba(255, 255, 255, 0.35)"
                         strokeWidth="2"
                         strokeDasharray="4 4"
                       />
@@ -387,8 +389,8 @@ export default function Home() {
                             <span
                               className={`block rounded-full transition-all ${
                                 isSelected
-                                  ? 'w-4 h-4 bg-white ring-4 ring-emerald-500/30'
-                                  : 'w-3 h-3 bg-neutral-400 hover:bg-white'
+                                  ? 'w-4 h-4 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] ring-2 ring-white/40'
+                                  : 'w-3 h-3 bg-neutral-500 hover:bg-white'
                               }`}
                             />
                           </button>
@@ -398,8 +400,8 @@ export default function Home() {
 
                     {/* Active point hover pill */}
                     {selectedScatterPoint !== null && (
-                      <div className="absolute top-4 left-4 p-2.5 rounded-xl bg-black/80 border border-white/15 backdrop-blur-md text-xs font-mono shadow-lg">
-                        <span className="text-neutral-400 block text-[10px] uppercase tracking-wider">Selected Data Point</span>
+                      <div className="absolute top-4 left-4 p-2.5 rounded-xl bg-black/85 border border-white/15 backdrop-blur-md text-xs font-mono shadow-lg">
+                        <span className="text-slate-400 block text-[10px] uppercase tracking-wider">Selected Data Point</span>
                         <span className="text-white font-bold tabular-nums">
                           {SAMPLE_SCATTER_POINTS[selectedScatterPoint].x}g Protein → {SAMPLE_SCATTER_POINTS[selectedScatterPoint].y} / 10 Focus
                         </span>
@@ -408,7 +410,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-white/5 text-xs font-mono text-neutral-400">
+                <div className="flex items-center justify-between pt-4 border-t border-white/5 text-xs font-mono text-slate-400">
                   <span>Continuous X/Y value calibration</span>
                   <Link href="/correlations" className="text-white hover:underline flex items-center gap-1">
                     <span>Explore Full Engine</span>
@@ -418,35 +420,37 @@ export default function Home() {
               </div>
 
               {/* BENTO 2: 16-Bit Whole-Food Nutrition (4 Cols) */}
-              <div className="lg:col-span-4 backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
+              <div className="lg:col-span-4 backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/20 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between transition-colors duration-300">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-amber-400" />
-                    <h3 className="font-serif font-normal text-2xl text-white tracking-tight">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 shrink-0">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-cabinet font-bold text-lg sm:text-xl text-slate-100 tracking-tight">
                       16-Bit Food Fuel
                     </h3>
                   </div>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-sans mb-6">
+                  <p className="text-xs sm:text-sm text-slate-400 font-sans mb-6">
                     Curated whole-food recipes illustrated with crisp retro pixel art. No generic ingredient guesswork.
                   </p>
 
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
+                  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono text-white font-bold">Ribeye &amp; Pasture Eggs</span>
-                      <span className="text-[10px] font-mono text-emerald-400">48g PRO</span>
+                      <span className="text-xs font-mono text-white font-semibold">Spiced Paneer Protein Bowl</span>
+                      <span className="text-[10px] font-mono text-slate-300 font-bold tabular-nums">48g PRO</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                       <div className="h-full bg-white w-3/4" />
                     </div>
-                    <span className="text-[11px] text-neutral-400 font-sans block">
-                      Bioavailable leucine and choline for sustained executive focus.
+                    <span className="text-[11px] text-slate-400 font-sans block leading-relaxed">
+                      Bioavailable plant protein and healthy fats for sustained executive focus.
                     </span>
                   </div>
                 </div>
 
                 <Link
                   href="/recipes"
-                  className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono text-neutral-300 hover:text-white pt-4 border-t border-white/5 transition-colors"
+                  className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono text-slate-400 hover:text-white pt-4 border-t border-white/5 transition-colors"
                 >
                   <span>View Recipe Catalog</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -454,19 +458,21 @@ export default function Home() {
               </div>
 
               {/* BENTO 3: Monochrome Consistency Heatmaps (4 Cols) */}
-              <div className="lg:col-span-4 backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
+              <div className="lg:col-span-4 backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/20 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between transition-colors duration-300">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Flame className="w-5 h-5 text-white" />
-                    <h3 className="font-serif font-normal text-2xl text-white tracking-tight">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 shrink-0">
+                      <Flame className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-cabinet font-bold text-lg sm:text-xl text-slate-100 tracking-tight">
                       Zero-Guilt Streaks
                     </h3>
                   </div>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-sans mb-6">
+                  <p className="text-xs sm:text-sm text-slate-400 font-sans mb-6">
                     Monochrome opacity shades represent adherence without screaming red sirens or gamified pressure.
                   </p>
 
-                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
                     {Array.from({ length: 28 }).map((_, i) => {
                       const opacity = [0.15, 0.4, 0.7, 0.9, 1.0, 0.6, 0.85][i % 7];
                       return (
@@ -480,28 +486,30 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/5 text-[11px] font-mono text-neutral-500">
+                <div className="pt-4 border-t border-white/5 text-[11px] font-mono text-slate-500">
                   Continuous habit momentum visualizer
                 </div>
               </div>
 
               {/* BENTO 4: Circadian Telemetry & Subjective State (8 Cols) */}
-              <div className="lg:col-span-8 backdrop-blur-xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
+              <div className="lg:col-span-8 backdrop-blur-xl bg-white/[0.02] border border-white/10 hover:border-white/20 rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between transition-colors duration-300">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Activity className="w-5 h-5 text-white" />
-                    <h3 className="font-serif font-normal text-2xl text-white tracking-tight">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 shrink-0">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-cabinet font-bold text-lg sm:text-xl text-slate-100 tracking-tight">
                       Subjective State Telemetry
                     </h3>
                   </div>
-                  <p className="text-xs sm:text-sm text-neutral-400 font-sans mb-6">
+                  <p className="text-xs sm:text-sm text-slate-400 font-sans mb-6">
                     Calibrate daily energy, focus depth, and sleep quality on a clean 1–10 logarithmic scale.
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-neutral-300">Subjective Energy</span>
+                        <span className="text-slate-300">Subjective Energy</span>
                         <span className="text-white font-bold tabular-nums">{previewEnergy} / 10</span>
                       </div>
                       <input
@@ -515,9 +523,9 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-neutral-300">Executive Focus</span>
+                        <span className="text-slate-300">Executive Focus</span>
                         <span className="text-white font-bold tabular-nums">{previewFocus} / 10</span>
                       </div>
                       <input
@@ -533,7 +541,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 mt-6 border-t border-white/5 text-xs font-mono text-neutral-400">
+                <div className="flex items-center justify-between pt-4 mt-6 border-t border-white/5 text-xs font-mono text-slate-400">
                   <span>Direct integration with Daily Planner</span>
                   <Link href="/dashboard" className="text-white hover:underline flex items-center gap-1">
                     <span>Open Dashboard</span>

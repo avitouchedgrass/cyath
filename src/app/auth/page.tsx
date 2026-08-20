@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
-import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock } from 'lucide-react';
+import { retroAudio } from '@/lib/retroAudio';
+import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock, Sparkles, Check } from 'lucide-react';
 
 function AuthContent() {
   const router = useRouter();
@@ -33,7 +34,6 @@ function AuthContent() {
     hasUpper: /[A-Z]/.test(password),
     hasLower: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
-    hasSymbol: /[^A-Za-z0-9]/.test(password),
   };
   const isPasswordValid = Object.values(passwordCriteria).every(Boolean);
 
@@ -46,7 +46,7 @@ function AuthContent() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // Auth State Listener (handles verification and password recovery events)
+  // Auth State Listener
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -54,28 +54,27 @@ function AuthContent() {
         setErrorMsg(null);
         setSuccessMsg(null);
       } else if (isVerificationSent && session?.user?.id && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
-        setSuccessMsg('Email verified successfully! Calibrating your account...');
+        setSuccessMsg('Email verified! Launching your dashboard...');
         setTimeout(() => {
           completeAuthentication({ id: session.user.id, email: session.user.email || email });
         }, 1200);
       }
     });
 
-    // Heartbeat polling for verification screen
     let pollTimer: NodeJS.Timeout | null = null;
     if (isVerificationSent) {
       pollTimer = setInterval(async () => {
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user?.id) {
-            setSuccessMsg('Email verified successfully! Calibrating your account...');
+            setSuccessMsg('Email verified! Launching your dashboard...');
             if (pollTimer) clearInterval(pollTimer);
             setTimeout(() => {
               completeAuthentication({ id: session.user.id, email: session.user.email || email });
             }, 1200);
           }
         } catch {
-          // Continue polling
+          // Poll
         }
       }, 2500);
     }
@@ -87,6 +86,7 @@ function AuthContent() {
   }, [isVerificationSent, email]);
 
   const completeAuthentication = (user?: { id: string; email?: string }) => {
+    retroAudio.playInspectConfirm();
     const { setUserSession, executePendingAction, userProfile } = useHabitStore.getState();
     if (user) {
       setUserSession(user);
@@ -97,8 +97,6 @@ function AuthContent() {
     }
 
     const { success, executedAction } = executePendingAction();
-    
-    // If onboarding not completed, route to onboarding wizard
     const needsOnboarding = !userProfile || !userProfile.onboardingCompleted;
     if (needsOnboarding) {
       router.push('/onboarding');
@@ -131,6 +129,7 @@ function AuthContent() {
     }
 
     setLoading(true);
+    retroAudio.playBlip();
 
     try {
       if (mode === 'signup') {
@@ -144,7 +143,6 @@ function AuthContent() {
         });
         if (error) throw error;
 
-        // If identities array is empty, the account already exists
         if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
           setErrorMsg('An account with this email address already exists. Please log in instead.');
           setLoading(false);
@@ -170,8 +168,7 @@ function AuthContent() {
       if (
         msg.toLowerCase().includes('already registered') ||
         msg.toLowerCase().includes('already exists') ||
-        msg.toLowerCase().includes('user already exists') ||
-        msg.toLowerCase().includes('duplicate')
+        msg.toLowerCase().includes('user already exists')
       ) {
         setErrorMsg('An account with this email address already exists. Please log in instead.');
       } else {
@@ -192,6 +189,7 @@ function AuthContent() {
     setErrorMsg(null);
     setSuccessMsg(null);
     setLoading(true);
+    retroAudio.playBlip();
 
     try {
       const redirectTo = typeof window !== 'undefined'
@@ -203,7 +201,7 @@ function AuthContent() {
       });
       if (error) throw error;
 
-      setSuccessMsg(`We've sent a password reset link to ${email}. Check your inbox to proceed.`);
+      setSuccessMsg(`We sent a password reset link to ${email}. Check your inbox!`);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to send password reset email.');
     } finally {
@@ -227,6 +225,7 @@ function AuthContent() {
     }
 
     setLoading(true);
+    retroAudio.playBlip();
 
     try {
       const { data, error } = await supabase.auth.updateUser({
@@ -234,7 +233,7 @@ function AuthContent() {
       });
       if (error) throw error;
 
-      setSuccessMsg('Password updated successfully! Redirecting to your dashboard...');
+      setSuccessMsg('Password updated successfully! Redirecting...');
       setTimeout(() => {
         if (data.user) {
           completeAuthentication({ id: data.user.id, email: data.user.email });
@@ -243,7 +242,7 @@ function AuthContent() {
         }
       }, 1500);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to update password. Your reset link may have expired.');
+      setErrorMsg(err.message || 'Failed to update password. Link may have expired.');
     } finally {
       setLoading(false);
     }
@@ -254,6 +253,7 @@ function AuthContent() {
     setResending(true);
     setErrorMsg(null);
     setSuccessMsg(null);
+    retroAudio.playBlip();
 
     try {
       const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined;
@@ -277,6 +277,7 @@ function AuthContent() {
   const handleGoogleAuth = async () => {
     setErrorMsg(null);
     setGoogleLoading(true);
+    retroAudio.playBlip();
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -293,6 +294,7 @@ function AuthContent() {
   };
 
   const handleGuestAccess = () => {
+    retroAudio.playBlip();
     useHabitStore.getState().initDemoSession();
     const { success, executedAction } = useHabitStore.getState().executePendingAction();
     if (success && executedAction?.returnUrl) {
@@ -303,65 +305,52 @@ function AuthContent() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#080808] px-4 py-12 selection:bg-white selection:text-black">
-      {/* Strict Neutral Monochrome Ambient Highlights */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 65%),
-            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
-          `
-        }}
-      />
-
-      {/* Brand Link (Top Left) */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#111914] text-[#F4F0EA] px-4 py-12">
+      
+      {/* Brand Link */}
       <Link 
         href="/"
-        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2.5 text-slate-400 hover:text-white transition-all group"
+        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2.5 text-[#C2CDBF] hover:text-[#F4F0EA] transition-all group"
         aria-label="Back to home"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-        <Logo className="w-7 h-7 opacity-85 group-hover:opacity-100 transition-opacity" />
-        <span className="font-serif font-medium text-sm tracking-tight text-white hidden sm:inline-block">Cyath</span>
+        <Logo className="w-7 h-7" />
+        <span className="font-fraunces font-bold text-base text-[#F4F0EA] hidden sm:inline-block">Cyath</span>
       </Link>
 
-      {/* Centered Auth Card */}
-      <div className="w-full max-w-[420px] rounded-2xl backdrop-blur-xl bg-white/[0.025] border border-white/10 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-6 relative z-10">
+      {/* Centered Retro Auth Card */}
+      <div className="w-full max-w-[430px] rounded-3xl bg-[#1A261E] border-4 border-[#F4F0EA] p-8 shadow-[8px_8px_0px_#D9A036] flex flex-col gap-6 relative z-10">
         
-        {/* Subtle Card Highlight Line */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
-
         {/* VIEW 1: Email Verification Sent Screen */}
         {isVerificationSent ? (
           <div className="flex flex-col gap-5 py-2">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
-                <Mail className="h-6 w-6 text-white animate-pulse" />
+              <div className="h-12 w-12 rounded-2xl bg-[#111914] border-2 border-[#F4F0EA] flex items-center justify-center text-[#D9A036]">
+                <Mail className="h-6 w-6 animate-pulse" />
               </div>
               <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-white/[0.04] text-slate-300 border border-white/10">
-                  <CheckCircle2 className="w-3 h-3" /> Verification Sent
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-[#111914] text-[#D9A036] border-2 border-[#F4F0EA]">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Verification Sent
                 </span>
               </div>
             </div>
 
             <div>
-              <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight">
+              <h1 className="font-fraunces font-black text-2xl sm:text-3xl text-[#F4F0EA] tracking-tight">
                 Check your inbox
               </h1>
-              <p className="text-slate-400 text-sm mt-2 font-sans leading-relaxed">
-                We sent a verification link to <span className="text-white font-mono font-medium">{email}</span>. Click the link to activate your Cyath protocol.
+              <p className="text-[#C2CDBF] text-xs sm:text-sm mt-2 font-cabinet font-medium leading-relaxed">
+                We sent a secure link to <span className="text-[#F4F0EA] font-mono font-bold">{email}</span>. Click it to activate your account.
               </p>
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-red-900/40 border-2 border-red-400 text-red-200 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl bg-white/[0.05] border border-white/20 text-white text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#D9A036] text-[#D9A036] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
@@ -371,16 +360,16 @@ function AuthContent() {
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resendCooldown > 0 || resending}
-                className="w-full py-3 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-[#F4F0EA] text-[#111914] font-cabinet font-bold text-xs border-2 border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <Loader2 className="w-4 h-4 animate-spin text-[#111914]" />
                 ) : (
-                  <RefreshCw className={`w-4 h-4 ${resendCooldown > 0 ? '' : 'text-black'}`} />
+                  <RefreshCw className="w-4 h-4 text-[#111914]" />
                 )}
                 <span>
                   {resendCooldown > 0
-                    ? `Resend available in ${resendCooldown}s`
+                    ? `Resend in ${resendCooldown}s`
                     : 'Resend Verification Email'}
                 </span>
               </button>
@@ -388,9 +377,9 @@ function AuthContent() {
               <button
                 type="button"
                 onClick={handleGuestAccess}
-                className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-xs font-mono font-bold text-[#F4F0EA] hover:bg-[#1A261E] transition-all cursor-pointer"
               >
-                <span>View a Demo (Skip to Dashboard)</span>
+                <span>Explore Demo Dashboard</span>
               </button>
 
               <div className="text-center pt-2">
@@ -401,7 +390,7 @@ function AuthContent() {
                     setErrorMsg(null);
                     setSuccessMsg(null);
                   }}
-                  className="text-xs text-slate-400 hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
+                  className="text-xs text-[#C2CDBF] hover:text-[#F4F0EA] underline cursor-pointer"
                 >
                   Use a different email address
                 </button>
@@ -409,40 +398,40 @@ function AuthContent() {
             </div>
           </div>
         ) : mode === 'forgot' ? (
-          /* VIEW 2: Request Password Reset Form */
+          /* VIEW 2: Reset Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
-                <KeyRound className="w-5 h-5 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] flex items-center justify-center text-[#D9A036] shrink-0">
+                <KeyRound className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
                   Account Recovery
                 </span>
-                <h1 className="font-cabinet font-bold text-2xl text-white tracking-tight">
+                <h1 className="font-fraunces font-black text-2xl text-[#F4F0EA] tracking-tight">
                   Reset Password
                 </h1>
               </div>
             </div>
 
-            <p className="text-slate-400 text-xs sm:text-sm font-sans leading-relaxed">
-              Enter the email address associated with your account and we&apos;ll send you a secure recovery link.
+            <p className="text-[#C2CDBF] text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
+              Enter your account email and we&apos;ll send you a password reset link.
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-red-900/40 border-2 border-red-400 text-red-200 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl bg-white/[0.05] border border-white/20 text-white text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#D9A036] text-[#D9A036] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
 
             <form onSubmit={handleResetPasswordRequest} className="flex flex-col gap-4">
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA] mb-1.5 block">
                   Email Address
                 </label>
                 <input
@@ -451,16 +440,16 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/50 text-sm font-cabinet font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#F4F0EA] text-[#111914] font-cabinet font-bold text-xs border-2 border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
+                {loading && <Loader2 className="w-4 h-4 animate-spin text-[#111914]" />}
                 <span>Send Reset Link</span>
               </button>
             </form>
@@ -469,51 +458,52 @@ function AuthContent() {
               <button
                 type="button"
                 onClick={() => {
+                  retroAudio.playBlip();
                   setMode('login');
                   setErrorMsg(null);
                   setSuccessMsg(null);
                 }}
-                className="text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="text-xs font-mono font-bold text-[#C2CDBF] hover:text-[#F4F0EA] cursor-pointer"
               >
                 ← Back to Log In
               </button>
             </div>
           </div>
         ) : mode === 'update_password' ? (
-          /* VIEW 3: Set New Password Form */
+          /* VIEW 3: Set New Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
-                <Lock className="w-5 h-5 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] flex items-center justify-center text-[#D9A036] shrink-0">
+                <Lock className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
                   Security Update
                 </span>
-                <h1 className="font-cabinet font-bold text-2xl text-white tracking-tight">
+                <h1 className="font-fraunces font-black text-2xl text-[#F4F0EA] tracking-tight">
                   Set New Password
                 </h1>
               </div>
             </div>
 
-            <p className="text-slate-400 text-xs sm:text-sm font-sans leading-relaxed">
-              Create a strong new password for your Cyath account.
+            <p className="text-[#C2CDBF] text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
+              Create a strong new password for your account.
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-red-900/40 border-2 border-red-400 text-red-200 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl bg-white/[0.05] border border-white/20 text-white text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#D9A036] text-[#D9A036] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
 
             <form onSubmit={handleUpdatePassword} className="flex flex-col gap-4">
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA] mb-1.5 block">
                   New Password
                 </label>
                 <input
@@ -522,42 +512,12 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] text-sm font-mono font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                 />
               </div>
 
-              {password.length > 0 && (
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                    Password Security
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.length ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.length ? '✓' : '○'}</span>
-                      <span>8+ Characters</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasUpper ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasUpper ? '✓' : '○'}</span>
-                      <span>Uppercase (A-Z)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasLower ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasLower ? '✓' : '○'}</span>
-                      <span>Lowercase (a-z)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasNumber ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasNumber ? '✓' : '○'}</span>
-                      <span>Number (0-9)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasSymbol ? 'text-white' : 'text-slate-600'} col-span-2`}>
-                      <span>{passwordCriteria.hasSymbol ? '✓' : '○'}</span>
-                      <span>Special Symbol (!@#$%)</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA] mb-1.5 block">
                   Confirm New Password
                 </label>
                 <input
@@ -566,88 +526,117 @@ function AuthContent() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] text-sm font-mono font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#F4F0EA] text-[#111914] font-cabinet font-bold text-xs border-2 border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
-                <span>Save New Password</span>
+                {loading && <Loader2 className="w-4 h-4 animate-spin text-[#111914]" />}
+                <span>Update Password</span>
               </button>
             </form>
           </div>
         ) : (
-          /* VIEW 4: Standard Sign Up / Log In Form */
-          <>
+          /* VIEW 4: Login / Signup Mode */
+          <div className="flex flex-col gap-5">
+            {/* Mode Switcher Tabs */}
+            <div className="grid grid-cols-2 p-1 rounded-2xl bg-[#111914] border-2 border-[#F4F0EA]">
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setMode('signup');
+                  setErrorMsg(null);
+                }}
+                className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  mode === 'signup'
+                    ? 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
+                    : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
+                }`}
+              >
+                Create Account
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setMode('login');
+                  setErrorMsg(null);
+                }}
+                className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  mode === 'login'
+                    ? 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
+                    : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
+                }`}
+              >
+                Log In
+              </button>
+            </div>
+
             <div>
-              <h1 className="font-cabinet font-bold text-3xl sm:text-4xl text-white tracking-tight">
-                {mode === 'signup' ? 'Sign Up' : 'Log In'}
+              <h1 className="font-fraunces font-black text-2xl sm:text-3xl text-[#F4F0EA] tracking-tight">
+                {mode === 'signup' ? 'Start Your Daily Protocol' : 'Welcome Back'}
               </h1>
-              <p className="text-slate-400 text-sm mt-1 font-sans">
+              <p className="text-[#C2CDBF] text-xs sm:text-sm mt-1 font-cabinet font-medium">
                 {mode === 'signup'
-                  ? 'Calibrate habits and unlock correlation telemetry.'
-                  : 'Access your saved routines and streak logs.'}
+                  ? 'Track proven daily habits, fuel with whole foods, and uncover energy patterns.'
+                  : 'Sign in to access your habit checklist and energy logs.'}
               </p>
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
+              <div className="px-4 py-3 rounded-xl bg-red-900/40 border-2 border-red-400 text-red-200 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
-            {successMsg && (
-              <div className="px-4 py-3 rounded-xl bg-white/[0.05] border border-white/20 text-white text-xs font-mono">
-                {successMsg}
-              </div>
-            )}
 
-            {/* 1. Fast Auth (Google Provider Only) */}
+            {/* Google OAuth */}
             <button
               type="button"
               onClick={handleGoogleAuth}
-              disabled={googleLoading || loading}
-              className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-neutral-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+              disabled={googleLoading}
+              className="w-full py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-xs font-cabinet font-bold text-[#F4F0EA] hover:bg-[#1A261E] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-[2px_2px_0px_#D9A036]"
             >
               {googleLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#F4F0EA]" />
               ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
-                    fill="#EA4335"
-                    d="M12 5c1.7 0 3 .6 3.9 1.5l2.9-2.9C17 1.9 14.7 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
+                    fill="currentColor"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   />
                   <path
-                    fill="#4285F4"
-                    d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
+                    fill="currentColor"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
                   />
                   <path
-                    fill="#FBBC05"
-                    d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z"
+                    fill="currentColor"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
                   />
                   <path
-                    fill="#34A853"
-                    d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"
+                    fill="currentColor"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
               )}
-              <span>{mode === 'signup' ? 'Sign up with Google' : 'Continue with Google'}</span>
+              <span>Continue with Google</span>
             </button>
 
-            {/* 2. Divider */}
+            {/* Divider */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">or</span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-0.5 bg-[#F4F0EA]/20" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">or email</span>
+              <div className="flex-1 h-0.5 bg-[#F4F0EA]/20" />
             </div>
 
-            {/* 3. Input Fields & Form */}
-            <form onSubmit={handleEmailAuth} className="flex flex-col gap-4">
+            {/* Email / Password Form */}
+            <form onSubmit={handleEmailAuth} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA] mb-1 block">
                   Email Address
                 </label>
                 <input
@@ -656,24 +645,24 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/50 text-sm font-cabinet font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-mono uppercase tracking-wider text-slate-400 block">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA]">
                     Password
                   </label>
                   {mode === 'login' && (
                     <button
                       type="button"
                       onClick={() => {
+                        retroAudio.playBlip();
                         setMode('forgot');
                         setErrorMsg(null);
-                        setSuccessMsg(null);
                       }}
-                      className="text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      className="text-[11px] font-mono font-bold text-[#D9A036] hover:underline cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -685,43 +674,13 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                  className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] text-sm font-mono font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                 />
               </div>
 
-              {mode === 'signup' && password.length > 0 && (
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                    Password Security
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.length ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.length ? '✓' : '○'}</span>
-                      <span>8+ Characters</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasUpper ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasUpper ? '✓' : '○'}</span>
-                      <span>Uppercase (A-Z)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasLower ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasLower ? '✓' : '○'}</span>
-                      <span>Lowercase (a-z)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasNumber ? 'text-white' : 'text-slate-600'}`}>
-                      <span>{passwordCriteria.hasNumber ? '✓' : '○'}</span>
-                      <span>Number (0-9)</span>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${passwordCriteria.hasSymbol ? 'text-white' : 'text-slate-600'} col-span-2`}>
-                      <span>{passwordCriteria.hasSymbol ? '✓' : '○'}</span>
-                      <span>Special Symbol (!@#$%)</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {mode === 'signup' && (
                 <div>
-                  <label className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5 block">
+                  <label className="text-xs font-mono uppercase font-bold text-[#F4F0EA] mb-1 block">
                     Confirm Password
                   </label>
                   <input
@@ -730,55 +689,32 @@ function AuthContent() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all font-sans"
+                    className="w-full px-4 py-3 rounded-xl bg-[#111914] border-2 border-[#F4F0EA] text-[#F4F0EA] text-sm font-mono font-bold focus:outline-none shadow-[2px_2px_0px_#D9A036]"
                   />
                 </div>
               )}
 
-              {/* 4. Primary Submit Action */}
               <button
                 type="submit"
-                disabled={loading || googleLoading}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl bg-[#F4F0EA] text-[#111914] font-cabinet font-bold text-xs border-2 border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
-                <span>{mode === 'signup' ? 'Sign Up' : 'Log In'}</span>
+                {loading && <Loader2 className="w-4 h-4 animate-spin text-[#111914]" />}
+                <span>{mode === 'signup' ? 'Create Account & Continue' : 'Log In'}</span>
               </button>
             </form>
 
-            {/* 5. View a Demo Button */}
-            <button
-              type="button"
-              onClick={handleGuestAccess}
-              className="w-full py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 text-xs font-mono text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>View a Demo</span>
-            </button>
-
-            {/* 6. Footer Switch Link */}
-            <div className="text-center">
+            {/* Quick Guest Demo Button */}
+            <div className="pt-2 border-t-2 border-[#F4F0EA]/20 text-center">
               <button
                 type="button"
-                onClick={() => {
-                  setMode((prev) => (prev === 'signup' ? 'login' : 'signup'));
-                  setErrorMsg(null);
-                  setSuccessMsg(null);
-                  setIsVerificationSent(false);
-                }}
-                className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+                onClick={handleGuestAccess}
+                className="text-xs font-mono font-bold text-[#C2CDBF] hover:text-[#F4F0EA] hover:underline cursor-pointer"
               >
-                {mode === 'signup' ? (
-                  <span>
-                    Already have an account? <span className="underline underline-offset-4 text-white">Log in</span>
-                  </span>
-                ) : (
-                  <span>
-                    Don&apos;t have an account? <span className="underline underline-offset-4 text-white">Sign up</span>
-                  </span>
-                )}
+                ⚡ Explore Demo Without Account
               </button>
             </div>
-          </>
+          </div>
         )}
 
       </div>
@@ -790,8 +726,8 @@ export default function AuthPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#080808] flex items-center justify-center text-slate-400 font-mono text-xs">
-          Loading authentication...
+        <div className="min-h-screen bg-[#111914] flex items-center justify-center text-xs font-mono text-[#F4F0EA]">
+          Loading...
         </div>
       }
     >

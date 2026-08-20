@@ -1,48 +1,56 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
-import { useHabitStore } from '@/store/useHabitStore';
+import { useHabitStore, HabitItem } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
+import { retroAudio } from '@/lib/retroAudio';
 import {
   Check,
   Plus,
-  Trash2,
-  Flame,
   ArrowRight,
-  X,
+  Flame,
   Calendar,
+  Sparkles,
+  Zap,
+  Moon,
+  Sun,
+  X,
+  Trash2,
 } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
+  const [mounted, setMounted] = useState(false);
+  const [showAddHabit, setShowAddHabit] = useState(false);
+  const [newHabitTitle, setNewHabitTitle] = useState('');
+  const [historyView, setHistoryView] = useState<'heatmap' | 'timeline'>('heatmap');
+
   const {
-    currentDate,
-    setDate,
     habits,
+    currentDate,
     logsByDate,
+    getDailyLog,
     toggleHabit,
     addCustomHabit,
     deleteHabit,
     setProtein,
     setHydration,
-    setSleep,
     setEnergy,
     setMood,
+    setSleep,
     setNotes,
+    setDate,
     removeRecipeFromDay,
-    getDailyLog,
-    isSyncing,
     userSession,
     setPendingAction,
+    isSyncing,
   } = useHabitStore();
 
-  const [newHabitTitle, setNewHabitTitle] = useState('');
-  const [showAddHabit, setShowAddHabit] = useState(false);
-  const [historyView, setHistoryView] = useState<'heatmap' | 'timeline'>('heatmap');
-  const [mounted, setMounted] = useState(false);
+  const isLight = themeMode === 'light';
 
   useEffect(() => {
     setMounted(true);
@@ -50,48 +58,46 @@ export default function DashboardPage() {
 
   const todayLog = getDailyLog(currentDate);
 
-  // Completed count calculation
-  const completedCount = habits.reduce((acc, h) => (todayLog.habitsCompleted[h.id] ? acc + 1 : acc), 0);
-  const completionPercentage = habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0;
+  // Calculate stats
+  const completedCount = useMemo(() => {
+    return habits.filter((h) => todayLog.habitsCompleted[h.id]).length;
+  }, [habits, todayLog.habitsCompleted]);
 
-  // Humanized Daily Routine Window
+  const completionPercentage = useMemo(() => {
+    if (habits.length === 0) return 0;
+    return Math.round((completedCount / habits.length) * 100);
+  }, [completedCount, habits.length]);
+
+  // Current routine time window based on current hour
   const routineWindow = useMemo(() => {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) {
+    if (hour < 11) {
       return {
-        title: 'Morning Energy Routine',
-        description: 'Get natural sunlight, drink electrolytes, and establish your daily focus baseline.',
-        badge: 'Morning Phase',
+        badge: 'MORNING PHASE',
+        title: 'Morning Jumpstart',
+        description: 'Drink 500ml water, get 15m natural sunlight, and have a high-protein breakfast.',
+      };
+    } else if (hour < 17) {
+      return {
+        badge: 'AFTERNOON PHASE',
+        title: 'Deep Focus Block',
+        description: 'Single-task on priority goals, stay hydrated, and take a brisk walking break.',
+      };
+    } else {
+      return {
+        badge: 'EVENING PHASE',
+        title: 'Restful Wind-Down',
+        description: 'Dim bright screens, enjoy a warm herbal tea, and cool down your bedroom.',
       };
     }
-    if (hour >= 12 && hour < 18) {
-      return {
-        title: 'Deep Work & Peak Focus',
-        description: 'Execute key focus blocks, stay hydrated, and hit your daily protein targets.',
-        badge: 'Afternoon Phase',
-      };
-    }
-    if (hour >= 18 && hour < 22) {
-      return {
-        title: 'Evening Wind-Down',
-        description: 'Dim blue lighting, lower screen exposure, and prepare for restorative sleep.',
-        badge: 'Evening Phase',
-      };
-    }
-    return {
-      title: 'Rest & Deep Recovery',
-      description: 'Restorative sleep for physical muscle repair and cognitive renewal.',
-      badge: 'Night Phase',
-    };
   }, []);
 
-  // 28-Day Behavioral Action Heatmap Matrix
+  // 28-Day Heatmap Days
   const heatmapDays = useMemo(() => {
     const today = new Date();
     const days = [];
-    const totalDays = 28;
 
-    for (let i = totalDays - 1; i >= 0; i--) {
+    for (let i = 27; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().split('T')[0];
@@ -164,61 +170,22 @@ export default function DashboardPage() {
 
   const avgDailyActions = (totalHeatmapActions / (heatmapDays.length || 1)).toFixed(1);
 
-  // Unified 14-Day Timeline History
-  const timelineDays = useMemo(() => {
-    const today = new Date();
-    const days = [];
-
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateKey = d.toISOString().split('T')[0];
-      const log = logsByDate[dateKey];
-      
-      let rate = 0;
-      let doneCount = 0;
-      if (log && habits.length > 0) {
-        doneCount = habits.filter((h) => log.habitsCompleted[h.id]).length;
-        rate = doneCount / habits.length;
-      } else if (i > 0 && !log) {
-        rate = [0.65, 0.8, 1.0, 0.85, 0.7, 1.0, 0.9, 1.0, 0.8, 1.0, 1.0, 0.85, 0.9][13 - i] || 0.5;
-        doneCount = Math.round(rate * habits.length);
-      }
-
-      if (dateKey === currentDate) {
-        rate = completionPercentage / 100;
-        doneCount = completedCount;
-      }
-
-      days.push({
-        dateStr: dateKey,
-        dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
-        dayNum: d.getDate(),
-        monthName: d.toLocaleDateString('en-US', { month: 'short' }),
-        rate,
-        doneCount,
-        isToday: dateKey === new Date().toISOString().split('T')[0],
-        isSelected: dateKey === currentDate,
-      });
-    }
-    return days;
-  }, [logsByDate, habits, currentDate, completionPercentage, completedCount]);
-
   // Streak Calculation
   const calculatedStreak = useMemo(() => {
     let streak = 0;
-    for (let i = timelineDays.length - 1; i >= 0; i--) {
-      if (timelineDays[i].rate >= 0.5) {
+    for (let i = heatmapDays.length - 1; i >= 0; i--) {
+      if (heatmapDays[i].totalActions >= 3) {
         streak++;
       } else {
         break;
       }
     }
     return Math.max(1, streak);
-  }, [timelineDays]);
+  }, [heatmapDays]);
 
-  // Guarded Handlers
+  // Handlers
   const handleToggleHabit = (habitId: string) => {
+    retroAudio.playBlip();
     if (!userSession) {
       setPendingAction({
         type: 'TOGGLE_HABIT',
@@ -238,12 +205,14 @@ export default function DashboardPage() {
       router.push('/login?redirect=/dashboard');
       return;
     }
+    retroAudio.playInspectConfirm();
     addCustomHabit(newHabitTitle.trim());
     setNewHabitTitle('');
     setShowAddHabit(false);
   };
 
   const handleSetProtein = (amount: number) => {
+    retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -252,6 +221,7 @@ export default function DashboardPage() {
   };
 
   const handleSetHydration = (amount: number) => {
+    retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -276,6 +246,7 @@ export default function DashboardPage() {
   };
 
   const handleSetSleep = (val: number) => {
+    retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -284,6 +255,7 @@ export default function DashboardPage() {
   };
 
   const handleRemoveRecipe = (recipeId: string, protein: number, calories: number) => {
+    retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -293,271 +265,149 @@ export default function DashboardPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#080808] flex items-center justify-center text-slate-400 font-mono text-xs">
-        Loading Daily Dashboard...
+      <div className="min-h-screen bg-[#111914] flex items-center justify-center text-[#F4F0EA] font-mono text-xs">
+        Loading Daily Planner...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
-      {/* Subtle Monochrome Ambient Glow */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.025) 0%, transparent 65%),
-            radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.015) 0%, transparent 60%)
-          `,
-        }}
+    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
+      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+    }`}>
+      <HeaderNav 
+        themeMode={themeMode} 
+        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
       />
 
-      <HeaderNav />
-
-      {/* Main Container with Clean Header Padding */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 pt-36 sm:pt-40 pb-24 flex flex-col gap-6">
+      {/* Main Container */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 pt-28 pb-24 flex flex-col gap-8">
         
-        {/* ========================================================================= */}
-        {/* TOP BAR: Dual-Typography Page Header & Monospace Eyebrow Tag */}
-        {/* ========================================================================= */}
-        <div className="flex items-center justify-between gap-4 pb-1">
+        {/* Top Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-              <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                DASHBOARD / DAILY OVERVIEW {isSyncing && '· SYNCING...'}
+              <span className={`px-2.5 py-0.5 rounded-md border-2 text-[10px] font-mono font-bold uppercase tracking-wider ${
+                isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
+              }`}>
+                Daily Planner · {currentDate} {isSyncing && '· Syncing...'}
               </span>
             </div>
-            <h1 className="font-serif font-medium text-3xl md:text-4xl text-white tracking-tight">
-              Daily Performance &amp; Habits
+            <h1 className={`font-fraunces font-black text-3xl md:text-4xl tracking-tight ${
+              isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+            }`}>
+              Your Daily Planner &amp; Habits
             </h1>
           </div>
+
+          {/* Quick Streak Pill */}
+          <div className={`self-start sm:self-auto px-4 py-2 rounded-2xl border-3 font-mono font-bold text-xs flex items-center gap-2 ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
+          }`}>
+            <Flame className={`w-4 h-4 ${isLight ? 'text-[#1A3629]' : 'text-[#D9A036]'}`} />
+            <span>{calculatedStreak} Day Streak</span>
+          </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* 1. BEHAVIORAL ACTION HEATMAP & MOMENTUM MATRIX */}
-        {/* ========================================================================= */}
-        <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl relative">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-            <div className="flex flex-col gap-0.5">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                  Behavioral Telemetry
-                </span>
-                <span className="text-[10px] font-mono text-slate-400 bg-white/[0.04] border border-white/10 px-2 py-0.5 rounded-md">
-                  28-Day Action Density
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                  Activity Heatmap Matrix
-                </h2>
-              </div>
+        {/* 1. 28-Day Heatmap & Consistency Card */}
+        <div className={`border-4 rounded-3xl p-6 sm:p-8 transition-all ${
+          isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block mb-1">
+                28-Day Consistency Matrix
+              </span>
+              <h2 className="font-fraunces font-bold text-xl tracking-tight">
+                Daily Check-in Activity
+              </h2>
             </div>
 
-            {/* View Switcher & Streak Badges */}
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono">
-                <button
-                  type="button"
-                  onClick={() => setHistoryView('heatmap')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    historyView === 'heatmap'
-                      ? 'bg-white text-black font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Heatmap Matrix
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setHistoryView('timeline')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    historyView === 'timeline'
-                      ? 'bg-white text-black font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  14-Day Strip
-                </button>
-              </div>
-
-              <div className="flex items-center gap-1.5 text-xs font-mono text-white font-medium bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-xl">
-                <Flame className="w-3.5 h-3.5 text-white" />
-                <span>{calculatedStreak}D STREAK</span>
-              </div>
+            <div className="flex items-center gap-3 text-xs font-mono font-bold opacity-80">
+              <span>Total Actions: <strong>{totalHeatmapActions}</strong></span>
+              <span>·</span>
+              <span>Daily Pace: <strong>{avgDailyActions}/day</strong></span>
             </div>
           </div>
 
-          {/* VIEW A: 28-Day Activity Heatmap Grid */}
-          {historyView === 'heatmap' ? (
-            <div className="space-y-4">
-              {/* Heatmap Matrix Grid (4 weeks x 7 days) */}
-              <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-2">
-                {heatmapDays.map((day) => {
-                  const isSelected = day.isSelected;
-                  
-                  // Strict monochrome level fills
-                  const levelClasses = {
-                    0: 'bg-white/[0.03] border-white/5 text-slate-500 hover:border-white/20',
-                    1: 'bg-white/20 border-white/25 text-slate-300 hover:bg-white/30',
-                    2: 'bg-white/45 border-white/50 text-black font-semibold hover:bg-white/55',
-                    3: 'bg-white/75 border-white/80 text-black font-bold hover:bg-white/85',
-                    4: 'bg-white border-white text-black font-bold shadow-[0_0_12px_rgba(255,255,255,0.4)]',
+          {/* Heatmap Grid */}
+          <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-2">
+            {heatmapDays.map((day) => {
+              const isSelected = day.isSelected;
+              
+              const levelClasses = isLight
+                ? {
+                    0: 'bg-[#F4F0EA] border-[#1A3629]/20 text-[#1A3629]/50',
+                    1: 'bg-[#E8E0D2] border-[#1A3629] text-[#1A3629]',
+                    2: 'bg-[#C2D7C7] border-[#1A3629] text-[#1A3629] font-bold',
+                    3: 'bg-[#6D9F80] border-[#1A3629] text-[#FFFDF9] font-bold',
+                    4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-black shadow-[2px_2px_0px_#3A6B52]',
+                  }[day.level]
+                : {
+                    0: 'bg-[#111914] border-[#F4F0EA]/20 text-[#F4F0EA]/50',
+                    1: 'bg-[#1D2B22] border-[#F4F0EA]/40 text-[#F4F0EA]',
+                    2: 'bg-[#3A5643] border-[#F4F0EA]/70 text-[#F4F0EA] font-bold',
+                    3: 'bg-[#7AA884] border-[#F4F0EA] text-[#111914] font-bold',
+                    4: 'bg-[#D9A036] border-[#F4F0EA] text-[#111914] font-black shadow-[2px_2px_0px_#F4F0EA]',
                   }[day.level];
 
-                  return (
-                    <div
-                      key={day.dateStr}
-                      className="relative group"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setDate(day.dateStr)}
-                        className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-200 cursor-pointer border ${levelClasses} ${
-                          isSelected
-                            ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-105 shadow-xl font-extrabold'
-                            : 'hover:scale-105'
-                        }`}
-                      >
-                        <span className="text-[10px] font-mono tabular-nums leading-none">
-                          {day.dayNum}
-                        </span>
-                        <span className="text-[8px] font-mono mt-0.5 opacity-80 uppercase leading-none">
-                          {day.dayName.charAt(0)}
-                        </span>
-                      </button>
-
-                      {/* Floating Tooltip */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-50 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-150">
-                        <div className="bg-[#121212] border border-white/20 rounded-xl px-3 py-2 text-xs font-mono shadow-2xl backdrop-blur-xl flex flex-col gap-0.5">
-                          <div className="text-white font-bold flex items-center gap-1.5">
-                            <span>{day.monthName} {day.dayNum}</span>
-                            <span className="text-slate-400 font-normal">·</span>
-                            <span className="text-white">{day.totalActions} actions</span>
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-sans">
-                            {day.habitsDone} habits · {day.mealsDone} meals {day.hydrationDone ? '· hydration' : ''} {day.reflectionDone ? '· reflection' : ''}
-                          </div>
-                        </div>
-                        <div className="w-2 h-2 bg-[#121212] border-r border-b border-white/20 transform rotate-45 -mt-1" />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Heatmap Footer: Activity Density Scale & Aggregate Telemetry */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-white/5 text-xs font-mono text-slate-400">
-                <div className="flex items-center gap-3">
-                  <span>Total Actions: <strong className="text-white">{totalHeatmapActions}</strong></span>
-                  <span>·</span>
-                  <span>Daily Velocity: <strong className="text-white">{avgDailyActions}/day</strong></span>
-                </div>
-
-                {/* Strict Monochrome Activity Scale */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] uppercase text-slate-500">Less</span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-md bg-white/[0.03] border border-white/5" title="0 actions" />
-                    <span className="w-3 h-3 rounded-md bg-white/20 border border-white/25" title="1-2 actions" />
-                    <span className="w-3 h-3 rounded-md bg-white/45 border border-white/50" title="3-4 actions" />
-                    <span className="w-3 h-3 rounded-md bg-white/75 border border-white/80" title="5-6 actions" />
-                    <span className="w-3 h-3 rounded-md bg-white border border-white" title="7+ actions" />
-                  </div>
-                  <span className="text-[10px] uppercase text-slate-500">More</span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* VIEW B: Interactive 14-Day Timeline Buttons */
-            <div className="grid grid-cols-7 sm:grid-cols-14 gap-2">
-              {timelineDays.map((day) => {
-                const isSelected = day.isSelected;
-                const isFull = day.rate >= 0.8;
-                const isPartial = day.rate >= 0.4;
-
-                return (
+              return (
+                <div key={day.dateStr} className="relative group">
                   <button
-                    key={day.dateStr}
                     type="button"
-                    onClick={() => setDate(day.dateStr)}
-                    className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border relative ${
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setDate(day.dateStr);
+                    }}
+                    className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border-2 ${levelClasses} ${
                       isSelected
-                        ? 'bg-white text-black border-white shadow-lg font-bold ring-2 ring-white/50 scale-[1.02]'
-                        : isFull
-                        ? 'bg-white/10 text-white border-white/20 hover:bg-white/15'
-                        : isPartial
-                        ? 'bg-white/[0.04] text-slate-200 border-white/15 hover:bg-white/10'
-                        : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
+                        ? 'ring-3 ring-current scale-105 shadow-lg'
+                        : 'hover:scale-105'
                     }`}
-                    title={`${day.monthName} ${day.dayNum}: ${Math.round(day.rate * 100)}% adherence`}
                   >
-                    <span className={`text-[10px] font-mono leading-none ${isSelected ? 'text-black font-bold' : 'text-slate-400'}`}>
-                      {day.dayName}
-                    </span>
-                    <span className="text-sm font-mono font-bold tabular-nums mt-1 leading-none">
+                    <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
                       {day.dayNum}
                     </span>
-                    
-                    {/* Bottom Indicator Dot */}
-                    <div className="mt-1.5 flex items-center justify-center">
-                      <span
-                        className={`h-1 w-3 rounded-full ${
-                          isSelected
-                            ? 'bg-black'
-                            : isFull
-                            ? 'bg-white'
-                            : isPartial
-                            ? 'bg-white/40'
-                            : 'bg-white/10'
-                        }`}
-                      />
-                    </div>
+                    <span className="text-[8px] font-mono mt-0.5 uppercase leading-none opacity-80">
+                      {day.dayName.charAt(0)}
+                    </span>
                   </button>
-                );
-              })}
-            </div>
-          )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* 2. BALANCED 3-COLUMN DASHBOARD BENTO GRID */}
-        {/* ========================================================================= */}
+        {/* 2. 3-Column Dashboard Bento */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
-          {/* ======================================================================= */}
-          {/* COLUMN 1: Habit Checklist & Daily Score */}
-          {/* ======================================================================= */}
+          {/* COLUMN 1: Habit Checklist */}
           <div className="flex flex-col gap-6">
             
-            {/* Daily Adherence Progress Card */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col items-center justify-between text-center relative overflow-hidden">
-              <div className="w-full flex items-center justify-between text-xs font-mono text-slate-200 mb-1">
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">TODAY&apos;S PROGRESS</span>
-                <span className="text-white font-mono font-semibold tabular-nums">
-                  {completedCount} of {habits.length} Done
-                </span>
+            {/* Today's Score Dial */}
+            <div className={`border-3 rounded-2xl p-6 text-center transition-all flex flex-col items-center ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
+              <div className="w-full flex items-center justify-between text-xs font-mono font-bold mb-3">
+                <span className="text-[10px] uppercase tracking-widest opacity-70">DAILY PROGRESS</span>
+                <span>{completedCount} / {habits.length} DONE</span>
               </div>
 
-              {/* Symmetrical Semi-Circular SVG Progress Gauge (Monochrome White) */}
-              <div className="relative w-48 h-28 flex items-end justify-center my-2">
-                <svg className="w-48 h-28" viewBox="0 0 120 70">
-                  {/* Background Arc */}
+              {/* Progress Dial */}
+              <div className="relative w-40 h-24 flex items-end justify-center my-1">
+                <svg className="w-40 h-24" viewBox="0 0 120 70">
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke="rgba(255, 255, 255, 0.08)"
-                    strokeWidth="8"
+                    stroke={isLight ? '#E5DDD0' : '#2A3B2F'}
+                    strokeWidth="10"
                     strokeLinecap="round"
                   />
-                  {/* Active Progress Arc */}
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke="white"
-                    strokeWidth="8"
+                    stroke={isLight ? '#1A3629' : '#D9A036'}
+                    strokeWidth="10"
                     strokeDasharray="141.37"
                     strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
                     strokeLinecap="round"
@@ -565,37 +415,24 @@ export default function DashboardPage() {
                   />
                 </svg>
 
-                {/* Score in Center of Arc */}
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="font-mono text-3xl font-bold text-white tracking-tight tabular-nums">
+                  <span className="font-mono text-3xl font-black tabular-nums">
                     {completionPercentage}%
-                  </span>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-medium">
-                    {completionPercentage >= 100
-                      ? 'Goal Met'
-                      : completionPercentage >= 70
-                      ? 'Almost There'
-                      : completionPercentage > 0
-                      ? 'In Progress'
-                      : 'Not Started'}
                   </span>
                 </div>
               </div>
-
-              <div className="w-full pt-3 border-t border-white/5 text-xs font-mono text-slate-400 flex items-center justify-between">
-                <span>Current Streak:</span>
-                <span className="text-white font-bold">{calculatedStreak} {calculatedStreak === 1 ? 'Day' : 'Days'}</span>
-              </div>
             </div>
 
-            {/* Daily Habit Checklist */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+            {/* Habit Checklist */}
+            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
               <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                    Protocol Checklist
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                    Routine Checklist
                   </span>
-                  <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
+                  <h2 className="font-fraunces font-bold text-lg">
                     Today&apos;s Habits
                   </h2>
                 </div>
@@ -603,8 +440,9 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddHabit(!showAddHabit)}
-                  className="px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/10 border border-white/10 text-white transition-all cursor-pointer flex items-center gap-1 text-xs font-mono font-medium"
-                  aria-label="Add habit"
+                  className={`px-3 py-1.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                    isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+                  }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add</span>
@@ -613,25 +451,29 @@ export default function DashboardPage() {
 
               {/* Add Custom Habit Form */}
               {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                <form onSubmit={handleAddHabitSubmit} className={`flex gap-2 p-3 rounded-xl border-2 ${
+                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
+                }`}>
                   <input
                     type="text"
                     placeholder="E.g., 20 Min Morning Walk..."
                     value={newHabitTitle}
                     onChange={(e) => setNewHabitTitle(e.target.value)}
-                    className="flex-1 bg-transparent text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none"
+                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none"
                     autoFocus
                   />
                   <button
                     type="submit"
-                    className="px-3 py-1 bg-white text-black text-xs font-mono rounded-lg font-semibold hover:bg-neutral-200 transition-colors cursor-pointer"
+                    className={`px-3 py-1 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
+                      isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
+                    }`}
                   >
                     Save
                   </button>
                 </form>
               )}
 
-              {/* Habit Checklist Items with Strictly Fixed 24px Container & 12px Gap */}
+              {/* Habit Items */}
               <div className="flex flex-col gap-2.5">
                 {habits.map((habit) => {
                   const isDone = !!todayLog.habitsCompleted[habit.id];
@@ -639,26 +481,31 @@ export default function DashboardPage() {
                     <div
                       key={habit.id}
                       onClick={() => handleToggleHabit(habit.id)}
-                      className={`group flex items-center justify-between p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+                      className={`group flex items-center justify-between p-3.5 rounded-xl border-2 transition-all cursor-pointer ${
                         isDone
-                          ? 'bg-white/[0.05] border-white/20 text-white shadow-sm'
-                          : 'bg-white/[0.02] border-white/10 hover:border-white/20 text-slate-200'
+                          ? isLight
+                            ? 'bg-[#E8DECF] border-[#1A3629] opacity-80'
+                            : 'bg-[#111914] border-[#F4F0EA] opacity-80'
+                          : isLight
+                            ? 'bg-[#F4F0EA] border-[#1A3629]/40 hover:border-[#1A3629]'
+                            : 'bg-[#111914] border-[#F4F0EA]/40 hover:border-[#F4F0EA]'
                       }`}
                     >
-                      {/* Fixed 24px container with 12px gap to text */}
-                      <div className="flex items-center gap-[12px] min-w-0 flex-1">
-                        <div className="w-6 h-6 shrink-0 flex items-center justify-center">
-                          <div
-                            className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
-                              isDone
-                                ? 'bg-white text-black border-white'
-                                : 'border-white/30 group-hover:border-white/60'
-                            }`}
-                          >
-                            {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                          </div>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                          isDone
+                            ? isLight
+                              ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                              : 'bg-[#D9A036] text-[#111914] border-[#F4F0EA]'
+                            : isLight
+                              ? 'border-[#1A3629]'
+                              : 'border-[#F4F0EA]'
+                        }`}>
+                          {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
-                        <span className={`text-xs font-sans truncate ${isDone ? 'line-through text-slate-400 font-normal' : 'font-medium text-white'}`}>
+                        <span className={`text-xs font-cabinet font-bold truncate ${
+                          isDone ? 'line-through opacity-70' : ''
+                        }`}>
                           {habit.title}
                         </span>
                       </div>
@@ -670,8 +517,7 @@ export default function DashboardPage() {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-400 transition-opacity cursor-pointer ml-2"
-                          aria-label="Delete habit"
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-opacity cursor-pointer ml-2"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -684,74 +530,72 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* ======================================================================= */}
-          {/* COLUMN 2: Coherent 2-Part Central Workspace */}
-          {/* ======================================================================= */}
+          {/* COLUMN 2: Daily Focus & Food Journal */}
           <div className="flex flex-col gap-6">
             
-            {/* Part A: Daily Focus State (Phase + Notes) */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-              
-              {/* Header */}
+            {/* Daily Phase */}
+            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
               <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                    Circadian State
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                    Routine Stage
                   </span>
-                  <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                    Daily Focus State
+                  <h2 className="font-fraunces font-bold text-lg">
+                    {routineWindow.title}
                   </h2>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="bg-white/[0.04] border border-white/10 text-white font-mono text-xs px-2.5 py-1 rounded-full">
-                    {routineWindow.badge}
-                  </span>
-                  <span className="bg-white/[0.04] border border-white/10 text-white font-mono text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <Flame className="w-3 h-3 text-white" />
-                    <span>{calculatedStreak}D</span>
-                  </span>
-                </div>
+                <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase ${
+                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
+                }`}>
+                  {routineWindow.badge}
+                </span>
               </div>
 
-              {/* Routine Window Details */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
-                <h3 className="font-cabinet font-semibold text-base text-white tracking-tight">
-                  {routineWindow.title}
-                </h3>
-                <p className="text-xs text-slate-400 font-sans leading-relaxed">
-                  {routineWindow.description}
-                </p>
-              </div>
+              <p className={`text-xs font-cabinet font-medium leading-relaxed ${
+                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+              }`}>
+                {routineWindow.description}
+              </p>
 
-              {/* Integrated Daily Reflection Notes */}
-              <div className="flex flex-col gap-2 pt-1 border-t border-white/5">
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                  Daily Observations &amp; Triggers
+              {/* Reflection Notes */}
+              <div className="pt-2 border-t-2 border-current/10 flex flex-col gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70">
+                  Daily Notes &amp; Observations
                 </span>
                 <textarea
                   value={todayLog.notes || ''}
                   onChange={(e) => setNotes(e.target.value, currentDate)}
-                  placeholder="Log daily focus triggers, fasting notes, or workout reflections..."
+                  placeholder="Note energy peaks, workout notes, or meals..."
                   rows={3}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl p-3.5 text-xs font-sans text-neutral-100 placeholder:text-slate-500 focus:border-white/30 focus:outline-none resize-none transition-colors"
+                  className={`w-full p-3 rounded-xl border-2 text-xs font-cabinet font-medium focus:outline-none resize-none ${
+                    isLight 
+                      ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60' 
+                      : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/60'
+                  }`}
                 />
               </div>
-
             </div>
 
-            {/* Part B: Logged Whole-Food Fuel (Empty & Active High-Fidelity States) */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+            {/* Logged Whole-Food Meals */}
+            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
               <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                    Nutrition Intake
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                    Nutrition Fuel
                   </span>
-                  <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                    Logged Whole-Food Fuel
+                  <h2 className="font-fraunces font-bold text-lg">
+                    Logged Whole Foods
                   </h2>
                 </div>
-                <Link href="/recipes" className="text-xs font-mono text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-                  <span>Browse Catalog</span>
+                <Link 
+                  href="/recipes" 
+                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1"
+                >
+                  <span>Catalog</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -764,11 +608,12 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={rId}
-                        className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/10 gap-3"
+                        className={`flex items-center justify-between p-3.5 rounded-xl border-2 gap-3 ${
+                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/30' : 'bg-[#111914] border-[#F4F0EA]/30'
+                        }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          {/* 16-bit pixel art recipe container */}
-                          <div className="w-12 h-12 rounded-lg bg-white/[0.03] border border-white/10 shrink-0 overflow-hidden flex items-center justify-center p-1">
+                          <div className="w-12 h-12 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
                             <img
                               src={recipe.image}
                               alt={recipe.name}
@@ -776,9 +621,9 @@ export default function DashboardPage() {
                             />
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-medium text-white truncate">{recipe.name}</span>
-                            <span className="text-[11px] font-mono text-slate-400 mt-0.5 tabular-nums">
-                              [{recipe.protein}g PRO | {recipe.calories} KCAL]
+                            <span className="text-xs font-cabinet font-bold truncate">{recipe.name}</span>
+                            <span className="text-[11px] font-mono font-bold opacity-80 mt-0.5">
+                              [{recipe.protein}g PRO · {recipe.calories} KCAL]
                             </span>
                           </div>
                         </div>
@@ -786,34 +631,30 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer shrink-0"
+                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-500 transition-colors cursor-pointer"
                           aria-label="Remove meal"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                /* Faint 16-bit Dotted Ghost Outline & Clickable Ghost Trigger */
-                <div className="p-6 text-center rounded-xl bg-white/[0.01] border border-dashed border-white/10 flex flex-col items-center justify-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-center overflow-hidden">
-                    <img
-                      src="/assets/food/grilled-chicken.png"
-                      alt="Meal placeholder"
-                      className="w-10 h-10 object-contain opacity-20 grayscale [image-rendering:pixelated]"
-                    />
-                  </div>
-                  <p className="text-xs font-mono text-slate-400">
+                <div className={`p-6 text-center rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 ${
+                  isLight ? 'bg-[#F4F0EA]/50 border-[#1A3629]/30' : 'bg-[#111914]/50 border-[#F4F0EA]/30'
+                }`}>
+                  <p className="text-xs font-cabinet font-medium opacity-80">
                     No whole-food meals logged yet today.
                   </p>
                   <Link
                     href="/recipes"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/10 text-xs font-mono text-slate-300 hover:text-white transition-all cursor-pointer"
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 text-xs font-cabinet font-bold cursor-pointer transition-all ${
+                      isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
+                    }`}
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>+ Log Today&apos;s Meal</span>
+                    <span>Browse Recipe Catalog</span>
                   </Link>
                 </div>
               )}
@@ -821,47 +662,44 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* ======================================================================= */}
-          {/* COLUMN 3: Nutrition & Telemetry Visualizations */}
-          {/* ======================================================================= */}
+          {/* COLUMN 3: Daily Metrics & Telemetry */}
           <div className="flex flex-col gap-6">
             
-            {/* Nutrition & Water Tracker */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                  Daily Targets
+            {/* Nutrition & Water Card */}
+            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                  Daily Fuel
                 </span>
-                <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                  Nutrition &amp; Water
+                <h2 className="font-fraunces font-bold text-lg">
+                  Protein &amp; Hydration
                 </h2>
               </div>
 
-              {/* Protein Target with Strict Monochrome Fill Bar */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400 uppercase text-[10px] tracking-wider">Protein Target</span>
-                  <span className="text-white font-semibold tabular-nums">
-                    {todayLog.totalProteinLogged}g <span className="text-slate-500 font-normal">/ 160g</span>
+              {/* Protein Steppers */}
+              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <div className="flex items-center justify-between text-xs font-mono font-bold">
+                  <span className="uppercase text-[10px] opacity-70">Protein Target</span>
+                  <span>
+                    {todayLog.totalProteinLogged}g <span className="opacity-60">/ 160g</span>
                   </span>
                 </div>
-                
-                {/* Monochrome Progress Bar */}
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, (todayLog.totalProteinLogged / 160) * 100)}%` }}
-                  />
-                </div>
 
-                {/* Tactile Macro Quick-Add Buttons */}
-                <div className="grid grid-cols-3 gap-1.5 pt-1">
+                <div className="grid grid-cols-3 gap-2">
                   {[15, 30, 45].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className="border border-white/10 bg-white/[0.03] hover:bg-white/10 active:scale-95 transition-all text-xs font-mono px-3 py-1.5 rounded-lg text-slate-200 font-medium cursor-pointer"
+                      className={`border-2 py-2 rounded-lg text-xs font-mono font-bold active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer ${
+                        isLight 
+                          ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
+                          : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                      }`}
                     >
                       +{amt}g
                     </button>
@@ -869,31 +707,28 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Hydration with Strict Monochrome Fill Bar */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400 uppercase text-[10px] tracking-wider">Hydration Intake</span>
-                  <span className="text-white font-semibold tabular-nums">
-                    {todayLog.hydrationLiters.toFixed(1)}L <span className="text-slate-500 font-normal">/ 3.5L</span>
+              {/* Hydration Steppers */}
+              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <div className="flex items-center justify-between text-xs font-mono font-bold">
+                  <span className="uppercase text-[10px] opacity-70">Water Intake</span>
+                  <span>
+                    {todayLog.hydrationLiters.toFixed(1)}L <span className="opacity-60">/ 3.5L</span>
                   </span>
                 </div>
 
-                {/* Monochrome Water Fill Bar */}
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, (todayLog.hydrationLiters / 3.5) * 100)}%` }}
-                  />
-                </div>
-
-                {/* Tactile Water Quick-Add Buttons */}
-                <div className="grid grid-cols-3 gap-1.5 pt-1">
+                <div className="grid grid-cols-3 gap-2">
                   {[0.25, 0.5, 1.0].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className="border border-white/10 bg-white/[0.03] hover:bg-white/10 active:scale-95 transition-all text-xs font-mono px-3 py-1.5 rounded-lg text-slate-200 font-medium cursor-pointer"
+                      className={`border-2 py-2 rounded-lg text-xs font-mono font-bold active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer ${
+                        isLight 
+                          ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
+                          : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                      }`}
                     >
                       +{amt}L
                     </button>
@@ -902,104 +737,62 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Energy & Focus Card - Strict Monochrome Hierarchy */}
-            <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                  Subjective Telemetry
+            {/* Energy & Focus Dials */}
+            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            }`}>
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
+                  Daily Check-in
                 </span>
-                <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                  Energy &amp; Focus
+                <h2 className="font-fraunces font-bold text-lg">
+                  Energy &amp; Sleep
                 </h2>
               </div>
 
-              {/* Energy Rating */}
-              <div className="space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-slate-300 font-medium">Energy Level</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-sm font-bold text-white tabular-nums">
-                      {todayLog.energyLevel} / 10
-                    </span>
-                    <span className="text-[10px] font-mono text-white bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/10 uppercase tracking-wider font-medium">
-                      {todayLog.energyLevel >= 8 ? 'Peak Flow' : todayLog.energyLevel >= 5 ? 'Steady' : 'Low'}
-                    </span>
-                  </div>
+              {/* Energy Level */}
+              <div className={`p-4 rounded-xl border-2 space-y-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <div className="flex items-center justify-between text-xs font-mono font-bold">
+                  <span>Energy Rating</span>
+                  <span>{todayLog.energyLevel} / 10</span>
                 </div>
-
-                <div className="flex items-center h-4 py-1">
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={todayLog.energyLevel}
-                    onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                    className="w-full accent-white h-1.5 bg-white/10 rounded-full cursor-pointer appearance-none"
-                    aria-label="Energy Level Rating"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-                  <span>1 · Low</span>
-                  <span>10 · High</span>
-                </div>
-              </div>
-
-              {/* Executive Focus */}
-              <div className="space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-slate-300 font-medium">Executive Focus</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-sm font-bold text-white tabular-nums">
-                      {todayLog.moodScore} / 10
-                    </span>
-                    <span className="text-[10px] font-mono text-white bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/10 uppercase tracking-wider font-medium">
-                      {todayLog.moodScore >= 8 ? 'Deep Flow' : todayLog.moodScore >= 5 ? 'Balanced' : 'Scattered'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center h-4 py-1">
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={todayLog.moodScore}
-                    onChange={(e) => handleSetMood(Number(e.target.value))}
-                    className="w-full accent-white h-1.5 bg-white/10 rounded-full cursor-pointer appearance-none"
-                    aria-label="Executive Focus Rating"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-                  <span>1 · Scattered</span>
-                  <span>10 · Laser Focus</span>
-                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={todayLog.energyLevel}
+                  onChange={(e) => handleSetEnergy(Number(e.target.value))}
+                  className="w-full accent-current h-2 rounded-full cursor-pointer"
+                />
               </div>
 
               {/* Sleep Duration */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-slate-300 font-medium">Sleep Duration</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-mono text-sm font-bold text-white tabular-nums">
-                      {todayLog.sleepHours} hrs
-                    </span>
-                  </div>
+              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <div className="flex items-center justify-between text-xs font-mono font-bold">
+                  <span>Sleep Duration</span>
+                  <span>{todayLog.sleepHours} hrs</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                    className="flex-1 py-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/10 active:scale-95 transition-all text-xs font-mono text-slate-200 font-medium cursor-pointer"
+                    className={`flex-1 py-2 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
+                      isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+                    }`}
                   >
                     -0.5h
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                    className="flex-1 py-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/10 active:scale-95 transition-all text-xs font-mono text-slate-200 font-medium cursor-pointer"
+                    className={`flex-1 py-2 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
+                      isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+                    }`}
                   >
                     +0.5h
                   </button>

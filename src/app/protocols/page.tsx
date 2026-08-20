@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore, HabitItem } from '@/store/useHabitStore';
+import { retroAudio } from '@/lib/retroAudio';
 import {
   Sun,
   Brain,
@@ -14,7 +15,6 @@ import {
   Plus,
   ArrowLeft,
   ChevronRight,
-  ArrowUpRight,
   X,
   Sparkles,
 } from 'lucide-react';
@@ -29,110 +29,111 @@ interface ProtocolBlueprint {
   habits: { title: string; hint: string }[];
   standardHabits: HabitItem[];
   whyItWorks: string;
-  deepScience: string[];
+  simpleHighlights: string[];
 }
 
 const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'morning-activation',
-    name: 'Morning Light & Energy',
-    shortSummary: 'Sets your internal circadian clock and clears morning grogginess in 15 minutes.',
+    name: 'Morning Sunlight & Energy',
+    shortSummary: 'Clears morning grogginess and naturally resets your internal clock in 15 minutes.',
     category: 'Morning',
     icon: 'sun',
     timeframe: 'First 30m of your day',
     habits: [
-      { title: '15m outdoor morning sunlight', hint: 'Direct optic exposure' },
-      { title: '500ml water + pinch of sea salt', hint: 'Cellular hydration' },
-      { title: '60s cold shower rinse or face splash', hint: 'Awakening reflex' },
+      { title: '15m outdoor morning sunlight', hint: 'Natural light exposure' },
+      { title: '500ml water + pinch of sea salt', hint: 'Morning rehydration' },
+      { title: 'Cold splash or quick rinse', hint: 'Natural wakeup reflex' },
     ],
     standardHabits: [
       { id: 'sunlight', title: 'Morning Sunlight Exposure (15m)', category: 'morning', targetDaysPerWeek: 7 },
       { id: 'hydration_morning', title: '500ml Water + Electrolytes', category: 'nutrition', targetDaysPerWeek: 7 },
       { id: 'cold_rinse', title: 'Cold Shower or Face Splash', category: 'recovery', targetDaysPerWeek: 6 },
     ],
-    whyItWorks: 'Early natural photon exposure stimulates retinal melanopsin cells, setting your 16-hour sleep-wake timer and elevating baseline alertness.',
-    deepScience: [
-      'Morning photon exposure stimulates melanopsin retinal ganglion cells, synchronizing the suprachiasmatic nucleus (SCN).',
-      'Hydration with sodium supports cellular osmolarity and eliminates morning brain fog caused by mild overnight dehydration.',
-      'Cold thermal stimulation triggers mild epinephrine release, elevating baseline heart rate and mental clarity.',
+    whyItWorks: 'Early natural sunlight resets your body clock for the day and sets a natural timer for great sleep 16 hours later.',
+    simpleHighlights: [
+      'Morning light resets your internal rhythm and stops grogginess faster than coffee.',
+      'A tall glass of salted water eliminates overnight dehydration.',
+      'Cool water triggers a natural alertness surge without jittery stimulants.',
     ],
   },
   {
     id: 'cognitive-flow',
     name: 'Deep Focus Sprint',
-    shortSummary: 'Protects executive working memory for high-leverage creative and deep work.',
+    shortSummary: 'Protects your attention for high-priority creative and deep focus work.',
     category: 'Focus',
     icon: 'brain',
     timeframe: 'Morning to Early Afternoon',
     habits: [
-      { title: 'Zero phone input first 30 mins', hint: 'Avoid reactive arousal' },
-      { title: 'High-protein breakfast (35g+)', hint: 'Steady dopamine release' },
-      { title: '90-min uninterrupted work block', hint: 'Single-tasking only' },
+      { title: 'Zero phone input first 30 mins', hint: 'Start in flow' },
+      { title: 'High-protein breakfast (35g+)', hint: 'Steady blood sugar' },
+      { title: '90-min single-task work block', hint: 'Zero distractions' },
     ],
     standardHabits: [
       { id: 'zero_phone', title: 'Zero Phone First 30 Mins', category: 'mindset', targetDaysPerWeek: 7 },
       { id: 'protein_breakfast', title: 'High-Protein Breakfast (35g+)', category: 'nutrition', targetDaysPerWeek: 7 },
       { id: 'deep_sprint', title: '90-Min Focus Sprint', category: 'mindset', targetDaysPerWeek: 5 },
     ],
-    whyItWorks: 'Eliminating notifications and stabilizing blood sugar preserves prefrontal cortex capacity and sustains dopamine output.',
-    deepScience: [
-      'Preventing context switching protects prefrontal cortex working memory from cognitive fragmentation.',
-      'Sustained amino acid availability provides precursor tyrosine for continuous dopamine and norepinephrine synthesis.',
-      '90-minute ultradian cycles align naturally with human brain wave rhythms for peak focus.',
+    whyItWorks: 'Avoiding phone notifications early protects your attention, while clean morning protein keeps your energy level for hours.',
+    simpleHighlights: [
+      'Zero phone notifications in the morning stops reactive stress.',
+      'Clean protein prevents the classic 11:00 AM energy crash.',
+      '90-minute blocks match your brain’s natural high-focus cycles.',
     ],
   },
   {
     id: 'deep-rem-sleep',
-    name: 'Restful Sleep Architecture',
-    shortSummary: 'Down-regulates your nervous system for deeper slow-wave delta and REM sleep.',
+    name: 'Restful Sleep Wind-Down',
+    shortSummary: 'Calms your nervous system for deeper, uninterrupted, and refreshing sleep.',
     category: 'Sleep',
     icon: 'moon',
     timeframe: '60 mins before bed',
     habits: [
       { title: 'Screens off 60 mins before bed', hint: 'Digital sunset' },
-      { title: 'Cool bedroom temperature (~67°F)', hint: 'Thermal delta trigger' },
-      { title: 'Magnesium glycinate or herbal tea', hint: 'GABA up-regulation' },
+      { title: 'Cool bedroom temperature (~67°F)', hint: 'Deep sleep trigger' },
+      { title: 'Magnesium or herbal chamomile tea', hint: 'Calming wind-down' },
     ],
     standardHabits: [
       { id: 'digital_sunset', title: 'Digital Sunset (Screens Off 60m Prior)', category: 'recovery', targetDaysPerWeek: 7 },
       { id: 'ambient_temp', title: 'Cool Dark Bedroom (67°F)', category: 'recovery', targetDaysPerWeek: 7 },
       { id: 'magnesium_glycine', title: 'Magnesium / Evening Herbal Tea', category: 'recovery', targetDaysPerWeek: 6 },
     ],
-    whyItWorks: 'Cutting blue light allows uninhibited melatonin secretion, while a cool room signals your core body to enter Stage 4 delta sleep.',
-    deepScience: [
-      'Removing 460nm blue light wavelengths allows uninhibited pineal gland melatonin secretion.',
-      'A 1–2°F drop in core body temperature is biologically required to transition into restorative delta sleep.',
-      'Magnesium acts as an agonist for calming GABA receptors, easing somatic muscle tension.',
+    whyItWorks: 'Dimming blue light lets your brain release natural melatonin, while a cool room lets your body temperature drop for deep sleep.',
+    simpleHighlights: [
+      'Dimming screens 1 hour before bed helps you fall asleep 2x faster.',
+      'A cool bedroom signals your body to enter deep physical repair mode.',
+      'Warm herbal tea eases physical tension from the day.',
     ],
   },
   {
     id: 'anabolic-glycogen',
     name: 'Strength & Muscle Fuel',
-    shortSummary: 'Supplies essential amino acids and fluids to maximize recovery and metabolic rate.',
+    shortSummary: 'Daily whole-food protein and hydration to keep you strong, active, and energized.',
     category: 'Movement',
     icon: 'zap',
     timeframe: 'Daily Fueling & Training',
     habits: [
-      { title: '130g+ daily whole-food protein', hint: 'Leucine threshold' },
-      { title: '30-45 mins resistance or cardio', hint: 'Zone 2 stimulus' },
-      { title: '2.5L to 3.0L water intake', hint: 'Intracellular pressure' },
+      { title: '130g+ daily whole-food protein', hint: 'Muscle fuel' },
+      { title: '30-45 mins resistance or brisk walk', hint: 'Daily movement' },
+      { title: '2.5L+ clean water intake', hint: 'Hydration baseline' },
     ],
     standardHabits: [
       { id: 'protein_target', title: 'Hit Daily Protein Target (130g+)', category: 'nutrition', targetDaysPerWeek: 7 },
       { id: 'zone2_resistance', title: '30-45 Min Resistance or Cardio', category: 'movement', targetDaysPerWeek: 5 },
       { id: 'hydration_3l', title: 'Hit 2.5L+ Hydration Target', category: 'nutrition', targetDaysPerWeek: 7 },
     ],
-    whyItWorks: 'Evenly distributed protein intake paired with regular resistance training optimizes lean muscle synthesis and glucose clearance.',
-    deepScience: [
-      'Evenly distributed leucine doses (3g+) trigger mTOR pathways for continuous muscle repair.',
-      'Adequate cellular hydration optimizes intracellular pressure, preventing workout fatigue and cramps.',
-      'Resistance training improves insulin sensitivity and glucose uptake into skeletal muscle.',
+    whyItWorks: 'Getting enough protein and moving every day keeps your muscles strong, metabolism high, and joints feeling great.',
+    simpleHighlights: [
+      'Hitting your protein goal supports muscle repair and all-day fullness.',
+      'Daily movement improves insulin sensitivity and lifts your mood.',
+      'Proper hydration keeps cramps and mid-afternoon headaches away.',
     ],
   },
 ];
 
 export default function ProtocolsPage() {
   const router = useRouter();
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Morning' | 'Focus' | 'Sleep' | 'Movement'>('All');
   const [selectedProtocolForModal, setSelectedProtocolForModal] = useState<ProtocolBlueprint | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -145,11 +146,15 @@ export default function ProtocolsPage() {
     setPendingAction,
   } = useHabitStore();
 
+  const isLight = themeMode === 'light';
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleToggleProtocol = (protocol: ProtocolBlueprint) => {
+    retroAudio.playInspectConfirm();
+
     if (!userSession) {
       setPendingAction({
         type: 'ACTIVATE_PROTOCOL',
@@ -176,159 +181,211 @@ export default function ProtocolsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
-      {/* Background Subtle Radial Glow */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.025) 0%, transparent 55%)
-          `,
-        }}
+    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
+      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+    }`}>
+      {/* Navigation Header */}
+      <HeaderNav 
+        themeMode={themeMode} 
+        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
       />
 
-      <HeaderNav />
-
       {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-8 pt-36 sm:pt-40 pb-24">
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-8 pt-28 pb-24">
         
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to Home</span>
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-1.5 rounded-full border border-white/10 bg-white text-black font-semibold hover:bg-slate-200 transition-all shadow-sm"
-          >
-            <span>Daily Dashboard</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        {/* Page Header: Playfair Display Header */}
-        <div className="max-w-2xl mb-8">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-              Curated Blueprints
+        {/* Header Breadcrumbs & Title */}
+        <div className="mb-10 text-center sm:text-left">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Link
+              href="/"
+              className={`inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 transition-all ${
+                isLight 
+                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5' 
+                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:-translate-y-0.5'
+              }`}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </Link>
+            <span className={`px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
+            }`}>
+              Daily Blueprints
             </span>
           </div>
-          <h1 className="font-serif font-medium text-3xl sm:text-4xl text-white tracking-tight">
-            Daily Protocols
+
+          <h1 className={`font-fraunces font-black text-3xl sm:text-5xl tracking-tight ${
+            isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+          }`}>
+            Daily Routine Blueprints
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base mt-2 font-sans leading-relaxed">
-            Curated daily routines calibrated for circadian timing, executive focus, and physical recovery.
+          <p className={`text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed ${
+            isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+          }`}>
+            Proven daily habits you can import directly into your planner. No overwhelming multi-hour routines—just simple, high-impact check-ins.
           </p>
         </div>
 
-        {/* Segmented Filter Bar */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/10 mb-8 overflow-x-auto scrollbar-none w-fit">
-          {(['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedFilter(cat)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
-                selectedFilter === cat
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Category Filters */}
+        <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider opacity-80 shrink-0">
+            Filter:
+          </span>
+          <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border-2 ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629]/30' : 'bg-[#1A261E] border-[#F4F0EA]/30'
+          }`}>
+            {(['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const).map((filter) => {
+              const isSelected = selectedFilter === filter;
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setSelectedFilter(filter);
+                  }}
+                  className={`px-3.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    isSelected
+                      ? isLight
+                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                        : 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
+                      : isLight
+                        ? 'text-[#2C4A3B] hover:text-[#1A3629]'
+                        : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
+                  }`}
+                >
+                  {filter}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Protocol Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Blueprint Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {filteredProtocols.map((protocol) => {
-            const isActive = mounted && activeProtocolIds.includes(protocol.id);
+            const isActivated = mounted && activeProtocolIds.includes(protocol.id);
+
+            const getIcon = () => {
+              switch (protocol.icon) {
+                case 'sun': return <Sun className="w-5 h-5 stroke-[2.5]" />;
+                case 'brain': return <Brain className="w-5 h-5 stroke-[2.5]" />;
+                case 'moon': return <Moon className="w-5 h-5 stroke-[2.5]" />;
+                case 'zap': return <Zap className="w-5 h-5 stroke-[2.5]" />;
+              }
+            };
 
             return (
               <div
                 key={protocol.id}
-                className="backdrop-blur-xl bg-white/[0.025] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-200 flex flex-col justify-between shadow-xl"
+                className={`border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 ${
+                  isLight
+                    ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
+                    : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
+                }`}
               >
                 <div>
-                  {/* Card Header: Uniform Dark Frosted Icon Badge + Cabinet Grotesk Title + Monospace Category Tag */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-200 shrink-0">
-                        {protocol.icon === 'sun' && <Sun className="w-4 h-4 text-slate-200" />}
-                        {protocol.icon === 'brain' && <Brain className="w-4 h-4 text-slate-200" />}
-                        {protocol.icon === 'moon' && <Moon className="w-4 h-4 text-slate-200" />}
-                        {protocol.icon === 'zap' && <Zap className="w-4 h-4 text-slate-200" />}
-                      </div>
-
-                      <div className="flex flex-col">
-                        <h2 className="font-cabinet font-bold text-lg text-slate-100 tracking-tight leading-snug">
-                          {protocol.name}
-                        </h2>
-                        <span className="text-[11px] font-mono text-slate-500">
-                          {protocol.timeframe}
-                        </span>
-                      </div>
+                  {/* Top Row: Icon & Status Badge */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center ${
+                      isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+                    }`}>
+                      {getIcon()}
                     </div>
 
-                    <span className="text-[10px] font-mono tracking-widest text-slate-400 bg-white/[0.03] border border-white/10 px-2 py-0.5 rounded-md uppercase">
-                      {protocol.category}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-wider ${
+                        isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
+                      }`}>
+                        {protocol.category}
+                      </span>
+                      {isActivated && (
+                        <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase flex items-center gap-1 ${
+                          isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#D9A036] text-[#111914] border-[#F4F0EA]'
+                        }`}>
+                          <Check className="w-3 h-3" />
+                          <span>Active</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Summary */}
-                  <p className="text-xs text-slate-300 font-sans mb-5 leading-relaxed">
+                  {/* Title & Short Summary */}
+                  <h3 className={`font-fraunces font-black text-2xl tracking-tight leading-snug mb-2 ${
+                    isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                  }`}>
+                    {protocol.name}
+                  </h3>
+                  <p className={`text-xs sm:text-sm font-cabinet font-medium leading-relaxed mb-6 ${
+                    isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+                  }`}>
                     {protocol.shortSummary}
                   </p>
 
-                  {/* Monospace Step Counters (01, 02, 03) */}
+                  {/* Daily Habits Checklist Preview */}
                   <div className="space-y-2.5 mb-6">
-                    {protocol.habits.map((h, idx) => (
-                      <div key={idx} className="flex items-baseline gap-2.5 text-xs">
-                        <span className="text-[11px] font-mono text-slate-500 font-medium shrink-0 tabular-nums">
-                          0{idx + 1}
-                        </span>
-                        <div className="flex items-baseline gap-2 flex-1">
-                          <span className="text-slate-200 font-sans">{h.title}</span>
-                          <span className="text-slate-500 font-mono text-[10px] tracking-tight">({h.hint})</span>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider opacity-70 block mb-1">
+                      Daily Checklist ({protocol.timeframe}):
+                    </span>
+                    {protocol.habits.map((habit, i) => (
+                      <div
+                        key={i}
+                        className={`flex items-center justify-between p-3 rounded-xl border-2 text-xs font-cabinet font-bold ${
+                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`font-mono text-xs ${isLight ? 'text-[#3A6B52]' : 'text-[#D9A036]'}`}>•</span>
+                          <span>{habit.title}</span>
                         </div>
+                        <span className="text-[10px] font-mono font-normal opacity-70">
+                          {habit.hint}
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Card Footer: Interactive Ghost Trigger + Standardized Height CTA Button */}
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+                {/* Actions Row */}
+                <div className={`pt-4 border-t-2 flex items-center justify-between gap-3 ${
+                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
+                }`}>
                   <button
                     type="button"
-                    onClick={() => setSelectedProtocolForModal(protocol)}
-                    className="text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setSelectedProtocolForModal(protocol);
+                    }}
+                    className={`text-xs font-mono font-bold hover:underline flex items-center gap-1 cursor-pointer ${
+                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                    }`}
                   >
-                    <span>Why it works</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <span>Read Why It Works</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleToggleProtocol(protocol)}
-                    className={`text-xs px-4 py-2 rounded-xl transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 h-9 ${
-                      isActive
-                        ? 'border border-white/20 bg-white/[0.04] text-slate-200 hover:border-red-400/40 hover:text-red-300 font-mono'
-                        : 'bg-white text-black hover:bg-slate-200 font-semibold shadow-sm'
+                    className={`px-4 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isActivated
+                        ? isLight
+                          ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
+                          : 'bg-[#111914] text-[#F4F0EA] border-[#F4F0EA]'
+                        : isLight
+                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5'
+                          : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5'
                     }`}
                   >
-                    {isActive ? (
+                    {isActivated ? (
                       <>
                         <Check className="w-3.5 h-3.5" />
-                        <span>Active in Protocol</span>
+                        <span>Remove Routine</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Add Protocol</span>
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>Add to Planner</span>
                       </>
                     )}
                   </button>
@@ -340,99 +397,117 @@ export default function ProtocolsPage() {
 
       </main>
 
-      {/* Progressive Disclosure Modal: Science & Details */}
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className={`px-5 py-3.5 rounded-xl border-3 font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3 ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#F4F0EA] border-[#111914] text-[#111914]'
+          }`}>
+            <Check className="w-4 h-4" />
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Blueprint Detail Modal */}
       {selectedProtocolForModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             onClick={() => setSelectedProtocolForModal(null)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
-          <div className="relative z-10 w-full max-w-lg rounded-2xl bg-[#0c0c0c] border border-white/15 p-6 sm:p-8 shadow-2xl flex flex-col gap-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                  {selectedProtocolForModal.category} Protocol
-                </span>
-                <h2 className="font-cabinet font-bold text-2xl text-white tracking-tight mt-0.5">
-                  {selectedProtocolForModal.name}
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedProtocolForModal(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-                aria-label="Close modal"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          <div className={`relative z-10 w-full max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl border-4 p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+          }`}>
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setSelectedProtocolForModal(null)}
+              className={`absolute right-6 top-6 rounded-full p-2 border-2 transition-all cursor-pointer ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+              }`}
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div>
+              <span className={`px-2.5 py-0.5 rounded-md border-2 text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
+              }`}>
+                {selectedProtocolForModal.category} Blueprint
+              </span>
+              <h2 className={`font-fraunces font-black text-2xl sm:text-3xl tracking-tight ${
+                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+              }`}>
+                {selectedProtocolForModal.name}
+              </h2>
             </div>
 
-            {/* Core Biological Mechanism */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
-              <span className="text-xs font-mono text-white font-medium block mb-1">
-                The Science in Plain English:
-              </span>
-              <p className="text-xs text-slate-300 font-sans leading-relaxed">
+            {/* Why It Works Section */}
+            <div className={`p-4 rounded-xl border-2 ${
+              isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+            }`}>
+              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider mb-1 opacity-75">
+                The Science in Plain English
+              </h4>
+              <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
                 {selectedProtocolForModal.whyItWorks}
               </p>
             </div>
 
-            {/* Detailed Bullet Points */}
+            {/* Key Takeaways */}
             <div className="space-y-2.5">
-              <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase block">
-                Biological Mechanisms:
-              </span>
-              {selectedProtocolForModal.deepScience.map((point, idx) => (
-                <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300 font-sans leading-relaxed">
-                  <Sparkles className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                  <span>{point}</span>
+              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider opacity-75">
+                Key Takeaways
+              </h4>
+              {selectedProtocolForModal.simpleHighlights.map((hl, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-xs font-cabinet font-medium leading-relaxed">
+                  <span className={`font-mono text-xs font-bold shrink-0 mt-0.5 ${
+                    isLight ? 'text-[#3A6B52]' : 'text-[#D9A036]'
+                  }`}>+</span>
+                  <span>{hl}</span>
                 </div>
               ))}
             </div>
 
-            {/* Action inside Modal */}
-            <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-xs font-mono text-slate-500">
-                Target: {selectedProtocolForModal.timeframe}
-              </span>
+            {/* Modal Bottom CTA */}
+            <div className="pt-4 border-t-2 border-current/15">
               <button
                 type="button"
                 onClick={() => {
                   handleToggleProtocol(selectedProtocolForModal);
                   setSelectedProtocolForModal(null);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-all cursor-pointer shadow-md"
+                className={`w-full py-4 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all shadow-[4px_4px_0px_#1A3629] flex items-center justify-center gap-2 cursor-pointer ${
+                  activeProtocolIds.includes(selectedProtocolForModal.id)
+                    ? isLight
+                      ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
+                      : 'bg-[#111914] text-[#F4F0EA] border-[#F4F0EA]'
+                    : isLight
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5'
+                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5'
+                }`}
               >
-                {activeProtocolIds.includes(selectedProtocolForModal.id)
-                  ? 'Remove from Routines'
-                  : 'Add to My Daily Routine'}
+                {activeProtocolIds.includes(selectedProtocolForModal.id) ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>Remove from Daily Planner</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    <span>Add All Habits to My Daily Planner</span>
+                  </>
+                )}
               </button>
             </div>
+
           </div>
         </div>
       )}
 
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="px-4 py-3 rounded-xl bg-white text-black font-sans text-xs font-medium shadow-2xl flex items-center gap-2.5 border border-white/20">
-            <Check className="w-4 h-4 text-black" />
-            <span>{toastMessage}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-slate-500 font-mono">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-serif font-medium text-white tracking-tight">Cyath</span>
-            <span>— Pixel-Perfect Health</span>
-          </div>
-          <div>Built with Next.js, Supabase &amp; Tailwind CSS</div>
-        </div>
-      </footer>
     </div>
   );
 }

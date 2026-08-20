@@ -4,9 +4,9 @@ import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
-import { PixelContainer } from '@/components/ui/PixelContainer';
 import { RECIPES, Recipe } from '@/lib/recipes';
 import { useHabitStore } from '@/store/useHabitStore';
+import { retroAudio } from '@/lib/retroAudio';
 import {
   Search,
   SlidersHorizontal,
@@ -42,6 +42,7 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const inspectParam = searchParams.get('inspect') || searchParams.get('recipe');
 
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDietFilter, setSelectedDietFilter] = useState<string>('All');
@@ -58,11 +59,13 @@ function RecipesContent() {
   const { logRecipeToDay, getDailyLog, userSession, setPendingAction, userProfile } = useHabitStore();
   const todayLog = getDailyLog();
 
+  const isLight = themeMode === 'light';
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle URL recipe inspection parameter (e.g. from landing page rotating dishes)
+  // Handle URL recipe inspection parameter
   useEffect(() => {
     if (inspectParam) {
       const match = RECIPES.find(
@@ -96,7 +99,7 @@ function RecipesContent() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Keyboard shortcut listener: Press '/' to focus search, 'Escape' to dismiss modals/dropdowns
+  // Keyboard shortcut listener: Press '/' to focus search, 'Escape' to dismiss modals
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/' && document.activeElement !== searchInputRef.current) {
@@ -114,6 +117,7 @@ function RecipesContent() {
   }, [selectedRecipe, isSortOpen]);
 
   const openRecipeModal = (recipe: Recipe) => {
+    retroAudio.playBlip();
     setSelectedRecipe(recipe);
     setPortionMultiplier(1.0);
   };
@@ -131,13 +135,11 @@ function RecipesContent() {
 
       let matchesDiet = true;
       if (selectedDietFilter === 'Vegetarian') {
-        matchesDiet = recipe.dietType === 'vegetarian' || recipe.dietType === 'vegan';
+        matchesDiet = recipe.tags.some((t) => t.toLowerCase().includes('veg') || t.toLowerCase().includes('plant'));
       } else if (selectedDietFilter === 'Vegan') {
-        matchesDiet = recipe.dietType === 'vegan';
+        matchesDiet = recipe.tags.some((t) => t.toLowerCase().includes('vegan') || t.toLowerCase().includes('plant-based'));
       } else if (selectedDietFilter === 'Pescatarian') {
-        matchesDiet = recipe.dietType === 'pescatarian' || recipe.dietType === 'vegetarian' || recipe.dietType === 'vegan';
-      } else if (selectedDietFilter === 'Omnivore') {
-        matchesDiet = recipe.dietType === 'omnivore';
+        matchesDiet = recipe.tags.some((t) => t.toLowerCase().includes('fish') || t.toLowerCase().includes('seafood') || t.toLowerCase().includes('veg'));
       }
 
       return matchesSearch && matchesCategory && matchesDiet;
@@ -150,112 +152,96 @@ function RecipesContent() {
   }, [searchQuery, selectedCategory, selectedDietFilter, sortBy]);
 
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
-    e?.stopPropagation();
+    if (e) e.stopPropagation();
+    retroAudio.playInspectConfirm();
+
     const scaledProtein = Math.round(recipe.protein * multiplier);
     const scaledCalories = Math.round(recipe.calories * multiplier);
-
-    if (!userSession) {
-      setPendingAction({
-        type: 'LOG_RECIPE',
-        payload: {
-          recipeId: recipe.id,
-          recipeName: recipe.name,
-          protein: scaledProtein,
-          calories: scaledCalories,
-          portion: multiplier,
-        },
-        returnUrl: '/recipes',
-      });
-      router.push('/login?redirect=/recipes');
-      return;
-    }
-
     logRecipeToDay(recipe.id, scaledProtein, scaledCalories);
-    setLoggedToast({ name: recipe.name, protein: scaledProtein, portion: multiplier });
-    setTimeout(() => setLoggedToast(null), 3000);
+
+    setLoggedToast({
+      name: recipe.name,
+      protein: scaledProtein,
+      portion: multiplier,
+    });
+
+    setTimeout(() => {
+      setLoggedToast(null);
+    }, 4000);
   };
 
-  const currentProtein = mounted ? todayLog.totalProteinLogged : 0;
-  const proteinProgress = mounted ? Math.min(100, Math.round((todayLog.totalProteinLogged / 130) * 100)) : 0;
-
   return (
-    <div className="min-h-screen bg-[#080808] text-neutral-100 selection:bg-white selection:text-black flex flex-col">
-      {/* Ambient subtle glow background */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)
-          `,
-        }}
+    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
+      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+    }`}>
+      {/* Navigation Header with Theme Toggle */}
+      <HeaderNav 
+        themeMode={themeMode} 
+        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
       />
 
-      <HeaderNav />
-
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-36 sm:pt-40 pb-24">
+      {/* Main Container */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
         
-        {/* Navigation & Header Strip */}
-        <div className="flex items-center justify-between mb-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to Home</span>
-          </Link>
-
-          {/* Dashboard Mini-Progress Button */}
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-3 text-xs font-mono px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-slate-300 hover:text-white transition-all shadow-sm group"
-          >
-            <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-white" />
-              <span suppressHydrationWarning>Dashboard ({currentProtein}g / 130g)</span>
-            </div>
-
-            {/* Mini Progress Bar */}
-            <div className="w-14 h-1.5 rounded-full bg-white/10 overflow-hidden hidden sm:block">
-              <div
-                className="h-full bg-white transition-all duration-500 rounded-full"
-                style={{ width: `${proteinProgress}%` }}
-              />
-            </div>
-          </Link>
-        </div>
-
-        {/* Page Header */}
-        <div className="max-w-3xl mb-10">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-              Whole-Food Catalog
+        {/* Header Title Section */}
+        <div className="mb-10 text-center sm:text-left">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Link
+              href="/"
+              className={`inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 transition-all ${
+                isLight 
+                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5' 
+                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:-translate-y-0.5'
+              }`}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </Link>
+            <span className={`px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
+            }`}>
+              16-Bit Fuel Catalog
             </span>
           </div>
-          <h1 className="font-serif font-medium text-3xl sm:text-5xl text-white tracking-tight leading-tight">
-            Whole-Food Fuel
+
+          <h1 className={`font-fraunces font-black text-3xl sm:text-5xl tracking-tight ${
+            isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+          }`}>
+            Whole-Food Fuel Recipes
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed font-sans max-w-2xl">
-            Whole-food meals calibrated for energy retention. One click logs macros directly to your daily protocol.
+          <p className={`text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed ${
+            isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+          }`}>
+            Hearty whole foods illustrated in clean retro pixel art. Simple to make, packed with clean protein, and ready to log in one tap.
           </p>
         </div>
 
-        {/* Control Row: Categories + Diet Filter + Search + Sort */}
+        {/* Control Row: Categories + Search + Sort */}
         <div className="flex flex-col gap-4 mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
             {/* Category Filter Pills */}
             <div className="overflow-x-auto pb-1 scrollbar-none">
-              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
+              <div className={`inline-flex items-center gap-1.5 p-1.5 rounded-2xl border-2 ${
+                isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+              }`}>
                 {CATEGORIES.map((cat) => {
                   const isSelected = selectedCategory === cat;
                   return (
                     <button
                       key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playBlip();
+                        setSelectedCategory(cat);
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-white text-black font-semibold shadow-sm'
-                          : 'text-slate-400 hover:text-white'
+                          ? isLight
+                            ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                            : 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
+                          : isLight
+                            ? 'text-[#2C4A3B] hover:text-[#1A3629]'
+                            : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
                       }`}
                     >
                       {cat}
@@ -268,26 +254,35 @@ function RecipesContent() {
             {/* Search Bar & Custom Sort Dropdown */}
             <div className="flex items-center gap-3">
               <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${
+                  isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                }`} />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search recipes..."
-                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-white/30 transition-all font-sans"
+                  className={`w-full pl-10 pr-8 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all ${
+                    isLight 
+                      ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]' 
+                      : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/60 shadow-[2px_2px_0px_#D9A036]'
+                  }`}
                 />
                 {!searchQuery && (
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 border border-white/10 px-1 py-0.5 rounded bg-white/5 pointer-events-none">
+                  <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border px-1.5 py-0.5 rounded pointer-events-none ${
+                    isLight ? 'border-[#1A3629]/40 text-[#1A3629]' : 'border-[#F4F0EA]/40 text-[#F4F0EA]'
+                  }`}>
                     /
                   </span>
                 )}
                 {searchQuery && (
                   <button
+                    type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -297,20 +292,26 @@ function RecipesContent() {
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="px-3.5 py-2 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-slate-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-2.5 shadow-sm cursor-pointer whitespace-nowrap"
+                  className={`px-4 py-2.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center justify-between gap-2.5 cursor-pointer whitespace-nowrap transition-all ${
+                    isLight 
+                      ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
+                      : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                  }`}
                   aria-haspopup="listbox"
                   aria-expanded={isSortOpen}
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-white font-medium">
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>
                     {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
                   </span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu Popup */}
                 {isSortOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#121212] border border-white/15 backdrop-blur-2xl shadow-2xl p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
+                  <div className={`absolute right-0 mt-2 w-48 rounded-xl border-2 p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono shadow-xl ${
+                    isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+                  }`}>
                     {SORT_OPTIONS.map((option) => {
                       const isSelected = sortBy === option.id;
                       return (
@@ -318,17 +319,22 @@ function RecipesContent() {
                           key={option.id}
                           type="button"
                           onClick={() => {
+                            retroAudio.playBlip();
                             setSortBy(option.id);
                             setIsSortOpen(false);
                           }}
-                          className={`w-full px-3 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer ${
+                          className={`w-full px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-white/10 text-white font-semibold'
-                              : 'text-slate-400 hover:text-white hover:bg-white/5'
+                              ? isLight
+                                ? 'bg-[#1A3629] text-[#FFFDF9]'
+                                : 'bg-[#F4F0EA] text-[#111914]'
+                              : isLight
+                                ? 'text-[#2C4A3B] hover:bg-[#F4F0EA]'
+                                : 'text-[#C2CDBF] hover:bg-[#111914]'
                           }`}
                         >
                           <span>{option.label}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                          {isSelected && <Check className="w-3.5 h-3.5" />}
                         </button>
                       );
                     })}
@@ -338,23 +344,32 @@ function RecipesContent() {
             </div>
           </div>
 
-          {/* Dedicated Diet Filter Row (Strict Monochrome, No Emojis) */}
+          {/* Dedicated Diet Filter Row */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase shrink-0">
+            <span className="text-[11px] font-mono font-bold tracking-wider uppercase shrink-0 opacity-80">
               Diet Filter:
             </span>
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.02] border border-white/5">
+            <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border-2 ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]/30' : 'bg-[#1A261E] border-[#F4F0EA]/30'
+            }`}>
               {DIET_FILTERS.map((df) => {
                 const isSelected = selectedDietFilter === df.id;
                 return (
                   <button
                     key={df.id}
                     type="button"
-                    onClick={() => setSelectedDietFilter(df.id)}
-                    className={`px-3 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setSelectedDietFilter(df.id);
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-white/15 text-white font-semibold border border-white/20 shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? isLight
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                          : 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
+                        : isLight
+                          ? 'text-[#2C4A3B] hover:text-[#1A3629]'
+                          : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
                     }`}
                   >
                     {df.label}
@@ -362,28 +377,27 @@ function RecipesContent() {
                 );
               })}
             </div>
-
-            {userProfile?.dietaryRestrictions?.[0] && userProfile.dietaryRestrictions[0] !== 'High-Protein Omnivore' && (
-              <span className="text-[10px] font-mono text-slate-400 border border-white/10 bg-white/[0.03] px-2.5 py-1 rounded-lg hidden sm:inline-block">
-                Auto-filtered for {userProfile.dietaryRestrictions[0]}
-              </span>
-            )}
           </div>
         </div>
 
         {/* Recipe Cards Grid */}
         {filteredRecipes.length === 0 ? (
-          <div className="text-center py-20 bg-white/[0.01] border border-white/5 rounded-2xl p-8">
-            <ChefHat className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="font-cabinet font-semibold text-base text-white">No matching recipes</h3>
-            <p className="text-slate-400 text-xs mt-1">Try clearing your search query or adjusting your dietary filter.</p>
+          <div className={`text-center py-20 border-3 rounded-2xl p-8 ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+          }`}>
+            <ChefHat className="w-12 h-12 mx-auto mb-3 opacity-60" />
+            <h3 className="font-fraunces font-bold text-xl">No matching recipes</h3>
+            <p className="text-sm font-cabinet font-medium mt-1 opacity-80">Try clearing your search query or adjusting your filter.</p>
             <button
+              type="button"
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('All');
                 setSelectedDietFilter('All');
               }}
-              className="mt-4 px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs cursor-pointer hover:bg-slate-200 transition-colors"
+              className={`mt-4 px-5 py-2.5 rounded-xl border-2 font-cabinet font-bold text-xs cursor-pointer transition-all ${
+                isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
+              }`}
             >
               Reset All Filters
             </button>
@@ -397,18 +411,24 @@ function RecipesContent() {
                 <div
                   key={recipe.id}
                   onClick={() => openRecipeModal(recipe)}
-                  className="group cursor-pointer bg-white/[0.025] border border-white/10 hover:border-white/20 hover:bg-white/[0.035] backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.99] flex flex-col justify-between"
+                  className={`group cursor-pointer border-3 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex flex-col justify-between ${
+                    isLight
+                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]'
+                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+                  }`}
                 >
                   {/* Card Body */}
                   <div>
                     {/* Header Badges & Focus Score */}
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-[10px] font-mono tracking-widest text-slate-400 bg-white/[0.03] border border-white/10 px-2 py-0.5 rounded-md uppercase">
+                      <span className={`text-[10px] font-mono font-bold tracking-wider border-2 px-2.5 py-0.5 rounded-full uppercase ${
+                        isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+                      }`}>
                         {recipe.category}
                       </span>
                       
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-400">
-                        <Sparkles className="w-3 h-3 text-slate-400" />
+                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold">
+                        <Sparkles className="w-3.5 h-3.5" />
                         <span>Focus {recipe.focusScore}</span>
                       </span>
                     </div>
@@ -416,22 +436,23 @@ function RecipesContent() {
                     {/* Pixel Art Dish Presentation */}
                     <div className="w-full flex items-center justify-center py-4 mb-4">
                       <div className="w-44 h-44 relative flex items-center justify-center">
-                        <PixelContainer
+                        <img
                           src={recipe.image}
                           alt={recipe.name}
-                          width={170}
-                          height={170}
-                          withGlow
-                          className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </div>
 
                     {/* Title & Subtitle in Cabinet Grotesk */}
-                    <h3 className="font-cabinet font-bold text-lg sm:text-xl text-white tracking-tight group-hover:text-slate-200 transition-colors leading-snug mb-1">
+                    <h3 className={`font-cabinet font-bold text-xl tracking-tight leading-snug mb-1 ${
+                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                    }`}>
                       {recipe.name}
                     </h3>
-                    <p className="text-slate-400 text-xs font-sans leading-relaxed line-clamp-2 mb-6">
+                    <p className={`text-xs font-cabinet font-medium leading-relaxed line-clamp-2 mb-6 ${
+                      isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+                    }`}>
                       {recipe.subtitle}
                     </p>
                   </div>
@@ -440,7 +461,9 @@ function RecipesContent() {
                   <div>
                     {/* Monospace Macro Summary Tag */}
                     <div className="flex items-center justify-center mb-3">
-                      <span className="w-full text-center text-xs font-mono font-medium text-slate-300 bg-white/[0.03] py-2 rounded-xl border border-white/5 tracking-wider tabular-nums">
+                      <span className={`w-full text-center text-xs font-mono font-bold py-2 rounded-xl border-2 tracking-wider tabular-nums ${
+                        isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20 text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]/20 text-[#F4F0EA]'
+                      }`}>
                         [{recipe.protein}G PRO · {recipe.calories} KCAL · {recipe.prepTimeMinutes}M]
                       </span>
                     </div>
@@ -449,20 +472,24 @@ function RecipesContent() {
                     <button
                       type="button"
                       onClick={(e) => handleQuickLog(recipe, 1.0, e)}
-                      className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`w-full py-3 px-4 rounded-xl text-xs font-cabinet font-bold flex items-center justify-center gap-2 border-2 transition-all cursor-pointer ${
                         isLogged
-                          ? 'bg-white/10 text-white border border-white/20 hover:bg-white/15 active:scale-95'
-                          : 'bg-white text-black hover:bg-slate-200 active:scale-95 shadow-sm'
+                          ? isLight
+                            ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
+                            : 'bg-[#111914] text-[#F4F0EA] border-[#F4F0EA]'
+                          : isLight
+                            ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5'
+                            : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5'
                       }`}
                     >
                       {isLogged ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-white" />
+                          <Check className="w-4 h-4" />
                           <span>Logged to Today</span>
                         </>
                       ) : (
                         <>
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-4 h-4 stroke-[2.5]" />
                           <span>Log to Today</span>
                         </>
                       )}
@@ -479,84 +506,108 @@ function RecipesContent() {
       {/* Toast Notification when logged */}
       {loggedToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="px-4 py-3 rounded-xl bg-white text-black font-sans text-xs font-medium shadow-2xl flex items-center gap-2.5 border border-white/20">
-            <Check className="w-4 h-4 text-black" />
+          <div className={`px-5 py-3.5 rounded-xl border-3 font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3 ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#F4F0EA] border-[#111914] text-[#111914]'
+          }`}>
+            <Check className="w-4 h-4" />
             <span>
-              Added <strong className="font-semibold">{loggedToast.name}</strong> ({loggedToast.portion}x portion · +{loggedToast.protein}g PRO) to today&apos;s log!
+              Added <strong>{loggedToast.name}</strong> ({loggedToast.portion}x portion · +{loggedToast.protein}g PRO) to today&apos;s log!
             </span>
           </div>
         </div>
       )}
 
-      {/* Refactored Recipe Detail Modal */}
+      {/* Retro Recipe Detail Modal */}
       {selectedRecipe && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             onClick={() => setSelectedRecipe(null)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
-          <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0c0c0c] border border-white/15 p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none">
+          <div className={`relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-4 p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none ${
+            isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+          }`}>
             {/* Close Button */}
             <button
+              type="button"
               onClick={() => setSelectedRecipe(null)}
-              className="absolute right-6 top-6 rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+              className={`absolute right-6 top-6 rounded-full p-2 border-2 transition-all cursor-pointer ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+              }`}
               aria-label="Close details"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            {/* Elevated Visual Anchor: 2x-3x Centered Pixel Art Image */}
+            {/* Pixel Art Image Anchor */}
             <div className="w-full flex flex-col items-center justify-center pt-2 pb-1">
               <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center">
                 <img
                   src={selectedRecipe.image}
                   alt={selectedRecipe.name}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_12px_24px_rgba(255,255,255,0.04)]"
+                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(0,0,0,0.2)]"
                 />
               </div>
             </div>
 
-            {/* Modal Title & Meta in Cabinet Grotesk */}
+            {/* Modal Title & Meta in Fraunces / Cabinet Grotesk */}
             <div className="text-center sm:text-left">
-              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase text-slate-400 mb-2">
-                <span className="bg-white/[0.03] border border-white/10 px-2 py-0.5 rounded-md text-[10px] tracking-widest text-slate-300">
+              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase font-bold mb-2">
+                <span className={`border-2 px-2.5 py-0.5 rounded-md text-[10px] tracking-widest ${
+                  isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+                }`}>
                   {selectedRecipe.category}
                 </span>
                 <span>·</span>
-                <span className="text-slate-400 text-xs">{selectedRecipe.prepTimeMinutes} mins prep</span>
+                <span>{selectedRecipe.prepTimeMinutes} mins prep</span>
                 <span>·</span>
-                <span className="text-slate-400 text-xs">Focus {selectedRecipe.focusScore}</span>
+                <span>Focus {selectedRecipe.focusScore}</span>
               </div>
-              <h2 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight leading-tight">
+              <h2 className={`font-fraunces font-black text-2xl sm:text-3xl tracking-tight leading-tight ${
+                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+              }`}>
                 {selectedRecipe.name}
               </h2>
-              <p className="text-slate-400 text-sm font-sans mt-1 leading-relaxed">
+              <p className={`text-sm font-cabinet font-medium mt-1 leading-relaxed ${
+                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+              }`}>
                 {selectedRecipe.subtitle}
               </p>
             </div>
 
-            {/* Serving Portion Controller */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Portion Controller */}
+            <div className={`p-4 rounded-xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+            }`}>
               <div>
-                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase block mb-0.5">
-                  Calibrated Portion Size
+                <span className="text-[10px] font-mono font-bold tracking-widest uppercase block mb-0.5">
+                  Portion Size
                 </span>
-                <span className="text-xs font-sans text-slate-300">Adjust nutrient yield for this meal</span>
+                <span className="text-xs font-cabinet font-medium">Adjust nutrient amount for this meal</span>
               </div>
 
-              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 self-start sm:self-auto">
+              <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border-2 ${
+                isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+              }`}>
                 {PORTION_MULTIPLIERS.map((multiplier) => {
                   const isSelected = portionMultiplier === multiplier;
                   return (
                     <button
                       key={multiplier}
                       type="button"
-                      onClick={() => setPortionMultiplier(multiplier)}
-                      className={`px-3 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                      onClick={() => {
+                        retroAudio.playBlip();
+                        setPortionMultiplier(multiplier);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-white text-black font-bold shadow-sm'
-                          : 'text-slate-400 hover:text-white'
+                          ? isLight
+                            ? 'bg-[#1A3629] text-[#FFFDF9]'
+                            : 'bg-[#F4F0EA] text-[#111914]'
+                          : isLight
+                            ? 'text-[#2C4A3B]'
+                            : 'text-[#C2CDBF]'
                       }`}
                     >
                       {multiplier}x
@@ -568,70 +619,75 @@ function RecipesContent() {
 
             {/* Scaled Macro Breakdown Card */}
             <div className="grid grid-cols-4 gap-2.5 text-center">
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
-                <span className="text-[10px] font-mono text-slate-500 block mb-1">PROTEIN</span>
-                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className={`p-3.5 rounded-xl border-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <span className="text-[10px] font-mono font-bold block mb-1">PROTEIN</span>
+                <span className="font-mono text-base sm:text-lg font-bold tabular-nums">
                   {Math.round(selectedRecipe.protein * portionMultiplier)}g
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
-                <span className="text-[10px] font-mono text-slate-500 block mb-1">CALORIES</span>
-                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className={`p-3.5 rounded-xl border-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <span className="text-[10px] font-mono font-bold block mb-1">CALORIES</span>
+                <span className="font-mono text-base sm:text-lg font-bold tabular-nums">
                   {Math.round(selectedRecipe.calories * portionMultiplier)}
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
-                <span className="text-[10px] font-mono text-slate-500 block mb-1">CARBS</span>
-                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className={`p-3.5 rounded-xl border-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <span className="text-[10px] font-mono font-bold block mb-1">CARBS</span>
+                <span className="font-mono text-base sm:text-lg font-bold tabular-nums">
                   {Math.round(selectedRecipe.carbs * portionMultiplier)}g
                 </span>
               </div>
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
-                <span className="text-[10px] font-mono text-slate-500 block mb-1">FATS</span>
-                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className={`p-3.5 rounded-xl border-2 ${
+                isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
+              }`}>
+                <span className="text-[10px] font-mono font-bold block mb-1">FATS</span>
+                <span className="font-mono text-base sm:text-lg font-bold tabular-nums">
                   {Math.round(selectedRecipe.fats * portionMultiplier)}g
                 </span>
               </div>
             </div>
 
-            {/* Recipe Narrative Description */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs font-sans text-slate-300 leading-relaxed">
-              {selectedRecipe.description}
-            </div>
-
-            {/* Ingredients & Method Sections in Cabinet Grotesk */}
+            {/* Ingredients & Method Sections */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-              {/* Ingredients List */}
+              {/* Ingredients */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <ChefHat className="w-4 h-4 text-slate-400" />
-                  <h4 className="font-cabinet font-semibold text-sm text-white tracking-tight">
+                  <ChefHat className="w-4 h-4" />
+                  <h4 className="font-cabinet font-bold text-sm tracking-tight">
                     Ingredients
                   </h4>
                 </div>
                 <ul className="space-y-2">
                   {selectedRecipe.ingredients.map((ing, i) => (
-                    <li key={i} className="flex items-start justify-between gap-2 text-xs border-b border-white/5 pb-1.5 font-sans text-slate-300">
+                    <li key={i} className={`flex items-start justify-between gap-2 text-xs border-b pb-1.5 font-cabinet font-medium ${
+                      isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
+                    }`}>
                       <span>{ing.item}</span>
-                      <span className="font-mono text-slate-400 shrink-0">{ing.amount}</span>
+                      <span className="font-mono font-bold shrink-0">{ing.amount}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Step-by-Step Instructions */}
+              {/* Instructions */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-slate-400" />
-                  <h4 className="font-cabinet font-semibold text-sm text-white tracking-tight">
-                    Method &amp; Preparation
+                  <Sparkles className="w-4 h-4" />
+                  <h4 className="font-cabinet font-bold text-sm tracking-tight">
+                    Instructions
                   </h4>
                 </div>
                 <ol className="space-y-2.5">
                   {selectedRecipe.instructions.map((step, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-300">
-                      <span className="font-mono text-[11px] text-slate-500 shrink-0 mt-0.5">
-                        {String(i + 1).padStart(2, '0')}
+                    <li key={i} className="flex items-start gap-2.5 text-xs leading-relaxed font-cabinet font-medium">
+                      <span className="font-mono text-[11px] font-bold shrink-0 mt-0.5">
+                        {String(i + 1).padStart(2, '0')}.
                       </span>
                       <span>{step}</span>
                     </li>
@@ -640,19 +696,23 @@ function RecipesContent() {
               </div>
             </div>
 
-            {/* Prominent High-Contrast Full-Width Action Button */}
-            <div className="sticky bottom-0 pt-4 pb-2 bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c] to-transparent">
+            {/* Prominent Action Button */}
+            <div className="sticky bottom-0 pt-4">
               <button
                 type="button"
                 onClick={() => {
                   handleQuickLog(selectedRecipe, portionMultiplier);
                   setSelectedRecipe(null);
                 }}
-                className="w-full py-4 px-6 rounded-xl bg-white text-black font-cabinet font-bold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 cursor-pointer"
+                className={`w-full py-4 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all shadow-[4px_4px_0px_#1A3629] flex items-center justify-center gap-2 cursor-pointer ${
+                  isLight
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5'
+                    : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5'
+                }`}
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>
-                  Log Portion to Protocol (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
+                  Log Meal to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
                 </span>
               </button>
             </div>
@@ -669,7 +729,7 @@ export default function RecipesPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#080808] flex items-center justify-center text-slate-400 font-mono text-xs">
+        <div className="min-h-screen bg-[#111914] flex items-center justify-center text-[#F4F0EA] font-mono text-xs">
           Loading recipes catalog...
         </div>
       }

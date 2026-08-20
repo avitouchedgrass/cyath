@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { PixelWaveDish } from './PixelWaveDish';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { retroAudio } from '@/lib/retroAudio';
+import { ChevronLeft, ChevronRight, Sparkles, Volume2, VolumeX } from 'lucide-react';
 
 export interface DishData {
   id: string;
@@ -77,6 +78,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
 
   const currentIndexRef = useRef(0);
   const isScanningRef = useRef(false);
@@ -99,9 +101,10 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     setScanProgress(0);
 
     onDishChange?.(DISH_ITEMS[next], next);
+    retroAudio.playScanWipe();
 
     const startTime = performance.now();
-    const duration = 1000;
+    const duration = 850;
 
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
@@ -127,7 +130,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
 
     const interval = setInterval(() => {
       triggerNextDish();
-    }, 4500);
+    }, 5000);
 
     return () => {
       clearInterval(interval);
@@ -140,12 +143,24 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const handleInspectRecipe = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    retroAudio.playInspectConfirm();
     router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
   };
 
+  const handleToggleSound = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const muted = retroAudio.toggleMute();
+    setIsMuted(muted);
+    if (!muted) {
+      retroAudio.playBlip();
+    }
+  };
+
   return (
-    <div className={`relative w-full flex items-center justify-center select-none ${className}`}>
-      {/* Food Arena with Interactive Hover and Tactile Click */}
+    <div className={`relative w-full flex flex-col items-center justify-center select-none ${className}`}>
+      
+      {/* Massive Unboxed Food Arena (Gentle Organic Float, No Box, No Tilt) */}
       <div 
         onClick={handleInspectRecipe}
         onKeyDown={(e) => {
@@ -157,31 +172,21 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         role="button"
         tabIndex={0}
         aria-label={`Interactive pixel food plate: ${currentDish.name}. Click to inspect recipe in detail.`}
-        className="group relative w-full max-w-[620px] sm:max-w-[700px] lg:max-w-[780px] min-h-[360px] sm:min-h-[460px] lg:min-h-[560px] aspect-square flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none"
+        className="group relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[680px] aspect-square min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.02] focus-visible:outline-none"
       >
-        
-        {/* Deep Atmospheric Diffuse Glow */}
+
+        {/* Ambient Warm Soil Diffuse Back-Glow */}
         <div 
-          className="absolute -inset-14 rounded-full pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-80"
+          className="absolute -inset-8 rounded-full pointer-events-none opacity-40 transition-opacity duration-300 group-hover:opacity-60"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 45%, transparent 70%)',
-            filter: 'blur(55px)',
+            background: 'radial-gradient(circle at 50% 50%, rgba(26, 54, 41, 0.12) 0%, rgba(232, 222, 207, 0.4) 45%, transparent 70%)',
+            filter: 'blur(40px)',
             zIndex: 0
           }}
         />
 
-        {/* Soft Core Radiance */}
-        <div 
-          className="absolute inset-2 rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 65%)',
-            filter: 'blur(30px)',
-            zIndex: 0
-          }}
-        />
-
-        {/* 60fps Hardware-Accelerated Dish with Invisible Wipe & Organic Pixel Wave */}
-        <div className="relative w-full h-full z-10">
+        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage (Big, Crisp Pixel Art) */}
+        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
           <PixelWaveDish
             currentIndex={currentIndex}
             prevIndex={prevIndex}
@@ -193,21 +198,22 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           />
         </div>
 
-        {/* Cycle Buttons */}
+        {/* Chunky Retro Left / Right Navigation Arrow Buttons */}
         <div 
-          className="absolute inset-x-2 top-1/2 -translate-y-1/2 flex items-center justify-between z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between z-30 pointer-events-none px-2"
         >
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              retroAudio.playBlip();
               triggerNextDish(currentIndex - 1);
             }}
-            className="pointer-events-auto p-2.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer shadow-lg active:scale-90"
+            className="pointer-events-auto p-3 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
             aria-label="Previous recipe"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
           </button>
 
           <button
@@ -215,24 +221,38 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              retroAudio.playBlip();
               triggerNextDish(currentIndex + 1);
             }}
-            className="pointer-events-auto p-2.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer shadow-lg active:scale-90"
+            className="pointer-events-auto p-3 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
             aria-label="Next recipe"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* Retro Pixelated Inspect Recipe Tooltip Badge */}
-        <div className="absolute bottom-4 sm:bottom-8 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 flex items-center gap-2 px-4 py-2 rounded-full bg-black/90 backdrop-blur-md border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
-          <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
-          <span className="font-mono text-xs font-semibold tracking-tight text-white">
-            Inspect Recipe <span className="text-slate-400 font-normal">· {currentDish.name} →</span>
+        {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
+        <div className="absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] shadow-[4px_4px_0px_#1A3629]">
+          <Sparkles className="w-4 h-4 text-[#1A3629]" />
+          <span className="font-cabinet font-bold text-xs sm:text-sm text-[#1A3629]">
+            Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>
         </div>
 
       </div>
+
+      {/* Retro 8-Bit Audio Indicator & Toggle Pill */}
+      <div className="mt-3 flex items-center gap-2 z-20">
+        <button
+          type="button"
+          onClick={handleToggleSound}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border-2 border-[#1A3629] text-[10px] font-mono font-bold text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+        >
+          {isMuted ? <VolumeX className="w-3 h-3 text-[#1A3629]" /> : <Volume2 className="w-3 h-3 text-[#1A3629]" />}
+          <span>{isMuted ? '8-BIT FX: OFF' : '8-BIT FX: ON'}</span>
+        </button>
+      </div>
+
     </div>
   );
 }

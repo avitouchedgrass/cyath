@@ -6,17 +6,19 @@ import { usePathname } from "next/navigation";
 import { InvertedButton } from "../ui/InvertedButton";
 import { Logo } from "../ui/Logo";
 import { useHabitStore } from "@/store/useHabitStore";
-import { User } from "lucide-react";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
+  theme?: 'retro' | 'dark';
 }
 
-export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
+export function HeaderNav({ onOpenAuth, theme }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { userSession } = useHabitStore();
+
+  const isRetro = theme === 'retro' || (theme === undefined && pathname === '/');
 
   useEffect(() => {
     setMounted(true);
@@ -36,6 +38,70 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     { name: "Correlations", href: "/correlations" },
     { name: "Methodology", href: "/#methodology" },
   ];
+
+  if (isRetro) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none transition-all duration-300">
+        <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
+          
+          {/* Left: Monogram */}
+          <Link href="/" className="flex items-center group z-10 p-1 hover:opacity-85 transition-opacity" aria-label="Home">
+            <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
+              <Logo className="w-10 h-10 sm:w-11 sm:h-11" />
+            </div>
+          </Link>
+
+          {/* Center: Neobrutalist Pill Nav */}
+          <nav 
+            className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 transition-all duration-300 ${
+              isScrolled 
+                ? "bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full px-6 py-2 shadow-[4px_4px_0px_#1A3629]" 
+                : "bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full px-6 py-2 shadow-[3px_3px_0px_#1A3629]"
+            }`}
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && !item.href.includes('#') && pathname.startsWith(item.href));
+
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href}
+                  className={`font-cabinet font-bold text-xs transition-colors px-2.5 py-1 rounded-full ${
+                    isActive
+                      ? "text-[#1A3629] bg-[#E8DECF]/70"
+                      : "text-[#1A3629] hover:text-[#3A6B52]"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right: Actions Button */}
+          <div className="flex items-center gap-3.5 z-10">
+            {mounted && userSession ? (
+              <Link
+                href="/dashboard"
+                className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-6 py-2 rounded-full shadow-[3px_3px_0px_#1A3629] font-cabinet font-bold text-xs hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_#1A3629] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
+                <span>Dashboard</span>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-6 py-2 rounded-full shadow-[3px_3px_0px_#1A3629] font-cabinet font-bold text-xs hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_#1A3629] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all cursor-pointer"
+              >
+                Dashboard
+              </Link>
+            )}
+          </div>
+
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none bg-gradient-to-b from-[#080808] via-[#080808]/80 to-transparent backdrop-blur-[2px]">

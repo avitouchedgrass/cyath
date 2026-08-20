@@ -17,6 +17,7 @@
 
   /* Typography Font Stacks */
   --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-fraunces: var(--font-fraunces), "Fraunces", Georgia, serif;
   --font-heading: var(--font-playfair), "Playfair Display", Georgia, serif;
   --font-cabinet: "Cabinet Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;

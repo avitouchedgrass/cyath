@@ -80,6 +80,13 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    const interval = setInterval(() => {
+      setCurrentDish((prev) => {
+        const idx = DISH_ITEMS.findIndex((d) => d.id === prev.id);
+        return DISH_ITEMS[(idx + 1) % DISH_ITEMS.length];
+      });
+    }, 4500);
+    return () => clearInterval(interval);
   }, []);
 
   const isLoggedIn = mounted && !!userSession;
@@ -104,20 +111,17 @@ export default function Home() {
       <main className="relative z-10 flex-1 flex flex-col">
         
         {/* ========================================================================= */}
-        {/* 1. HERO SECTION: Typewriter, Specular CTA & PixelShowcase Arena */}
+        {/* 1. HERO SECTION: Premium-Playful Retro Neobrutalism Hero Staging */}
         {/* ========================================================================= */}
-        <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28">
+        <section className="bg-[#F4F0EA] px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 border-[#1A3629]">
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
-            {/* Hero Left Column: Glassmorphic Narrative Card */}
+            {/* Hero Left Column: Physical Tactile Content Tile */}
             <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
-              <div className="w-full max-w-2xl backdrop-blur-xl bg-white/[0.03] border border-white/10 shadow-2xl rounded-3xl p-8 sm:p-12 lg:p-14 flex flex-col items-start relative overflow-hidden">
+              <div className="w-full max-w-2xl bg-[#FFFDF9] border-4 border-[#1A3629] rounded-3xl p-8 sm:p-10 lg:p-12 shadow-[8px_8px_0px_#1A3629] flex flex-col items-start relative">
                 
-                {/* Top highlight line */}
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
-
-                {/* Headline with Typewriter */}
-                <div className="font-serif font-normal tracking-[-0.02em] text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] leading-[1.06] text-white min-h-[110px] sm:min-h-[135px]">
+                {/* Headline with High-Contrast Vintage Serif & Typewriter */}
+                <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl text-[#1A3629] tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px]">
                   <TextType
                     text={[
                       "Pixel-Perfect Health.",
@@ -128,84 +132,94 @@ export default function Home() {
                     deletingSpeed={25}
                     pauseDuration={2400}
                     startOnVisible={true}
-                    cursorClassName="bg-white"
+                    cursorClassName="bg-[#1A3629]"
                   />
-                </div>
+                </h1>
                 
-                {/* Editorial Subtext */}
-                <p className="text-neutral-400 text-sm sm:text-base lg:text-lg mt-6 leading-relaxed font-sans font-normal tracking-normal max-w-xl">
+                {/* Body Text in Cabinet Grotesk */}
+                <p className="font-cabinet font-medium text-base sm:text-lg text-[#2C4A3B] leading-relaxed mt-5 max-w-xl">
                   Log whole-food fuel, track daily routines in 30 seconds, and let our continuous correlation engine uncover what drives your peak energy days.
                 </p>
 
-                {/* Primary & Secondary Call to Actions */}
-                <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+                {/* Primary & Secondary Chunky Neobrutalist CTAs */}
+                <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                   <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
-                    <SpecularButton 
-                      size="lg" 
-                      radius={20} 
-                      intensity={1.8} 
-                      shineFade={30}
-                      blur={16}
-                      className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight active:scale-95 shadow-lg"
+                    <button
+                      type="button"
+                      className="w-full sm:w-auto bg-[#1A3629] text-[#FFFDF9] border-4 border-[#1A3629] font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                     >
                       {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
-                    </SpecularButton>
+                    </button>
                   </Link>
 
-                  <Link 
-                    href="/protocols"
-                    className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-[20px] backdrop-blur-md bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-neutral-200 transition-all font-medium tracking-tight text-center inline-flex justify-center items-center text-sm sm:text-base h-[54px] sm:h-[58px]"
-                  >
-                    Browse Blueprints
+                  <Link href="/protocols" className="w-full sm:w-auto">
+                    <button
+                      type="button"
+                      className="w-full sm:w-auto bg-[#FFFDF9] text-[#1A3629] border-4 border-[#1A3629] font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                    >
+                      Browse Blueprints
+                    </button>
                   </Link>
                 </div>
 
-                {/* Strict Monochrome Product Micro-Widgets */}
-                <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t border-white/10 w-full">
+                {/* Bottom Metric Inset Micro-Cards */}
+                <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 border-[#1A3629]/15 w-full">
                   
-                  {/* Micro-Widget 1: Streak Heatmap Preview */}
-                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px]">
-                    <div className="flex items-center gap-1 mb-2">
-                      {[1, 0.75, 0.9, 1, 0.6, 1, 1].map((opacity, i) => (
+                  {/* Micro-Card 1: Streak Heatmap Preview */}
+                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px]">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
                         <span 
                           key={i} 
-                          className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-xs bg-white" 
+                          className="h-3 w-3 rounded-xs bg-[#1A3629]" 
                           style={{ opacity }} 
                         />
                       ))}
                     </div>
                     <div>
-                      <div className="text-white text-xs font-semibold tracking-tight">Streak Heatmaps</div>
-                      <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">Monochrome consistency</div>
+                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
+                        Streak Heatmaps
+                      </div>
+                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
+                        Monochrome consistency
+                      </div>
                     </div>
                   </div>
 
-                  {/* Micro-Widget 2: Macro Fueling Preview */}
-                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px] overflow-hidden">
+                  {/* Micro-Card 2: Macro Fueling Preview */}
+                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px] overflow-hidden">
                     <div 
                       key={currentDish.id}
-                      className="font-mono tabular-nums text-[11px] font-bold text-white tracking-tight mb-2 whitespace-nowrap animate-stat-flip"
+                      className="font-mono font-bold text-[#1A3629] text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip"
                     >
-                      {currentDish.protein} <span className="text-neutral-500 font-normal font-sans text-[10px]">PRO</span> · {currentDish.calories} <span className="text-neutral-500 font-normal font-sans text-[10px]">KCAL</span>
+                      {currentDish.protein} PRO · {currentDish.calories} KCAL
                     </div>
                     <div>
-                      <div className="text-white text-xs font-semibold tracking-tight">Macro-Fueling</div>
-                      <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">16-bit whole food targets</div>
+                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
+                        Macro-Fueling
+                      </div>
+                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
+                        16-bit whole food targets
+                      </div>
                     </div>
                   </div>
 
-                  {/* Micro-Widget 3: Energy Rating Preview */}
-                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-h-[110px] overflow-hidden">
+                  {/* Micro-Card 3: Energy Rating Preview */}
+                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px] overflow-hidden">
                     <div 
                       key={`focus-${currentDish.id}`}
-                      className="font-mono tabular-nums text-[11px] font-bold text-white tracking-tight mb-2 flex items-center gap-1.5 whitespace-nowrap animate-stat-flip"
+                      className="font-mono font-bold text-[#1A3629] text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip"
                     >
                       <span>{currentDish.focus}</span>
-                      <span className="text-[9.5px] text-neutral-400 font-sans font-normal uppercase tracking-wider">Focus Index</span>
+                      <span className="text-[10px] text-[#2C4A3B] font-mono font-normal uppercase">Focus Index</span>
                     </div>
                     <div>
-                      <div className="text-white text-xs font-semibold tracking-tight">Energy Correlation</div>
-                      <div className="text-[11px] text-neutral-400 mt-0.5 font-sans leading-snug">Routine × state insights</div>
+                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
+                        Energy Correlation
+                      </div>
+                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
+                        Routine × state insights
+                      </div>
                     </div>
                   </div>
 
@@ -214,7 +228,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Hero Right Column: Food Showcase Arena */}
+            {/* Hero Right Column: Massive Unboxed Pixel Art Showcase with 8-Bit Audio & Wipes */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PixelShowcase onDishChange={(dish) => setCurrentDish(dish)} />
             </div>

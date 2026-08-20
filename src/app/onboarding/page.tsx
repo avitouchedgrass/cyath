@@ -12,7 +12,6 @@ import {
   Zap,
   Dumbbell,
   Moon,
-  Sun,
   Heart,
   Scale,
   ChevronDown,
@@ -76,8 +75,7 @@ function OnboardingContent() {
   const searchParams = useSearchParams();
   const isEditing = searchParams.get('edit') === 'true';
 
-  const { userProfile, updateUserProfile, userSession, themeMode, toggleThemeMode } = useHabitStore();
-  const isLight = themeMode === 'light';
+  const { userProfile, updateUserProfile, userSession } = useHabitStore();
 
   const [step, setStep] = useState(1);
   const totalSteps = 4;
@@ -201,19 +199,19 @@ function OnboardingContent() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
       
       <div className="relative z-10 w-full max-w-xl mx-auto">
         
-        {/* Top Header Monogram, Step Indicator & Theme Switcher */}
+        {/* Top Header Monogram & Step Indicator */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Logo className="w-9 h-9" />
+            <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
+              <Logo className="w-9 h-9" />
+            </div>
             <div>
-              <div className="text-xs font-mono font-bold">Personal Setup</div>
-              <div className="text-[10px] font-mono text-[#D9A036]">
+              <div className="text-xs font-mono font-bold text-[#1A3629]">Personal Setup</div>
+              <div className="text-[10px] font-mono text-[#1A3629]">
                 Step {step} of {totalSteps}
               </div>
             </div>
@@ -221,56 +219,36 @@ function OnboardingContent() {
 
           <div className="flex items-center gap-3">
             {/* Progress Bar */}
-            <div className={`w-24 h-2.5 rounded-full border overflow-hidden ${
-              isLight ? 'bg-[#E8DECF] border-[#1B2A24]/30' : 'bg-[#1D2622] border-[#F4F0EA]/30'
-            }`}>
+            <div className="w-28 h-2.5 rounded-full border border-[#1A3629]/30 bg-[#E8DECF] overflow-hidden">
               <div
-                className="h-full bg-[#D9A036] transition-all duration-300"
+                className="h-full bg-[#1A3629] transition-all duration-300"
                 style={{ width: `${(step / totalSteps) * 100}%` }}
               />
             </div>
-
-            {/* Theme Toggle */}
-            <button
-              type="button"
-              onClick={toggleThemeMode}
-              className={`p-1.5 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                  : 'bg-[#1D2622] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-              }`}
-              aria-label="Toggle Theme"
-            >
-              {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5 text-[#D9A036]" />}
-            </button>
           </div>
         </div>
 
         {/* Dynamic Step Container */}
-        <div className={`rounded-3xl p-6 sm:p-9 border-3 transition-all ${
-          isLight
-            ? 'bg-[#FFFDF9] border-[#1B2A24] shadow-[6px_6px_0px_#1B2A24]'
-            : 'bg-[#1D2622] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-        }`}>
+        <div className="rounded-3xl p-6 sm:p-9 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] transition-all">
           
           {/* STEP 1: Personal Demographics */}
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                   Welcome to Cyath
                 </span>
-                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1">
+                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1 text-[#1A3629]">
                   What should we call you?
                 </h1>
-                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium opacity-75">
+                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium text-[#2C4A3B]">
                   We&apos;ll calibrate your daily protein and hydration targets based on your setup.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                  <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                     Your Name
                   </label>
                   <input
@@ -278,18 +256,14 @@ function OnboardingContent() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Alex Morgan"
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-cabinet font-bold focus:outline-none ${
-                      isLight
-                        ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] placeholder-[#1B2A24]/40 shadow-[2px_2px_0px_#1B2A24]'
-                        : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/50 shadow-[2px_2px_0px_#D9A036]'
-                    }`}
+                    className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#1A3629]/40 shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold focus:outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Age Input */}
                   <div>
-                    <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                    <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                       Age (Years)
                     </label>
                     <input
@@ -297,16 +271,14 @@ function OnboardingContent() {
                       value={age}
                       onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder="e.g. 26"
-                      className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none ${
+                      className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none bg-[#F4F0EA] ${
                         !isAgeValid && age !== ''
-                          ? 'border-red-400'
-                          : isLight
-                          ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                          : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                          ? 'border-red-500 text-red-700'
+                          : 'border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]'
                       }`}
                     />
                     {!isAgeValid && age !== '' && (
-                      <span className="text-[11px] font-mono text-red-500 mt-1 block font-bold">
+                      <span className="text-[11px] font-mono text-red-600 mt-1 block font-bold">
                         {parsedAge > 120 ? 'Maximum age is 120.' : 'Please enter age between 10 and 120.'}
                       </span>
                     )}
@@ -314,26 +286,20 @@ function OnboardingContent() {
 
                   {/* Gender Selector */}
                   <div className="relative" ref={sexDropdownRef}>
-                    <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                    <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                       Biological Sex / Gender
                     </label>
                     <button
                       type="button"
                       onClick={() => setIsSexDropdownOpen(!isSexDropdownOpen)}
-                      className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-cabinet font-bold flex items-center justify-between cursor-pointer ${
-                        isLight
-                          ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                          : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                      }`}
+                      className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold flex items-center justify-between cursor-pointer"
                     >
                       <span>{SEX_OPTIONS.find((o) => o.id === sex)?.label || 'Select'}</span>
                       <ChevronDown className={`w-4 h-4 transition-transform ${isSexDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isSexDropdownOpen && (
-                      <div className={`absolute left-0 right-0 top-full mt-2 rounded-xl border-2 p-1 shadow-2xl z-30 font-mono text-xs ${
-                        isLight ? 'bg-[#FFFDF9] border-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA]'
-                      }`}>
+                      <div className="absolute left-0 right-0 top-full mt-2 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629] p-1 shadow-2xl z-30 font-mono text-xs">
                         {SEX_OPTIONS.map((opt) => (
                           <button
                             key={opt.id}
@@ -345,12 +311,8 @@ function OnboardingContent() {
                             }}
                             className={`w-full px-3 py-2 rounded-lg flex items-center justify-between cursor-pointer ${
                               sex === opt.id
-                                ? isLight
-                                  ? 'bg-[#1B2A24] text-[#FFFDF9] font-bold'
-                                  : 'bg-[#F4F0EA] text-[#131916] font-bold'
-                                : isLight
-                                ? 'text-[#1B2A24] hover:bg-black/5'
-                                : 'text-[#C2CDBF] hover:bg-[#1D2622]'
+                                ? 'bg-[#1A3629] text-[#FFFDF9] font-bold'
+                                : 'text-[#1A3629] hover:bg-black/5'
                             }`}
                           >
                             <span>{opt.label}</span>
@@ -370,27 +332,23 @@ function OnboardingContent() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                     Targets Setup
                   </span>
-                  <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1">
+                  <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1 text-[#1A3629]">
                     Your Height &amp; Weight
                   </h1>
                 </div>
 
                 {/* Unit Switcher */}
-                <div className={`flex items-center gap-1 p-1 rounded-xl border text-xs font-mono font-bold ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1B2A24]/30' : 'bg-[#131916] border-[#F4F0EA]/30'
-                }`}>
+                <div className="flex items-center gap-1 p-1 rounded-xl border border-[#1A3629]/30 bg-[#F4F0EA] text-xs font-mono font-bold">
                   <button
                     type="button"
                     onClick={() => setIsImperial(false)}
                     className={`px-2.5 py-1 rounded-lg cursor-pointer ${
                       !isImperial
-                        ? isLight
-                          ? 'bg-[#1B2A24] text-[#FFFDF9]'
-                          : 'bg-[#F4F0EA] text-[#131916]'
-                        : 'opacity-60'
+                        ? 'bg-[#1A3629] text-[#FFFDF9]'
+                        : 'opacity-60 text-[#1A3629]'
                     }`}
                   >
                     Metric
@@ -400,10 +358,8 @@ function OnboardingContent() {
                     onClick={() => setIsImperial(true)}
                     className={`px-2.5 py-1 rounded-lg cursor-pointer ${
                       isImperial
-                        ? isLight
-                          ? 'bg-[#1B2A24] text-[#FFFDF9]'
-                          : 'bg-[#F4F0EA] text-[#131916]'
-                        : 'opacity-60'
+                        ? 'bg-[#1A3629] text-[#FFFDF9]'
+                        : 'opacity-60 text-[#1A3629]'
                     }`}
                   >
                     Imperial
@@ -415,7 +371,7 @@ function OnboardingContent() {
                 {isImperial ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                         Height (Feet &amp; Inches)
                       </label>
                       <div className="flex items-center gap-2">
@@ -425,31 +381,23 @@ function OnboardingContent() {
                           max="7"
                           value={heightFeet}
                           onChange={(e) => handleHeightImperialChange(Number(e.target.value), heightInches)}
-                          className={`w-full px-3 py-3 rounded-xl border-2 text-sm font-mono font-bold text-center ${
-                            isLight
-                              ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]'
-                              : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                          }`}
+                          className="w-full px-3 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] text-sm font-mono font-bold text-center"
                         />
-                        <span className="text-xs font-mono font-bold">ft</span>
+                        <span className="text-xs font-mono font-bold text-[#1A3629]">ft</span>
                         <input
                           type="number"
                           min="0"
                           max="11"
                           value={heightInches}
                           onChange={(e) => handleHeightImperialChange(heightFeet, Number(e.target.value))}
-                          className={`w-full px-3 py-3 rounded-xl border-2 text-sm font-mono font-bold text-center ${
-                            isLight
-                              ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]'
-                              : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                          }`}
+                          className="w-full px-3 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] text-sm font-mono font-bold text-center"
                         />
-                        <span className="text-xs font-mono font-bold">in</span>
+                        <span className="text-xs font-mono font-bold text-[#1A3629]">in</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                         Weight (Lbs)
                       </label>
                       <div className="flex items-center gap-2">
@@ -459,20 +407,16 @@ function OnboardingContent() {
                           max="400"
                           value={weightLbs}
                           onChange={(e) => handleWeightLbsChange(Number(e.target.value))}
-                          className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold ${
-                            isLight
-                              ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]'
-                              : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                          }`}
+                          className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] text-sm font-mono font-bold"
                         />
-                        <span className="text-xs font-mono font-bold">lbs</span>
+                        <span className="text-xs font-mono font-bold text-[#1A3629]">lbs</span>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                         Height (cm)
                       </label>
                       <div className="flex items-center gap-2">
@@ -482,18 +426,14 @@ function OnboardingContent() {
                           max="250"
                           value={heightCm}
                           onChange={(e) => setHeightCm(Number(e.target.value))}
-                          className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold ${
-                            isLight
-                              ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]'
-                              : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                          }`}
+                          className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] text-sm font-mono font-bold"
                         />
-                        <span className="text-xs font-mono font-bold">cm</span>
+                        <span className="text-xs font-mono font-bold text-[#1A3629]">cm</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 opacity-80">
+                      <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
                         Weight (kg)
                       </label>
                       <div className="flex items-center gap-2">
@@ -503,37 +443,29 @@ function OnboardingContent() {
                           max="200"
                           value={weightKg}
                           onChange={(e) => setWeightKg(Number(e.target.value))}
-                          className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold ${
-                            isLight
-                              ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]'
-                              : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                          }`}
+                          className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] text-sm font-mono font-bold"
                         />
-                        <span className="text-xs font-mono font-bold">kg</span>
+                        <span className="text-xs font-mono font-bold text-[#1A3629]">kg</span>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Target Preview */}
-                <div className={`p-4 rounded-2xl border-2 flex items-center justify-between mt-4 ${
-                  isLight
-                    ? 'bg-[#F4F0EA] border-[#1B2A24]'
-                    : 'bg-[#131916] border-[#F4F0EA]'
-                }`}>
+                <div className="p-4 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-between mt-4">
                   <div className="flex items-center gap-3">
-                    <Scale className="w-5 h-5 text-[#D9A036]" />
+                    <Scale className="w-5 h-5 text-[#1A3629]" />
                     <div>
-                      <div className="text-xs font-mono font-bold">Suggested Targets</div>
-                      <div className="text-[11px] font-cabinet font-medium opacity-75">
+                      <div className="text-xs font-mono font-bold text-[#1A3629]">Suggested Targets</div>
+                      <div className="text-[11px] font-cabinet font-medium text-[#2C4A3B]">
                         Based on your weight &amp; goals
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-xs font-mono font-black text-[#D9A036] block tabular-nums">~{estimatedProteinTarget}g Protein</span>
-                    <span className="text-[10px] font-mono font-bold tabular-nums opacity-90">~{estimatedHydrationTarget}L Water</span>
+                    <span className="text-xs font-mono font-black text-[#1A3629] block tabular-nums">~{estimatedProteinTarget}g Protein</span>
+                    <span className="text-[10px] font-mono font-bold tabular-nums opacity-90 text-[#2C4A3B]">~{estimatedHydrationTarget}L Water</span>
                   </div>
                 </div>
 
@@ -545,13 +477,13 @@ function OnboardingContent() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                   Primary Priority
                 </span>
-                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1">
+                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1 text-[#1A3629]">
                   What is your main goal?
                 </h1>
-                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium opacity-75">
+                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium text-[#2C4A3B]">
                   We&apos;ll customize your daily checklist to match your top priority.
                 </p>
               </div>
@@ -570,28 +502,22 @@ function OnboardingContent() {
                       }}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                         isSelected
-                          ? isLight
-                            ? 'bg-[#F4F0EA] border-[#1B2A24] shadow-[3px_3px_0px_#1B2A24]'
-                            : 'bg-[#131916] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
-                          : isLight
-                          ? 'bg-[#FFFDF9] border-[#1B2A24]/20 hover:border-[#1B2A24]'
-                          : 'bg-[#131916]/60 border-[#F4F0EA]/30 hover:border-[#F4F0EA]'
+                          ? 'bg-[#F4F0EA] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
+                          : 'bg-[#FFFDF9] border-[#1A3629]/20 hover:border-[#1A3629]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center ${
-                          isLight ? 'bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#1D2622] border-[#F4F0EA] text-[#F4F0EA]'
-                        }`}>
+                        <div className="w-8 h-8 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] flex items-center justify-center">
                           <Icon className="w-4 h-4" />
                         </div>
-                        {isSelected && <Check className="w-4 h-4 text-[#D9A036] stroke-[3]" />}
+                        {isSelected && <Check className="w-4 h-4 text-[#1A3629] stroke-[3]" />}
                       </div>
 
                       <div>
-                        <h3 className="font-cabinet font-bold text-sm">
+                        <h3 className="font-cabinet font-bold text-sm text-[#1A3629]">
                           {g.title}
                         </h3>
-                        <p className="text-[11px] font-cabinet font-medium mt-0.5 leading-relaxed opacity-75">
+                        <p className="text-[11px] font-cabinet font-medium mt-0.5 leading-relaxed text-[#2C4A3B]">
                           {g.description}
                         </p>
                       </div>
@@ -606,19 +532,19 @@ function OnboardingContent() {
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                   Food Preferences
                 </span>
-                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1">
+                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight mt-1 text-[#1A3629]">
                   Any dietary preferences?
                 </h1>
-                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium opacity-75">
+                <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium text-[#2C4A3B]">
                   We&apos;ll auto-filter whole-food recipes to match your lifestyle.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase font-bold mb-2 opacity-80">
+                <label className="block text-xs font-mono uppercase font-bold mb-2 text-[#1A3629]">
                   Dietary Style
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -634,12 +560,8 @@ function OnboardingContent() {
                         }}
                         className={`p-3 rounded-xl border-2 text-left text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-between ${
                           isSelected
-                            ? isLight
-                              ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24] shadow-[3px_3px_0px_#3A6B52]'
-                              : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
-                            : isLight
-                            ? 'bg-[#F4F0EA] border-[#1B2A24]/30 text-[#1B2A24] hover:border-[#1B2A24]'
-                            : 'bg-[#131916] border-[#F4F0EA]/30 text-[#C2CDBF] hover:border-[#F4F0EA]'
+                            ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52]'
+                            : 'bg-[#F4F0EA] border-[#1A3629]/30 text-[#1A3629] hover:border-[#1A3629]'
                         }`}
                       >
                         <span>{diet}</span>
@@ -651,7 +573,7 @@ function OnboardingContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase font-bold mb-2 opacity-80">
+                <label className="block text-xs font-mono uppercase font-bold mb-2 text-[#1A3629]">
                   Allergies or Restrictions
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -664,12 +586,8 @@ function OnboardingContent() {
                         onClick={() => toggleAllergy(allergy)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer border-2 ${
                           isSelected
-                            ? isLight
-                              ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24] shadow-[2px_2px_0px_#3A6B52]'
-                              : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                            : isLight
-                            ? 'bg-[#F4F0EA] border-[#1B2A24]/30 text-[#1B2A24] hover:border-[#1B2A24]'
-                            : 'bg-[#131916] border-[#F4F0EA]/30 text-[#C2CDBF] hover:border-[#F4F0EA]'
+                            ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]'
+                            : 'bg-[#F4F0EA] border-[#1A3629]/30 text-[#1A3629] hover:border-[#1A3629]'
                         }`}
                       >
                         {allergy}
@@ -682,12 +600,12 @@ function OnboardingContent() {
           )}
 
           {/* Navigation Controls */}
-          <div className="flex items-center justify-between pt-6 mt-6 border-t border-current/15">
+          <div className="flex items-center justify-between pt-6 mt-6 border-t border-[#1A3629]/15">
             {step > 1 ? (
               <button
                 type="button"
                 onClick={prevStep}
-                className="inline-flex items-center gap-2 text-xs font-mono font-bold opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
+                className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#1A3629] opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -700,11 +618,7 @@ function OnboardingContent() {
               type="button"
               onClick={nextStep}
               disabled={step === 1 && !isAgeValid}
-              className={`px-6 py-3 rounded-xl font-cabinet font-bold text-xs border-2 shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
-                isLight
-                  ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24]'
-                  : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA]'
-              }`}
+              className="px-6 py-3 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <span>
                 {step === totalSteps
@@ -730,7 +644,7 @@ export default function OnboardingPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-[#131916] flex items-center justify-center text-xs font-mono text-[#F4F0EA]">
+        <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-xs font-mono text-[#1A3629]">
           Loading setup...
         </div>
       }

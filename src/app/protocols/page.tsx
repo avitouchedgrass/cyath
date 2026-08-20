@@ -16,7 +16,6 @@ import {
   ArrowLeft,
   ChevronRight,
   X,
-  Sparkles,
 } from 'lucide-react';
 
 interface ProtocolBlueprint {
@@ -98,60 +97,55 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
       { id: 'ambient_temp', title: 'Cool Dark Bedroom (67°F)', category: 'recovery', targetDaysPerWeek: 7 },
       { id: 'magnesium_glycine', title: 'Magnesium / Evening Herbal Tea', category: 'recovery', targetDaysPerWeek: 6 },
     ],
-    whyItWorks: 'Dimming blue light lets your brain release natural melatonin, while a cool room lets your body temperature drop for deep sleep.',
+    whyItWorks: 'Lowering your core body temperature and dimming screens helps your body produce melatonin naturally.',
     simpleHighlights: [
-      'Dimming screens 1 hour before bed helps you fall asleep 2x faster.',
-      'A cool bedroom signals your body to enter deep physical repair mode.',
-      'Warm herbal tea eases physical tension from the day.',
+      'Turning screens off lets your natural sleep hormone ramp up on time.',
+      'A cool bedroom signals your body to drop into restorative deep sleep.',
+      'A warm herbal tea or magnesium relaxes tension before your head hits the pillow.',
     ],
   },
   {
-    id: 'anabolic-glycogen',
-    name: 'Strength & Muscle Fuel',
-    shortSummary: 'Daily whole-food protein and hydration to keep you strong, active, and energized.',
+    id: 'cellular-mobility',
+    name: 'Daily Movement & Posture',
+    shortSummary: 'Keeps your joints supple and undoes the stiffness of long sitting sessions.',
     category: 'Movement',
     icon: 'zap',
-    timeframe: 'Daily Fueling & Training',
+    timeframe: 'Throughout the day',
     habits: [
-      { title: '130g+ daily whole-food protein', hint: 'Muscle fuel' },
-      { title: '30-45 mins resistance or brisk walk', hint: 'Daily movement' },
-      { title: '2.5L+ clean water intake', hint: 'Hydration baseline' },
+      { title: '10-min post-meal walk', hint: 'Smooth digestion' },
+      { title: '30-sec spine decompression hang', hint: 'Posture relief' },
+      { title: '5-min deep hip opener stretch', hint: 'Release tension' },
     ],
     standardHabits: [
-      { id: 'protein_target', title: 'Hit Daily Protein Target (130g+)', category: 'nutrition', targetDaysPerWeek: 7 },
-      { id: 'zone2_resistance', title: '30-45 Min Resistance or Cardio', category: 'movement', targetDaysPerWeek: 5 },
-      { id: 'hydration_3l', title: 'Hit 2.5L+ Hydration Target', category: 'nutrition', targetDaysPerWeek: 7 },
+      { id: 'post_meal_walk', title: '10-Min Post-Meal Walk', category: 'nutrition', targetDaysPerWeek: 7 },
+      { id: 'dead_hang', title: '30-Sec Dead Hang (Spine Relief)', category: 'recovery', targetDaysPerWeek: 6 },
+      { id: 'hip_openers', title: '5-Min Hip Mobility Stretch', category: 'recovery', targetDaysPerWeek: 5 },
     ],
-    whyItWorks: 'Getting enough protein and moving every day keeps your muscles strong, metabolism high, and joints feeling great.',
+    whyItWorks: 'A brief 10-minute walk after eating moderates blood sugar surges and prevents sluggishness.',
     simpleHighlights: [
-      'Hitting your protein goal supports muscle repair and all-day fullness.',
-      'Daily movement improves insulin sensitivity and lifts your mood.',
-      'Proper hydration keeps cramps and mid-afternoon headaches away.',
+      'Gentle walking after meals stops post-lunch grogginess immediately.',
+      'Hanging decompresses spinal discs compressed by long sitting.',
+      'Hip openers restore natural pelvic alignment and lower back comfort.',
     ],
   },
 ];
 
 export default function ProtocolsPage() {
   const router = useRouter();
+  const { activeProtocolIds, activateProtocol, userSession, setPendingAction } = useHabitStore();
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Morning' | 'Focus' | 'Sleep' | 'Movement'>('All');
   const [selectedProtocolForModal, setSelectedProtocolForModal] = useState<ProtocolBlueprint | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const {
-    themeMode,
-    toggleThemeMode,
-    activeProtocolIds,
-    activateProtocol,
-    userSession,
-    setPendingAction,
-  } = useHabitStore();
-
-  const isLight = themeMode === 'light';
-
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const filteredProtocols = CURATED_PROTOCOLS.filter((p) => {
+    if (selectedFilter === 'All') return true;
+    return p.category === selectedFilter;
+  });
 
   const handleToggleProtocol = (protocol: ProtocolBlueprint) => {
     retroAudio.playInspectConfirm();
@@ -159,70 +153,52 @@ export default function ProtocolsPage() {
     if (!userSession) {
       setPendingAction({
         type: 'ACTIVATE_PROTOCOL',
-        payload: { protocolId: protocol.id, habitsToAdd: protocol.standardHabits },
+        payload: { protocolId: protocol.id },
         returnUrl: '/protocols',
       });
       router.push('/login?redirect=/protocols');
       return;
     }
 
-    const isCurrentlyActive = activeProtocolIds.includes(protocol.id);
+    const isAlreadyActive = activeProtocolIds.includes(protocol.id);
     activateProtocol(protocol.id, protocol.standardHabits);
 
     setToastMessage(
-      isCurrentlyActive
-        ? `Removed ${protocol.name} from daily routines`
-        : `Added ${protocol.name} to your daily routines!`
+      isAlreadyActive
+        ? `Removed ${protocol.name} from your planner.`
+        : `Added ${protocol.name} habits to your Daily Planner!`
     );
-    setTimeout(() => setToastMessage(null), 3000);
+
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const filteredProtocols = CURATED_PROTOCOLS.filter(
-    (p) => selectedFilter === 'All' || p.category === selectedFilter
-  );
-
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
       {/* Navigation Header */}
-      <HeaderNav 
-        themeMode={themeMode} 
-        onToggleTheme={toggleThemeMode} 
-      />
+      <HeaderNav />
 
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-8 pt-28 pb-24">
+      {/* Main Container */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
         
-        {/* Header Breadcrumbs & Title */}
+        {/* Header Title */}
         <div className="mb-10 text-center sm:text-left">
           <div className="inline-flex items-center gap-2 mb-3">
             <Link
               href="/"
-              className={`inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 transition-all ${
-                isLight 
-                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5' 
-                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:-translate-y-0.5'
-              }`}
+              className="inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
             </Link>
-            <span className={`px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
-            }`}>
+            <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
               Daily Blueprints
             </span>
           </div>
 
-          <h1 className={`font-fraunces font-black text-3xl sm:text-5xl tracking-tight ${
-            isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-          }`}>
+          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
             Daily Routine Blueprints
           </h1>
-          <p className={`text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed ${
-            isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-          }`}>
+          <p className="text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed text-[#2C4A3B]">
             Proven daily habits you can import directly into your planner. No overwhelming multi-hour routines—just simple, high-impact check-ins.
           </p>
         </div>
@@ -232,9 +208,7 @@ export default function ProtocolsPage() {
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider opacity-80 shrink-0">
             Filter:
           </span>
-          <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border-2 ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629]/30' : 'bg-[#1A261E] border-[#F4F0EA]/30'
-          }`}>
+          <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
             {(['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const).map((filter) => {
               const isSelected = selectedFilter === filter;
               return (
@@ -247,12 +221,8 @@ export default function ProtocolsPage() {
                   }}
                   className={`px-3.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                     isSelected
-                      ? isLight
-                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                        : 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
-                      : isLight
-                        ? 'text-[#2C4A3B] hover:text-[#1A3629]'
-                        : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
+                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                      : 'text-[#2C4A3B] hover:text-[#1A3629]'
                   }`}
                 >
                   {filter}
@@ -279,31 +249,21 @@ export default function ProtocolsPage() {
             return (
               <div
                 key={protocol.id}
-                className={`border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 ${
-                  isLight
-                    ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
-                    : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-                }`}
+                className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
               >
                 <div>
                   {/* Top Row: Icon & Status Badge */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                    }`}>
+                    <div className="w-10 h-10 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] flex items-center justify-center">
                       {getIcon()}
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-wider ${
-                        isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-                      }`}>
+                      <span className="px-2.5 py-0.5 rounded-full border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-[10px] font-mono font-bold uppercase tracking-wider">
                         {protocol.category}
                       </span>
                       {isActivated && (
-                        <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase flex items-center gap-1 ${
-                          isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#D9A036] text-[#111914] border-[#F4F0EA]'
-                        }`}>
+                        <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] text-[10px] font-mono font-bold uppercase flex items-center gap-1">
                           <Check className="w-3 h-3" />
                           <span>Active</span>
                         </span>
@@ -312,14 +272,10 @@ export default function ProtocolsPage() {
                   </div>
 
                   {/* Title & Short Summary */}
-                  <h3 className={`font-fraunces font-black text-2xl tracking-tight leading-snug mb-2 ${
-                    isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                  }`}>
+                  <h3 className="font-fraunces font-black text-2xl tracking-tight leading-snug mb-2 text-[#1A3629]">
                     {protocol.name}
                   </h3>
-                  <p className={`text-xs sm:text-sm font-cabinet font-medium leading-relaxed mb-6 ${
-                    isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                  }`}>
+                  <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed mb-6 text-[#2C4A3B]">
                     {protocol.shortSummary}
                   </p>
 
@@ -331,12 +287,10 @@ export default function ProtocolsPage() {
                     {protocol.habits.map((habit, i) => (
                       <div
                         key={i}
-                        className={`flex items-center justify-between p-3 rounded-xl border-2 text-xs font-cabinet font-bold ${
-                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                        }`}
+                        className="flex items-center justify-between p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] text-xs font-cabinet font-bold"
                       >
                         <div className="flex items-center gap-2">
-                          <span className={`font-mono text-xs ${isLight ? 'text-[#3A6B52]' : 'text-[#D9A036]'}`}>•</span>
+                          <span className="font-mono text-xs text-[#3A6B52]">•</span>
                           <span>{habit.title}</span>
                         </div>
                         <span className="text-[10px] font-mono font-normal opacity-70">
@@ -348,18 +302,14 @@ export default function ProtocolsPage() {
                 </div>
 
                 {/* Actions Row */}
-                <div className={`pt-4 border-t-2 flex items-center justify-between gap-3 ${
-                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
-                }`}>
+                <div className="pt-4 border-t-2 border-[#1A3629]/15 flex items-center justify-between gap-3">
                   <button
                     type="button"
                     onClick={() => {
                       retroAudio.playBlip();
                       setSelectedProtocolForModal(protocol);
                     }}
-                    className={`text-xs font-mono font-bold hover:underline flex items-center gap-1 cursor-pointer ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}
+                    className="text-xs font-mono font-bold hover:underline flex items-center gap-1 cursor-pointer text-[#1A3629]"
                   >
                     <span>Read Why It Works</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -370,12 +320,8 @@ export default function ProtocolsPage() {
                     onClick={() => handleToggleProtocol(protocol)}
                     className={`px-4 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isActivated
-                        ? isLight
-                          ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
-                          : 'bg-[#111914] text-[#F4F0EA] border-[#F4F0EA]'
-                        : isLight
-                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5'
-                          : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5'
+                        ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
+                        : 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5'
                     }`}
                   >
                     {isActivated ? (
@@ -401,9 +347,7 @@ export default function ProtocolsPage() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className={`px-5 py-3.5 rounded-xl border-3 font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3 ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#F4F0EA] border-[#111914] text-[#111914]'
-          }`}>
+          <div className="px-5 py-3.5 rounded-xl border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3">
             <Check className="w-4 h-4" />
             <span>{toastMessage}</span>
           </div>
@@ -418,38 +362,28 @@ export default function ProtocolsPage() {
             className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
-          <div className={`relative z-10 w-full max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl border-4 p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-          }`}>
+          <div className="relative z-10 w-full max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl border-4 border-[#1A3629] bg-[#FFFDF9] p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none">
             {/* Close Button */}
             <button
               type="button"
               onClick={() => setSelectedProtocolForModal(null)}
-              className={`absolute right-6 top-6 rounded-full p-2 border-2 transition-all cursor-pointer ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-              }`}
+              className="absolute right-6 top-6 rounded-full p-2 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] transition-all cursor-pointer"
               aria-label="Close"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <span className={`px-2.5 py-0.5 rounded-md border-2 text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-              }`}>
+              <span className="px-2.5 py-0.5 rounded-md border-2 border-[#1A3629] bg-[#F4F0EA] text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 text-[#1A3629]">
                 {selectedProtocolForModal.category} Blueprint
               </span>
-              <h2 className={`font-fraunces font-black text-2xl sm:text-3xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 {selectedProtocolForModal.name}
               </h2>
             </div>
 
             {/* Why It Works Section */}
-            <div className={`p-4 rounded-xl border-2 ${
-              isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-            }`}>
+            <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
               <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider mb-1 opacity-75">
                 The Science in Plain English
               </h4>
@@ -465,30 +399,24 @@ export default function ProtocolsPage() {
               </h4>
               {selectedProtocolForModal.simpleHighlights.map((hl, i) => (
                 <div key={i} className="flex items-start gap-2.5 text-xs font-cabinet font-medium leading-relaxed">
-                  <span className={`font-mono text-xs font-bold shrink-0 mt-0.5 ${
-                    isLight ? 'text-[#3A6B52]' : 'text-[#D9A036]'
-                  }`}>+</span>
+                  <span className="font-mono text-xs font-bold shrink-0 mt-0.5 text-[#3A6B52]">+</span>
                   <span>{hl}</span>
                 </div>
               ))}
             </div>
 
             {/* Modal Bottom CTA */}
-            <div className="pt-4 border-t-2 border-current/15">
+            <div className="pt-4 border-t-2 border-[#1A3629]/15">
               <button
                 type="button"
                 onClick={() => {
                   handleToggleProtocol(selectedProtocolForModal);
                   setSelectedProtocolForModal(null);
                 }}
-                className={`w-full py-4 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all shadow-[4px_4px_0px_#1A3629] flex items-center justify-center gap-2 cursor-pointer ${
+                className={`w-full py-4 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeProtocolIds.includes(selectedProtocolForModal.id)
-                    ? isLight
-                      ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
-                      : 'bg-[#111914] text-[#F4F0EA] border-[#F4F0EA]'
-                    : isLight
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5'
-                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5'
+                    ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
+                    : 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5'
                 }`}
               >
                 {activeProtocolIds.includes(selectedProtocolForModal.id) ? (

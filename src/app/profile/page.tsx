@@ -12,7 +12,6 @@ import {
   ChevronRight,
   LogOut,
   RefreshCw,
-  Trash2,
   CheckCircle2,
   Sliders,
   Sparkles,
@@ -36,22 +35,16 @@ const GOAL_LABELS: Record<string, { title: string; icon: React.ElementType }> = 
 export default function ProfilePage() {
   const router = useRouter();
   const {
-    themeMode,
-    toggleThemeMode,
     userSession,
     setUserSession,
     userProfile,
     logsByDate,
     activeProtocolIds,
-    deleteAccountData,
   } = useHabitStore();
 
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const isLight = themeMode === 'light';
 
   useEffect(() => {
     setMounted(true);
@@ -101,26 +94,17 @@ export default function ProfilePage() {
   const GoalIcon = goalMeta.icon;
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
-      <HeaderNav 
-        themeMode={themeMode} 
-        onToggleTheme={toggleThemeMode} 
-      />
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+      <HeaderNav />
 
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-10 pt-28 pb-24">
         
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-current/15">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-[#1A3629]/15">
           <Link
             href="/dashboard"
-            className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 transition-all ${
-              isLight 
-                ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-            }`}
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Return to Daily Planner</span>
@@ -129,9 +113,7 @@ export default function ProfilePage() {
           {isGuest ? (
             <Link
               href="/login?redirect=/onboarding?edit=true"
-              className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border-2 transition-all ${
-                isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA]'
-              }`}
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] transition-all"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Sign In to Edit Biometrics</span>
@@ -139,11 +121,7 @@ export default function ProfilePage() {
           ) : (
             <Link
               href="/onboarding?edit=true"
-              className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border-2 transition-all ${
-                isLight 
-                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-              }`}
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] transition-all"
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>Edit Biometrics &amp; Goals</span>
@@ -158,31 +136,23 @@ export default function ProfilePage() {
           <div className="lg:col-span-8 space-y-8">
             
             {/* Identity & Biometrics Panel */}
-            <div className={`border-4 rounded-3xl p-6 sm:p-8 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-            }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b-2 border-current/15">
+            <div className="border-4 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-3xl p-6 sm:p-8 transition-all">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b-2 border-[#1A3629]/15">
                 <div className="flex items-center gap-5">
-                  <div className={`w-16 h-16 rounded-2xl border-3 flex items-center justify-center text-2xl font-fraunces font-black shrink-0 ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-                  }`}>
+                  <div className="w-16 h-16 rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-2xl font-fraunces font-black shrink-0 text-[#1A3629]">
                     {displayName.charAt(0).toUpperCase()}
                   </div>
                   
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h1 className={`font-fraunces font-black text-2xl sm:text-3xl tracking-tight ${
-                        isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                      }`}>
+                      <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                         {displayName}
                       </h1>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border-2 uppercase ${
-                        isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#D9A036]'
-                      }`}>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border-2 border-[#1A3629] bg-[#F4F0EA] uppercase text-[#1A3629]">
                         {isGuest ? 'Demo Mode' : 'Verified'}
                       </span>
                     </div>
-                    <p className="text-xs font-mono font-bold opacity-75">
+                    <p className="text-xs font-mono font-bold opacity-75 text-[#2C4A3B]">
                       {userEmail}
                     </p>
                   </div>
@@ -192,11 +162,7 @@ export default function ProfilePage() {
                   {isGuest ? (
                     <Link
                       href="/login?redirect=/onboarding?edit=true"
-                      className={`px-4 py-2.5 rounded-xl text-xs font-cabinet font-bold border-2 flex items-center gap-1.5 transition-all ${
-                        isLight 
-                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]' 
-                          : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                      }`}
+                      className="px-4 py-2.5 rounded-xl text-xs font-cabinet font-bold border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] flex items-center gap-1.5 transition-all"
                     >
                       <Lock className="w-3.5 h-3.5" />
                       <span>Sign In to Save</span>
@@ -204,11 +170,7 @@ export default function ProfilePage() {
                   ) : (
                     <Link
                       href="/onboarding?edit=true"
-                      className={`px-4 py-2.5 rounded-xl text-xs font-cabinet font-bold border-2 transition-all ${
-                        isLight 
-                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]' 
-                          : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                      }`}
+                      className="px-4 py-2.5 rounded-xl text-xs font-cabinet font-bold border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] transition-all"
                     >
                       Edit Profile
                     </Link>
@@ -219,44 +181,36 @@ export default function ProfilePage() {
               {/* Biometrics Matrix */}
               {userProfile ? (
                 <div className="pt-6">
-                  <div className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 mb-4">
+                  <div className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 mb-4 text-[#1A3629]">
                     Biometrics &amp; Daily Goals
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className={`p-3.5 rounded-xl border-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
                       <span className="text-[10px] font-mono font-bold block mb-1 opacity-70">Height &amp; Weight</span>
                       <span className="text-xs font-mono font-bold tabular-nums">
                         {userProfile.heightCm} cm · {userProfile.weightKg} kg
                       </span>
                     </div>
 
-                    <div className={`p-3.5 rounded-xl border-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
                       <span className="text-[10px] font-mono font-bold block mb-1 opacity-70">Age &amp; Sex</span>
                       <span className="text-xs font-mono font-bold capitalize tabular-nums">
                         {userProfile.age} yrs · {userProfile.sex}
                       </span>
                     </div>
 
-                    <div className={`p-3.5 rounded-xl border-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
                       <span className="text-[10px] font-mono font-bold block mb-1 opacity-70">Core Goal</span>
                       <div className="flex items-center gap-1.5">
-                        <GoalIcon className="w-3.5 h-3.5 shrink-0" />
+                        <GoalIcon className="w-3.5 h-3.5 shrink-0 text-[#1A3629]" />
                         <span className="text-xs font-cabinet font-bold truncate">
                           {goalMeta.title}
                         </span>
                       </div>
                     </div>
 
-                    <div className={`p-3.5 rounded-xl border-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
                       <span className="text-[10px] font-mono font-bold block mb-1 opacity-70">Diet Restrictions</span>
                       <span className="text-xs font-cabinet font-medium truncate block">
                         {userProfile.allergies && userProfile.allergies.length > 0
@@ -273,19 +227,17 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block">
+                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block text-[#1A3629]">
                     All-Time Stats
                   </span>
-                  <h2 className="font-fraunces font-bold text-xl">
+                  <h2 className="font-fraunces font-bold text-xl text-[#1A3629]">
                     Lifetime Activity
                   </h2>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className={`border-3 rounded-2xl p-5 ${
-                  isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-                }`}>
+                <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
                     Days Logged
                   </span>
@@ -297,9 +249,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className={`border-3 rounded-2xl p-5 ${
-                  isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-                }`}>
+                <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
                     Habits Completed
                   </span>
@@ -311,9 +261,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className={`border-3 rounded-2xl p-5 ${
-                  isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-                }`}>
+                <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
                     Protein Tracked
                   </span>
@@ -328,22 +276,20 @@ export default function ProfilePage() {
             </div>
 
             {/* Subscribed Protocol Blueprints */}
-            <div className={`border-3 rounded-2xl p-6 sm:p-8 ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-            }`}>
-              <div className="flex items-center justify-between mb-5 pb-4 border-b-2 border-current/15">
+            <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-5 pb-4 border-b-2 border-[#1A3629]/15">
                 <div>
-                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block">
+                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block text-[#1A3629]">
                     Routine Blueprints
                   </span>
-                  <h3 className="font-fraunces font-bold text-lg">
+                  <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
                     Active Blueprints
                   </h3>
                 </div>
 
                 <Link
                   href="/protocols"
-                  className="text-xs font-mono font-bold hover:underline inline-flex items-center gap-1"
+                  className="text-xs font-mono font-bold hover:underline inline-flex items-center gap-1 text-[#1A3629]"
                 >
                   <span>Browse Catalog</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -352,14 +298,12 @@ export default function ProfilePage() {
 
               {activeProtocolIds.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-xs font-cabinet font-medium opacity-80 mb-3">
+                  <p className="text-xs font-cabinet font-medium opacity-80 mb-3 text-[#2C4A3B]">
                     No protocol blueprints active yet.
                   </p>
                   <Link
                     href="/protocols"
-                    className={`px-4 py-2 rounded-xl border-2 text-xs font-cabinet font-bold inline-block ${
-                      isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
-                    }`}
+                    className="px-4 py-2 rounded-xl border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] text-xs font-cabinet font-bold inline-block"
                   >
                     Explore Daily Blueprints
                   </Link>
@@ -369,24 +313,20 @@ export default function ProfilePage() {
                   {activeProtocolIds.map((id) => (
                     <div
                       key={id}
-                      className={`p-4 rounded-xl border-2 flex items-center justify-between ${
-                        isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                      }`}
+                      className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center ${
-                          isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-                        }`}>
+                        <div className="w-8 h-8 rounded-lg border-2 bg-[#FFFDF9] border-[#1A3629] flex items-center justify-center text-[#1A3629]">
                           <Sparkles className="w-4 h-4" />
                         </div>
                         <div>
-                          <h4 className="text-xs font-cabinet font-bold capitalize">
+                          <h4 className="text-xs font-cabinet font-bold capitalize text-[#1A3629]">
                             {id.replace('-', ' & ')}
                           </h4>
-                          <span className="text-[10px] font-mono opacity-70">Active in Planner</span>
+                          <span className="text-[10px] font-mono opacity-70 text-[#2C4A3B]">Active in Planner</span>
                         </div>
                       </div>
-                      <span className="text-xs font-mono font-bold">✓ Active</span>
+                      <span className="text-xs font-mono font-bold text-[#1A3629]">✓ Active</span>
                     </div>
                   ))}
                 </div>
@@ -399,18 +339,16 @@ export default function ProfilePage() {
           <div className="lg:col-span-4 space-y-6">
             
             {/* Cloud Sync */}
-            <div className={`border-3 rounded-2xl p-6 space-y-4 ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-            }`}>
+            <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 space-y-4">
               <div>
-                <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block">
+                <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block text-[#1A3629]">
                   Cloud Storage
                 </span>
-                <h3 className="font-fraunces font-bold text-lg">
+                <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
                   Sync &amp; Backup
                 </h3>
               </div>
-              <p className="text-xs font-cabinet font-medium leading-relaxed opacity-80">
+              <p className="text-xs font-cabinet font-medium leading-relaxed opacity-80 text-[#2C4A3B]">
                 Your daily habits, recipes, and biometrics are saved locally and synced automatically.
               </p>
 
@@ -418,16 +356,14 @@ export default function ProfilePage() {
                 type="button"
                 onClick={handleForceSync}
                 disabled={isSyncing}
-                className={`w-full py-3 rounded-xl text-xs font-mono font-bold border-2 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-                }`}
+                className="w-full py-3 rounded-xl text-xs font-mono font-bold border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                 <span>{isSyncing ? 'Syncing...' : 'Sync Cloud Records'}</span>
               </button>
 
               {syncStatus && (
-                <div className="text-xs font-mono font-bold flex items-center gap-1.5 justify-center text-center">
+                <div className="text-xs font-mono font-bold flex items-center gap-1.5 justify-center text-center text-[#1A3629]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>{syncStatus}</span>
                 </div>
@@ -435,14 +371,12 @@ export default function ProfilePage() {
             </div>
 
             {/* Session Management */}
-            <div className={`border-3 rounded-2xl p-6 space-y-4 ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-            }`}>
+            <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 space-y-4">
               <div>
-                <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block">
+                <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70 block text-[#1A3629]">
                   Account
                 </span>
-                <h3 className="font-fraunces font-bold text-lg">
+                <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
                   Session
                 </h3>
               </div>
@@ -450,11 +384,7 @@ export default function ProfilePage() {
               {isGuest ? (
                 <Link
                   href="/login"
-                  className={`w-full py-3 rounded-xl text-xs font-cabinet font-bold border-2 flex items-center justify-center gap-2 ${
-                    isLight 
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]' 
-                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full py-3 rounded-xl text-xs font-cabinet font-bold border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] flex items-center justify-center gap-2"
                 >
                   Create Account to Save
                 </Link>
@@ -462,9 +392,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className={`w-full py-3 rounded-xl text-xs font-mono font-bold border-2 transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
-                  }`}
+                  className="w-full py-3 rounded-xl text-xs font-mono font-bold border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out</span>

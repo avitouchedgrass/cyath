@@ -23,8 +23,6 @@ export default function DashboardPage() {
   const [newHabitTitle, setNewHabitTitle] = useState('');
 
   const {
-    themeMode,
-    toggleThemeMode,
     habits,
     currentDate,
     logsByDate,
@@ -258,18 +256,15 @@ export default function DashboardPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#131916] flex items-center justify-center text-[#F4F0EA] font-mono text-xs">
+      <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">
         Loading Daily Planner...
       </div>
     );
   }
 
   return (
-    <div className={`${themeMode === 'dark' ? 'dark' : ''} min-h-screen bg-[#F4F0EA] dark:bg-[#131916] text-[#1B2A24] dark:text-[#F4F0EA] transition-colors duration-300 flex flex-col`}>
-      <HeaderNav 
-        themeMode={themeMode} 
-        onToggleTheme={toggleThemeMode} 
-      />
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+      <HeaderNav />
 
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 pt-28 pb-24 flex flex-col gap-8">
@@ -278,38 +273,38 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24] dark:bg-[#1D2622] dark:border-[#F4F0EA] dark:text-[#D9A036]">
+              <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
                 Daily Planner · {currentDate} {isSyncing && '· Syncing...'}
               </span>
             </div>
-            <h1 className="font-fraunces font-black text-3xl md:text-4xl tracking-tight text-[#1B2A24] dark:text-[#F4F0EA]">
+            <h1 className="font-fraunces font-black text-3xl md:text-4xl tracking-tight text-[#1A3629]">
               Your Daily Planner &amp; Habits
             </h1>
           </div>
 
           {/* Reserved Tactile Shadow for Top Streak Badge */}
-          <div className="self-start sm:self-auto px-4 py-1.5 rounded-full border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] text-[#1B2A24] dark:text-[#F4F0EA] font-mono font-bold text-xs flex items-center gap-2 shadow-[3px_3px_0px_#D9A036]">
-            <Flame className="w-4 h-4 text-[#D9A036]" />
+          <div className="self-start sm:self-auto px-4 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono font-bold text-xs flex items-center gap-2 shadow-[3px_3px_0px_#1A3629]">
+            <Flame className="w-4 h-4 text-[#1A3629]" />
             <span>{calculatedStreak} Day Streak</span>
           </div>
         </div>
 
         {/* 1. 28-Day Consistency Matrix (Flat Bento Box, 2px border, No Shadow) */}
-        <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 transition-all">
+        <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-1">
                 28-Day Consistency Matrix
               </span>
-              <h2 className="font-fraunces font-bold text-xl tracking-tight">
+              <h2 className="font-fraunces font-bold text-xl tracking-tight text-[#1A3629]">
                 Daily Check-in Activity
               </h2>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1B2A24]/70 dark:text-[#F4F0EA]/70">
-              <span>Total Actions: <strong className="text-[#1B2A24] dark:text-[#F4F0EA]">{totalHeatmapActions}</strong></span>
+            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1A3629]/70">
+              <span>Total Actions: <strong className="text-[#1A3629]">{totalHeatmapActions}</strong></span>
               <span>·</span>
-              <span>Daily Pace: <strong className="text-[#1B2A24] dark:text-[#F4F0EA]">{avgDailyActions}/day</strong></span>
+              <span>Daily Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
             </div>
           </div>
 
@@ -320,11 +315,11 @@ export default function DashboardPage() {
               
               // Only active/completed days get borders/fills. Inactive = no borders/backgrounds
               const levelClasses = {
-                0: 'bg-transparent border border-transparent text-[#1B2A24]/40 dark:text-[#F4F0EA]/40 hover:bg-black/5 dark:hover:bg-white/5',
-                1: 'bg-[#E8E0D2] border border-[#1B2A24]/30 text-[#1B2A24] dark:bg-[#1D2B22] dark:border-[#F4F0EA]/30 dark:text-[#F4F0EA]',
-                2: 'bg-[#C2D7C7] border border-[#1B2A24]/60 text-[#1B2A24] font-bold dark:bg-[#3A5643] dark:border-[#F4F0EA]/60 dark:text-[#F4F0EA]',
-                3: 'bg-[#6D9F80] border border-[#1B2A24] text-[#FFFDF9] font-bold dark:bg-[#7AA884] dark:border-[#F4F0EA] dark:text-[#131916]',
-                4: 'bg-[#D9A036] border border-[#1B2A24] text-[#1B2A24] font-black dark:bg-[#D9A036] dark:border-[#F4F0EA] dark:text-[#131916]',
+                0: 'bg-transparent border border-transparent text-[#1A3629]/40 hover:bg-black/5',
+                1: 'bg-[#E8E0D2] border border-[#1A3629]/30 text-[#1A3629]',
+                2: 'bg-[#C2D7C7] border border-[#1A3629]/60 text-[#1A3629] font-bold',
+                3: 'bg-[#6D9F80] border border-[#1A3629] text-[#FFFDF9] font-bold',
+                4: 'bg-[#1A3629] border border-[#1A3629] text-[#FFFDF9] font-black',
               }[day.level];
 
               return (
@@ -337,7 +332,7 @@ export default function DashboardPage() {
                     }}
                     className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
                       isSelected
-                        ? 'ring-2 ring-[#D9A036] scale-105 font-bold'
+                        ? 'ring-2 ring-[#1A3629] scale-105 font-bold'
                         : 'hover:scale-105'
                     }`}
                   >
@@ -361,9 +356,9 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-6">
             
             {/* Daily Progress Arc (Calibrated Technical Dial) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 text-center transition-all flex flex-col items-center">
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 text-center transition-all flex flex-col items-center">
               <div className="w-full flex items-center justify-between text-xs font-mono font-bold mb-3">
-                <span className="text-[10px] uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">DAILY PROGRESS</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#1A3629]/60">DAILY PROGRESS</span>
                 <span>{completedCount} / {habits.length} DONE</span>
               </div>
 
@@ -374,14 +369,14 @@ export default function DashboardPage() {
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
                     stroke="currentColor"
-                    className="text-[#1B2A24]/15 dark:text-[#F4F0EA]/15"
+                    className="text-[#1A3629]/15"
                     strokeWidth="4"
                     strokeLinecap="round"
                   />
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke="#D9A036"
+                    stroke="#1A3629"
                     strokeWidth="4"
                     strokeDasharray="141.37"
                     strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
@@ -391,7 +386,7 @@ export default function DashboardPage() {
                 </svg>
 
                 <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="font-mono text-3xl font-bold tabular-nums text-[#1B2A24] dark:text-[#F4F0EA]">
+                  <span className="font-mono text-3xl font-bold tabular-nums text-[#1A3629]">
                     {completionPercentage}%
                   </span>
                 </div>
@@ -399,13 +394,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Habit Checklist (Flat Bento Box) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
                     Routine Checklist
                   </span>
-                  <h2 className="font-fraunces font-bold text-lg">
+                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                     Today&apos;s Habits
                   </h2>
                 </div>
@@ -414,7 +409,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddHabit(!showAddHabit)}
-                  className="px-3.5 py-1.5 rounded-xl border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-mono font-bold flex items-center gap-1 shadow-[4px_4px_0px_#1B2A24] dark:shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1B2A24] dark:hover:shadow-[6px_6px_0px_#D9A036] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none transition-all cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold flex items-center gap-1 shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#3A6B52] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+ Add</span>
@@ -423,18 +418,18 @@ export default function DashboardPage() {
 
               {/* Add Custom Habit Form */}
               {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-2.5 rounded-xl border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/60 dark:bg-[#131916]/60">
+                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA]/60">
                   <input
                     type="text"
                     placeholder="E.g., 20 Min Morning Walk..."
                     value={newHabitTitle}
                     onChange={(e) => setNewHabitTitle(e.target.value)}
-                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none placeholder-[#1B2A24]/40 dark:placeholder-[#F4F0EA]/40"
+                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none placeholder-[#1A3629]/40 text-[#1A3629]"
                     autoFocus
                   />
                   <button
                     type="submit"
-                    className="px-3 py-1 rounded-lg border border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-mono font-bold cursor-pointer"
+                    className="px-3 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold cursor-pointer"
                   >
                     Save
                   </button>
@@ -449,18 +444,18 @@ export default function DashboardPage() {
                     <div
                       key={habit.id}
                       onClick={() => handleToggleHabit(habit.id)}
-                      className="group flex items-center justify-between py-2.5 px-3 rounded-lg bg-transparent hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                      className="group flex items-center justify-between py-2.5 px-3 rounded-lg bg-transparent hover:bg-black/5 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
                           isDone
-                            ? 'bg-[#D9A036] text-[#1B2A24] border-[#D9A036]'
-                            : 'border-[#1B2A24]/40 dark:border-[#F4F0EA]/40 group-hover:border-[#1B2A24] dark:group-hover:border-[#F4F0EA]'
+                            ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                            : 'border-[#1A3629]/40 group-hover:border-[#1A3629]'
                         }`}>
                           {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
-                        <span className={`text-xs font-cabinet font-bold truncate ${
-                          isDone ? 'line-through opacity-50' : 'text-[#1B2A24] dark:text-[#F4F0EA]'
+                        <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] ${
+                          isDone ? 'line-through opacity-50' : ''
                         }`}>
                           {habit.title}
                         </span>
@@ -473,7 +468,7 @@ export default function DashboardPage() {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:text-red-600 transition-opacity cursor-pointer ml-2"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-red-600 hover:text-red-800 transition-opacity cursor-pointer ml-2"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -490,28 +485,28 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-6">
             
             {/* Daily Phase (Flat Bento Box, 2px border, No Shadow) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
                     Routine Stage
                   </span>
-                  <h2 className="font-fraunces font-bold text-lg">
+                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                     {routineWindow.title}
                   </h2>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/80 dark:bg-[#131916]/80 text-[10px] font-mono font-bold uppercase">
+                <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA]/80 text-[10px] font-mono font-bold uppercase text-[#1A3629]">
                   {routineWindow.badge}
                 </span>
               </div>
 
-              <p className="text-xs font-cabinet font-medium leading-relaxed text-[#1B2A24]/75 dark:text-[#F4F0EA]/75">
+              <p className="text-xs font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
                 {routineWindow.description}
               </p>
 
               {/* Reflection Notes */}
-              <div className="pt-2 border-t border-[#1B2A24]/10 dark:border-[#F4F0EA]/10 flex flex-col gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">
+              <div className="pt-2 border-t border-[#1A3629]/10 flex flex-col gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
                   Daily Notes &amp; Observations
                 </span>
                 <textarea
@@ -519,25 +514,25 @@ export default function DashboardPage() {
                   onChange={(e) => setNotes(e.target.value, currentDate)}
                   placeholder="Note energy peaks, workout notes, or meals..."
                   rows={3}
-                  className="w-full p-3 rounded-xl border border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/50 dark:bg-[#131916]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1B2A24]/40 dark:placeholder-[#F4F0EA]/40"
+                  className="w-full p-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629]"
                 />
               </div>
             </div>
 
             {/* Logged Whole-Food Meals (Flat Bento Box, 2px border, No Shadow) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-4 transition-all">
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
                     Nutrition Fuel
                   </span>
-                  <h2 className="font-fraunces font-bold text-lg">
+                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                     Logged Whole Foods
                   </h2>
                 </div>
                 <Link 
                   href="/recipes" 
-                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1 text-[#1B2A24] dark:text-[#D9A036]"
+                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1 text-[#1A3629]"
                 >
                   <span>Catalog</span>
                   <ArrowRight className="w-3 h-3" />
@@ -552,7 +547,7 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={rId}
-                        className="flex items-center justify-between p-3 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 gap-3"
+                        className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 gap-3"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
@@ -563,8 +558,8 @@ export default function DashboardPage() {
                             />
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-cabinet font-bold truncate">{recipe.name}</span>
-                            <span className="text-[11px] font-mono font-bold opacity-75 mt-0.5">
+                            <span className="text-xs font-cabinet font-bold truncate text-[#1A3629]">{recipe.name}</span>
+                            <span className="text-[11px] font-mono font-bold opacity-75 mt-0.5 text-[#2C4A3B]">
                               [{recipe.protein}g PRO · {recipe.calories} KCAL]
                             </span>
                           </div>
@@ -573,7 +568,7 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-500 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-600 transition-colors cursor-pointer"
                           aria-label="Remove meal"
                         >
                           <X className="w-4 h-4" />
@@ -583,15 +578,15 @@ export default function DashboardPage() {
                   })}
                 </div>
               ) : (
-                <div className="p-6 text-center rounded-xl border border-dashed border-[#1B2A24]/20 dark:border-[#F4F0EA]/20 bg-[#F4F0EA]/30 dark:bg-[#131916]/30 flex flex-col items-center justify-center gap-3">
-                  <p className="text-xs font-cabinet font-medium text-[#1B2A24]/70 dark:text-[#F4F0EA]/70">
+                <div className="p-6 text-center rounded-xl border border-dashed border-[#1A3629]/20 bg-[#F4F0EA]/30 flex flex-col items-center justify-center gap-3">
+                  <p className="text-xs font-cabinet font-medium text-[#2C4A3B]">
                     No whole-food meals logged yet today.
                   </p>
                   
-                  {/* Primary CTA with Tactile Shadow & Active Depression */}
+                  {/* Primary CTA */}
                   <Link
                     href="/recipes"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#1B2A24] text-[#FFFDF9] dark:bg-[#F4F0EA] dark:text-[#131916] text-xs font-cabinet font-bold shadow-[4px_4px_0px_#1B2A24] dark:shadow-[4px_4px_0px_#D9A036] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1B2A24] dark:hover:shadow-[6px_6px_0px_#D9A036] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-cabinet font-bold shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#3A6B52] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Browse Recipe Catalog</span>
@@ -605,21 +600,21 @@ export default function DashboardPage() {
           {/* COLUMN 3: Daily Metrics & Telemetry */}
           <div className="flex flex-col gap-6">
             
-            {/* Nutrition & Water Card (Flat Bento Box, 2px border, Flat Secondary Action Pills) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-5 transition-all">
+            {/* Nutrition & Water Card */}
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-5 transition-all">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
                   Daily Fuel
                 </span>
-                <h2 className="font-fraunces font-bold text-lg">
+                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                   Protein &amp; Hydration
                 </h2>
               </div>
 
               {/* Protein Steppers */}
-              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
+              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">Protein Target</span>
+                  <span className="uppercase text-[10px] text-[#1A3629]/60">Protein Target</span>
                   <span>
                     {todayLog.totalProteinLogged}g <span className="opacity-50">/ 160g</span>
                   </span>
@@ -632,7 +627,7 @@ export default function DashboardPage() {
                       key={amt}
                       type="button"
                       onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className="border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
+                      className="border border-[#1A3629]/30 hover:bg-[#1A3629]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
                     >
                       +{amt}g
                     </button>
@@ -641,9 +636,9 @@ export default function DashboardPage() {
               </div>
 
               {/* Hydration Steppers */}
-              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
+              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] text-[#1B2A24]/60 dark:text-[#F4F0EA]/60">Water Intake</span>
+                  <span className="uppercase text-[10px] text-[#1A3629]/60">Water Intake</span>
                   <span>
                     {todayLog.hydrationLiters.toFixed(1)}L <span className="opacity-50">/ 3.5L</span>
                   </span>
@@ -656,7 +651,7 @@ export default function DashboardPage() {
                       key={amt}
                       type="button"
                       onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className="border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
+                      className="border border-[#1A3629]/30 hover:bg-[#1A3629]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
                     >
                       +{amt}L
                     </button>
@@ -665,19 +660,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Energy & Focus Dials (Flat Bento Box, 2px border) */}
-            <div className="border-2 border-[#1B2A24] dark:border-[#F4F0EA] bg-[#FFFDF9] dark:bg-[#1D2622] rounded-2xl p-6 flex flex-col gap-5 transition-all">
+            {/* Energy & Focus Dials */}
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-5 transition-all">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1B2A24]/60 dark:text-[#F4F0EA]/60 block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
                   Daily Check-in
                 </span>
-                <h2 className="font-fraunces font-bold text-lg">
+                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                   Energy &amp; Sleep
                 </h2>
               </div>
 
               {/* Energy Level */}
-              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-2">
+              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
                   <span>Energy Rating</span>
                   <span>{todayLog.energyLevel} / 10</span>
@@ -688,12 +683,12 @@ export default function DashboardPage() {
                   max="10"
                   value={todayLog.energyLevel}
                   onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                  className="w-full accent-[#D9A036] h-1.5 rounded-full cursor-pointer"
+                  className="w-full accent-[#1A3629] h-1.5 rounded-full cursor-pointer"
                 />
               </div>
 
               {/* Sleep Duration */}
-              <div className="p-4 rounded-xl border border-[#1B2A24]/15 dark:border-[#F4F0EA]/15 bg-[#F4F0EA]/40 dark:bg-[#131916]/40 space-y-3">
+              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
                   <span>Sleep Duration</span>
                   <span>{todayLog.sleepHours} hrs</span>
@@ -704,14 +699,14 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                    className="flex-1 py-1.5 rounded-lg border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
+                    className="flex-1 py-1.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#1A3629]/10 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
                   >
                     -0.5h
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                    className="flex-1 py-1.5 rounded-lg border border-[#1B2A24]/30 dark:border-[#F4F0EA]/30 hover:bg-[#1B2A24]/10 dark:hover:bg-[#F4F0EA]/10 text-xs font-mono font-bold text-[#1B2A24] dark:text-[#F4F0EA] transition-colors cursor-pointer"
+                    className="flex-1 py-1.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#1A3629]/10 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
                   >
                     +0.5h
                   </button>

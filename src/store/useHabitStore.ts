@@ -49,7 +49,6 @@ export const DEFAULT_HABITS: HabitItem[] = [
 ];
 
 export interface HabitStoreState {
-  themeMode: 'light' | 'dark';
   currentDate: string; // YYYY-MM-DD
   habits: HabitItem[];
   logsByDate: Record<string, DailyLogData>;
@@ -61,8 +60,6 @@ export interface HabitStoreState {
   pendingAction: PendingUserAction | null;
 
   // Actions
-  setThemeMode: (mode: 'light' | 'dark') => void;
-  toggleThemeMode: () => void;
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
@@ -105,7 +102,6 @@ const createEmptyDailyLog = (): DailyLogData => ({
 export const useHabitStore = create<HabitStoreState>()(
   persist(
     (set, get) => ({
-      themeMode: 'dark',
       currentDate: getTodayString(),
       habits: DEFAULT_HABITS,
       logsByDate: {
@@ -117,21 +113,6 @@ export const useHabitStore = create<HabitStoreState>()(
       userSession: null,
       userProfile: null,
       pendingAction: null,
-
-      setThemeMode: (mode) => {
-        set({ themeMode: mode });
-        if (typeof document !== 'undefined') {
-          document.documentElement.classList.toggle('dark', mode === 'dark');
-        }
-      },
-
-      toggleThemeMode: () => {
-        const next = get().themeMode === 'light' ? 'dark' : 'light';
-        set({ themeMode: next });
-        if (typeof document !== 'undefined') {
-          document.documentElement.classList.toggle('dark', next === 'dark');
-        }
-      },
 
       setDate: (date) => set({ currentDate: date }),
 

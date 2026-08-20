@@ -4,18 +4,12 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
-import { deriveCorrelations, CorrelationResult } from '@/lib/correlation';
+import { deriveCorrelations } from '@/lib/correlation';
 import { retroAudio } from '@/lib/retroAudio';
 import {
-  TrendingUp,
   Sparkles,
-  Zap,
   ArrowLeft,
-  Calendar,
-  Activity,
-  ArrowRight,
   ChevronRight,
-  Award,
 } from 'lucide-react';
 
 export default function CorrelationsPage() {
@@ -23,9 +17,7 @@ export default function CorrelationsPage() {
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string>('protein-focus');
   const [mounted, setMounted] = useState(false);
 
-  const { themeMode, toggleThemeMode, logsByDate } = useHabitStore();
-
-  const isLight = themeMode === 'light';
+  const { logsByDate } = useHabitStore();
 
   useEffect(() => {
     setMounted(true);
@@ -94,13 +86,8 @@ export default function CorrelationsPage() {
   }, [activeCorrelation]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
-      <HeaderNav 
-        themeMode={themeMode} 
-        onToggleTheme={toggleThemeMode} 
-      />
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+      <HeaderNav />
 
       {/* Main Content */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-24">
@@ -109,11 +96,7 @@ export default function CorrelationsPage() {
         <div className="flex items-center justify-between mb-8">
           <Link
             href="/"
-            className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 transition-all ${
-              isLight 
-                ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5' 
-                : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:-translate-y-0.5'
-            }`}
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Home</span>
@@ -121,11 +104,7 @@ export default function CorrelationsPage() {
 
           <Link
             href="/dashboard"
-            className={`inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 transition-all cursor-pointer ${
-              isLight
-                ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52]'
-                : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
-            }`}
+            className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] transition-all cursor-pointer"
           >
             <span>Open Daily Planner</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -135,21 +114,15 @@ export default function CorrelationsPage() {
         {/* Hero Section Header */}
         <div className="max-w-3xl mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
-            <span className={`px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
-            }`}>
+            <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
               Personal Patterns
             </span>
           </div>
 
-          <h1 className={`font-fraunces font-black text-3xl sm:text-5xl tracking-tight leading-tight ${
-            isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-          }`}>
+          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[#1A3629]">
             Your Energy &amp; Focus Discoveries
           </h1>
-          <p className={`text-base sm:text-lg mt-3 leading-relaxed font-cabinet font-medium max-w-2xl ${
-            isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-          }`}>
+          <p className="text-base sm:text-lg mt-3 leading-relaxed font-cabinet font-medium max-w-2xl text-[#2C4A3B]">
             We connect the dots between your daily food, sleep, and mood logs so you know what triggers your highest energy days.
           </p>
         </div>
@@ -159,9 +132,7 @@ export default function CorrelationsPage() {
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider opacity-80 shrink-0">
             Window:
           </span>
-          <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border-2 ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629]/30' : 'bg-[#1A261E] border-[#F4F0EA]/30'
-          }`}>
+          <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
             {([7, 14, 30] as const).map((days) => (
               <button
                 key={days}
@@ -172,12 +143,8 @@ export default function CorrelationsPage() {
                 }}
                 className={`px-3.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                   timeHorizon === days
-                    ? isLight
-                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                      : 'bg-[#F4F0EA] text-[#111914] shadow-[2px_2px_0px_#D9A036]'
-                    : isLight
-                      ? 'text-[#2C4A3B] hover:text-[#1A3629]'
-                      : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                    : 'text-[#2C4A3B] hover:text-[#1A3629]'
                 }`}
               >
                 {days} Days
@@ -188,9 +155,7 @@ export default function CorrelationsPage() {
 
         {/* 4 Highlight Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          <div className={`border-3 rounded-2xl p-5 transition-all ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-          }`}>
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
               Top Energy Driver
             </span>
@@ -203,9 +168,7 @@ export default function CorrelationsPage() {
             </p>
           </div>
 
-          <div className={`border-3 rounded-2xl p-5 transition-all ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-          }`}>
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
               Sleep Sweet Spot
             </span>
@@ -217,9 +180,7 @@ export default function CorrelationsPage() {
             </p>
           </div>
 
-          <div className={`border-3 rounded-2xl p-5 transition-all ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-          }`}>
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
               Morning Routine Effect
             </span>
@@ -232,9 +193,7 @@ export default function CorrelationsPage() {
             </p>
           </div>
 
-          <div className={`border-3 rounded-2xl p-5 transition-all ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[4px_4px_0px_#D9A036]'
-          }`}>
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
               Hydration Impact
             </span>
@@ -249,40 +208,30 @@ export default function CorrelationsPage() {
         </div>
 
         {/* Interactive Pattern Chart Area */}
-        <div className={`border-4 rounded-3xl p-6 sm:p-8 mb-10 transition-all ${
-          isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[8px_8px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[8px_8px_0px_#D9A036]'
-        }`}>
+        <div className="border-4 border-[#1A3629] bg-[#FFFDF9] shadow-[8px_8px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-10 transition-all">
           {/* Chart Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h3 className={`font-fraunces font-black text-2xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <h3 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
                 {activeCorrelation.title}
               </h3>
-              <p className={`text-xs sm:text-sm font-cabinet font-medium mt-1 ${
-                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-              }`}>
+              <p className="text-xs sm:text-sm font-cabinet font-medium mt-1 text-[#2C4A3B]">
                 {activeCorrelation.description}
               </p>
             </div>
 
-            <div className={`px-4 py-2 rounded-xl border-2 text-xs font-mono font-bold self-start sm:self-auto ${
-              isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#D9A036]'
-            }`}>
+            <div className="px-4 py-2 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold self-start sm:self-auto">
               <span>Pattern Strength:</span>{' '}
               <span>{Math.round(Math.abs(activeCorrelation.coefficient) * 100)}% Match</span>
             </div>
           </div>
 
           {/* Retro Grid Paper Chart Canvas */}
-          <div className={`h-64 sm:h-80 w-full border-3 rounded-2xl p-4 relative overflow-hidden mb-6 ${
-            isLight ? 'bg-[#F4F0EA] border-[#1A3629]/30' : 'bg-[#111914] border-[#F4F0EA]/30'
-          }`}>
+          <div className="h-64 sm:h-80 w-full border-3 border-[#1A3629]/30 bg-[#F4F0EA] rounded-2xl p-4 relative overflow-hidden mb-6">
             {/* Retro Grid Lines */}
             <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 pointer-events-none opacity-20">
               {Array.from({ length: 24 }).map((_, i) => (
-                <div key={i} className={`border ${isLight ? 'border-[#1A3629]' : 'border-[#F4F0EA]'}`} />
+                <div key={i} className="border border-[#1A3629]" />
               ))}
             </div>
 
@@ -293,7 +242,7 @@ export default function CorrelationsPage() {
                 y1={`${trendline.y1}%`}
                 x2="88%"
                 y2={`${trendline.y2}%`}
-                stroke={isLight ? '#1A3629' : '#D9A036'}
+                stroke="#1A3629"
                 strokeWidth="3.5"
                 strokeDasharray="6 6"
               />
@@ -311,11 +260,7 @@ export default function CorrelationsPage() {
                     className="absolute -translate-x-1/2 -translate-y-1/2 p-2 group/dot cursor-pointer"
                     style={{ left: `${leftPct}%`, top: `${topPct}%` }}
                   >
-                    <span className={`block rounded-full border-2 transition-all ${
-                      isLight
-                        ? 'w-4 h-4 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] group-hover/dot:scale-125'
-                        : 'w-4 h-4 bg-[#D9A036] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] group-hover/dot:scale-125'
-                    }`} />
+                    <span className="block rounded-full border-2 w-4 h-4 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] group-hover/dot:scale-125 transition-all" />
                   </div>
                 );
               })}
@@ -323,11 +268,9 @@ export default function CorrelationsPage() {
           </div>
 
           {/* Simple Takeaway Box */}
-          <div className={`p-4 rounded-xl border-2 flex items-center gap-3 ${
-            isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-          }`}>
-            <Sparkles className={`w-5 h-5 shrink-0 ${isLight ? 'text-[#1A3629]' : 'text-[#D9A036]'}`} />
-            <p className="text-xs sm:text-sm font-cabinet font-bold leading-relaxed">
+          <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] flex items-center gap-3">
+            <Sparkles className="w-5 h-5 shrink-0 text-[#1A3629]" />
+            <p className="text-xs sm:text-sm font-cabinet font-bold leading-relaxed text-[#1A3629]">
               Takeaway: {activeCorrelation.recommendation}
             </p>
           </div>

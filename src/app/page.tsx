@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
 import { TextType } from '@/components/reactbits/TextType';
-import { SpecularButton } from '@/components/reactbits/SpecularButton';
 import { useHabitStore } from '@/store/useHabitStore';
 import {
   Flame,
@@ -13,19 +12,9 @@ import {
   Sparkles,
   Zap,
   ArrowRight,
-  CheckCircle2,
   TrendingUp,
   Sliders,
-  Moon,
-  Dumbbell,
-  ShieldCheck,
   ChevronRight,
-  Layers,
-  BarChart3,
-  Clock,
-  Heart,
-  X,
-  Check,
 } from 'lucide-react';
 
 const STEP_LOOP = [
@@ -76,7 +65,7 @@ export default function Home() {
   const [previewFocus, setPreviewFocus] = useState(9);
   const [mounted, setMounted] = useState(false);
 
-  const { userSession, themeMode, toggleThemeMode } = useHabitStore();
+  const { userSession } = useHabitStore();
 
   useEffect(() => {
     setMounted(true);
@@ -90,42 +79,26 @@ export default function Home() {
   }, []);
 
   const isLoggedIn = mounted && !!userSession;
-  const isLight = themeMode === 'light';
 
   return (
-    <div className={`relative min-h-screen overflow-hidden flex flex-col transition-colors duration-300 ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
-      {/* Global Navigation Header with Light/Dark Mode Switcher */}
-      <HeaderNav 
-        themeMode={themeMode} 
-        onToggleTheme={toggleThemeMode} 
-      />
+    <div className="relative min-h-screen overflow-hidden flex flex-col bg-[#F4F0EA] text-[#1A3629]">
+      {/* Global Navigation Header */}
+      <HeaderNav />
 
       {/* Main Page Content */}
       <main className="relative z-10 flex-1 flex flex-col">
         
         {/* ========================================================================= */}
-        {/* 1. HERO SECTION: Unboxed Retro Neobrutalism (Light / Dark Adaptable) */}
+        {/* 1. HERO SECTION: Unboxed Retro Neobrutalism */}
         {/* ========================================================================= */}
-        <section 
-          className={`px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 transition-colors duration-300 ${
-            isLight
-              ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]'
-              : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-          }`}
-        >
+        <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]">
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Hero Left Column: Clean Unboxed Typography & Chunky Neobrutalist CTAs */}
             <div className="lg:col-span-6 w-full flex flex-col items-start justify-center">
               
               {/* Headline with High-Contrast Vintage Serif & Typewriter */}
-              <h1 
-                className={`font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px] ${
-                  isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                }`}
-              >
+              <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px] text-[#1A3629]">
                 <TextType
                   text={[
                     "Pixel-Perfect Health.",
@@ -136,16 +109,12 @@ export default function Home() {
                   deletingSpeed={25}
                   pauseDuration={2400}
                   startOnVisible={true}
-                  cursorClassName={isLight ? "bg-[#1A3629]" : "bg-[#F4F0EA]"}
+                  cursorClassName="bg-[#1A3629]"
                 />
               </h1>
               
               {/* Editorial Body Text in Cabinet Grotesk */}
-              <p 
-                className={`font-cabinet font-medium text-base sm:text-lg leading-relaxed mt-6 max-w-xl ${
-                  isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                }`}
-              >
+              <p className="font-cabinet font-medium text-base sm:text-lg leading-relaxed mt-6 max-w-xl text-[#2C4A3B]">
                 Log whole-food fuel, track daily routines in 30 seconds, and let our simple pattern engine uncover what drives your best energy days.
               </p>
 
@@ -154,11 +123,7 @@ export default function Home() {
                 <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
-                      isLight
-                        ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                        : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#D9A036] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                    }`}
+                    className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                   >
                     {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                   </button>
@@ -167,11 +132,7 @@ export default function Home() {
                 <Link href="/protocols" className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
-                      isLight
-                        ? 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                        : 'bg-[#1A261E] text-[#F4F0EA] border-[#F4F0EA] shadow-[5px_5px_0px_#F4F0EA] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#F4F0EA] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                    }`}
+                    className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                   >
                     Browse Blueprints
                   </button>
@@ -179,117 +140,63 @@ export default function Home() {
               </div>
 
               {/* Bottom Metric Inset Micro-Cards */}
-              <div 
-                className={`mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 w-full ${
-                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/20'
-                }`}
-              >
+              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 border-[#1A3629]/15 w-full">
                 
                 {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div 
-                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] transition-all ${
-                    isLight 
-                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
-                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
-                  }`}
-                >
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div className="flex items-center gap-1.5 mb-2">
                     {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
                       <span 
                         key={i} 
-                        className={`h-3 w-3 rounded-xs ${isLight ? 'bg-[#1A3629]' : 'bg-[#F4F0EA]'}`} 
+                        className="h-3 w-3 rounded-xs bg-[#1A3629]" 
                         style={{ opacity }} 
                       />
                     ))}
                   </div>
                   <div>
-                    <div 
-                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
-                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
-                      }`}
-                    >
+                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
                       Streak Heatmaps
                     </div>
-                    <div 
-                      className={`font-mono text-[11px] mt-0.5 ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#F4F0EA]'
-                      }`}
-                    >
+                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
                       Gentle consistency
                     </div>
                   </div>
                 </div>
 
                 {/* Micro-Card 2: Macro Fueling Preview */}
-                <div 
-                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden transition-all ${
-                    isLight 
-                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
-                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
-                  }`}
-                >
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div 
                     key={currentDish.id}
-                    className={`font-mono font-bold text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}
+                    className="font-mono font-bold text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
                   >
                     {currentDish.protein} PRO · {currentDish.calories} KCAL
                   </div>
                   <div>
-                    <div 
-                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
-                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
-                      }`}
-                    >
+                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
                       Whole-Food Fuel
                     </div>
-                    <div 
-                      className={`font-mono text-[11px] mt-0.5 ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                      }`}
-                    >
+                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
                       16-bit hearty dishes
                     </div>
                   </div>
                 </div>
 
                 {/* Micro-Card 3: Energy Rating Preview */}
-                <div 
-                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden transition-all ${
-                    isLight 
-                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
-                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
-                  }`}
-                >
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div 
                     key={`focus-${currentDish.id}`}
-                    className={`font-mono font-bold text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}
+                    className="font-mono font-bold text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
                   >
                     <span>{currentDish.focus}</span>
-                    <span 
-                      className={`text-[10px] font-mono font-normal uppercase ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#8F9E8B]'
-                      }`}
-                    >
+                    <span className="text-[10px] font-mono font-normal uppercase text-[#2C4A3B]">
                       Focus Rating
                     </span>
                   </div>
                   <div>
-                    <div 
-                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
-                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
-                      }`}
-                    >
+                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
                       Energy Links
                     </div>
-                    <div 
-                      className={`font-mono text-[11px] mt-0.5 ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                      }`}
-                    >
+                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
                       Routine × mood insights
                     </div>
                   </div>
@@ -299,10 +206,9 @@ export default function Home() {
 
             </div>
 
-            {/* Hero Right Column: Massive Unboxed Pixel Art Showcase with 8-Bit Audio & Wipes */}
+            {/* Hero Right Column: Massive Unboxed Pixel Art Showcase */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PixelShowcase 
-                themeMode={themeMode}
                 onDishChange={(dish) => setCurrentDish(dish)} 
               />
             </div>
@@ -313,31 +219,18 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 2. THE 3-STEP ROUTINE: "How Cyath Works" */}
         {/* ========================================================================= */}
-        <section 
-          id="methodology"
-          className={`px-6 lg:px-12 py-20 sm:py-28 border-b-4 transition-colors duration-300 ${
-            isLight ? 'border-[#1A3629] bg-[#EFE9DF]' : 'border-[#F4F0EA] bg-[#0E1510]'
-          }`}
-        >
+        <section id="methodology" className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#EFE9DF]">
           <div className="w-full max-w-7xl mx-auto">
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">
-              <span className={`px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block ${
-                isLight 
-                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-              }`}>
+              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
                 Simple 3-Step Routine
               </span>
-              <h2 className={`font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Built for Everyday Momentum
               </h2>
-              <p className={`text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto ${
-                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-              }`}>
+              <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
                 Skip the complex spreadsheets. Cyath turns 30-second daily habits into clear insights on how to feel your best.
               </p>
             </div>
@@ -362,67 +255,43 @@ export default function Home() {
                       }
                     }}
                     className={`border-3 p-8 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 cursor-pointer focus-visible:outline-none hover:-translate-y-1 ${
-                      isLight
-                        ? isActive
-                          ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
-                          : 'bg-[#FFFDF9]/80 border-[#1A3629] shadow-[4px_4px_0px_#1A3629]'
-                        : isActive
-                          ? 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-                          : 'bg-[#1A261E]/80 border-[#F4F0EA] shadow-[4px_4px_0px_#F4F0EA]'
+                      isActive
+                        ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
+                        : 'bg-[#FFFDF9]/80 border-[#1A3629] shadow-[4px_4px_0px_#1A3629]'
                     }`}
                   >
                     <div>
                       {/* Step Number & Badge */}
                       <div className="flex items-center justify-between mb-6">
-                        <span className={`font-mono text-3xl font-black tracking-tight tabular-nums ${
-                          isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                        }`}>
+                        <span className="font-mono text-3xl font-black tracking-tight tabular-nums text-[#1A3629]">
                           {item.step}
                         </span>
-                        <span className={`px-3 py-1 rounded-full border-2 text-[11px] font-mono font-bold uppercase tracking-wider ${
-                          isLight
-                            ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]'
-                            : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                        }`}>
+                        <span className="px-3 py-1 rounded-full border-2 text-[11px] font-mono font-bold uppercase tracking-wider bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                           {item.badge}
                         </span>
                       </div>
 
                       {/* Title & Icon */}
                       <div className="flex items-start gap-3 mb-3">
-                        <div className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                          isLight 
-                            ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' 
-                            : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                        }`}>
+                        <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                           <Icon className="w-4 h-4 stroke-[2.5]" />
                         </div>
-                        <h3 className={`font-cabinet font-bold text-xl tracking-tight leading-snug ${
-                          isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                        }`}>
+                        <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629]">
                           {item.title}
                         </h3>
                       </div>
 
                       {/* Description */}
-                      <p className={`text-sm font-cabinet font-medium leading-relaxed mb-6 ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                      }`}>
+                      <p className="text-sm font-cabinet font-medium leading-relaxed mb-6 text-[#2C4A3B]">
                         {item.description}
                       </p>
                     </div>
 
                     {/* Highlights */}
-                    <div className={`space-y-2.5 pt-4 border-t-2 ${
-                      isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
-                    }`}>
+                    <div className="space-y-2.5 pt-4 border-t-2 border-[#1A3629]/15">
                       {item.highlights.map((point) => (
-                        <div key={point} className={`flex items-center gap-2.5 text-xs sm:text-sm font-cabinet font-bold ${
-                          isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                        }`}>
-                          <span className={`font-mono text-xs shrink-0 select-none ${
-                            isLight ? 'text-[#3A6B52]' : 'text-[#D9A036]'
-                          }`}>+</span>
+                        <div key={point} className="flex items-center gap-2.5 text-xs sm:text-sm font-cabinet font-bold text-[#1A3629]">
+                          <span className="font-mono text-xs shrink-0 select-none text-[#3A6B52]">+</span>
                           <span>{point}</span>
                         </div>
                       ))}
@@ -438,76 +307,50 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 3. INTERACTIVE BENTO SHOWCASE: Fuel, Patterns & Energy */}
         {/* ========================================================================= */}
-        <section className={`px-6 lg:px-12 py-20 sm:py-28 border-b-4 transition-colors duration-300 ${
-          isLight ? 'border-[#1A3629] bg-[#F4F0EA]' : 'border-[#F4F0EA] bg-[#111914]'
-        }`}>
+        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#F4F0EA]">
           <div className="w-full max-w-7xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className={`px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block ${
-                isLight 
-                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-              }`}>
+              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
                 What You Get
               </span>
-              <h2 className={`font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Designed for Daily Energy
               </h2>
-              <p className={`text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto ${
-                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-              }`}>
+              <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
                 Everything you need to sustain steady focus and physical momentum, gathered in one straightforward space.
               </p>
             </div>
 
-            {/* Bento Grid (Tactile Retro Neobrutalist Cards) */}
+            {/* Bento Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* BENTO 1: Food & Focus Patterns (8 Cols) */}
-              <div className={`lg:col-span-8 border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]'
-                  : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-              }`}>
+              <div className="lg:col-span-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 ${
-                          isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                        }`}>
+                        <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                           <TrendingUp className="w-4 h-4 stroke-[2.5]" />
                         </div>
-                        <h3 className={`font-cabinet font-bold text-xl tracking-tight ${
-                          isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                        }`}>
+                        <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                           Food &amp; Focus Patterns
                         </h3>
                       </div>
-                      <p className={`text-xs sm:text-sm font-cabinet font-medium ${
-                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                      }`}>
+                      <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B]">
                         See the direct connection between your protein fuel and your peak focus days.
                       </p>
                     </div>
 
-                    <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 text-xs font-mono font-bold shrink-0 ${
-                      isLight 
-                        ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' 
-                        : 'bg-[#111914] border-[#F4F0EA] text-[#D9A036]'
-                    }`}>
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 text-xs font-mono font-bold shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                       <span>Strong Link:</span>
                       <span className="tabular-nums">84% Match</span>
                     </div>
                   </div>
 
                   {/* Interactive Scatter Simulation Area */}
-                  <div className={`h-56 sm:h-64 w-full border-2 rounded-xl p-4 relative overflow-hidden mb-4 ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                  }`}>
+                  <div className="h-56 sm:h-64 w-full border-2 border-[#1A3629]/20 bg-[#F4F0EA] rounded-xl p-4 relative overflow-hidden mb-4">
                     {/* SVG Trendline */}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
                       <line
@@ -515,7 +358,7 @@ export default function Home() {
                         y1="82%"
                         x2="90%"
                         y2="18%"
-                        stroke={isLight ? '#1A3629' : '#D9A036'}
+                        stroke="#1A3629"
                         strokeWidth="3"
                         strokeDasharray="6 6"
                       />
@@ -539,13 +382,9 @@ export default function Home() {
                           >
                             <span
                               className={`block rounded-full transition-all border-2 ${
-                                isLight
-                                  ? isSelected
-                                    ? 'w-5 h-5 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629]'
-                                    : 'w-3.5 h-3.5 bg-[#FFFDF9] border-[#1A3629]'
-                                  : isSelected
-                                    ? 'w-5 h-5 bg-[#D9A036] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                                    : 'w-3.5 h-3.5 bg-[#1A261E] border-[#F4F0EA]'
+                                isSelected
+                                  ? 'w-5 h-5 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629]'
+                                  : 'w-3.5 h-3.5 bg-[#FFFDF9] border-[#1A3629]'
                               }`}
                             />
                           </button>
@@ -555,11 +394,7 @@ export default function Home() {
 
                     {/* Active point hover pill */}
                     {selectedScatterPoint !== null && (
-                      <div className={`absolute top-4 left-4 p-3 rounded-xl border-2 text-xs font-mono shadow-md ${
-                        isLight 
-                          ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' 
-                          : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                      }`}>
+                      <div className="absolute top-4 left-4 p-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] text-xs font-mono shadow-md">
                         <span className="block text-[10px] uppercase font-bold tracking-wider opacity-70">
                           {SAMPLE_SCATTER_POINTS[selectedScatterPoint].label} Discovery
                         </span>
@@ -571,9 +406,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className={`flex items-center justify-between pt-4 border-t-2 text-xs font-mono font-bold ${
-                  isLight ? 'border-[#1A3629]/15 text-[#2C4A3B]' : 'border-[#F4F0EA]/15 text-[#C2CDBF]'
-                }`}>
+                <div className="flex items-center justify-between pt-4 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold text-[#2C4A3B]">
                   <span>Daily habit &amp; meal insights</span>
                   <Link href="/correlations" className="hover:underline flex items-center gap-1">
                     <span>View All Discoveries</span>
@@ -583,41 +416,27 @@ export default function Home() {
               </div>
 
               {/* BENTO 2: 16-Bit Food Fuel (4 Cols) */}
-              <div className={`lg:col-span-4 border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]'
-                  : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-              }`}>
+              <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                    }`}>
+                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                       <Sparkles className="w-4 h-4 stroke-[2.5]" />
                     </div>
-                    <h3 className={`font-cabinet font-bold text-xl tracking-tight ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}>
+                    <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       16-Bit Food Fuel
                     </h3>
                   </div>
-                  <p className={`text-xs sm:text-sm font-cabinet font-medium mb-6 ${
-                    isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                  }`}>
+                  <p className="text-xs sm:text-sm font-cabinet font-medium mb-6 text-[#2C4A3B]">
                     Curated whole-food recipes with step-by-step prep and retro pixel art.
                   </p>
 
-                  <div className={`p-4 rounded-xl border-2 space-y-3 ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                  }`}>
+                  <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-cabinet font-bold">Spiced Paneer Protein Bowl</span>
                       <span className="text-[11px] font-mono font-bold tabular-nums">48g PRO</span>
                     </div>
-                    <div className={`h-2.5 w-full rounded-full border overflow-hidden ${
-                      isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
-                    }`}>
-                      <div className={`h-full w-3/4 ${isLight ? 'bg-[#1A3629]' : 'bg-[#D9A036]'}`} />
+                    <div className="h-2.5 w-full rounded-full border border-[#1A3629] bg-[#FFFDF9] overflow-hidden">
+                      <div className="h-full w-3/4 bg-[#1A3629]" />
                     </div>
                     <span className="text-[11px] font-cabinet font-medium block leading-relaxed opacity-85">
                       Clean plant protein and nourishing fats for sustained energy.
@@ -627,9 +446,7 @@ export default function Home() {
 
                 <Link
                   href="/recipes"
-                  className={`mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t-2 transition-colors ${
-                    isLight ? 'border-[#1A3629]/15 hover:text-[#3A6B52]' : 'border-[#F4F0EA]/15 hover:text-[#D9A036]'
-                  }`}
+                  className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t-2 border-[#1A3629]/15 hover:text-[#3A6B52] transition-colors"
                 >
                   <span>Browse Recipes Catalog</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -637,41 +454,27 @@ export default function Home() {
               </div>
 
               {/* BENTO 3: Zero-Stress Streaks (4 Cols) */}
-              <div className={`lg:col-span-4 border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]'
-                  : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-              }`}>
+              <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                    }`}>
+                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                       <Flame className="w-4 h-4 stroke-[2.5]" />
                     </div>
-                    <h3 className={`font-cabinet font-bold text-xl tracking-tight ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}>
+                    <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       Stress-Free Streaks
                     </h3>
                   </div>
-                  <p className={`text-xs sm:text-sm font-cabinet font-medium mb-6 ${
-                    isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                  }`}>
+                  <p className="text-xs sm:text-sm font-cabinet font-medium mb-6 text-[#2C4A3B]">
                     Gentle pixel shading shows your consistency without guilt trips if you take a day off.
                   </p>
 
-                  <div className={`grid grid-cols-7 gap-1.5 p-3 rounded-xl border-2 ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                  }`}>
+                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
                     {Array.from({ length: 28 }).map((_, i) => {
                       const opacity = [0.2, 0.45, 0.75, 0.9, 1.0, 0.6, 0.85][i % 7];
                       return (
                         <div
                           key={i}
-                          className={`h-5 rounded-md transition-opacity hover:opacity-100 ${
-                            isLight ? 'bg-[#1A3629]' : 'bg-[#F4F0EA]'
-                          }`}
+                          className="h-5 rounded-md transition-opacity hover:opacity-100 bg-[#1A3629]"
                           style={{ opacity }}
                         />
                       );
@@ -679,42 +482,28 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className={`pt-4 border-t-2 text-[11px] font-mono font-bold ${
-                  isLight ? 'border-[#1A3629]/15 text-[#2C4A3B]' : 'border-[#F4F0EA]/15 text-[#C2CDBF]'
-                }`}>
+                <div className="pt-4 border-t-2 border-[#1A3629]/15 text-[11px] font-mono font-bold text-[#2C4A3B]">
                   28-Day Habit Activity Matrix
                 </div>
               </div>
 
               {/* BENTO 4: Daily Energy Journal (8 Cols) */}
-              <div className={`lg:col-span-8 border-3 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]'
-                  : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
-              }`}>
+              <div className="lg:col-span-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
-                    }`}>
+                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
                       <Activity className="w-4 h-4 stroke-[2.5]" />
                     </div>
-                    <h3 className={`font-cabinet font-bold text-xl tracking-tight ${
-                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-                    }`}>
+                    <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       Daily Energy Journal
                     </h3>
                   </div>
-                  <p className={`text-xs sm:text-sm font-cabinet font-medium mb-6 ${
-                    isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-                  }`}>
+                  <p className="text-xs sm:text-sm font-cabinet font-medium mb-6 text-[#2C4A3B]">
                     Rate your daily energy, focus depth, and rest with simple retro dials.
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-xl border-2 space-y-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Daily Energy</span>
                         <span className="tabular-nums">{previewEnergy} / 10</span>
@@ -726,15 +515,11 @@ export default function Home() {
                         aria-label="Adjust preview energy rating on 1 to 10 scale"
                         value={previewEnergy}
                         onChange={(e) => setPreviewEnergy(Number(e.target.value))}
-                        className={`w-full cursor-pointer focus-visible:outline-none ${
-                          isLight ? 'accent-[#1A3629]' : 'accent-[#D9A036]'
-                        }`}
+                        className="w-full cursor-pointer focus-visible:outline-none accent-[#1A3629]"
                       />
                     </div>
 
-                    <div className={`p-4 rounded-xl border-2 space-y-2 ${
-                      isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
-                    }`}>
+                    <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Focus Rating</span>
                         <span className="tabular-nums">{previewFocus} / 10</span>
@@ -746,17 +531,13 @@ export default function Home() {
                         aria-label="Adjust preview focus rating on 1 to 10 scale"
                         value={previewFocus}
                         onChange={(e) => setPreviewFocus(Number(e.target.value))}
-                        className={`w-full cursor-pointer focus-visible:outline-none ${
-                          isLight ? 'accent-[#1A3629]' : 'accent-[#D9A036]'
-                        }`}
+                        className="w-full cursor-pointer focus-visible:outline-none accent-[#1A3629]"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className={`flex items-center justify-between pt-4 mt-6 border-t-2 text-xs font-mono font-bold ${
-                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
-                }`}>
+                <div className="flex items-center justify-between pt-4 mt-6 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold">
                   <span>Synced directly to your Daily Planner</span>
                   <Link href="/dashboard" className="hover:underline flex items-center gap-1">
                     <span>Open Dashboard</span>
@@ -773,27 +554,17 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 4. THE DIFFERENCE: Why Old-School Trackers Fail */}
         {/* ========================================================================= */}
-        <section className={`px-6 lg:px-12 py-20 sm:py-28 border-b-4 transition-colors duration-300 ${
-          isLight ? 'border-[#1A3629] bg-[#EFE9DF]' : 'border-[#F4F0EA] bg-[#0E1510]'
-        }`}>
+        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#EFE9DF]">
           <div className="w-full max-w-5xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className={`px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block ${
-                isLight 
-                  ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                  : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-              }`}>
+              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
                 The Difference
               </span>
-              <h2 className={`font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Why Old-School Apps Burn You Out
               </h2>
-              <p className={`text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto ${
-                isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-              }`}>
+              <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
                 Most health platforms are built like rigid spreadsheets. Cyath is made for ease, speed, and real momentum.
               </p>
             </div>
@@ -802,9 +573,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               
               {/* Old-School Apps (Dull & Dashed) */}
-              <div className={`border-3 border-dashed rounded-2xl p-8 flex flex-col justify-between h-full space-y-6 opacity-75 ${
-                isLight ? 'bg-[#FFFDF9]/40 border-[#1A3629]/40' : 'bg-transparent border-[#F4F0EA]/30'
-              }`}>
+              <div className="border-3 border-dashed border-[#1A3629]/40 bg-[#FFFDF9]/40 rounded-2xl p-8 flex flex-col justify-between h-full space-y-6 opacity-75">
                 <div>
                   <div className="flex items-center gap-2.5 mb-5">
                     <span className="font-mono text-xs font-bold select-none">[x]</span>
@@ -829,17 +598,13 @@ export default function Home() {
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t-2 border-dashed border-current/15 font-mono text-[11px]">
+                <div className="pt-4 border-t-2 border-dashed border-[#1A3629]/20 font-mono text-[11px]">
                   Old Routine · High Friction
                 </div>
               </div>
 
               {/* The Cyath Way (Tactile & Solid) */}
-              <div className={`border-3 rounded-2xl p-8 flex flex-col justify-between h-full space-y-6 ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
-                  : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-              }`}>
+              <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-2xl p-8 flex flex-col justify-between h-full space-y-6">
                 <div>
                   <div className="flex items-center gap-2.5 mb-5">
                     <span className="font-mono text-xs font-bold select-none">[+]</span>
@@ -864,9 +629,7 @@ export default function Home() {
                   </ul>
                 </div>
 
-                <div className={`pt-4 border-t-2 font-mono text-[11px] flex items-center justify-between font-bold ${
-                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/15'
-                }`}>
+                <div className="pt-4 border-t-2 border-[#1A3629]/15 font-mono text-[11px] flex items-center justify-between font-bold">
                   <span>Everyday Standard</span>
                   <span className="font-bold">Stress-Free Momentum →</span>
                 </div>
@@ -880,23 +643,13 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 5. FINALE CTA BANNER */}
         {/* ========================================================================= */}
-        <section className={`px-6 lg:px-12 py-20 sm:py-28 ${
-          isLight ? 'bg-[#F4F0EA]' : 'bg-[#111914]'
-        }`}>
-          <div className={`w-full max-w-5xl mx-auto border-4 rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden ${
-            isLight
-              ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[8px_8px_0px_#1A3629]'
-              : 'bg-[#1A261E] border-[#F4F0EA] shadow-[8px_8px_0px_#D9A036]'
-          }`}>
-            <h2 className={`font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight max-w-2xl mx-auto leading-tight ${
-              isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-            }`}>
+        <section className="px-6 lg:px-12 py-20 sm:py-28 bg-[#F4F0EA]">
+          <div className="w-full max-w-5xl mx-auto border-4 border-[#1A3629] bg-[#FFFDF9] shadow-[8px_8px_0px_#1A3629] rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden">
+            <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight max-w-2xl mx-auto leading-tight text-[#1A3629]">
               Build Daily Habits You Actually Enjoy
             </h2>
 
-            <p className={`text-base sm:text-lg mt-4 max-w-xl mx-auto font-cabinet font-medium leading-relaxed ${
-              isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-            }`}>
+            <p className="text-base sm:text-lg mt-4 max-w-xl mx-auto font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
               Join hundreds creating sustainable daily energy with whole-food fuel and simple 30-second check-ins.
             </p>
 
@@ -904,11 +657,7 @@ export default function Home() {
               <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
-                    isLight
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#D9A036] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                  }`}
+                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                 >
                   {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                 </button>
@@ -917,11 +666,7 @@ export default function Home() {
               <Link href="/dashboard" className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
-                    isLight
-                      ? 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                      : 'bg-[#1A261E] text-[#F4F0EA] border-[#F4F0EA] shadow-[5px_5px_0px_#F4F0EA] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#F4F0EA] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
-                  }`}
+                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                 >
                   Explore Live Demo
                 </button>
@@ -936,40 +681,28 @@ export default function Home() {
       {/* ========================================================================= */}
       {/* 6. RETRO FIELD-GUIDE FOOTER */}
       {/* ========================================================================= */}
-      <footer className={`relative z-10 border-t-4 pt-16 pb-12 px-6 lg:px-12 transition-colors duration-300 ${
-        isLight ? 'border-[#1A3629] bg-[#EFE9DF]' : 'border-[#F4F0EA] bg-[#0E1510]'
-      }`}>
-        <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b-2 ${
-          isLight ? 'border-[#1A3629]/20' : 'border-[#F4F0EA]/20'
-        }`}>
+      <footer className="relative z-10 border-t-4 border-[#1A3629] bg-[#EFE9DF] pt-16 pb-12 px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b-2 border-[#1A3629]/20">
           
           {/* Col 1 & 2: Brand & Mission */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
-              <span className={`font-fraunces font-black text-2xl tracking-tight ${
-                isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
-              }`}>
+              <span className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
                 Cyath
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold ${
-                isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA]'
-              }`}>
+              <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold">
                 v1.0 Retro
               </span>
             </div>
-            <p className={`text-xs font-cabinet font-medium max-w-sm leading-relaxed ${
-              isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-            }`}>
+            <p className="text-xs font-cabinet font-medium max-w-sm leading-relaxed text-[#2C4A3B]">
               A simple daily habit and nutrition journal built on 30-second check-ins, whole-food recipes, and clear personal discoveries.
             </p>
           </div>
 
           {/* Col 3: Platform */}
           <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider">Platform</div>
-            <ul className={`space-y-2 text-xs font-cabinet font-bold ${
-              isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-            }`}>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Platform</div>
+            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
               <li>
                 <Link href="/dashboard" className="hover:underline">Daily Planner</Link>
               </li>
@@ -987,10 +720,8 @@ export default function Home() {
 
           {/* Col 4: Protocols */}
           <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider">Blueprints</div>
-            <ul className={`space-y-2 text-xs font-cabinet font-bold ${
-              isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-            }`}>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Blueprints</div>
+            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
               <li>
                 <Link href="/protocols" className="hover:underline">Morning Sunlight &amp; Energy</Link>
               </li>
@@ -1008,10 +739,8 @@ export default function Home() {
 
           {/* Col 5: Account & Settings */}
           <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider">Account</div>
-            <ul className={`space-y-2 text-xs font-cabinet font-bold ${
-              isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
-            }`}>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Account</div>
+            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
               <li>
                 <Link href="/auth" className="hover:underline">Sign Up</Link>
               </li>
@@ -1030,9 +759,7 @@ export default function Home() {
         </div>
 
         {/* Bottom copyright line */}
-        <div className={`max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold ${
-          isLight ? 'text-[#2C4A3B]' : 'text-[#8F9E8B]'
-        }`}>
+        <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold text-[#2C4A3B]">
           <div>© {new Date().getFullYear()} Cyath. Handcrafted with retro precision.</div>
           <div>Zero tracking cookies · Secure local &amp; cloud storage</div>
         </div>

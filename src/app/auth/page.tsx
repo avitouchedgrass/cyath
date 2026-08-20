@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
 import { retroAudio } from '@/lib/retroAudio';
-import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock } from 'lucide-react';
 
 function AuthContent() {
   const router = useRouter();
@@ -15,9 +15,6 @@ function AuthContent() {
   const initialMode = searchParams.get('mode') === 'update_password' || searchParams.get('reset') === 'true'
     ? 'update_password'
     : (searchParams.get('mode') as 'signup' | 'login' | 'forgot' | 'update_password') || 'signup';
-
-  const { themeMode, toggleThemeMode } = useHabitStore();
-  const isLight = themeMode === 'light';
 
   const [mode, setMode] = useState<'signup' | 'login' | 'forgot' | 'update_password'>(initialMode);
   const [email, setEmail] = useState('');
@@ -144,12 +141,15 @@ function AuthContent() {
         if (error) throw error;
 
         if (data.session) {
-          completeAuthentication({ id: data.user!.id, email: data.user!.email });
+          setSuccessMsg('Account created successfully! Launching your dashboard...');
+          setTimeout(() => {
+            completeAuthentication({ id: data.user!.id, email: data.user!.email });
+          }, 1000);
         } else {
           setIsVerificationSent(true);
           setResendCooldown(60);
         }
-      } else {
+      } else if (mode === 'login') {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -157,12 +157,13 @@ function AuthContent() {
 
         if (error) throw error;
 
-        if (data.user) {
+        setSuccessMsg('Welcome back! Launching your dashboard...');
+        setTimeout(() => {
           completeAuthentication({ id: data.user.id, email: data.user.email });
-        }
+        }, 800);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication failed. Please check your details.');
+      setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -170,9 +171,13 @@ function AuthContent() {
 
   const handleResetPasswordRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) {
+      setErrorMsg('Please enter your account email.');
+      return;
+    }
+    setLoading(true);
     setErrorMsg(null);
     setSuccessMsg(null);
-    setLoading(true);
     retroAudio.playBlip();
 
     try {
@@ -181,10 +186,9 @@ function AuthContent() {
         redirectTo,
       });
       if (error) throw error;
-
-      setSuccessMsg(`We sent a password reset link to ${email}. Check your inbox!`);
+      setSuccessMsg('Password reset link sent! Check your inbox.');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to send password reset email.');
+      setErrorMsg(err.message || 'Failed to send reset email.');
     } finally {
       setLoading(false);
     }
@@ -196,7 +200,7 @@ function AuthContent() {
     setSuccessMsg(null);
 
     if (!isPasswordValid) {
-      setErrorMsg('Please satisfy all password complexity requirements.');
+      setErrorMsg('Password must be at least 8 chars with uppercase, lowercase, and a number.');
       return;
     }
 
@@ -286,82 +290,56 @@ function AuthContent() {
   };
 
   return (
-    <div className={`min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden px-4 py-12 transition-colors duration-300 ${
-      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
-    }`}>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden px-4 py-12 bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300">
       
       {/* Top Header Links */}
       <div className="absolute top-6 left-6 right-6 sm:top-8 sm:left-8 sm:right-8 z-20 flex items-center justify-between pointer-events-auto">
         <Link 
           href="/"
-          className={`flex items-center gap-2.5 transition-all group ${
-            isLight ? 'text-[#1B2A24] hover:opacity-80' : 'text-[#C2CDBF] hover:text-[#F4F0EA]'
-          }`}
+          className="flex items-center gap-2.5 transition-all text-[#1A3629] hover:opacity-80 group"
           aria-label="Back to home"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-          <Logo className="w-7 h-7" />
+          <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
+            <Logo className="w-7 h-7" />
+          </div>
           <span className="font-fraunces font-bold text-base hidden sm:inline-block">Cyath</span>
         </Link>
-
-        {/* Theme Toggle Button */}
-        <button
-          type="button"
-          onClick={toggleThemeMode}
-          className={`p-2 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center ${
-            isLight
-              ? 'bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-              : 'bg-[#1D2622] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-          }`}
-          aria-label="Toggle Theme"
-        >
-          {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-[#D9A036]" />}
-        </button>
       </div>
 
       {/* Centered Retro Auth Card */}
-      <div className={`w-full max-w-[430px] rounded-3xl p-8 border-3 transition-all flex flex-col gap-6 relative z-10 ${
-        isLight
-          ? 'bg-[#FFFDF9] border-[#1B2A24] shadow-[6px_6px_0px_#1B2A24]'
-          : 'bg-[#1D2622] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
-      }`}>
+      <div className="w-full max-w-[430px] rounded-3xl p-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] transition-all flex flex-col gap-6 relative z-10">
         
         {/* VIEW 1: Email Verification Sent Screen */}
         {isVerificationSent ? (
           <div className="flex flex-col gap-5 py-2">
             <div className="flex items-center gap-3">
-              <div className={`h-12 w-12 rounded-2xl border-2 flex items-center justify-center text-[#D9A036] ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA]'
-              }`}>
+              <div className="h-12 w-12 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629]">
                 <Mail className="h-6 w-6 animate-pulse" />
               </div>
               <div>
-                <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border-2 ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA] text-[#D9A036]'
-                }`}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Verification Sent
                 </span>
               </div>
             </div>
 
             <div>
-              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight">
+              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 Check your inbox
               </h1>
-              <p className="text-xs sm:text-sm mt-2 font-cabinet font-medium leading-relaxed opacity-75">
+              <p className="text-xs sm:text-sm mt-2 font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
                 We sent a secure link to <span className="font-mono font-bold">{email}</span>. Click it to activate your account.
               </p>
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-900/30 border-2 border-red-400 text-red-400 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className={`px-4 py-3 rounded-xl border-2 text-xs font-mono font-bold ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#131916] border-[#D9A036] text-[#D9A036]'
-              }`}>
+              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
@@ -371,9 +349,7 @@ function AuthContent() {
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resendCooldown > 0 || resending}
-                className={`w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ${
-                  isLight ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24]' : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA]'
-                }`}
+                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -390,9 +366,7 @@ function AuthContent() {
               <button
                 type="button"
                 onClick={handleGuestAccess}
-                className={`w-full py-3 rounded-xl border-2 text-xs font-mono font-bold transition-all cursor-pointer ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA]'
-                }`}
+                className="w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold transition-all cursor-pointer"
               >
                 <span>Explore Demo Dashboard</span>
               </button>
@@ -405,7 +379,7 @@ function AuthContent() {
                     setErrorMsg(null);
                     setSuccessMsg(null);
                   }}
-                  className="text-xs opacity-75 hover:opacity-100 underline cursor-pointer"
+                  className="text-xs text-[#2C4A3B] opacity-75 hover:opacity-100 underline cursor-pointer"
                 >
                   Use a different email address
                 </button>
@@ -416,41 +390,37 @@ function AuthContent() {
           /* VIEW 2: Reset Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className={`h-10 w-10 rounded-xl border-2 flex items-center justify-center text-[#D9A036] shrink-0 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA]'
-              }`}>
+              <div className="h-10 w-10 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
                 <KeyRound className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                   Account Recovery
                 </span>
-                <h1 className="font-fraunces font-black text-2xl tracking-tight">
+                <h1 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
                   Reset Password
                 </h1>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed opacity-75">
+            <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
               Enter your account email and we&apos;ll send you a password reset link.
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-900/30 border-2 border-red-400 text-red-400 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className={`px-4 py-3 rounded-xl border-2 text-xs font-mono font-bold ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#131916] border-[#D9A036] text-[#D9A036]'
-              }`}>
+              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
 
             <form onSubmit={handleResetPasswordRequest} className="flex flex-col gap-4">
               <div>
-                <label className="text-xs font-mono uppercase font-bold mb-1.5 block opacity-80">
+                <label className="text-xs font-mono uppercase font-bold mb-1.5 block text-[#1A3629]">
                   Email Address
                 </label>
                 <input
@@ -459,20 +429,14 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-cabinet font-bold focus:outline-none ${
-                    isLight
-                      ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] placeholder-[#1B2A24]/40 shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/50 shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#1A3629]/40 shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
-                  isLight ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24]' : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA]'
-                }`}
+                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>Send Reset Link</span>
@@ -488,7 +452,7 @@ function AuthContent() {
                   setErrorMsg(null);
                   setSuccessMsg(null);
                 }}
-                className="text-xs font-mono font-bold opacity-75 hover:opacity-100 cursor-pointer"
+                className="text-xs font-mono font-bold text-[#1A3629] opacity-75 hover:opacity-100 cursor-pointer"
               >
                 ← Back to Log In
               </button>
@@ -498,41 +462,37 @@ function AuthContent() {
           /* VIEW 3: Set New Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className={`h-10 w-10 rounded-xl border-2 flex items-center justify-center text-[#D9A036] shrink-0 ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA]'
-              }`}>
+              <div className="h-10 w-10 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
                 <Lock className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
                   Security Update
                 </span>
-                <h1 className="font-fraunces font-black text-2xl tracking-tight">
+                <h1 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
                   Set New Password
                 </h1>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed opacity-75">
+            <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
               Create a strong new password for your account.
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-900/30 border-2 border-red-400 text-red-400 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className={`px-4 py-3 rounded-xl border-2 text-xs font-mono font-bold ${
-                isLight ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24]' : 'bg-[#131916] border-[#D9A036] text-[#D9A036]'
-              }`}>
+              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
 
             <form onSubmit={handleUpdatePassword} className="flex flex-col gap-4">
               <div>
-                <label className="text-xs font-mono uppercase font-bold mb-1.5 block opacity-80">
+                <label className="text-xs font-mono uppercase font-bold mb-1.5 block text-[#1A3629]">
                   New Password
                 </label>
                 <input
@@ -541,16 +501,12 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none ${
-                    isLight
-                      ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-mono uppercase font-bold mb-1.5 block opacity-80">
+                <label className="text-xs font-mono uppercase font-bold mb-1.5 block text-[#1A3629]">
                   Confirm New Password
                 </label>
                 <input
@@ -559,20 +515,14 @@ function AuthContent() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none ${
-                    isLight
-                      ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
-                  isLight ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24]' : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA]'
-                }`}
+                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>Update Password</span>
@@ -583,9 +533,7 @@ function AuthContent() {
           /* VIEW 4: Login / Signup Mode */
           <div className="flex flex-col gap-5">
             {/* Mode Switcher Tabs */}
-            <div className={`grid grid-cols-2 p-1 rounded-2xl border-2 ${
-              isLight ? 'bg-[#F4F0EA] border-[#1B2A24]' : 'bg-[#131916] border-[#F4F0EA]'
-            }`}>
+            <div className="grid grid-cols-2 p-1 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA]">
               <button
                 type="button"
                 onClick={() => {
@@ -595,10 +543,8 @@ function AuthContent() {
                 }}
                 className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                   mode === 'signup'
-                    ? isLight
-                      ? 'bg-[#FFFDF9] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#F4F0EA] text-[#131916] shadow-[2px_2px_0px_#D9A036]'
-                    : 'opacity-70 hover:opacity-100'
+                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]'
+                    : 'opacity-70 hover:opacity-100 text-[#1A3629]'
                 }`}
               >
                 Create Account
@@ -612,10 +558,8 @@ function AuthContent() {
                 }}
                 className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                   mode === 'login'
-                    ? isLight
-                      ? 'bg-[#FFFDF9] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#F4F0EA] text-[#131916] shadow-[2px_2px_0px_#D9A036]'
-                    : 'opacity-70 hover:opacity-100'
+                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]'
+                    : 'opacity-70 hover:opacity-100 text-[#1A3629]'
                 }`}
               >
                 Log In
@@ -623,10 +567,10 @@ function AuthContent() {
             </div>
 
             <div>
-              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight">
+              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 {mode === 'signup' ? 'Start Your Daily Protocol' : 'Welcome Back'}
               </h1>
-              <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium opacity-75">
+              <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium text-[#2C4A3B]">
                 {mode === 'signup'
                   ? 'Track proven daily habits, fuel with whole foods, and uncover energy patterns.'
                   : 'Sign in to access your habit checklist and energy logs.'}
@@ -634,7 +578,7 @@ function AuthContent() {
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-900/30 border-2 border-red-400 text-red-400 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
@@ -644,11 +588,7 @@ function AuthContent() {
               type="button"
               onClick={handleGoogleAuth}
               disabled={googleLoading}
-              className={`w-full py-3 rounded-xl border-2 text-xs font-cabinet font-bold transition-all flex items-center justify-center gap-2.5 cursor-pointer ${
-                isLight
-                  ? 'bg-[#FFFDF9] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24] hover:bg-[#F4F0EA]'
-                  : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:bg-[#1D2622]'
-              }`}
+              className="w-full py-3 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA] text-xs font-cabinet font-bold transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               {googleLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -677,15 +617,15 @@ function AuthContent() {
 
             {/* Divider */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-0.5 bg-current/15" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#D9A036]">or email</span>
-              <div className="flex-1 h-0.5 bg-current/15" />
+              <div className="flex-1 h-0.5 bg-[#1A3629]/15" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">or email</span>
+              <div className="flex-1 h-0.5 bg-[#1A3629]/15" />
             </div>
 
             {/* Email / Password Form */}
             <form onSubmit={handleEmailAuth} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-mono uppercase font-bold mb-1 block opacity-80">
+                <label className="text-xs font-mono uppercase font-bold mb-1 block text-[#1A3629]">
                   Email Address
                 </label>
                 <input
@@ -694,17 +634,13 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-cabinet font-bold focus:outline-none ${
-                    isLight
-                      ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] placeholder-[#1B2A24]/40 shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/50 shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#1A3629]/40 shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold focus:outline-none"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-mono uppercase font-bold opacity-80">
+                  <label className="text-xs font-mono uppercase font-bold text-[#1A3629]">
                     Password
                   </label>
                   {mode === 'login' && (
@@ -715,7 +651,7 @@ function AuthContent() {
                         setMode('forgot');
                         setErrorMsg(null);
                       }}
-                      className="text-[11px] font-mono font-bold text-[#D9A036] hover:underline cursor-pointer"
+                      className="text-[11px] font-mono font-bold text-[#1A3629] hover:underline cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -727,17 +663,13 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none ${
-                    isLight
-                      ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                      : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
                 />
               </div>
 
               {mode === 'signup' && (
                 <div>
-                  <label className="text-xs font-mono uppercase font-bold mb-1 block opacity-80">
+                  <label className="text-xs font-mono uppercase font-bold mb-1 block text-[#1A3629]">
                     Confirm Password
                   </label>
                   <input
@@ -746,11 +678,7 @@ function AuthContent() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-mono font-bold focus:outline-none ${
-                      isLight
-                        ? 'bg-[#F4F0EA] border-[#1B2A24] text-[#1B2A24] shadow-[2px_2px_0px_#1B2A24]'
-                        : 'bg-[#131916] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
-                    }`}
+                    className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
                   />
                 </div>
               )}
@@ -758,9 +686,7 @@ function AuthContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 shadow-[3px_3px_0px_#D9A036] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
-                  isLight ? 'bg-[#1B2A24] text-[#FFFDF9] border-[#1B2A24]' : 'bg-[#F4F0EA] text-[#131916] border-[#F4F0EA]'
-                }`}
+                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>{mode === 'signup' ? 'Create Account & Continue' : 'Log In'}</span>
@@ -768,11 +694,11 @@ function AuthContent() {
             </form>
 
             {/* Quick Guest Demo Button */}
-            <div className="pt-2 border-t border-current/15 text-center">
+            <div className="pt-2 border-t border-[#1A3629]/15 text-center">
               <button
                 type="button"
                 onClick={handleGuestAccess}
-                className="text-xs font-mono font-bold opacity-75 hover:opacity-100 hover:underline cursor-pointer"
+                className="text-xs font-mono font-bold text-[#1A3629] opacity-75 hover:opacity-100 hover:underline cursor-pointer"
               >
                 ⚡ Explore Demo Without Account
               </button>
@@ -789,7 +715,7 @@ export default function AuthPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#131916] flex items-center justify-center text-xs font-mono text-[#F4F0EA]">
+        <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-xs font-mono text-[#1A3629]">
           Loading...
         </div>
       }

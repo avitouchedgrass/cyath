@@ -27,7 +27,6 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState('');
-  const [historyView, setHistoryView] = useState<'heatmap' | 'timeline'>('heatmap');
 
   const {
     habits,
@@ -287,7 +286,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 rounded-md border-2 text-[10px] font-mono font-bold uppercase tracking-wider ${
+              <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider ${
                 isLight ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] text-[#D9A036]'
               }`}>
                 Daily Planner · {currentDate} {isSyncing && '· Syncing...'}
@@ -300,18 +299,20 @@ export default function DashboardPage() {
             </h1>
           </div>
 
-          {/* Quick Streak Pill */}
-          <div className={`self-start sm:self-auto px-4 py-2 rounded-2xl border-3 font-mono font-bold text-xs flex items-center gap-2 ${
-            isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
+          {/* Reserved Shadow for Top Streak Badge */}
+          <div className={`self-start sm:self-auto px-4 py-2 rounded-2xl border-2 font-mono font-bold text-xs flex items-center gap-2 ${
+            isLight 
+              ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]' 
+              : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#D9A036]'
           }`}>
             <Flame className={`w-4 h-4 ${isLight ? 'text-[#1A3629]' : 'text-[#D9A036]'}`} />
             <span>{calculatedStreak} Day Streak</span>
           </div>
         </div>
 
-        {/* 1. 28-Day Heatmap & Consistency Card */}
-        <div className={`border-4 rounded-3xl p-6 sm:p-8 transition-all ${
-          isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[6px_6px_0px_#D9A036]'
+        {/* 1. 28-Day Consistency Matrix (Flat Container, No Shadow, Crisp border-2) */}
+        <div className={`border-2 rounded-2xl p-6 sm:p-7 transition-all ${
+          isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
         }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -330,25 +331,25 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Heatmap Grid */}
+          {/* Heatmap Grid - Inactive Days Unbordered & Subtly Muted */}
           <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-2">
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
               
               const levelClasses = isLight
                 ? {
-                    0: 'bg-[#F4F0EA] border-[#1A3629]/20 text-[#1A3629]/50',
-                    1: 'bg-[#E8E0D2] border-[#1A3629] text-[#1A3629]',
-                    2: 'bg-[#C2D7C7] border-[#1A3629] text-[#1A3629] font-bold',
-                    3: 'bg-[#6D9F80] border-[#1A3629] text-[#FFFDF9] font-bold',
-                    4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-black shadow-[2px_2px_0px_#3A6B52]',
+                    0: 'bg-transparent border border-transparent text-[#1A3629]/40 hover:bg-[#1A3629]/5',
+                    1: 'bg-[#E8E0D2] border border-[#1A3629]/30 text-[#1A3629]',
+                    2: 'bg-[#C2D7C7] border border-[#1A3629]/60 text-[#1A3629] font-bold',
+                    3: 'bg-[#6D9F80] border border-[#1A3629] text-[#FFFDF9] font-bold',
+                    4: 'bg-[#1A3629] border border-[#1A3629] text-[#FFFDF9] font-black',
                   }[day.level]
                 : {
-                    0: 'bg-[#111914] border-[#F4F0EA]/20 text-[#F4F0EA]/50',
-                    1: 'bg-[#1D2B22] border-[#F4F0EA]/40 text-[#F4F0EA]',
-                    2: 'bg-[#3A5643] border-[#F4F0EA]/70 text-[#F4F0EA] font-bold',
-                    3: 'bg-[#7AA884] border-[#F4F0EA] text-[#111914] font-bold',
-                    4: 'bg-[#D9A036] border-[#F4F0EA] text-[#111914] font-black shadow-[2px_2px_0px_#F4F0EA]',
+                    0: 'bg-transparent border border-transparent text-[#8F9E8B] hover:bg-white/5',
+                    1: 'bg-[#1D2B22] border border-[#F4F0EA]/30 text-[#F4F0EA]',
+                    2: 'bg-[#3A5643] border border-[#F4F0EA]/60 text-[#F4F0EA] font-bold',
+                    3: 'bg-[#7AA884] border border-[#F4F0EA] text-[#111914] font-bold',
+                    4: 'bg-[#D9A036] border border-[#F4F0EA] text-[#111914] font-black',
                   }[day.level];
 
               return (
@@ -359,9 +360,9 @@ export default function DashboardPage() {
                       retroAudio.playBlip();
                       setDate(day.dateStr);
                     }}
-                    className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border-2 ${levelClasses} ${
+                    className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
                       isSelected
-                        ? 'ring-3 ring-current scale-105 shadow-lg'
+                        ? 'ring-2 ring-current scale-105 font-bold'
                         : 'hover:scale-105'
                     }`}
                   >
@@ -378,36 +379,36 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 2. 3-Column Dashboard Bento */}
+        {/* 2. 3-Column Dashboard Bento (Flat Containers, No Shadows, Crisp border-2) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
           {/* COLUMN 1: Habit Checklist */}
           <div className="flex flex-col gap-6">
             
-            {/* Today's Score Dial */}
-            <div className={`border-3 rounded-2xl p-6 text-center transition-all flex flex-col items-center ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Today's Score Dial (Calibrated Precision Dial) */}
+            <div className={`border-2 rounded-2xl p-6 text-center transition-all flex flex-col items-center ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div className="w-full flex items-center justify-between text-xs font-mono font-bold mb-3">
                 <span className="text-[10px] uppercase tracking-widest opacity-70">DAILY PROGRESS</span>
                 <span>{completedCount} / {habits.length} DONE</span>
               </div>
 
-              {/* Progress Dial */}
+              {/* Thinned-Out Calibrated Progress Gauge (strokeWidth 4.5) */}
               <div className="relative w-40 h-24 flex items-end justify-center my-1">
                 <svg className="w-40 h-24" viewBox="0 0 120 70">
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
-                    stroke={isLight ? '#E5DDD0' : '#2A3B2F'}
-                    strokeWidth="10"
+                    stroke={isLight ? '#E5DDD0' : 'rgba(244, 240, 234, 0.12)'}
+                    strokeWidth="4.5"
                     strokeLinecap="round"
                   />
                   <path
                     d="M 15,60 A 45,45 0 0,1 105,60"
                     fill="none"
                     stroke={isLight ? '#1A3629' : '#D9A036'}
-                    strokeWidth="10"
+                    strokeWidth="4.5"
                     strokeDasharray="141.37"
                     strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
                     strokeLinecap="round"
@@ -423,9 +424,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Habit Checklist */}
-            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Habit Checklist (Flat List Items with Subtle Separation) */}
+            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div className="flex items-center justify-between">
                 <div>
@@ -437,11 +438,14 @@ export default function DashboardPage() {
                   </h2>
                 </div>
 
+                {/* Primary Action Button with subtle offset shadow */}
                 <button
                   type="button"
                   onClick={() => setShowAddHabit(!showAddHabit)}
-                  className={`px-3 py-1.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
-                    isLight ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+                  className={`px-3 py-1.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center gap-1 transition-all cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none ${
+                    isLight 
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]' 
+                      : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
                   }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -451,8 +455,8 @@ export default function DashboardPage() {
 
               {/* Add Custom Habit Form */}
               {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className={`flex gap-2 p-3 rounded-xl border-2 ${
-                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
+                <form onSubmit={handleAddHabitSubmit} className={`flex gap-2 p-2.5 rounded-xl border ${
+                  isLight ? 'bg-[#F4F0EA] border-[#1A3629]/40' : 'bg-[#111914] border-[#F4F0EA]/40'
                 }`}>
                   <input
                     type="text"
@@ -464,7 +468,7 @@ export default function DashboardPage() {
                   />
                   <button
                     type="submit"
-                    className={`px-3 py-1 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg border text-xs font-mono font-bold cursor-pointer ${
                       isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
                     }`}
                   >
@@ -473,38 +477,30 @@ export default function DashboardPage() {
                 </form>
               )}
 
-              {/* Habit Items */}
-              <div className="flex flex-col gap-2.5">
+              {/* Flattened Habit Checklist Items */}
+              <div className="flex flex-col divide-y divide-current/10">
                 {habits.map((habit) => {
                   const isDone = !!todayLog.habitsCompleted[habit.id];
                   return (
                     <div
                       key={habit.id}
                       onClick={() => handleToggleHabit(habit.id)}
-                      className={`group flex items-center justify-between p-3.5 rounded-xl border-2 transition-all cursor-pointer ${
-                        isDone
-                          ? isLight
-                            ? 'bg-[#E8DECF] border-[#1A3629] opacity-80'
-                            : 'bg-[#111914] border-[#F4F0EA] opacity-80'
-                          : isLight
-                            ? 'bg-[#F4F0EA] border-[#1A3629]/40 hover:border-[#1A3629]'
-                            : 'bg-[#111914] border-[#F4F0EA]/40 hover:border-[#F4F0EA]'
-                      }`}
+                      className="group flex items-center justify-between py-3 px-1.5 transition-colors cursor-pointer hover:bg-current/5 rounded-lg"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
                           isDone
                             ? isLight
                               ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
-                              : 'bg-[#D9A036] text-[#111914] border-[#F4F0EA]'
+                              : 'bg-[#D9A036] text-[#111914] border-[#D9A036]'
                             : isLight
-                              ? 'border-[#1A3629]'
-                              : 'border-[#F4F0EA]'
+                              ? 'border-[#1A3629]/60'
+                              : 'border-[#F4F0EA]/60'
                         }`}>
                           {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
                         <span className={`text-xs font-cabinet font-bold truncate ${
-                          isDone ? 'line-through opacity-70' : ''
+                          isDone ? 'line-through opacity-60' : ''
                         }`}>
                           {habit.title}
                         </span>
@@ -517,7 +513,7 @@ export default function DashboardPage() {
                             e.stopPropagation();
                             deleteHabit(habit.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-opacity cursor-pointer ml-2"
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-opacity cursor-pointer ml-2"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -533,9 +529,9 @@ export default function DashboardPage() {
           {/* COLUMN 2: Daily Focus & Food Journal */}
           <div className="flex flex-col gap-6">
             
-            {/* Daily Phase */}
-            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Daily Phase (Flat Container, No Shadow) */}
+            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div className="flex items-center justify-between">
                 <div>
@@ -546,7 +542,7 @@ export default function DashboardPage() {
                     {routineWindow.title}
                   </h2>
                 </div>
-                <span className={`px-2.5 py-0.5 rounded-full border-2 text-[10px] font-mono font-bold uppercase ${
+                <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold uppercase ${
                   isLight ? 'bg-[#F4F0EA] border-[#1A3629]' : 'bg-[#111914] border-[#F4F0EA]'
                 }`}>
                   {routineWindow.badge}
@@ -560,7 +556,7 @@ export default function DashboardPage() {
               </p>
 
               {/* Reflection Notes */}
-              <div className="pt-2 border-t-2 border-current/10 flex flex-col gap-2">
+              <div className="pt-2 border-t border-current/10 flex flex-col gap-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70">
                   Daily Notes &amp; Observations
                 </span>
@@ -569,18 +565,18 @@ export default function DashboardPage() {
                   onChange={(e) => setNotes(e.target.value, currentDate)}
                   placeholder="Note energy peaks, workout notes, or meals..."
                   rows={3}
-                  className={`w-full p-3 rounded-xl border-2 text-xs font-cabinet font-medium focus:outline-none resize-none ${
+                  className={`w-full p-3 rounded-xl border text-xs font-cabinet font-medium focus:outline-none resize-none ${
                     isLight 
-                      ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60' 
-                      : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA] placeholder-[#C2CDBF]/60'
+                      ? 'bg-[#F4F0EA] border-[#1A3629]/40 text-[#1A3629] placeholder-[#2C4A3B]/60' 
+                      : 'bg-[#111914] border-[#F4F0EA]/40 text-[#F4F0EA] placeholder-[#C2CDBF]/60'
                   }`}
                 />
               </div>
             </div>
 
-            {/* Logged Whole-Food Meals */}
-            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Logged Whole-Food Meals (Flat Container, No Shadow) */}
+            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-4 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div className="flex items-center justify-between">
                 <div>
@@ -601,19 +597,19 @@ export default function DashboardPage() {
               </div>
 
               {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 ? (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   {todayLog.loggedRecipeIds.map((rId) => {
                     const recipe = RECIPES.find((r) => r.id === rId);
                     if (!recipe) return null;
                     return (
                       <div
                         key={rId}
-                        className={`flex items-center justify-between p-3.5 rounded-xl border-2 gap-3 ${
-                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/30' : 'bg-[#111914] border-[#F4F0EA]/30'
+                        className={`flex items-center justify-between p-3 rounded-xl border gap-3 ${
+                          isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-12 h-12 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
+                          <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
                             <img
                               src={recipe.image}
                               alt={recipe.name}
@@ -631,7 +627,7 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-500 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg opacity-70 hover:opacity-100 hover:text-red-400 transition-colors cursor-pointer"
                           aria-label="Remove meal"
                         >
                           <X className="w-4 h-4" />
@@ -641,15 +637,15 @@ export default function DashboardPage() {
                   })}
                 </div>
               ) : (
-                <div className={`p-6 text-center rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 ${
-                  isLight ? 'bg-[#F4F0EA]/50 border-[#1A3629]/30' : 'bg-[#111914]/50 border-[#F4F0EA]/30'
+                <div className={`p-6 text-center rounded-xl border border-dashed flex flex-col items-center justify-center gap-3 ${
+                  isLight ? 'bg-[#F4F0EA]/40 border-[#1A3629]/20' : 'bg-[#111914]/40 border-[#F4F0EA]/20'
                 }`}>
                   <p className="text-xs font-cabinet font-medium opacity-80">
                     No whole-food meals logged yet today.
                   </p>
                   <Link
                     href="/recipes"
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 text-xs font-cabinet font-bold cursor-pointer transition-all ${
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-cabinet font-bold cursor-pointer transition-all ${
                       isLight ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]' : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA]'
                     }`}
                   >
@@ -665,9 +661,9 @@ export default function DashboardPage() {
           {/* COLUMN 3: Daily Metrics & Telemetry */}
           <div className="flex flex-col gap-6">
             
-            {/* Nutrition & Water Card */}
-            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Nutrition & Water Card (Flat Container, Secondary Button Styling) */}
+            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
@@ -679,7 +675,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Protein Steppers */}
-              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+              <div className={`p-4 rounded-xl border space-y-3 ${
                 isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
               }`}>
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
@@ -689,16 +685,17 @@ export default function DashboardPage() {
                   </span>
                 </div>
 
+                {/* Flat Secondary Action Buttons */}
                 <div className="grid grid-cols-3 gap-2">
                   {[15, 30, 45].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className={`border-2 py-2 rounded-lg text-xs font-mono font-bold active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer ${
+                      className={`border py-1.5 rounded-lg text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
                         isLight 
-                          ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                          : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                          ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
+                          : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
                       }`}
                     >
                       +{amt}g
@@ -708,7 +705,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Hydration Steppers */}
-              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+              <div className={`p-4 rounded-xl border space-y-3 ${
                 isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
               }`}>
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
@@ -718,16 +715,17 @@ export default function DashboardPage() {
                   </span>
                 </div>
 
+                {/* Flat Secondary Action Buttons */}
                 <div className="grid grid-cols-3 gap-2">
                   {[0.25, 0.5, 1.0].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className={`border-2 py-2 rounded-lg text-xs font-mono font-bold active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer ${
+                      className={`border py-1.5 rounded-lg text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
                         isLight 
-                          ? 'bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]' 
-                          : 'bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036]'
+                          ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
+                          : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
                       }`}
                     >
                       +{amt}L
@@ -737,9 +735,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Energy & Focus Dials */}
-            <div className={`border-3 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
-              isLight ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036]'
+            {/* Energy & Focus Dials (Flat Container, Secondary Button Styling) */}
+            <div className={`border-2 rounded-2xl p-6 flex flex-col gap-5 transition-all ${
+              isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
             }`}>
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-70 block">
@@ -751,7 +749,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Energy Level */}
-              <div className={`p-4 rounded-xl border-2 space-y-2 ${
+              <div className={`p-4 rounded-xl border space-y-2 ${
                 isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
               }`}>
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
@@ -764,12 +762,12 @@ export default function DashboardPage() {
                   max="10"
                   value={todayLog.energyLevel}
                   onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                  className="w-full accent-current h-2 rounded-full cursor-pointer"
+                  className="w-full accent-current h-1.5 rounded-full cursor-pointer"
                 />
               </div>
 
               {/* Sleep Duration */}
-              <div className={`p-4 rounded-xl border-2 space-y-3 ${
+              <div className={`p-4 rounded-xl border space-y-3 ${
                 isLight ? 'bg-[#F4F0EA] border-[#1A3629]/20' : 'bg-[#111914] border-[#F4F0EA]/20'
               }`}>
                 <div className="flex items-center justify-between text-xs font-mono font-bold">
@@ -777,12 +775,15 @@ export default function DashboardPage() {
                   <span>{todayLog.sleepHours} hrs</span>
                 </div>
 
+                {/* Flat Secondary Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                    className={`flex-1 py-2 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
-                      isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+                    className={`flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
+                      isLight 
+                        ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
+                        : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
                     }`}
                   >
                     -0.5h
@@ -790,8 +791,10 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                    className={`flex-1 py-2 rounded-lg border-2 text-xs font-mono font-bold cursor-pointer ${
-                      isLight ? 'bg-[#FFFDF9] border-[#1A3629]' : 'bg-[#1A261E] border-[#F4F0EA]'
+                    className={`flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold bg-transparent transition-colors cursor-pointer ${
+                      isLight 
+                        ? 'border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629]/10' 
+                        : 'border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
                     }`}
                   >
                     +0.5h

@@ -230,13 +230,13 @@ export default function Home() {
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">
-              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono uppercase tracking-widest text-neutral-300 mb-4 inline-block">
+              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-4 inline-block">
                 The Methodology
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.02em] text-white">
                 The 3-Step Behavioral Loop
               </h2>
-              <p className="text-neutral-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
+              <p className="text-slate-400 text-sm sm:text-base mt-4 font-sans leading-relaxed">
                 Traditional habit apps burn you out with tedious entry. Cyath transforms frictionless 30-second daily logs into quantitative performance intelligence.
               </p>
             </div>
@@ -260,10 +260,10 @@ export default function Home() {
                         setActiveStepIndex(idx);
                       }
                     }}
-                    className={`backdrop-blur-xl rounded-3xl p-8 border transition-all duration-300 relative flex flex-col justify-between cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none ${
+                    className={`backdrop-blur-md bg-white/[0.02] border p-8 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none hover:border-white/20 hover:bg-white/[0.03] hover:-translate-y-1 ${
                       isActive
-                        ? 'bg-white/[0.04] border-white/30 shadow-2xl ring-1 ring-white/15'
-                        : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.03]'
+                        ? 'border-white/25 bg-white/[0.035] shadow-2xl ring-1 ring-white/15'
+                        : 'border-white/10'
                     }`}
                   >
                     <div>
@@ -272,33 +272,33 @@ export default function Home() {
                         <span className="font-mono text-3xl font-bold text-white tracking-tight tabular-nums">
                           {item.step}
                         </span>
-                        <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-neutral-300">
+                        <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-slate-300 uppercase tracking-wider">
                           {item.badge}
                         </span>
                       </div>
 
-                      {/* Title & Icon */}
-                      <div className="flex items-center gap-3 mb-3 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
+                      {/* Title & Icon (Cabinet Grotesk, No Truncation) */}
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0 mt-0.5">
                           <Icon className="w-4 h-4" />
                         </div>
-                        <h3 className="font-serif font-normal text-xl text-white tracking-tight truncate">
+                        <h3 className="font-cabinet font-bold text-xl text-slate-100 tracking-tight leading-snug">
                           {item.title}
                         </h3>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6 break-words">
+                      {/* Description with Breathing Room */}
+                      <p className="text-slate-400 text-sm font-sans leading-relaxed mb-6">
                         {item.description}
                       </p>
                     </div>
 
-                    {/* Bullet Highlights */}
-                    <div className="space-y-2 pt-4 border-t border-white/5">
+                    {/* High-Tech Calibration Highlights (Strict Monochrome) */}
+                    <div className="space-y-2.5 pt-4 border-t border-white/5">
                       {item.highlights.map((point) => (
-                        <div key={point} className="flex items-center gap-2 text-xs font-mono text-neutral-300">
-                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          <span className="truncate">{point}</span>
+                        <div key={point} className="flex items-center gap-2.5 text-sm text-slate-400 font-sans">
+                          <span className="font-mono text-xs text-slate-500 shrink-0 select-none">+</span>
+                          <span>{point}</span>
                         </div>
                       ))}
                     </div>

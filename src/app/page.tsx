@@ -70,14 +70,13 @@ const SAMPLE_SCATTER_POINTS = [
 
 export default function Home() {
   const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
-  const [heroTheme, setHeroTheme] = useState<'light' | 'dark'>('dark');
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [selectedScatterPoint, setSelectedScatterPoint] = useState<number | null>(4);
   const [previewEnergy, setPreviewEnergy] = useState(8);
   const [previewFocus, setPreviewFocus] = useState(9);
   const [mounted, setMounted] = useState(false);
 
-  const { userSession } = useHabitStore();
+  const { userSession, themeMode, toggleThemeMode } = useHabitStore();
 
   useEffect(() => {
     setMounted(true);
@@ -91,16 +90,16 @@ export default function Home() {
   }, []);
 
   const isLoggedIn = mounted && !!userSession;
-  const isLight = heroTheme === 'light';
+  const isLight = themeMode === 'light';
 
   return (
     <div className={`relative min-h-screen overflow-hidden flex flex-col transition-colors duration-300 ${
-      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
     }`}>
       {/* Global Navigation Header with Light/Dark Mode Switcher */}
       <HeaderNav 
-        themeMode={heroTheme} 
-        onToggleTheme={() => setHeroTheme((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        themeMode={themeMode} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Page Content */}
@@ -303,7 +302,7 @@ export default function Home() {
             {/* Hero Right Column: Massive Unboxed Pixel Art Showcase with 8-Bit Audio & Wipes */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PixelShowcase 
-                themeMode={heroTheme}
+                themeMode={themeMode}
                 onDishChange={(dish) => setCurrentDish(dish)} 
               />
             </div>

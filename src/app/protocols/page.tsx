@@ -133,13 +133,14 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
 
 export default function ProtocolsPage() {
   const router = useRouter();
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Morning' | 'Focus' | 'Sleep' | 'Movement'>('All');
   const [selectedProtocolForModal, setSelectedProtocolForModal] = useState<ProtocolBlueprint | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   const {
+    themeMode,
+    toggleThemeMode,
     activeProtocolIds,
     activateProtocol,
     userSession,
@@ -182,12 +183,12 @@ export default function ProtocolsPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
     }`}>
       {/* Navigation Header */}
       <HeaderNav 
         themeMode={themeMode} 
-        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Content */}

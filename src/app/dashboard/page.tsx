@@ -18,12 +18,13 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [mounted, setMounted] = useState(false);
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState('');
 
   const {
+    themeMode,
+    toggleThemeMode,
     habits,
     currentDate,
     logsByDate,
@@ -267,7 +268,7 @@ export default function DashboardPage() {
     <div className={`${themeMode === 'dark' ? 'dark' : ''} min-h-screen bg-[#F4F0EA] dark:bg-[#131916] text-[#1B2A24] dark:text-[#F4F0EA] transition-colors duration-300 flex flex-col`}>
       <HeaderNav 
         themeMode={themeMode} 
-        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Container */}

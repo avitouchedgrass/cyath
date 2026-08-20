@@ -42,7 +42,7 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const inspectParam = searchParams.get('inspect') || searchParams.get('recipe');
 
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
+  const { themeMode, toggleThemeMode, logRecipeToDay, getDailyLog, userSession, setPendingAction, userProfile } = useHabitStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDietFilter, setSelectedDietFilter] = useState<string>('All');
@@ -56,9 +56,7 @@ function RecipesContent() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { logRecipeToDay, getDailyLog, userSession, setPendingAction, userProfile } = useHabitStore();
   const todayLog = getDailyLog();
-
   const isLight = themeMode === 'light';
 
   useEffect(() => {
@@ -177,7 +175,7 @@ function RecipesContent() {
       {/* Navigation Header with Theme Toggle */}
       <HeaderNav 
         themeMode={themeMode} 
-        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Container */}

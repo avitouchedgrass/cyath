@@ -19,12 +19,11 @@ import {
 } from 'lucide-react';
 
 export default function CorrelationsPage() {
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [timeHorizon, setTimeHorizon] = useState<7 | 14 | 30>(14);
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string>('protein-focus');
   const [mounted, setMounted] = useState(false);
 
-  const { logsByDate } = useHabitStore();
+  const { themeMode, toggleThemeMode, logsByDate } = useHabitStore();
 
   const isLight = themeMode === 'light';
 
@@ -96,11 +95,11 @@ export default function CorrelationsPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
     }`}>
       <HeaderNav 
         themeMode={themeMode} 
-        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Content */}

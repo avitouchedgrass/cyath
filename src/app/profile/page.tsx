@@ -35,8 +35,9 @@ const GOAL_LABELS: Record<string, { title: string; icon: React.ElementType }> = 
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const {
+    themeMode,
+    toggleThemeMode,
     userSession,
     setUserSession,
     userProfile,
@@ -101,11 +102,11 @@ export default function ProfilePage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 flex flex-col ${
-      isLight ? 'bg-[#F4F0EA] text-[#1A3629]' : 'bg-[#111914] text-[#F4F0EA]'
+      isLight ? 'bg-[#F4F0EA] text-[#1B2A24]' : 'bg-[#131916] text-[#F4F0EA]'
     }`}>
       <HeaderNav 
         themeMode={themeMode} 
-        onToggleTheme={() => setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+        onToggleTheme={toggleThemeMode} 
       />
 
       {/* Main Container */}

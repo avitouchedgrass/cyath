@@ -41,6 +41,7 @@ export default function DashboardPage() {
 
   const [newHabitTitle, setNewHabitTitle] = useState('');
   const [showAddHabit, setShowAddHabit] = useState(false);
+  const [historyView, setHistoryView] = useState<'heatmap' | 'timeline'>('heatmap');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -83,6 +84,85 @@ export default function DashboardPage() {
       badge: 'Night Phase',
     };
   }, []);
+
+  // 28-Day Behavioral Action Heatmap Matrix
+  const heatmapDays = useMemo(() => {
+    const today = new Date();
+    const days = [];
+    const totalDays = 28;
+
+    for (let i = totalDays - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toISOString().split('T')[0];
+      const log = logsByDate[dateKey];
+
+      let habitsDone = 0;
+      let mealsDone = 0;
+      let hydrationDone = 0;
+      let reflectionDone = 0;
+
+      if (log) {
+        if (log.habitsCompleted) {
+          habitsDone = Object.values(log.habitsCompleted).filter(Boolean).length;
+        }
+        if (log.loggedRecipeIds && log.loggedRecipeIds.length > 0) {
+          mealsDone = log.loggedRecipeIds.length;
+        } else if ((log.totalProteinLogged || 0) > 0) {
+          mealsDone = 1;
+        }
+        if ((log.hydrationLiters || 0) > 0) {
+          hydrationDone = 1;
+        }
+        if ((log.energyLevel || 0) > 0 || (log.moodScore || 0) > 0 || (log.sleepHours || 0) > 0) {
+          reflectionDone = 1;
+        }
+      } else if (i > 0 && !userSession) {
+        const seed = [4, 6, 5, 8, 3, 7, 6, 9, 5, 4, 7, 6, 8, 5, 6, 7, 8, 4, 9, 6, 5, 7, 8, 6, 7, 5, 8, 6][i % 28] || 4;
+        habitsDone = Math.min(habits.length, Math.max(1, Math.round(seed * 0.4)));
+        mealsDone = seed > 5 ? 2 : 1;
+        hydrationDone = 1;
+        reflectionDone = 1;
+      }
+
+      if (dateKey === currentDate) {
+        habitsDone = completedCount;
+        mealsDone = (todayLog.loggedRecipeIds || []).length || (todayLog.totalProteinLogged > 0 ? 1 : 0);
+        hydrationDone = (todayLog.hydrationLiters || 0) > 0 ? 1 : 0;
+        reflectionDone = (todayLog.energyLevel || 0) > 0 ? 1 : 0;
+      }
+
+      const totalActions = habitsDone + mealsDone + hydrationDone + reflectionDone;
+
+      let level: 0 | 1 | 2 | 3 | 4 = 0;
+      if (totalActions >= 7) level = 4;
+      else if (totalActions >= 5) level = 3;
+      else if (totalActions >= 3) level = 2;
+      else if (totalActions >= 1) level = 1;
+
+      days.push({
+        dateStr: dateKey,
+        dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        dayNum: d.getDate(),
+        monthName: d.toLocaleDateString('en-US', { month: 'short' }),
+        totalActions,
+        habitsDone,
+        mealsDone,
+        hydrationDone,
+        reflectionDone,
+        level,
+        isToday: dateKey === new Date().toISOString().split('T')[0],
+        isSelected: dateKey === currentDate,
+      });
+    }
+    return days;
+  }, [logsByDate, habits, currentDate, completedCount, todayLog, userSession]);
+
+  const totalHeatmapActions = useMemo(() => {
+    return heatmapDays.reduce((sum, d) => sum + d.totalActions, 0);
+  }, [heatmapDays]);
+
+  const avgDailyActions = (totalHeatmapActions / (heatmapDays.length || 1)).toFixed(1);
 
   // Unified 14-Day Timeline History
   const timelineDays = useMemo(() => {
@@ -255,75 +335,191 @@ export default function DashboardPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 1. UNIFIED 14-DAY TIMELINE STRIP */}
+        {/* 1. BEHAVIORAL ACTION HEATMAP & MOMENTUM MATRIX */}
         {/* ========================================================================= */}
-        <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
+        <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 shadow-xl relative">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                Performance History
-              </span>
               <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Behavioral Telemetry
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 bg-white/[0.04] border border-white/10 px-2 py-0.5 rounded-md">
+                  28-Day Action Density
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <h2 className="font-cabinet font-semibold text-lg text-slate-100 tracking-tight">
-                  14-Day Momentum Matrix
+                  Activity Heatmap Matrix
                 </h2>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-white font-medium bg-white/[0.04] border border-white/10 px-3 py-1 rounded-full">
-              <Flame className="w-3.5 h-3.5 text-white" />
-              <span>{calculatedStreak} {calculatedStreak === 1 ? 'DAY' : 'DAYS'} STREAK</span>
+
+            {/* View Switcher & Streak Badges */}
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => setHistoryView('heatmap')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    historyView === 'heatmap'
+                      ? 'bg-white text-black font-bold shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Heatmap Matrix
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHistoryView('timeline')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    historyView === 'timeline'
+                      ? 'bg-white text-black font-bold shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  14-Day Strip
+                </button>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs font-mono text-white font-medium bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-xl">
+                <Flame className="w-3.5 h-3.5 text-white" />
+                <span>{calculatedStreak}D STREAK</span>
+              </div>
             </div>
           </div>
 
-          {/* Interactive 14-Day Timeline Buttons */}
-          <div className="grid grid-cols-7 sm:grid-cols-14 gap-2">
-            {timelineDays.map((day) => {
-              const isSelected = day.isSelected;
-              const isFull = day.rate >= 0.8;
-              const isPartial = day.rate >= 0.4;
-
-              return (
-                <button
-                  key={day.dateStr}
-                  type="button"
-                  onClick={() => setDate(day.dateStr)}
-                  className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border relative ${
-                    isSelected
-                      ? 'bg-white text-black border-white shadow-lg font-bold ring-2 ring-white/50 scale-[1.02]'
-                      : isFull
-                      ? 'bg-white/10 text-white border-white/20 hover:bg-white/15'
-                      : isPartial
-                      ? 'bg-white/[0.04] text-slate-200 border-white/15 hover:bg-white/10'
-                      : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
-                  }`}
-                  title={`${day.monthName} ${day.dayNum}: ${Math.round(day.rate * 100)}% adherence`}
-                >
-                  <span className={`text-[10px] font-mono leading-none ${isSelected ? 'text-black font-bold' : 'text-slate-400'}`}>
-                    {day.dayName}
-                  </span>
-                  <span className="text-sm font-mono font-bold tabular-nums mt-1 leading-none">
-                    {day.dayNum}
-                  </span>
+          {/* VIEW A: 28-Day Activity Heatmap Grid */}
+          {historyView === 'heatmap' ? (
+            <div className="space-y-4">
+              {/* Heatmap Matrix Grid (4 weeks x 7 days) */}
+              <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-2">
+                {heatmapDays.map((day) => {
+                  const isSelected = day.isSelected;
                   
-                  {/* Bottom Indicator Dot */}
-                  <div className="mt-1.5 flex items-center justify-center">
-                    <span
-                      className={`h-1 w-3 rounded-full ${
-                        isSelected
-                          ? 'bg-black'
-                          : isFull
-                          ? 'bg-white'
-                          : isPartial
-                          ? 'bg-white/40'
-                          : 'bg-white/10'
-                      }`}
-                    />
+                  // Strict monochrome level fills
+                  const levelClasses = {
+                    0: 'bg-white/[0.03] border-white/5 text-slate-500 hover:border-white/20',
+                    1: 'bg-white/20 border-white/25 text-slate-300 hover:bg-white/30',
+                    2: 'bg-white/45 border-white/50 text-black font-semibold hover:bg-white/55',
+                    3: 'bg-white/75 border-white/80 text-black font-bold hover:bg-white/85',
+                    4: 'bg-white border-white text-black font-bold shadow-[0_0_12px_rgba(255,255,255,0.4)]',
+                  }[day.level];
+
+                  return (
+                    <div
+                      key={day.dateStr}
+                      className="relative group"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setDate(day.dateStr)}
+                        className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-200 cursor-pointer border ${levelClasses} ${
+                          isSelected
+                            ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-105 shadow-xl font-extrabold'
+                            : 'hover:scale-105'
+                        }`}
+                      >
+                        <span className="text-[10px] font-mono tabular-nums leading-none">
+                          {day.dayNum}
+                        </span>
+                        <span className="text-[8px] font-mono mt-0.5 opacity-80 uppercase leading-none">
+                          {day.dayName.charAt(0)}
+                        </span>
+                      </button>
+
+                      {/* Floating Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-50 pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-150">
+                        <div className="bg-[#121212] border border-white/20 rounded-xl px-3 py-2 text-xs font-mono shadow-2xl backdrop-blur-xl flex flex-col gap-0.5">
+                          <div className="text-white font-bold flex items-center gap-1.5">
+                            <span>{day.monthName} {day.dayNum}</span>
+                            <span className="text-slate-400 font-normal">·</span>
+                            <span className="text-white">{day.totalActions} actions</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 font-sans">
+                            {day.habitsDone} habits · {day.mealsDone} meals {day.hydrationDone ? '· hydration' : ''} {day.reflectionDone ? '· reflection' : ''}
+                          </div>
+                        </div>
+                        <div className="w-2 h-2 bg-[#121212] border-r border-b border-white/20 transform rotate-45 -mt-1" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Heatmap Footer: Activity Density Scale & Aggregate Telemetry */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-white/5 text-xs font-mono text-slate-400">
+                <div className="flex items-center gap-3">
+                  <span>Total Actions: <strong className="text-white">{totalHeatmapActions}</strong></span>
+                  <span>·</span>
+                  <span>Daily Velocity: <strong className="text-white">{avgDailyActions}/day</strong></span>
+                </div>
+
+                {/* Strict Monochrome Activity Scale */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase text-slate-500">Less</span>
+                  <div className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-md bg-white/[0.03] border border-white/5" title="0 actions" />
+                    <span className="w-3 h-3 rounded-md bg-white/20 border border-white/25" title="1-2 actions" />
+                    <span className="w-3 h-3 rounded-md bg-white/45 border border-white/50" title="3-4 actions" />
+                    <span className="w-3 h-3 rounded-md bg-white/75 border border-white/80" title="5-6 actions" />
+                    <span className="w-3 h-3 rounded-md bg-white border border-white" title="7+ actions" />
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                  <span className="text-[10px] uppercase text-slate-500">More</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* VIEW B: Interactive 14-Day Timeline Buttons */
+            <div className="grid grid-cols-7 sm:grid-cols-14 gap-2">
+              {timelineDays.map((day) => {
+                const isSelected = day.isSelected;
+                const isFull = day.rate >= 0.8;
+                const isPartial = day.rate >= 0.4;
+
+                return (
+                  <button
+                    key={day.dateStr}
+                    type="button"
+                    onClick={() => setDate(day.dateStr)}
+                    className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border relative ${
+                      isSelected
+                        ? 'bg-white text-black border-white shadow-lg font-bold ring-2 ring-white/50 scale-[1.02]'
+                        : isFull
+                        ? 'bg-white/10 text-white border-white/20 hover:bg-white/15'
+                        : isPartial
+                        ? 'bg-white/[0.04] text-slate-200 border-white/15 hover:bg-white/10'
+                        : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
+                    }`}
+                    title={`${day.monthName} ${day.dayNum}: ${Math.round(day.rate * 100)}% adherence`}
+                  >
+                    <span className={`text-[10px] font-mono leading-none ${isSelected ? 'text-black font-bold' : 'text-slate-400'}`}>
+                      {day.dayName}
+                    </span>
+                    <span className="text-sm font-mono font-bold tabular-nums mt-1 leading-none">
+                      {day.dayNum}
+                    </span>
+                    
+                    {/* Bottom Indicator Dot */}
+                    <div className="mt-1.5 flex items-center justify-center">
+                      <span
+                        className={`h-1 w-3 rounded-full ${
+                          isSelected
+                            ? 'bg-black'
+                            : isFull
+                            ? 'bg-white'
+                            : isPartial
+                            ? 'bg-white/40'
+                            : 'bg-white/10'
+                        }`}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* ========================================================================= */}

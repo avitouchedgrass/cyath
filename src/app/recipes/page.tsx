@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelContainer } from '@/components/ui/PixelContainer';
 import { RECIPES, Recipe } from '@/lib/recipes';
@@ -25,10 +25,10 @@ const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
 
 const DIET_FILTERS = [
   { id: 'All', label: 'All Diets' },
-  { id: 'Vegetarian', label: '🌿 Vegetarian' },
-  { id: 'Vegan', label: '🌱 Vegan' },
-  { id: 'Pescatarian', label: '🐟 Pescatarian' },
-  { id: 'Omnivore', label: '🥩 Omnivore' },
+  { id: 'Vegetarian', label: 'Vegetarian' },
+  { id: 'Vegan', label: 'Vegan' },
+  { id: 'Pescatarian', label: 'Pescatarian' },
+  { id: 'Omnivore', label: 'Omnivore' },
 ] as const;
 
 const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
@@ -37,8 +37,11 @@ const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
   { id: 'time', label: 'Quickest Prep' },
 ];
 
-export default function RecipesPage() {
+function RecipesContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inspectParam = searchParams.get('inspect') || searchParams.get('recipe');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDietFilter, setSelectedDietFilter] = useState<string>('All');
@@ -58,6 +61,19 @@ export default function RecipesPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Handle URL recipe inspection parameter (e.g. from landing page rotating dishes)
+  useEffect(() => {
+    if (inspectParam) {
+      const match = RECIPES.find(
+        (r) => r.id.toLowerCase() === inspectParam.toLowerCase() || r.id.toLowerCase().includes(inspectParam.toLowerCase())
+      );
+      if (match) {
+        setSelectedRecipe(match);
+        setPortionMultiplier(1.0);
+      }
+    }
+  }, [inspectParam]);
 
   // Sync user's profile dietary preference on initial load
   useEffect(() => {
@@ -138,7 +154,6 @@ export default function RecipesPage() {
     const scaledProtein = Math.round(recipe.protein * multiplier);
     const scaledCalories = Math.round(recipe.calories * multiplier);
 
-    // Auth Gate: Check if user is authenticated
     if (!userSession) {
       setPendingAction({
         type: 'LOG_RECIPE',
@@ -323,7 +338,7 @@ export default function RecipesPage() {
             </div>
           </div>
 
-          {/* Dedicated Diet Filter Row */}
+          {/* Dedicated Diet Filter Row (Strict Monochrome, No Emojis) */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase shrink-0">
               Diet Filter:
@@ -336,9 +351,9 @@ export default function RecipesPage() {
                     key={df.id}
                     type="button"
                     onClick={() => setSelectedDietFilter(df.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-white/15 text-white font-semibold border border-white/20'
+                        ? 'bg-white/15 text-white font-semibold border border-white/20 shadow-sm'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -349,8 +364,8 @@ export default function RecipesPage() {
             </div>
 
             {userProfile?.dietaryRestrictions?.[0] && userProfile.dietaryRestrictions[0] !== 'High-Protein Omnivore' && (
-              <span className="text-[10px] font-mono text-slate-400 border border-white/10 bg-white/[0.03] px-2 py-1 rounded-lg hidden sm:inline-block">
-                Auto-calibrated from profile ({userProfile.dietaryRestrictions[0]})
+              <span className="text-[10px] font-mono text-slate-400 border border-white/10 bg-white/[0.03] px-2.5 py-1 rounded-lg hidden sm:inline-block">
+                Auto-filtered for {userProfile.dietaryRestrictions[0]}
               </span>
             )}
           </div>
@@ -647,5 +662,19 @@ export default function RecipesPage() {
       )}
 
     </div>
+  );
+}
+
+export default function RecipesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#080808] flex items-center justify-center text-slate-400 font-mono text-xs">
+          Loading recipes catalog...
+        </div>
+      }
+    >
+      <RecipesContent />
+    </Suspense>
   );
 }

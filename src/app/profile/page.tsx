@@ -445,14 +445,38 @@ export default function ProfilePage() {
                   Create Account to Save Data
                 </Link>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign Out of Account</span>
-                </button>
+                <div className="flex flex-col gap-2.5">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (userSession?.email) {
+                        try {
+                          const redirectTo = typeof window !== 'undefined'
+                            ? `${window.location.origin}/auth/callback?next=/auth?mode=update_password`
+                            : undefined;
+                          await supabase.auth.resetPasswordForEmail(userSession.email, { redirectTo });
+                          setSyncStatus('Password reset link sent to ' + userSession.email);
+                          setTimeout(() => setSyncStatus(null), 4000);
+                        } catch (err: any) {
+                          alert(err.message || 'Failed to send reset link.');
+                        }
+                      }
+                    }}
+                    className="w-full py-2.5 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/10 text-slate-200 hover:text-white hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Send Password Reset Email</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out of Account</span>
+                  </button>
+                </div>
               )}
             </div>
 

@@ -18,6 +18,15 @@ export interface DishData {
 
 export const DISH_ITEMS: DishData[] = [
   {
+    id: 'paneer',
+    recipeId: 'warm-ancient-grain-bowl',
+    name: 'Spiced Paneer Protein Bowl',
+    image: '/assets/food/grain-bowl.png',
+    protein: '32g',
+    calories: '540',
+    focus: '9.2/10',
+  },
+  {
     id: 'pasta',
     recipeId: 'truffle-tagliatelle-pasta',
     name: 'Truffle & Parmesan Tagliatelle',
@@ -53,15 +62,6 @@ export const DISH_ITEMS: DishData[] = [
     calories: '560',
     focus: '8.9/10',
   },
-  {
-    id: 'grain',
-    recipeId: 'warm-ancient-grain-bowl',
-    name: 'Warm Ancient Grain & Avocado Bowl',
-    image: '/assets/food/grain-bowl.png',
-    protein: '22g',
-    calories: '490',
-    focus: '8.7/10',
-  },
 ];
 
 const DISH_IMAGES = DISH_ITEMS.map((d) => d.image);
@@ -69,9 +69,10 @@ const DISH_IMAGES = DISH_ITEMS.map((d) => d.image);
 interface PixelShowcaseProps {
   onDishChange?: (dish: DishData, index: number) => void;
   className?: string;
+  themeMode?: 'light' | 'dark';
 }
 
-export function PixelShowcase({ onDishChange, className = '' }: PixelShowcaseProps) {
+export function PixelShowcase({ onDishChange, className = '', themeMode = 'dark' }: PixelShowcaseProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
@@ -83,6 +84,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const currentIndexRef = useRef(0);
   const isScanningRef = useRef(false);
   const animFrameRef = useRef<number | null>(null);
+  const isLight = themeMode === 'light';
 
   const triggerNextDish = (targetNext?: number) => {
     if (isScanningRef.current) return;
@@ -160,7 +162,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   return (
     <div className={`relative w-full flex flex-col items-center justify-center select-none ${className}`}>
       
-      {/* Massive Unboxed Food Arena (Gentle Organic Float, No Box, No Tilt) */}
+      {/* Massive Unboxed Food Arena (No Box Container, Pure Big Floating Art) */}
       <div 
         onClick={handleInspectRecipe}
         onKeyDown={(e) => {
@@ -175,18 +177,26 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         className="group relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[680px] aspect-square min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.02] focus-visible:outline-none"
       >
 
-        {/* Ambient Warm Soil Diffuse Back-Glow */}
+        {/* Subtle Ambient Diffuse Radial Glow */}
         <div 
-          className="absolute -inset-8 rounded-full pointer-events-none opacity-40 transition-opacity duration-300 group-hover:opacity-60"
+          className="absolute -inset-10 rounded-full pointer-events-none opacity-30 transition-opacity duration-300 group-hover:opacity-50"
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(26, 54, 41, 0.12) 0%, rgba(232, 222, 207, 0.4) 45%, transparent 70%)',
-            filter: 'blur(40px)',
+            background: isLight 
+              ? 'radial-gradient(circle at 50% 50%, rgba(26, 54, 41, 0.12) 0%, rgba(232, 222, 207, 0.4) 45%, transparent 70%)'
+              : 'radial-gradient(circle at 50% 50%, rgba(217, 160, 54, 0.15) 0%, rgba(244, 240, 234, 0.05) 45%, transparent 70%)',
+            filter: 'blur(45px)',
             zIndex: 0
           }}
         />
 
-        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage (Big, Crisp Pixel Art) */}
-        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
+        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage (Massive, Sharp Pixel Art) */}
+        <div 
+          className={`relative w-full h-full z-10 [image-rendering:pixelated] ${
+            isLight 
+              ? "drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]" 
+              : "drop-shadow-[20px_20px_0px_rgba(0,0,0,0.5)]"
+          }`}
+        >
           <PixelWaveDish
             currentIndex={currentIndex}
             prevIndex={prevIndex}
@@ -210,7 +220,11 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
               retroAudio.playBlip();
               triggerNextDish(currentIndex - 1);
             }}
-            className="pointer-events-auto p-3 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+            className={`pointer-events-auto p-3 rounded-full border-3 transition-all cursor-pointer ${
+              isLight
+                ? "bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                : "bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#111914] shadow-[3px_3px_0px_#D9A036] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            }`}
             aria-label="Previous recipe"
           >
             <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
@@ -224,7 +238,11 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
               retroAudio.playBlip();
               triggerNextDish(currentIndex + 1);
             }}
-            className="pointer-events-auto p-3 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+            className={`pointer-events-auto p-3 rounded-full border-3 transition-all cursor-pointer ${
+              isLight
+                ? "bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                : "bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] hover:bg-[#111914] shadow-[3px_3px_0px_#D9A036] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            }`}
             aria-label="Next recipe"
           >
             <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -232,10 +250,16 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         </div>
 
         {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
-        <div className="absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFFDF9] border-3 border-[#1A3629] shadow-[4px_4px_0px_#1A3629]">
-          <Sparkles className="w-4 h-4 text-[#1A3629]" />
-          <span className="font-cabinet font-bold text-xs sm:text-sm text-[#1A3629]">
-            Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
+        <div 
+          className={`absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full border-3 ${
+            isLight
+              ? "bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[4px_4px_0px_#1A3629]"
+              : "bg-[#F4F0EA] border-[#111914] text-[#111914] shadow-[4px_4px_0px_#111914]"
+          }`}
+        >
+          <Sparkles className={`w-4 h-4 ${isLight ? "text-[#1A3629]" : "text-[#111914]"}`} />
+          <span className="font-cabinet font-bold text-xs sm:text-sm">
+            Inspect Recipe <span className={isLight ? "text-[#2C4A3B] font-medium" : "text-[#111914]/80 font-medium"}>· {currentDish.name} →</span>
           </span>
         </div>
 
@@ -246,9 +270,17 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         <button
           type="button"
           onClick={handleToggleSound}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border-2 border-[#1A3629] text-[10px] font-mono font-bold text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold transition-all cursor-pointer ${
+            isLight
+              ? "bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              : "bg-[#1A261E] border-[#F4F0EA] text-[#F4F0EA] shadow-[2px_2px_0px_#D9A036] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          }`}
         >
-          {isMuted ? <VolumeX className="w-3 h-3 text-[#1A3629]" /> : <Volume2 className="w-3 h-3 text-[#1A3629]" />}
+          {isMuted ? (
+            <VolumeX className={`w-3 h-3 ${isLight ? "text-[#1A3629]" : "text-[#F4F0EA]"}`} />
+          ) : (
+            <Volume2 className={`w-3 h-3 ${isLight ? "text-[#1A3629]" : "text-[#F4F0EA]"}`} />
+          )}
           <span>{isMuted ? '8-BIT FX: OFF' : '8-BIT FX: ON'}</span>
         </button>
       </div>

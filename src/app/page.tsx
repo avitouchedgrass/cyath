@@ -70,6 +70,7 @@ const SAMPLE_SCATTER_POINTS = [
 
 export default function Home() {
   const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
+  const [heroTheme, setHeroTheme] = useState<'light' | 'dark'>('dark');
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [selectedScatterPoint, setSelectedScatterPoint] = useState<number | null>(4);
   const [previewEnergy, setPreviewEnergy] = useState(8);
@@ -90,6 +91,7 @@ export default function Home() {
   }, []);
 
   const isLoggedIn = mounted && !!userSession;
+  const isLight = heroTheme === 'light';
 
   return (
     <div className="relative min-h-screen bg-[#080808] overflow-hidden flex flex-col text-neutral-100 selection:bg-white selection:text-black">
@@ -104,133 +106,215 @@ export default function Home() {
         }}
       />
 
-      {/* Global Navigation Header */}
-      <HeaderNav />
+      {/* Global Navigation Header with Light/Dark Mode Switcher */}
+      <HeaderNav 
+        themeMode={heroTheme} 
+        onToggleTheme={() => setHeroTheme((prev) => (prev === 'light' ? 'dark' : 'light'))} 
+      />
 
       {/* Main Page Content */}
       <main className="relative z-10 flex-1 flex flex-col">
         
         {/* ========================================================================= */}
-        {/* 1. HERO SECTION: Premium-Playful Retro Neobrutalism Hero Staging */}
+        {/* 1. HERO SECTION: Unboxed Retro Neobrutalism (Light / Dark Adaptable) */}
         {/* ========================================================================= */}
-        <section className="bg-[#F4F0EA] px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 border-[#1A3629]">
+        <section 
+          className={`px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 transition-colors duration-300 ${
+            isLight
+              ? 'bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]'
+              : 'bg-[#111914] border-[#F4F0EA] text-[#F4F0EA]'
+          }`}
+        >
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
-            {/* Hero Left Column: Physical Tactile Content Tile */}
-            <div className="lg:col-span-6 w-full flex justify-center lg:justify-start">
-              <div className="w-full max-w-2xl bg-[#FFFDF9] border-4 border-[#1A3629] rounded-3xl p-8 sm:p-10 lg:p-12 shadow-[8px_8px_0px_#1A3629] flex flex-col items-start relative">
-                
-                {/* Headline with High-Contrast Vintage Serif & Typewriter */}
-                <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl text-[#1A3629] tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px]">
-                  <TextType
-                    text={[
-                      "Pixel-Perfect Health.",
-                      "Calibrated for High Performance.",
-                      "Behavioral Momentum Engineered."
-                    ]}
-                    typingSpeed={45}
-                    deletingSpeed={25}
-                    pauseDuration={2400}
-                    startOnVisible={true}
-                    cursorClassName="bg-[#1A3629]"
-                  />
-                </h1>
-                
-                {/* Body Text in Cabinet Grotesk */}
-                <p className="font-cabinet font-medium text-base sm:text-lg text-[#2C4A3B] leading-relaxed mt-5 max-w-xl">
-                  Log whole-food fuel, track daily routines in 30 seconds, and let our continuous correlation engine uncover what drives your peak energy days.
-                </p>
+            {/* Hero Left Column: Clean Unboxed Typography & Chunky Neobrutalist CTAs */}
+            <div className="lg:col-span-6 w-full flex flex-col items-start justify-center">
+              
+              {/* Headline with High-Contrast Vintage Serif & Typewriter */}
+              <h1 
+                className={`font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px] ${
+                  isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                }`}
+              >
+                <TextType
+                  text={[
+                    "Pixel-Perfect Health.",
+                    "Calibrated for High Performance.",
+                    "Behavioral Momentum Engineered."
+                  ]}
+                  typingSpeed={45}
+                  deletingSpeed={25}
+                  pauseDuration={2400}
+                  startOnVisible={true}
+                  cursorClassName={isLight ? "bg-[#1A3629]" : "bg-[#F4F0EA]"}
+                />
+              </h1>
+              
+              {/* Editorial Body Text in Cabinet Grotesk */}
+              <p 
+                className={`font-cabinet font-medium text-base sm:text-lg leading-relaxed mt-6 max-w-xl ${
+                  isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+                }`}
+              >
+                Log whole-food fuel, track daily routines in 30 seconds, and let our continuous correlation engine uncover what drives your peak energy days.
+              </p>
 
-                {/* Primary & Secondary Chunky Neobrutalist CTAs */}
-                <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                  <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
-                    <button
-                      type="button"
-                      className="w-full sm:w-auto bg-[#1A3629] text-[#FFFDF9] border-4 border-[#1A3629] font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
-                    >
-                      {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
-                    </button>
-                  </Link>
+              {/* Primary & Secondary Chunky Neobrutalist CTAs */}
+              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+                <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
+                  <button
+                    type="button"
+                    className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
+                      isLight
+                        ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
+                        : 'bg-[#F4F0EA] text-[#111914] border-[#F4F0EA] shadow-[5px_5px_0px_#D9A036] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#D9A036] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
+                    }`}
+                  >
+                    {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
+                  </button>
+                </Link>
 
-                  <Link href="/protocols" className="w-full sm:w-auto">
-                    <button
-                      type="button"
-                      className="w-full sm:w-auto bg-[#FFFDF9] text-[#1A3629] border-4 border-[#1A3629] font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                <Link href="/protocols" className="w-full sm:w-auto">
+                  <button
+                    type="button"
+                    className={`w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 transition-all cursor-pointer inline-flex items-center justify-center ${
+                      isLight
+                        ? 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
+                        : 'bg-[#1A261E] text-[#F4F0EA] border-[#F4F0EA] shadow-[5px_5px_0px_#F4F0EA] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#F4F0EA] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none'
+                    }`}
+                  >
+                    Browse Blueprints
+                  </button>
+                </Link>
+              </div>
+
+              {/* Bottom Metric Inset Micro-Cards */}
+              <div 
+                className={`mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 w-full ${
+                  isLight ? 'border-[#1A3629]/15' : 'border-[#F4F0EA]/20'
+                }`}
+              >
+                
+                {/* Micro-Card 1: Streak Heatmap Preview */}
+                <div 
+                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] transition-all ${
+                    isLight 
+                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
+                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 mb-2">
+                    {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
+                      <span 
+                        key={i} 
+                        className={`h-3 w-3 rounded-xs ${isLight ? 'bg-[#1A3629]' : 'bg-[#F4F0EA]'}`} 
+                        style={{ opacity }} 
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <div 
+                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
+                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
+                      }`}
                     >
-                      Browse Blueprints
-                    </button>
-                  </Link>
+                      Streak Heatmaps
+                    </div>
+                    <div 
+                      className={`font-mono text-[11px] mt-0.5 ${
+                        isLight ? 'text-[#2C4A3B]' : 'text-[#F4F0EA]'
+                      }`}
+                    >
+                      Monochrome consistency
+                    </div>
+                  </div>
                 </div>
 
-                {/* Bottom Metric Inset Micro-Cards */}
-                <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 border-[#1A3629]/15 w-full">
-                  
-                  {/* Micro-Card 1: Streak Heatmap Preview */}
-                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px]">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
-                        <span 
-                          key={i} 
-                          className="h-3 w-3 rounded-xs bg-[#1A3629]" 
-                          style={{ opacity }} 
-                        />
-                      ))}
-                    </div>
-                    <div>
-                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
-                        Streak Heatmaps
-                      </div>
-                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
-                        Monochrome consistency
-                      </div>
-                    </div>
+                {/* Micro-Card 2: Macro Fueling Preview */}
+                <div 
+                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden transition-all ${
+                    isLight 
+                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
+                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
+                  }`}
+                >
+                  <div 
+                    key={currentDish.id}
+                    className={`font-mono font-bold text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip ${
+                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                    }`}
+                  >
+                    {currentDish.protein} PRO · {currentDish.calories} KCAL
                   </div>
-
-                  {/* Micro-Card 2: Macro Fueling Preview */}
-                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px] overflow-hidden">
+                  <div>
                     <div 
-                      key={currentDish.id}
-                      className="font-mono font-bold text-[#1A3629] text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip"
+                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
+                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
+                      }`}
                     >
-                      {currentDish.protein} PRO · {currentDish.calories} KCAL
+                      Macro-Fueling
                     </div>
-                    <div>
-                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
-                        Macro-Fueling
-                      </div>
-                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
-                        16-bit whole food targets
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Micro-Card 3: Energy Rating Preview */}
-                  <div className="bg-[#F4F0EA] border-2 border-[#1A3629] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] flex flex-col justify-between min-h-[105px] overflow-hidden">
                     <div 
-                      key={`focus-${currentDish.id}`}
-                      className="font-mono font-bold text-[#1A3629] text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip"
+                      className={`font-mono text-[11px] mt-0.5 ${
+                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+                      }`}
                     >
-                      <span>{currentDish.focus}</span>
-                      <span className="text-[10px] text-[#2C4A3B] font-mono font-normal uppercase">Focus Index</span>
-                    </div>
-                    <div>
-                      <div className="font-cabinet font-bold text-[#1A3629] text-xs uppercase tracking-wide">
-                        Energy Correlation
-                      </div>
-                      <div className="font-mono text-[#2C4A3B] text-[11px] mt-0.5">
-                        Routine × state insights
-                      </div>
+                      16-bit whole food targets
                     </div>
                   </div>
+                </div>
 
+                {/* Micro-Card 3: Energy Rating Preview */}
+                <div 
+                  className={`border-2 rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden transition-all ${
+                    isLight 
+                      ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
+                      : 'bg-[#1A261E] border-[#F4F0EA] shadow-[3px_3px_0px_#F4F0EA]'
+                  }`}
+                >
+                  <div 
+                    key={`focus-${currentDish.id}`}
+                    className={`font-mono font-bold text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip ${
+                      isLight ? 'text-[#1A3629]' : 'text-[#F4F0EA]'
+                    }`}
+                  >
+                    <span>{currentDish.focus}</span>
+                    <span 
+                      className={`text-[10px] font-mono font-normal uppercase ${
+                        isLight ? 'text-[#2C4A3B]' : 'text-[#8F9E8B]'
+                      }`}
+                    >
+                      Focus Index
+                    </span>
+                  </div>
+                  <div>
+                    <div 
+                      className={`font-cabinet font-bold text-xs uppercase tracking-wide ${
+                        isLight ? 'text-[#1A3629]' : 'text-[#8F9E8B]'
+                      }`}
+                    >
+                      Energy Correlation
+                    </div>
+                    <div 
+                      className={`font-mono text-[11px] mt-0.5 ${
+                        isLight ? 'text-[#2C4A3B]' : 'text-[#C2CDBF]'
+                      }`}
+                    >
+                      Routine × state insights
+                    </div>
+                  </div>
                 </div>
 
               </div>
+
             </div>
 
             {/* Hero Right Column: Massive Unboxed Pixel Art Showcase with 8-Bit Audio & Wipes */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
-              <PixelShowcase onDishChange={(dish) => setCurrentDish(dish)} />
+              <PixelShowcase 
+                themeMode={heroTheme}
+                onDishChange={(dish) => setCurrentDish(dish)} 
+              />
             </div>
 
           </div>

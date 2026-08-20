@@ -89,8 +89,8 @@ export default function ProfilePage() {
   if (!mounted) return null;
 
   const isGuest = !userSession || userSession.id.startsWith('guest_');
-  const userEmail = userSession?.email || (isGuest ? 'guest.session@cyath.app' : 'user@cyath.app');
-  const displayName = userProfile?.fullName || (isGuest ? 'Guest Explorer' : userEmail.split('@')[0]);
+  const userEmail = userSession?.email || (isGuest ? 'demo.user@cyath.health' : 'user@cyath.app');
+  const displayName = userProfile?.fullName || (isGuest ? 'demo-user' : userEmail.split('@')[0]);
 
   const goalMeta = userProfile?.primaryGoal && GOAL_LABELS[userProfile.primaryGoal]
     ? GOAL_LABELS[userProfile.primaryGoal]

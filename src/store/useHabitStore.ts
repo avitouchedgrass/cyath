@@ -422,11 +422,11 @@ export const useHabitStore = create<HabitStoreState>()(
         set({
           userSession: { id: `guest_${Date.now()}`, email: 'demo.user@cyath.health' },
           userProfile: {
-            fullName: 'Alex Vance (Demo)',
-            age: 28,
+            fullName: 'demo-user',
+            age: 19,
             sex: 'male',
             heightCm: 178,
-            weightKg: 74,
+            weightKg: 70,
             primaryGoal: 'focus',
             allergies: [],
             dietaryRestrictions: ['High-Protein Omnivore'],
@@ -483,6 +483,22 @@ export const useHabitStore = create<HabitStoreState>()(
     }),
     {
       name: 'cyath-habit-store-v2',
+      partialize: (state) => {
+        // If current session is a demo user (starts with 'guest_'), do NOT persist guest changes to localStorage!
+        if (state.userSession?.id.startsWith('guest_')) {
+          return {
+            userSession: null,
+            userProfile: null,
+            habits: DEFAULT_HABITS,
+            activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+            logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+            streakCount: 0,
+            pendingAction: null,
+            currentDate: state.currentDate,
+          };
+        }
+        return state;
+      },
     }
   )
 );

@@ -227,7 +227,7 @@ function OnboardingContent() {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Avi Sharma"
+                    placeholder="e.g. Alex Morgan"
                     className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 font-sans transition-all"
                   />
                 </div>

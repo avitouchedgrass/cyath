@@ -17,6 +17,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: session.user.id,
             email: session.user.email,
           });
+        } else {
+          // If no authenticated Supabase session, reset any leftover demo session on page refresh
+          const current = useHabitStore.getState().userSession;
+          if (current?.id.startsWith('guest_')) {
+            useHabitStore.setState({
+              userSession: null,
+              userProfile: null,
+              logsByDate: { [new Date().toISOString().split('T')[0]]: {
+                habitsCompleted: {},
+                totalProteinLogged: 0,
+                totalCaloriesLogged: 0,
+                hydrationLiters: 0,
+                sleepHours: 8,
+                energyLevel: 7,
+                moodScore: 7,
+                notes: '',
+                loggedRecipeIds: [],
+              } },
+              streakCount: 0,
+              pendingAction: null,
+            });
+          }
         }
       } catch (err) {
         console.error('Failed to initialize session:', err);
@@ -33,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: session.user.email,
         });
       } else {
-        // Only clear if not in an explicit demo/guest session
+        // Only clear if not in an active in-memory guest session
         const current = useHabitStore.getState().userSession;
         if (current && !current.id.startsWith('guest_')) {
           setUserSession(null);

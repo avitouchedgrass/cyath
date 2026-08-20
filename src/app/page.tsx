@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
 import { TextType } from '@/components/reactbits/TextType';
 import { SpecularButton } from '@/components/reactbits/SpecularButton';
+import { useHabitStore } from '@/store/useHabitStore';
 import {
   Flame,
   Activity,
@@ -73,6 +74,15 @@ export default function Home() {
   const [selectedScatterPoint, setSelectedScatterPoint] = useState<number | null>(4);
   const [previewEnergy, setPreviewEnergy] = useState(8);
   const [previewFocus, setPreviewFocus] = useState(9);
+  const [mounted, setMounted] = useState(false);
+
+  const { userSession } = useHabitStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted && !!userSession;
 
   return (
     <div className="relative min-h-screen bg-[#080808] overflow-hidden flex flex-col text-neutral-100 selection:bg-white selection:text-black">
@@ -129,7 +139,7 @@ export default function Home() {
 
                 {/* Primary & Secondary Call to Actions */}
                 <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                  <Link href="/auth" className="w-full sm:w-auto">
+                  <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                     <SpecularButton 
                       size="lg" 
                       radius={20} 
@@ -138,7 +148,7 @@ export default function Home() {
                       blur={16}
                       className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight active:scale-95 shadow-lg"
                     >
-                      Start Calibration — Free
+                      {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                     </SpecularButton>
                   </Link>
 
@@ -627,14 +637,14 @@ export default function Home() {
             </p>
 
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth" className="w-full sm:w-auto">
+              <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                 <SpecularButton
                   size="lg"
                   radius={20}
                   intensity={2.0}
                   className="w-full sm:w-auto text-sm sm:text-base font-medium tracking-tight shadow-xl"
                 >
-                  Start Calibration — Free
+                  {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                 </SpecularButton>
               </Link>
 

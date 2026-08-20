@@ -23,6 +23,14 @@ import {
 const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
 
+const DIET_FILTERS = [
+  { id: 'All', label: 'All Diets' },
+  { id: 'Vegetarian', label: '🌿 Vegetarian' },
+  { id: 'Vegan', label: '🌱 Vegan' },
+  { id: 'Pescatarian', label: '🐟 Pescatarian' },
+  { id: 'Omnivore', label: '🥩 Omnivore' },
+] as const;
+
 const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
   { id: 'protein', label: 'Highest Protein' },
   { id: 'calories', label: 'Lowest Calories' },
@@ -33,6 +41,7 @@ export default function RecipesPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedDietFilter, setSelectedDietFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'protein' | 'calories' | 'time'>('protein');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -43,12 +52,22 @@ export default function RecipesPage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { logRecipeToDay, getDailyLog, userSession, setPendingAction } = useHabitStore();
+  const { logRecipeToDay, getDailyLog, userSession, setPendingAction, userProfile } = useHabitStore();
   const todayLog = getDailyLog();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Sync user's profile dietary preference on initial load
+  useEffect(() => {
+    if (userProfile?.dietaryRestrictions?.[0]) {
+      const pref = userProfile.dietaryRestrictions[0];
+      if (pref === 'Vegetarian') setSelectedDietFilter('Vegetarian');
+      else if (pref === 'Vegan / Plant-Based') setSelectedDietFilter('Vegan');
+      else if (pref === 'Pescatarian') setSelectedDietFilter('Pescatarian');
+    }
+  }, [userProfile?.dietaryRestrictions]);
 
   // Close custom dropdown when clicking outside
   useEffect(() => {
@@ -94,14 +113,25 @@ export default function RecipesPage() {
       const matchesCategory =
         selectedCategory === 'All' || recipe.category === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      let matchesDiet = true;
+      if (selectedDietFilter === 'Vegetarian') {
+        matchesDiet = recipe.dietType === 'vegetarian' || recipe.dietType === 'vegan';
+      } else if (selectedDietFilter === 'Vegan') {
+        matchesDiet = recipe.dietType === 'vegan';
+      } else if (selectedDietFilter === 'Pescatarian') {
+        matchesDiet = recipe.dietType === 'pescatarian' || recipe.dietType === 'vegetarian' || recipe.dietType === 'vegan';
+      } else if (selectedDietFilter === 'Omnivore') {
+        matchesDiet = recipe.dietType === 'omnivore';
+      }
+
+      return matchesSearch && matchesCategory && matchesDiet;
     }).sort((a, b) => {
       if (sortBy === 'protein') return b.protein - a.protein;
       if (sortBy === 'calories') return a.calories - b.calories;
       if (sortBy === 'time') return a.prepTimeMinutes - b.prepTimeMinutes;
       return 0;
     });
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, selectedDietFilter, sortBy]);
 
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -181,7 +211,7 @@ export default function RecipesPage() {
         </div>
 
         {/* Page Header */}
-        <div className="max-w-3xl mb-12">
+        <div className="max-w-3xl mb-10">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
               Whole-Food Catalog
@@ -195,101 +225,134 @@ export default function RecipesPage() {
           </p>
         </div>
 
-        {/* Control Row */}
-        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between mb-8">
-          
-          {/* Category Filter Pills */}
-          <div className="overflow-x-auto pb-1 scrollbar-none">
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
-              {CATEGORIES.map((cat) => {
-                const isSelected = selectedCategory === cat;
+        {/* Control Row: Categories + Diet Filter + Search + Sort */}
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+            {/* Category Filter Pills */}
+            <div className="overflow-x-auto pb-1 scrollbar-none">
+              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
+                {CATEGORIES.map((cat) => {
+                  const isSelected = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-white text-black font-semibold shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Search Bar & Custom Sort Dropdown */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search recipes..."
+                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-white/30 transition-all font-sans"
+                />
+                {!searchQuery && (
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 border border-white/10 px-1 py-0.5 rounded bg-white/5 pointer-events-none">
+                    /
+                  </span>
+                )}
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Custom Sort Dropdown */}
+              <div className="relative" ref={sortDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                  className="px-3.5 py-2 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-slate-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-2.5 shadow-sm cursor-pointer whitespace-nowrap"
+                  aria-haspopup="listbox"
+                  aria-expanded={isSortOpen}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-white font-medium">
+                    {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu Popup */}
+                {isSortOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#121212] border border-white/15 backdrop-blur-2xl shadow-2xl p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
+                    {SORT_OPTIONS.map((option) => {
+                      const isSelected = sortBy === option.id;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => {
+                            setSortBy(option.id);
+                            setIsSortOpen(false);
+                          }}
+                          className={`w-full px-3 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-white/10 text-white font-semibold'
+                              : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <span>{option.label}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Dedicated Diet Filter Row */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase shrink-0">
+              Diet Filter:
+            </span>
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.02] border border-white/5">
+              {DIET_FILTERS.map((df) => {
+                const isSelected = selectedDietFilter === df.id;
                 return (
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
+                    key={df.id}
+                    type="button"
+                    onClick={() => setSelectedDietFilter(df.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-white text-black font-semibold shadow-sm'
+                        ? 'bg-white/15 text-white font-semibold border border-white/20'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    {cat}
+                    {df.label}
                   </button>
                 );
               })}
             </div>
-          </div>
 
-          {/* Search Bar & Custom Sort Dropdown */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search recipes..."
-                className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-white/30 transition-all font-sans"
-              />
-              {!searchQuery && (
-                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 border border-white/10 px-1 py-0.5 rounded bg-white/5 pointer-events-none">
-                  /
-                </span>
-              )}
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Custom Dropdown */}
-            <div className="relative" ref={sortDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setIsSortOpen(!isSortOpen)}
-                className="px-3.5 py-2 rounded-xl bg-[#121212]/95 border border-white/10 text-xs font-mono text-slate-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-between gap-2.5 shadow-sm cursor-pointer whitespace-nowrap"
-                aria-haspopup="listbox"
-                aria-expanded={isSortOpen}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-white font-medium">
-                  {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
-                </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Dropdown Menu Popup */}
-              {isSortOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#121212] border border-white/15 backdrop-blur-2xl shadow-2xl p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono">
-                  {SORT_OPTIONS.map((option) => {
-                    const isSelected = sortBy === option.id;
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => {
-                          setSortBy(option.id);
-                          setIsSortOpen(false);
-                        }}
-                        className={`w-full px-3 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-white/10 text-white font-semibold'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
-                        }`}
-                      >
-                        <span>{option.label}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            {userProfile?.dietaryRestrictions?.[0] && userProfile.dietaryRestrictions[0] !== 'High-Protein Omnivore' && (
+              <span className="text-[10px] font-mono text-slate-400 border border-white/10 bg-white/[0.03] px-2 py-1 rounded-lg hidden sm:inline-block">
+                Auto-calibrated from profile ({userProfile.dietaryRestrictions[0]})
+              </span>
+            )}
           </div>
         </div>
 
@@ -298,15 +361,16 @@ export default function RecipesPage() {
           <div className="text-center py-20 bg-white/[0.01] border border-white/5 rounded-2xl p-8">
             <ChefHat className="w-10 h-10 text-slate-600 mx-auto mb-3" />
             <h3 className="font-cabinet font-semibold text-base text-white">No matching recipes</h3>
-            <p className="text-slate-400 text-xs mt-1">Try clearing your search query or selecting a different category filter.</p>
+            <p className="text-slate-400 text-xs mt-1">Try clearing your search query or adjusting your dietary filter.</p>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('All');
+                setSelectedDietFilter('All');
               }}
               className="mt-4 px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs cursor-pointer hover:bg-slate-200 transition-colors"
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         ) : (
@@ -449,118 +513,129 @@ export default function RecipesPage() {
                 <span>·</span>
                 <span className="text-slate-400 text-xs">Focus {selectedRecipe.focusScore}</span>
               </div>
-              <h2 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mb-2">
+              <h2 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight leading-tight">
                 {selectedRecipe.name}
               </h2>
-              <p className="text-slate-400 text-xs sm:text-sm font-sans leading-relaxed">
-                {selectedRecipe.description}
+              <p className="text-slate-400 text-sm font-sans mt-1 leading-relaxed">
+                {selectedRecipe.subtitle}
               </p>
             </div>
 
-            {/* Tactile Portion Segmented Control */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            {/* Serving Portion Controller */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-mono tracking-widest uppercase text-slate-400 block">
-                  Select Serving Portion
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase block mb-0.5">
+                  Calibrated Portion Size
                 </span>
-                <span className="text-[11px] text-slate-500 font-sans">
-                  Scales macros dynamically before logging
-                </span>
+                <span className="text-xs font-sans text-slate-300">Adjust nutrient yield for this meal</span>
               </div>
 
-              {/* Wrapped group pill with active/inactive states */}
-              <div className="bg-white/[0.02] border border-white/10 p-1 rounded-lg inline-flex gap-1">
-                {PORTION_MULTIPLIERS.map((mult) => (
-                  <button
-                    key={mult}
-                    type="button"
-                    onClick={() => setPortionMultiplier(mult)}
-                    className={`px-3 py-1.5 text-xs font-mono transition-all cursor-pointer ${
-                      portionMultiplier === mult
-                        ? 'bg-white text-black font-semibold rounded-md shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] rounded-md'
-                    }`}
-                  >
-                    {mult}x
-                  </button>
-                ))}
+              <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 self-start sm:self-auto">
+                {PORTION_MULTIPLIERS.map((multiplier) => {
+                  const isSelected = portionMultiplier === multiplier;
+                  return (
+                    <button
+                      key={multiplier}
+                      type="button"
+                      onClick={() => setPortionMultiplier(multiplier)}
+                      className={`px-3 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-white text-black font-bold shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {multiplier}x
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Scaled Macro Breakdown Bar with strict font-mono */}
-            <div className="grid grid-cols-4 gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center font-mono">
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider">Protein</div>
-                <div className="text-xl font-bold text-white tabular-nums mt-0.5">
+            {/* Scaled Macro Breakdown Card */}
+            <div className="grid grid-cols-4 gap-2.5 text-center">
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
+                <span className="text-[10px] font-mono text-slate-500 block mb-1">PROTEIN</span>
+                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
                   {Math.round(selectedRecipe.protein * portionMultiplier)}g
-                </div>
+                </span>
               </div>
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider">Carbs</div>
-                <div className="text-xl font-bold text-slate-300 tabular-nums mt-0.5">
-                  {Math.round(selectedRecipe.carbs * portionMultiplier)}g
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider">Fats</div>
-                <div className="text-xl font-bold text-slate-300 tabular-nums mt-0.5">
-                  {Math.round(selectedRecipe.fats * portionMultiplier)}g
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider">Calories</div>
-                <div className="text-xl font-bold text-white tabular-nums mt-0.5">
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
+                <span className="text-[10px] font-mono text-slate-500 block mb-1">CALORIES</span>
+                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
                   {Math.round(selectedRecipe.calories * portionMultiplier)}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
+                <span className="text-[10px] font-mono text-slate-500 block mb-1">CARBS</span>
+                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+                  {Math.round(selectedRecipe.carbs * portionMultiplier)}g
+                </span>
+              </div>
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
+                <span className="text-[10px] font-mono text-slate-500 block mb-1">FATS</span>
+                <span className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+                  {Math.round(selectedRecipe.fats * portionMultiplier)}g
+                </span>
+              </div>
+            </div>
+
+            {/* Recipe Narrative Description */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs font-sans text-slate-300 leading-relaxed">
+              {selectedRecipe.description}
+            </div>
+
+            {/* Ingredients & Method Sections in Cabinet Grotesk */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+              {/* Ingredients List */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <ChefHat className="w-4 h-4 text-slate-400" />
+                  <h4 className="font-cabinet font-semibold text-sm text-white tracking-tight">
+                    Ingredients
+                  </h4>
                 </div>
+                <ul className="space-y-2">
+                  {selectedRecipe.ingredients.map((ing, i) => (
+                    <li key={i} className="flex items-start justify-between gap-2 text-xs border-b border-white/5 pb-1.5 font-sans text-slate-300">
+                      <span>{ing.item}</span>
+                      <span className="font-mono text-slate-400 shrink-0">{ing.amount}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Step-by-Step Instructions */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-slate-400" />
+                  <h4 className="font-cabinet font-semibold text-sm text-white tracking-tight">
+                    Method &amp; Preparation
+                  </h4>
+                </div>
+                <ol className="space-y-2.5">
+                  {selectedRecipe.instructions.map((step, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-300">
+                      <span className="font-mono text-[11px] text-slate-500 shrink-0 mt-0.5">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
             </div>
 
-            {/* Ingredients Checklist with Cabinet Grotesk Header & Monospace Amounts */}
-            <div>
-              <h3 className="font-cabinet font-bold text-base text-slate-100 mb-3 tracking-tight">
-                Ingredients ({portionMultiplier}x portion)
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {selectedRecipe.ingredients.map((ing, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs"
-                  >
-                    <span className="text-slate-200 font-sans">{ing.item}</span>
-                    <span className="text-slate-400 font-mono font-medium tabular-nums">{ing.amount}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Step-by-Step Instructions with Cabinet Grotesk Header */}
-            <div>
-              <h3 className="font-cabinet font-bold text-base text-slate-100 mb-3 tracking-tight">
-                Method &amp; Preparation
-              </h3>
-              <ol className="space-y-2.5">
-                {selectedRecipe.instructions.map((step, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
-                    <span className="w-5 h-5 rounded-md bg-white/10 text-white font-mono text-[10px] flex items-center justify-center shrink-0 mt-0.5 tabular-nums font-semibold">
-                      0{idx + 1}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Sticky / Prominent Primary Action CTA */}
-            <div className="pt-2">
+            {/* Prominent High-Contrast Full-Width Action Button */}
+            <div className="sticky bottom-0 pt-4 pb-2 bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c] to-transparent">
               <button
                 type="button"
                 onClick={() => {
                   handleQuickLog(selectedRecipe, portionMultiplier);
                   setSelectedRecipe(null);
                 }}
-                className="w-full py-4 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-4 px-6 rounded-xl bg-white text-black font-cabinet font-bold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>
                   Log Portion to Protocol (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
                 </span>
@@ -571,16 +646,6 @@ export default function RecipesPage() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-8 px-6 text-center text-xs text-slate-500 font-mono">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-serif font-medium text-white tracking-tight">Cyath</span>
-            <span>— Pixel-Perfect Health</span>
-          </div>
-          <div>Built with Next.js, Supabase &amp; Tailwind CSS</div>
-        </div>
-      </footer>
     </div>
   );
 }

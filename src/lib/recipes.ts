@@ -9,6 +9,7 @@ export interface Recipe {
   fats: number;
   prepTimeMinutes: number;
   category: 'High Protein' | 'Steady Carbs' | 'Quick Fuel' | 'Keto Clean' | 'Post Workout';
+  dietType: 'vegetarian' | 'vegan' | 'pescatarian' | 'omnivore';
   tags: string[];
   focusScore: string;
   description: string;
@@ -28,7 +29,8 @@ export const RECIPES: Recipe[] = [
     fats: 14,
     prepTimeMinutes: 20,
     category: 'High Protein',
-    tags: ['High Protein', 'Gluten-Free', 'Post Workout', 'Lean Muscle'],
+    dietType: 'omnivore',
+    tags: ['High Protein', 'Gluten-Free', 'Post Workout', 'Omnivore'],
     focusScore: '9.4/10',
     description:
       'High-bioavailability protein paired with micro-nutrient dense dark greens. Calibrated to supply steady amino acids for physical recovery without post-meal fatigue.',
@@ -59,6 +61,7 @@ export const RECIPES: Recipe[] = [
     fats: 19,
     prepTimeMinutes: 18,
     category: 'Steady Carbs',
+    dietType: 'vegetarian',
     tags: ['Glycogen Reload', 'Pre-Workout', 'Vegetarian', 'Complex Carbs'],
     focusScore: '8.4/10',
     description:
@@ -90,7 +93,8 @@ export const RECIPES: Recipe[] = [
     fats: 28,
     prepTimeMinutes: 12,
     category: 'Quick Fuel',
-    tags: ['Choline Rich', 'Brain Fuel', 'Low Carb', 'Morning Alert'],
+    dietType: 'vegetarian',
+    tags: ['Choline Rich', 'Brain Fuel', 'Vegetarian', 'Morning Alert'],
     focusScore: '9.1/10',
     description:
       'Loaded with dietary choline and healthy fats from pasture-raised yolks to stimulate morning acetylcholine production, alertness, and mental clarity.',
@@ -120,7 +124,8 @@ export const RECIPES: Recipe[] = [
     fats: 16,
     prepTimeMinutes: 22,
     category: 'High Protein',
-    tags: ['High Protein', 'Electrolyte Rich', 'Balanced Macros', 'Post Workout'],
+    dietType: 'omnivore',
+    tags: ['High Protein', 'Electrolyte Rich', 'Balanced Macros', 'Omnivore'],
     focusScore: '8.9/10',
     description:
       'Complete amino acid profile combined with natural potassium, magnesium, and bioavailable iron from grass-fed beef to restore muscle and neural vigor.',
@@ -151,7 +156,8 @@ export const RECIPES: Recipe[] = [
     fats: 17,
     prepTimeMinutes: 25,
     category: 'Steady Carbs',
-    tags: ['Plant Protein', 'Fiber Rich', 'Microbiome', 'Clean Balance'],
+    dietType: 'vegan',
+    tags: ['Plant Protein', 'Fiber Rich', 'Vegan', 'Vegetarian', 'Clean Balance'],
     focusScore: '8.7/10',
     description:
       'High-fiber prebiotic complex with monosaturated lipids. Promotes healthy gut microbiome fermentation for sustained serotonin and steady dopamine levels.',
@@ -182,7 +188,8 @@ export const RECIPES: Recipe[] = [
     fats: 18,
     prepTimeMinutes: 10,
     category: 'Quick Fuel',
-    tags: ['Fast Prep', 'Brain Fats', 'Antioxidants', 'Breakfast'],
+    dietType: 'vegetarian',
+    tags: ['Fast Prep', 'Brain Fats', 'Vegetarian', 'Breakfast'],
     focusScore: '9.0/10',
     description:
       'Natural whole-grain carbohydrates paired with bioavailable fatty acids. Excellent for fast cognitive activation without glycemic rollercoasters.',
@@ -211,7 +218,8 @@ export const RECIPES: Recipe[] = [
     fats: 32,
     prepTimeMinutes: 18,
     category: 'Keto Clean',
-    tags: ['Ultra High Protein', 'Carnivore Clean', 'Keto', 'Muscle Repair'],
+    dietType: 'omnivore',
+    tags: ['Ultra High Protein', 'Carnivore Clean', 'Keto', 'Omnivore'],
     focusScore: '9.3/10',
     description:
       'Maximum protein density with pure carnitine and zinc. Ideal for nighttime muscle repair or intense physical output recovery.',
@@ -240,7 +248,8 @@ export const RECIPES: Recipe[] = [
     fats: 14,
     prepTimeMinutes: 14,
     category: 'Steady Carbs',
-    tags: ['Clean Fuel', 'Japanese Minimalist', 'Easy Digest', 'Daily Staple'],
+    dietType: 'vegetarian',
+    tags: ['Clean Fuel', 'Japanese Minimalist', 'Vegetarian', 'Daily Staple'],
     focusScore: '8.8/10',
     description:
       'Clean, hypoallergenic fuel with easily assimilated rice starches and high-quality egg albumen. Perfect pre-training fuel or recovery comfort bowl.',
@@ -269,7 +278,8 @@ export const RECIPES: Recipe[] = [
     fats: 13,
     prepTimeMinutes: 16,
     category: 'Post Workout',
-    tags: ['High Protein', 'Lean Seafood', 'Fast Glycogen', 'Post Workout'],
+    dietType: 'pescatarian',
+    tags: ['High Protein', 'Lean Seafood', 'Pescatarian', 'Post Workout'],
     focusScore: '9.2/10',
     description:
       'High protein-to-calorie ratio from ocean-wild shrimp combined with light pasta to immediately restock muscular glycogen without sluggishness.',

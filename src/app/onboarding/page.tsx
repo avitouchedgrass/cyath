@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
@@ -11,43 +11,35 @@ import {
   Zap,
   Dumbbell,
   Moon,
-  Sparkles,
   Heart,
-  ShieldAlert,
-  Sliders,
   Scale,
-  User,
-  Utensils,
+  ChevronDown,
 } from 'lucide-react';
 
 const GOAL_OPTIONS = [
   {
     id: 'focus' as const,
-    title: 'Peak Cognitive Focus',
-    description: 'Eliminate brain fog, stabilize dopamine, and lock into deep work sessions.',
+    title: 'Cognitive Focus',
+    description: 'Deep work, dopamine balance & mental clarity',
     icon: Zap,
-    recommendedProtocols: ['deep-focus-sprint'],
   },
   {
     id: 'muscle' as const,
-    title: 'Muscle Fuel & Strength',
-    description: 'Optimize whole-food amino acid intake, protein timing, and recovery.',
+    title: 'Muscle & Strength',
+    description: 'Lean muscle synthesis & recovery timing',
     icon: Dumbbell,
-    recommendedProtocols: ['strength-muscle-fuel'],
   },
   {
     id: 'sleep' as const,
-    title: 'Circadian Sleep & Energy',
-    description: 'Calibrate light exposure, lower cortisol, and achieve restorative REM sleep.',
+    title: 'Circadian Sleep',
+    description: 'Deep delta sleep, melatonin & morning energy',
     icon: Moon,
-    recommendedProtocols: ['morning-activation', 'deep-rem-sleep'],
   },
   {
     id: 'longevity' as const,
-    title: 'Metabolic Health & Longevity',
-    description: 'Maintain glycemic stability, cellular hydration, and sustained daily vigor.',
+    title: 'Metabolic Health',
+    description: 'Cellular hydration & glycemic stability',
     icon: Heart,
-    recommendedProtocols: ['morning-activation'],
   },
 ];
 
@@ -70,6 +62,13 @@ const DIETARY_STYLES = [
   'Low-Carb / Keto',
 ];
 
+const SEX_OPTIONS: { id: 'male' | 'female' | 'other' | 'prefer_not_to_say'; label: string }[] = [
+  { id: 'male', label: 'Male' },
+  { id: 'female', label: 'Female' },
+  { id: 'other', label: 'Other / Non-Binary' },
+  { id: 'prefer_not_to_say', label: 'Prefer not to say' },
+];
+
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -88,8 +87,10 @@ function OnboardingContent() {
 
   // Form State initialized from store or defaults
   const [fullName, setFullName] = useState(userProfile?.fullName || '');
-  const [age, setAge] = useState(userProfile?.age || 26);
+  const [age, setAge] = useState<number | string>(userProfile?.age || 26);
   const [sex, setSex] = useState<'male' | 'female' | 'other' | 'prefer_not_to_say'>(userProfile?.sex || 'male');
+  const [isSexDropdownOpen, setIsSexDropdownOpen] = useState(false);
+  const sexDropdownRef = useRef<HTMLDivElement>(null);
   
   // Unit toggle for biometrics
   const [isImperial, setIsImperial] = useState(false);
@@ -106,6 +107,17 @@ function OnboardingContent() {
   );
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>(userProfile?.allergies || []);
   const [selectedDiet, setSelectedDiet] = useState<string>(userProfile?.dietaryRestrictions?.[0] || 'High-Protein Omnivore');
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sexDropdownRef.current && !sexDropdownRef.current.contains(e.target as Node)) {
+        setIsSexDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Sync imperial to metric
   const handleHeightImperialChange = (feet: number, inches: number) => {
@@ -136,14 +148,23 @@ function OnboardingContent() {
     });
   };
 
+  // Age validation: Max 120, Min 10
+  const parsedAge = Number(age);
+  const isAgeValid = typeof parsedAge === 'number' && !isNaN(parsedAge) && parsedAge >= 10 && parsedAge <= 120 && age !== '';
+
   // Calculated Calibrated Targets
   const estimatedProteinTarget = Math.round(weightKg * 1.8);
   const estimatedHydrationTarget = (Math.round((weightKg * 0.035) * 10) / 10).toFixed(1);
 
   const handleFinish = () => {
+    if (isEditing && (!userSession || userSession.id.startsWith('guest_'))) {
+      router.push('/login?redirect=/onboarding?edit=true');
+      return;
+    }
+
     updateUserProfile({
       fullName: fullName.trim() || 'Cyath Explorer',
-      age,
+      age: isAgeValid ? parsedAge : 26,
       sex,
       heightCm,
       weightKg,
@@ -161,6 +182,10 @@ function OnboardingContent() {
   };
 
   const nextStep = () => {
+    if (step === 1 && !isAgeValid) {
+      return;
+    }
+
     if (step < totalSteps) {
       setStep((prev) => prev + 1);
     } else {
@@ -181,7 +206,7 @@ function OnboardingContent() {
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.03) 0%, transparent 60%)
+            radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.025) 0%, transparent 60%)
           `,
         }}
       />
@@ -194,7 +219,7 @@ function OnboardingContent() {
             <Logo className="w-9 h-9" />
             <div>
               <div className="text-xs font-mono font-medium text-white">Personal Profile Setup</div>
-              <div className="text-[10px] font-mono text-neutral-500">
+              <div className="text-[10px] font-mono text-slate-500">
                 Step {step} of {totalSteps}
               </div>
             </div>
@@ -210,23 +235,26 @@ function OnboardingContent() {
         </div>
 
         {/* Dynamic Step Container */}
-        <div className="backdrop-blur-2xl bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-9 shadow-2xl">
+        <div className="backdrop-blur-xl bg-white/[0.025] border border-white/10 rounded-2xl p-6 sm:p-9 shadow-2xl">
           
           {/* STEP 1: Personal Demographics */}
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Identity Calibration
+                </span>
+                <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mt-0.5">
                   Personal Identity
                 </h1>
-                <p className="text-neutral-400 text-xs sm:text-sm mt-1 font-sans">
+                <p className="text-slate-400 text-xs sm:text-sm mt-1 font-sans">
                   We&apos;ll customize your daily protocol targets and baseline recommendations.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                     Full Name or Preferred Name
                   </label>
                   <input
@@ -234,39 +262,80 @@ function OnboardingContent() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Alex Morgan"
-                    className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/40 font-sans transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-white/40 font-sans transition-all"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Age Input with Strict Max 120 & Validation Feedback */}
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                       Age (Years)
                     </label>
                     <input
                       type="number"
-                      min="14"
-                      max="100"
                       value={age}
-                      onChange={(e) => setAge(Math.max(14, Number(e.target.value)))}
-                      className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm focus:outline-none focus:border-white/40 font-mono transition-all"
+                      onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="e.g. 26"
+                      className={`w-full px-4 py-3 rounded-xl bg-white/[0.02] border text-white text-sm focus:outline-none font-mono transition-all ${
+                        !isAgeValid && age !== ''
+                          ? 'border-red-500/50 focus:border-red-500'
+                          : 'border-white/10 focus:border-white/40'
+                      }`}
                     />
+                    {!isAgeValid && age !== '' && (
+                      <span className="text-[11px] font-mono text-red-400 mt-1 block">
+                        {parsedAge > 120
+                          ? 'Maximum age is 120.'
+                          : parsedAge < 10
+                          ? 'Minimum age is 10.'
+                          : 'Please enter a valid age between 10 and 120.'}
+                      </span>
+                    )}
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                  {/* Custom Glassmorphic Select Dropdown */}
+                  <div className="relative" ref={sexDropdownRef}>
+                    <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                       Biological Sex / Gender
                     </label>
-                    <select
-                      value={sex}
-                      onChange={(e) => setSex(e.target.value as any)}
-                      className="w-full px-3 py-3 rounded-xl bg-[#111111] border border-white/10 text-white text-sm focus:outline-none focus:border-white/40 font-mono transition-all cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={() => setIsSexDropdownOpen(!isSexDropdownOpen)}
+                      className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-sans flex items-center justify-between hover:border-white/20 transition-all cursor-pointer"
+                      aria-haspopup="listbox"
+                      aria-expanded={isSexDropdownOpen}
                     >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other / Non-Binary</option>
-                      <option value="prefer_not_to_say">Prefer not to say</option>
-                    </select>
+                      <span>{SEX_OPTIONS.find((o) => o.id === sex)?.label || 'Select'}</span>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isSexDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Glassmorphic Dropdown Menu */}
+                    {isSexDropdownOpen && (
+                      <div className="absolute left-0 right-0 top-full mt-2 rounded-xl backdrop-blur-2xl bg-[#121212]/95 border border-white/15 p-1 shadow-2xl z-30 font-sans animate-in fade-in zoom-in-95 duration-150">
+                        {SEX_OPTIONS.map((opt) => {
+                          const isSelected = sex === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => {
+                                setSex(opt.id);
+                                setIsSexDropdownOpen(false);
+                              }}
+                              className={`w-full px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer text-left ${
+                                isSelected
+                                  ? 'bg-white/10 text-white font-semibold'
+                                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -278,10 +347,13 @@ function OnboardingContent() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
+                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                    Physiological Data
+                  </span>
+                  <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mt-0.5">
                     Physical Biometrics
                   </h1>
-                  <p className="text-neutral-400 text-xs sm:text-sm mt-1 font-sans">
+                  <p className="text-slate-400 text-xs sm:text-sm mt-1 font-sans">
                     Used to calculate whole-food amino acid targets and fluid baselines.
                   </p>
                 </div>
@@ -291,8 +363,8 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={() => setIsImperial(false)}
-                    className={`px-2.5 py-1 rounded-lg transition-all ${
-                      !isImperial ? 'bg-white text-black font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                      !isImperial ? 'bg-white text-black font-semibold shadow-sm' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     Metric (cm/kg)
@@ -300,8 +372,8 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={() => setIsImperial(true)}
-                    className={`px-2.5 py-1 rounded-lg transition-all ${
-                      isImperial ? 'bg-white text-black font-semibold shadow-sm' : 'text-neutral-400 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                      isImperial ? 'bg-white text-black font-semibold shadow-sm' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     Imperial (ft/lbs)
@@ -313,7 +385,7 @@ function OnboardingContent() {
                 {isImperial ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                         Height (Feet &amp; Inches)
                       </label>
                       <div className="flex items-center gap-2">
@@ -323,25 +395,25 @@ function OnboardingContent() {
                           max="7"
                           value={heightFeet}
                           onChange={(e) => handleHeightImperialChange(Number(e.target.value), heightInches)}
-                          className="w-full px-3 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono text-center"
+                          className="w-full px-3 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono text-center focus:outline-none focus:border-white/40"
                           placeholder="ft"
                         />
-                        <span className="text-xs font-mono text-neutral-500">ft</span>
+                        <span className="text-xs font-mono text-slate-500">ft</span>
                         <input
                           type="number"
                           min="0"
                           max="11"
                           value={heightInches}
                           onChange={(e) => handleHeightImperialChange(heightFeet, Number(e.target.value))}
-                          className="w-full px-3 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono text-center"
+                          className="w-full px-3 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono text-center focus:outline-none focus:border-white/40"
                           placeholder="in"
                         />
-                        <span className="text-xs font-mono text-neutral-500">in</span>
+                        <span className="text-xs font-mono text-slate-500">in</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                         Weight (Pounds)
                       </label>
                       <div className="flex items-center gap-2">
@@ -351,16 +423,16 @@ function OnboardingContent() {
                           max="400"
                           value={weightLbs}
                           onChange={(e) => handleWeightLbsChange(Number(e.target.value))}
-                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono"
+                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono focus:outline-none focus:border-white/40"
                         />
-                        <span className="text-xs font-mono text-neutral-500">lbs</span>
+                        <span className="text-xs font-mono text-slate-500">lbs</span>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                         Height (Centimeters)
                       </label>
                       <div className="flex items-center gap-2">
@@ -370,14 +442,14 @@ function OnboardingContent() {
                           max="250"
                           value={heightCm}
                           onChange={(e) => setHeightCm(Number(e.target.value))}
-                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono"
+                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono focus:outline-none focus:border-white/40"
                         />
-                        <span className="text-xs font-mono text-neutral-500">cm</span>
+                        <span className="text-xs font-mono text-slate-500">cm</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
+                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1.5">
                         Weight (Kilograms)
                       </label>
                       <div className="flex items-center gap-2">
@@ -387,29 +459,29 @@ function OnboardingContent() {
                           max="200"
                           value={weightKg}
                           onChange={(e) => setWeightKg(Number(e.target.value))}
-                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono"
+                          className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white text-sm font-mono focus:outline-none focus:border-white/40"
                         />
-                        <span className="text-xs font-mono text-neutral-500">kg</span>
+                        <span className="text-xs font-mono text-slate-500">kg</span>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Calibrated Target Preview Pill */}
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-between mt-4">
+                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-between mt-4">
                   <div className="flex items-center gap-3">
                     <Scale className="w-5 h-5 text-white" />
                     <div>
-                      <div className="text-xs font-mono text-neutral-300">Calibrated Daily Baseline</div>
-                      <div className="text-[11px] text-neutral-500 font-sans">
+                      <div className="text-xs font-mono text-slate-300">Calibrated Daily Baseline</div>
+                      <div className="text-[11px] text-slate-500 font-sans">
                         Estimated optimal daily fueling targets
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-xs font-mono font-bold text-white block">~{estimatedProteinTarget}g Protein</span>
-                    <span className="text-[10px] font-mono text-emerald-400">~{estimatedHydrationTarget}L Water</span>
+                    <span className="text-xs font-mono font-bold text-white block tabular-nums">~{estimatedProteinTarget}g Protein</span>
+                    <span className="text-[10px] font-mono text-slate-300 tabular-nums">~{estimatedHydrationTarget}L Water</span>
                   </div>
                 </div>
 
@@ -417,19 +489,22 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* STEP 3: Primary Behavioral Goal */}
+          {/* STEP 3: Primary Behavioral Goal (Simplified & Crisp) */}
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Optimization Priority
+                </span>
+                <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mt-0.5">
                   Primary Focus Target
                 </h1>
-                <p className="text-neutral-400 text-xs sm:text-sm mt-1 font-sans">
+                <p className="text-slate-400 text-xs sm:text-sm mt-1 font-sans">
                   Select your core health driver. Cyath will calibrate your daily routine checklist accordingly.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {GOAL_OPTIONS.map((g) => {
                   const isSelected = primaryGoal === g.id;
                   const Icon = g.icon;
@@ -438,24 +513,24 @@ function OnboardingContent() {
                     <div
                       key={g.id}
                       onClick={() => setPrimaryGoal(g.id)}
-                      className={`p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-start gap-4 ${
+                      className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 ${
                         isSelected
                           ? 'bg-white/[0.06] border-white/30 shadow-lg ring-1 ring-white/20'
                           : 'bg-white/[0.02] border-white/5 hover:border-white/15 hover:bg-white/[0.03]'
                       }`}
                     >
-                      <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0 mt-0.5">
-                        <Icon className="w-4 h-4" />
+                      <div className="flex items-center justify-between">
+                        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white shrink-0">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        {isSelected && <Check className="w-4 h-4 text-white" />}
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-serif font-normal text-base text-white tracking-tight">
-                            {g.title}
-                          </h3>
-                          {isSelected && <Check className="w-4 h-4 text-emerald-400" />}
-                        </div>
-                        <p className="text-xs text-neutral-400 font-sans mt-1">
+                      <div>
+                        <h3 className="font-cabinet font-semibold text-sm text-white tracking-tight">
+                          {g.title}
+                        </h3>
+                        <p className="text-[11px] text-slate-400 font-sans mt-0.5 leading-relaxed">
                           {g.description}
                         </p>
                       </div>
@@ -470,16 +545,45 @@ function OnboardingContent() {
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h1 className="font-serif font-normal text-2xl sm:text-3xl text-white tracking-tight">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                  Nutritional Parameters
+                </span>
+                <h1 className="font-cabinet font-bold text-2xl sm:text-3xl text-white tracking-tight mt-0.5">
                   Dietary Boundaries &amp; Allergies
                 </h1>
-                <p className="text-neutral-400 text-xs sm:text-sm mt-1 font-sans">
-                  Filter whole-food recipe suggestions to match your dietary constraints.
+                <p className="text-slate-400 text-xs sm:text-sm mt-1 font-sans">
+                  Filter whole-food recipe suggestions to match your dietary lifestyle.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">
+                  Dietary Lifestyle
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {DIETARY_STYLES.map((diet) => {
+                    const isSelected = selectedDiet === diet;
+                    return (
+                      <button
+                        key={diet}
+                        type="button"
+                        onClick={() => setSelectedDiet(diet)}
+                        className={`p-3 rounded-xl border text-left text-xs font-mono transition-all cursor-pointer flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-white text-black font-semibold shadow-md'
+                            : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        <span>{diet}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-black stroke-[3]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">
                   Known Allergies &amp; Sensitivities
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -493,36 +597,10 @@ function OnboardingContent() {
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-white text-black font-semibold shadow-sm'
-                            : 'bg-white/[0.03] border border-white/10 text-neutral-400 hover:text-white'
+                            : 'bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white'
                         }`}
                       >
                         {allergy}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">
-                  Dietary Lifestyle
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {DIETARY_STYLES.map((diet) => {
-                    const isSelected = selectedDiet === diet;
-                    return (
-                      <button
-                        key={diet}
-                        type="button"
-                        onClick={() => setSelectedDiet(diet)}
-                        className={`p-3 rounded-xl border text-left text-xs font-mono transition-all cursor-pointer flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-white/10 border-white/30 text-white font-medium'
-                            : 'bg-white/[0.02] border-white/5 text-neutral-400 hover:text-white hover:border-white/15'
-                        }`}
-                      >
-                        <span>{diet}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                       </button>
                     );
                   })}
@@ -537,7 +615,7 @@ function OnboardingContent() {
               <button
                 type="button"
                 onClick={prevStep}
-                className="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -549,7 +627,8 @@ function OnboardingContent() {
             <button
               type="button"
               onClick={nextStep}
-              className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 active:scale-95 transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+              disabled={step === 1 && !isAgeValid}
+              className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-slate-200 active:scale-95 transition-all shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>
                 {step === totalSteps

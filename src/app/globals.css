@@ -108,6 +108,10 @@ body {
   image-rendering: crisp-edges;
 }
 
+.font-cabinet {
+  font-family: var(--font-cabinet);
+}
+
 /* Accessibility: Intentional graceful reduced-motion alternatives */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

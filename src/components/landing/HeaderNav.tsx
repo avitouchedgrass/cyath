@@ -75,23 +75,25 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3.5 z-10">
-          <Link
-            href="/dashboard"
-            className="hidden sm:inline-flex text-xs font-mono text-neutral-300 hover:text-white transition-colors px-2 py-1.5"
-          >
-            Dashboard
-          </Link>
+          {!pathname.startsWith('/dashboard') && (
+            <Link
+              href="/dashboard"
+              className="hidden sm:inline-flex text-xs font-mono text-neutral-300 hover:text-white transition-colors px-2 py-1.5"
+            >
+              Dashboard
+            </Link>
+          )}
 
-          {mounted && userSession ? (
+          {mounted && (userSession || pathname.startsWith('/dashboard')) ? (
             <Link
               href="/profile"
-              className="inline-flex items-center gap-2 py-1.5 px-3 rounded-full bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 transition-all text-xs font-mono text-white"
+              className="border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 text-xs font-mono text-slate-300 transition-all"
             >
-              <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
-                {(userSession.email || 'U').charAt(0).toUpperCase()}
-              </div>
-              <span className="max-w-[100px] truncate hidden sm:inline">
-                {userSession.email ? userSession.email.split('@')[0] : 'Profile'}
+              <span className={`w-1.5 h-1.5 rounded-full ${userSession && !userSession.id.startsWith('guest_') ? 'bg-white' : 'bg-white/60'}`} />
+              <span className="max-w-[120px] truncate">
+                {userSession && !userSession.id.startsWith('guest_')
+                  ? (userSession.email ? userSession.email.split('@')[0] : 'Profile')
+                  : 'Local Sandbox'}
               </span>
             </Link>
           ) : (

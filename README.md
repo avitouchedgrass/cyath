@@ -1,6 +1,6 @@
 # Cyath
 
-> **Behavioral Momentum Engineered.**
+> **Pixel-Perfect Health**
 
 Cyath is a full-stack, adaptive behavioral health platform that replaces rigid habit-streak mechanics with real-time feedback loops. By correlating daily whole-food nutrition, sleep quality, and physical recovery metrics with subjective energy and focus, Cyath automatically scales daily routines to prevent burnout and maintain long-term momentum.
 

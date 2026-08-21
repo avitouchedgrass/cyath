@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cyath
 
-## Getting Started
+> **Behavioral Momentum Engineered.**
 
-First, run the development server:
+Cyath is a full-stack, adaptive behavioral health platform that replaces rigid habit-streak mechanics with real-time feedback loops. By correlating daily whole-food nutrition, sleep quality, and physical recovery metrics with subjective energy and focus, Cyath automatically scales daily routines to prevent burnout and maintain long-term momentum.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Key Features
+
+* **Adaptive Routine Scaling:** Dynamically adjusts daily habit workloads based on logged sleep, energy, and physical recovery markers—eliminating the punitive "streak reset" fatigue.
+* **Whole-Food Fuel & Macro Tracking:** Built-in logging for whole-food nutrition, tracking key variables like protein intake and calorie balance alongside performance outcomes.
+* **Correlation Engine:** Uses structured data logs to analyze how physical inputs (e.g., 7+ hours of sleep, 100g+ protein) directly correlate with high-focus output days.
+* **Contextual AI Health Agent:** A local, RAG-enabled LLM pipeline that queries user history to deliver privacy-focused, individualized recovery and routine recommendations.
+* **Pixel-Art Aesthetic & Editorial UI:** High-contrast, performance-focused interface styled in an editorial cream-and-forest-green design language with custom 16-bit visual assets.
+
+---
+
+## Tech Stack
+
+* **Frontend:** Next.js (React), TypeScript, Tailwind CSS
+* **Backend:** Node.js (Express), Python (FastAPI for asynchronous analytical tasks)
+* **Database & Caching:** PostgreSQL (relational logs & user data), Redis (active session & routine state)
+* **AI / ML Layer:** Local LLM Agent architecture integrated via a Retrieval-Augmented Generation (RAG) pipeline with vector embeddings
+
+---
+
+## System Architecture Overview
+
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[ Frontend (Next.js / TS) ]
+│
+▼  (REST / GraphQL API)
+[ Node.js / Express API ] ───► [ PostgreSQL / Redis ]
+│
+▼  (Async Analytics Payload)
+[ FastAPI ML Service ] ──────► [ Vector DB / Local RAG Engine ]
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Getting Started Locally
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+* Node.js (v18+)
+* Python (v3.10+)
+* PostgreSQL & Redis instances (local or managed)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/your-username/cyath.git](https://github.com/your-username/cyath.git)
+   cd cyath
 
-## Deploy on Vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install frontend & API dependencies:**
+```bash
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+
+
+3. **Set up environment variables:**
+Create a `.env.local` file in the root directory and add your configurations:
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/cyath
+REDIS_URL=redis://localhost:6379
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+
+```
+
+
+4. **Run database migrations:**
+```bash
+npx prisma db push
+
+```
+
+
+5. **Start the development server:**
+```bash
+npm run dev
+
+```
+
+
+Open `http://localhost:3000` in your browser.
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+```
+
+***
+
+<ElicitationsGroup message="What would you like to do next?">
+<Elicitation label="Add a section detailing the RAG pipeline setup and configuration" query="Add a section detailing the RAG pipeline setup and configuration to the README" query_intent="CLICKABLE_SUGGESTION" />
+<Elicitation label="Draft a CONTRIBUTING.md guide for open-source contributors" query="Draft a CONTRIBUTING.md guide for the Cyath repository" query_intent="CLICKABLE_SUGGESTION" />
+<Elicitation label="Create a license file and badges for the top of the README" query="Create a standard MIT License block and Markdown badges for Cyath" query_intent="CLICKABLE_SUGGESTION" />
+</ElicitationsGroup>
+
+```

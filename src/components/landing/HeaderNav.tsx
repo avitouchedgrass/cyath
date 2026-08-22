@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
-import { User } from "lucide-react";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -42,13 +41,13 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none transition-all duration-300">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
-        {/* Left: Pixel Font "cyath" Brand Pill */}
+        {/* Left: Lowercase Pixel Text Logo (Unboxed, Big, Matching Width) */}
         <Link 
           href="/" 
-          className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-pixel font-bold text-xs sm:text-sm tracking-wider shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center min-w-[110px] sm:min-w-[124px] cursor-pointer z-10" 
-          aria-label="Cyath Home"
+          className="font-pixel text-2xl sm:text-3xl font-bold lowercase tracking-wider text-[#1A3629] select-none hover:opacity-80 transition-opacity z-10" 
+          aria-label="cyath home"
         >
-          <span>cyath</span>
+          cyath
         </Link>
 
         {/* Center: Tactile Pill Nav */}
@@ -83,15 +82,14 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-4 sm:px-5 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer min-w-[110px] sm:min-w-[124px] justify-center"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center cursor-pointer min-w-[110px] sm:min-w-[124px]"
             >
-              <User className="w-3.5 h-3.5" />
               <span>Profile</span>
             </Link>
           ) : (
             <Link
               href={mounted && userSession ? "/dashboard" : "/login"}
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-2 cursor-pointer min-w-[110px] sm:min-w-[124px] justify-center"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer min-w-[110px] sm:min-w-[124px]"
             >
               <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
               <span>Dashboard</span>

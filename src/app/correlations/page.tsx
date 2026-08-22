@@ -6,11 +6,6 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { deriveCorrelations } from '@/lib/correlation';
 import { retroAudio } from '@/lib/retroAudio';
-import {
-  Sparkles,
-  ArrowLeft,
-  ChevronRight,
-} from 'lucide-react';
 
 export default function CorrelationsPage() {
   const [timeHorizon, setTimeHorizon] = useState<7 | 14 | 30>(14);
@@ -96,43 +91,13 @@ export default function CorrelationsPage() {
         <div className="flex items-center justify-between mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Home</span>
+            <span>← Back to Home</span>
           </Link>
 
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] transition-all cursor-pointer"
-          >
-            <span>Open Daily Planner</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        {/* Hero Section Header */}
-        <div className="max-w-3xl mb-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-              Personal Patterns
-            </span>
-          </div>
-
-          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[#1A3629]">
-            Your Energy &amp; Focus Discoveries
-          </h1>
-          <p className="text-base sm:text-lg mt-3 leading-relaxed font-cabinet font-medium max-w-2xl text-[#2C4A3B]">
-            We connect the dots between your daily food, sleep, and mood logs so you know what triggers your highest energy days.
-          </p>
-        </div>
-
-        {/* Time Horizon Selector */}
-        <div className="flex items-center gap-2 mb-8">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider opacity-80 shrink-0">
-            Window:
-          </span>
-          <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
+          {/* Time Horizon Pills */}
+          <div className="inline-flex items-center gap-1 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]">
             {([7, 14, 30] as const).map((days) => (
               <button
                 key={days}
@@ -141,139 +106,176 @@ export default function CorrelationsPage() {
                   retroAudio.playBlip();
                   setTimeHorizon(days);
                 }}
-                className={`px-3.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                   timeHorizon === days
                     ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
                     : 'text-[#2C4A3B] hover:text-[#1A3629]'
                 }`}
               >
-                {days} Days
+                {days}D Window
               </button>
             ))}
           </div>
         </div>
 
-        {/* 4 Highlight Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
-              Top Energy Driver
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black tracking-tight">+34%</span>
-              <span className="text-xs font-cabinet font-bold">High Protein</span>
-            </div>
-            <p className="text-xs font-cabinet font-medium mt-2 leading-relaxed opacity-85">
-              Days with 120g+ whole-food protein average an 8.8+ focus score.
-            </p>
+        {/* Title Header */}
+        <div className="mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+            <span>Pattern Discovery Engine</span>
           </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
-              Sleep Sweet Spot
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black tracking-tight">7.5h–8.5h</span>
-            </div>
-            <p className="text-xs font-cabinet font-medium mt-2 leading-relaxed opacity-85">
-              Gives you a +2.8 point boost in morning energy and mood.
-            </p>
-          </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
-              Morning Routine Effect
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black tracking-tight">88%</span>
-              <span className="text-xs font-cabinet font-bold">Consistency</span>
-            </div>
-            <p className="text-xs font-cabinet font-medium mt-2 leading-relaxed opacity-85">
-              Starting with water &amp; sunlight keeps your momentum high all day.
-            </p>
-          </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 transition-all">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-1 opacity-70">
-              Hydration Impact
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black tracking-tight">+22%</span>
-              <span className="text-xs font-cabinet font-bold">Focus</span>
-            </div>
-            <p className="text-xs font-cabinet font-medium mt-2 leading-relaxed opacity-85">
-              Drinking 2.5L+ water prevents the 3:00 PM afternoon dip.
-            </p>
-          </div>
+          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
+            Habit &amp; Energy Correlations
+          </h1>
+          <p className="text-base sm:text-lg font-cabinet font-medium mt-2 max-w-2xl text-[#2C4A3B]">
+            Automated regression engine connecting your daily nutrition, sleep, and routines directly to your self-rated focus.
+          </p>
         </div>
 
-        {/* Interactive Pattern Chart Area */}
-        <div className="border-4 border-[#1A3629] bg-[#FFFDF9] shadow-[8px_8px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-10 transition-all">
-          {/* Chart Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h3 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
-                {activeCorrelation.title}
-              </h3>
-              <p className="text-xs sm:text-sm font-cabinet font-medium mt-1 text-[#2C4A3B]">
-                {activeCorrelation.description}
-              </p>
-            </div>
+        {/* Interactive Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Left: Correlation Selection List (4 Cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629] px-1">
+              Active Hypotheses ({correlations.length})
+            </h2>
 
-            <div className="px-4 py-2 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold self-start sm:self-auto">
-              <span>Pattern Strength:</span>{' '}
-              <span>{Math.round(Math.abs(activeCorrelation.coefficient) * 100)}% Match</span>
-            </div>
-          </div>
-
-          {/* Retro Grid Paper Chart Canvas */}
-          <div className="h-64 sm:h-80 w-full border-3 border-[#1A3629]/30 bg-[#F4F0EA] rounded-2xl p-4 relative overflow-hidden mb-6">
-            {/* Retro Grid Lines */}
-            <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 pointer-events-none opacity-20">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div key={i} className="border border-[#1A3629]" />
-              ))}
-            </div>
-
-            {/* SVG Trendline */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-              <line
-                x1="12%"
-                y1={`${trendline.y1}%`}
-                x2="88%"
-                y2={`${trendline.y2}%`}
-                stroke="#1A3629"
-                strokeWidth="3.5"
-                strokeDasharray="6 6"
-              />
-            </svg>
-
-            {/* Data Points */}
-            <div className="relative w-full h-full">
-              {activeCorrelation.points.map((pt, i) => {
-                const leftPct = ((pt.x - minX) / (maxX - minX || 1)) * 76 + 12;
-                const topPct = 100 - (((pt.y - minY) / (maxY - minY || 1)) * 76 + 12);
-
+            <div className="space-y-3">
+              {correlations.map((corr) => {
+                const isSelected = corr.id === activeCorrelation.id;
                 return (
-                  <div
-                    key={i}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 p-2 group/dot cursor-pointer"
-                    style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                  <button
+                    key={corr.id}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setSelectedCorrelationId(corr.id);
+                    }}
+                    className={`w-full text-left p-5 rounded-2xl border-3 transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] -translate-y-0.5'
+                        : 'bg-[#FFFDF9]/70 border-[#1A3629]/40 hover:border-[#1A3629] hover:bg-[#FFFDF9]'
+                    }`}
                   >
-                    <span className="block rounded-full border-2 w-4 h-4 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] group-hover/dot:scale-125 transition-all" />
-                  </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider border border-[#1A3629]/30 px-2 py-0.5 rounded bg-[#F4F0EA]">
+                        {corr.xLabel}
+                      </span>
+                      <span className="font-mono text-xs font-bold tabular-nums">
+                        {corr.confidence}% Match
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="font-cabinet font-bold text-base tracking-tight leading-snug">
+                        {corr.title}
+                      </h3>
+                      <p className="text-xs font-cabinet font-medium mt-1 opacity-80 line-clamp-2">
+                        {corr.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] font-mono font-bold pt-2 border-t border-[#1A3629]/15">
+                      <span>r = {corr.coefficient.toFixed(2)}</span>
+                      <span>{corr.impactScore} LINK →</span>
+                    </div>
+                  </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Simple Takeaway Box */}
-          <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] flex items-center gap-3">
-            <Sparkles className="w-5 h-5 shrink-0 text-[#1A3629]" />
-            <p className="text-xs sm:text-sm font-cabinet font-bold leading-relaxed text-[#1A3629]">
-              Takeaway: {activeCorrelation.recommendation}
-            </p>
+          {/* Right: Deep Dive Scatter Stage (8 Cols) */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Main Scatter Container */}
+            <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
+              
+              {/* Card Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-[#1A3629]/15">
+                <div>
+                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase opacity-70">
+                    Active Telemetry · {timeHorizon}-Day Sample
+                  </span>
+                  <h2 className="font-fraunces font-bold text-2xl tracking-tight mt-0.5">
+                    {activeCorrelation.title}
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-xs font-mono font-bold shrink-0">
+                  <span>Match Strength:</span>
+                  <span className="tabular-nums font-black">{activeCorrelation.confidence}%</span>
+                </div>
+              </div>
+
+              {/* Scatter Chart Canvas */}
+              <div className="relative w-full h-80 sm:h-96 rounded-2xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] p-6 overflow-hidden select-none">
+                
+                {/* Axis Labels */}
+                <div className="absolute top-4 left-6 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2C4A3B]">
+                  ▲ {activeCorrelation.yLabel}
+                </div>
+                <div className="absolute bottom-3 right-6 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2C4A3B]">
+                  {activeCorrelation.xLabel} ▶
+                </div>
+
+                {/* SVG Regression Line */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+                  <line
+                    x1="12%"
+                    y1={`${trendline.y1}%`}
+                    x2="88%"
+                    y2={`${trendline.y2}%`}
+                    stroke="#1A3629"
+                    strokeWidth="3"
+                    strokeDasharray="6 6"
+                  />
+                </svg>
+
+                {/* Data Points */}
+                <div className="relative w-full h-full">
+                  {activeCorrelation.points.map((pt, idx) => {
+                    const xPct = ((pt.x - minX) / (maxX - minX || 1)) * 76 + 12;
+                    const yPct = 100 - (((pt.y - minY) / (maxY - minY || 1)) * 76 + 12);
+
+                    return (
+                      <div
+                        key={idx}
+                        className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
+                        style={{ left: `${xPct}%`, top: `${yPct}%` }}
+                      >
+                        <span className="block w-4 h-4 rounded-full border-2 border-[#FFFDF9] bg-[#1A3629] shadow-[2px_2px_0px_#1A3629] group-hover:scale-150 transition-transform" />
+                        
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-30 whitespace-nowrap">
+                          <div className="px-3 py-1.5 rounded-lg border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono text-[10px] font-bold shadow-lg">
+                            <span>{pt.date}: </span>
+                            <span>{pt.x} → {pt.y}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Actionable Takeaway Box */}
+              <div className="p-5 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA] space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold">[!]</span>
+                  <h4 className="font-cabinet font-bold text-sm uppercase tracking-wider">
+                    Actionable Calibration
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
+                  {activeCorrelation.recommendation}
+                </p>
+              </div>
+
+            </div>
+
           </div>
+
         </div>
 
       </main>

@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { PixelWaveDish } from './PixelWaveDish';
 import { retroAudio } from '@/lib/retroAudio';
-import { ChevronLeft, ChevronRight, Sparkles, Volume2, VolumeX } from 'lucide-react';
 
 export interface DishData {
   id: string;
@@ -18,12 +17,30 @@ export interface DishData {
 
 export const DISH_ITEMS: DishData[] = [
   {
-    id: 'paneer',
-    recipeId: 'warm-ancient-grain-bowl',
-    name: 'Spiced Paneer Protein Bowl',
-    image: '/assets/food/grain-bowl.png',
-    protein: '32g',
-    calories: '540',
+    id: 'steak',
+    recipeId: 'chimichurri-seared-steak',
+    name: 'Cast-Iron Strip Steak with Chimichurri',
+    image: '/assets/food/steak-chimichurri.png',
+    protein: '52g',
+    calories: '580',
+    focus: '9.3/10',
+  },
+  {
+    id: 'chicken',
+    recipeId: 'herb-grilled-chicken',
+    name: 'Herb Grilled Chicken & Crispy Greens',
+    image: '/assets/food/grilled-chicken.png',
+    protein: '48g',
+    calories: '520',
+    focus: '9.4/10',
+  },
+  {
+    id: 'prawn',
+    recipeId: 'garlic-prawn-linguine',
+    name: 'Garlic Butter Prawn Linguine',
+    image: '/assets/food/prawn-linguine.png',
+    protein: '44g',
+    calories: '530',
     focus: '9.2/10',
   },
   {
@@ -36,22 +53,22 @@ export const DISH_ITEMS: DishData[] = [
     focus: '8.4/10',
   },
   {
-    id: 'chicken',
-    recipeId: 'herb-grilled-chicken',
-    name: 'Herb Grilled Chicken & Crispy Greens',
-    image: '/assets/food/grilled-chicken.png',
-    protein: '48g',
-    calories: '520',
-    focus: '9.4/10',
+    id: 'avocado-toast',
+    recipeId: 'avocado-sourdough-toast',
+    name: 'Poached Egg & Avocado Sourdough',
+    image: '/assets/food/avocado-toast.png',
+    protein: '24g',
+    calories: '410',
+    focus: '9.0/10',
   },
   {
-    id: 'eggs',
-    recipeId: 'cast-iron-skillet-eggs',
-    name: 'Cast-Iron Skillet Eggs & Greens',
-    image: '/assets/food/skillet-eggs.png',
-    protein: '34g',
-    calories: '440',
-    focus: '9.1/10',
+    id: 'egg-rice',
+    recipeId: 'tamago-sesame-rice-bowl',
+    name: 'Tamago Sesame Soft Egg Rice Bowl',
+    image: '/assets/food/egg-rice-bowl.png',
+    protein: '26g',
+    calories: '460',
+    focus: '8.8/10',
   },
   {
     id: 'taco',
@@ -61,6 +78,24 @@ export const DISH_ITEMS: DishData[] = [
     protein: '42g',
     calories: '560',
     focus: '8.9/10',
+  },
+  {
+    id: 'grain-bowl',
+    recipeId: 'warm-ancient-grain-bowl',
+    name: 'Warm Ancient Grain & Avocado Bowl',
+    image: '/assets/food/grain-bowl.png',
+    protein: '22g',
+    calories: '490',
+    focus: '8.7/10',
+  },
+  {
+    id: 'eggs',
+    recipeId: 'cast-iron-skillet-eggs',
+    name: 'Cast-Iron Skillet Eggs & Greens',
+    image: '/assets/food/skillet-eggs.png',
+    protein: '34g',
+    calories: '440',
+    focus: '9.1/10',
   },
 ];
 
@@ -75,14 +110,12 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
-  const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
   const currentIndexRef = useRef(0);
   const isScanningRef = useRef(false);
-  const animFrameRef = useRef<number | null>(null);
 
   const triggerNextDish = (targetNext?: number) => {
     if (isScanningRef.current) return;
@@ -97,32 +130,17 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     setPrevIndex(prev);
     setCurrentIndex(next);
     currentIndexRef.current = next;
-    setScanDirection((dir) => (dir === 'horizontal' ? 'vertical' : 'horizontal'));
     setScanProgress(0);
 
     onDishChange?.(DISH_ITEMS[next], next);
     retroAudio.playScanWipe();
 
-    const startTime = performance.now();
-    const duration = 850;
-
-    const animateScan = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1.0);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setScanProgress(eased);
-
-      if (progress < 1.0) {
-        animFrameRef.current = requestAnimationFrame(animateScan);
-      } else {
-        setIsScanning(false);
-        isScanningRef.current = false;
-        setPrevIndex(null);
-        setScanProgress(1.0);
-      }
-    };
-
-    animFrameRef.current = requestAnimationFrame(animateScan);
+    setTimeout(() => {
+      setIsScanning(false);
+      isScanningRef.current = false;
+      setPrevIndex(null);
+      setScanProgress(1.0);
+    }, 350);
   };
 
   useEffect(() => {
@@ -130,11 +148,10 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
 
     const interval = setInterval(() => {
       triggerNextDish();
-    }, 5000);
+    }, 4500);
 
     return () => {
       clearInterval(interval);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
 
@@ -160,7 +177,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   return (
     <div className={`relative w-full flex flex-col items-center justify-center select-none ${className}`}>
       
-      {/* Massive Unboxed Food Arena (Pure Floating Art) */}
+      {/* Massive Food Arena (Click anywhere to cycle or inspect) */}
       <div 
         onClick={handleInspectRecipe}
         onKeyDown={(e) => {
@@ -185,53 +202,20 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           }}
         />
 
-        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage (Massive, Sharp Pixel Art) */}
-        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
+        {/* Sharp Pixel Art Stage */}
+        <div className="relative w-full h-full z-10 [image-rendering:pixelated]">
           <PixelWaveDish
             currentIndex={currentIndex}
             prevIndex={prevIndex}
             isScanning={isScanning}
-            scanDirection={scanDirection}
             scanProgress={scanProgress}
             dishImages={DISH_IMAGES}
             className="w-full h-full"
           />
         </div>
 
-        {/* Chunky Retro Left / Right Navigation Arrow Buttons */}
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between z-30 pointer-events-none px-2">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              retroAudio.playBlip();
-              triggerNextDish(currentIndex - 1);
-            }}
-            className="pointer-events-auto p-3 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
-            aria-label="Previous recipe"
-          >
-            <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
-          </button>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              retroAudio.playBlip();
-              triggerNextDish(currentIndex + 1);
-            }}
-            className="pointer-events-auto p-3 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] hover:bg-[#F4F0EA] shadow-[3px_3px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
-            aria-label="Next recipe"
-          >
-            <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
-        </div>
-
-        {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
+        {/* Clean Tactile Inspect Recipe Pill Badge */}
         <div className="absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[4px_4px_0px_#1A3629]">
-          <Sparkles className="w-4 h-4 text-[#1A3629]" />
           <span className="font-cabinet font-bold text-xs sm:text-sm">
             Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>
@@ -246,11 +230,6 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           onClick={handleToggleSound}
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
         >
-          {isMuted ? (
-            <VolumeX className="w-3 h-3 text-[#1A3629]" />
-          ) : (
-            <Volume2 className="w-3 h-3 text-[#1A3629]" />
-          )}
           <span>{isMuted ? '8-BIT FX: OFF' : '8-BIT FX: ON'}</span>
         </button>
       </div>

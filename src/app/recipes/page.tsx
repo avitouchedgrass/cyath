@@ -7,17 +7,6 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { RECIPES, Recipe } from '@/lib/recipes';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import {
-  Search,
-  SlidersHorizontal,
-  ChevronDown,
-  Sparkles,
-  Check,
-  Plus,
-  ArrowLeft,
-  X,
-  ChefHat,
-} from 'lucide-react';
 
 const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -55,18 +44,17 @@ function RecipesContent() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  const todayLog = getDailyLog();
-
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle URL recipe inspection parameter
+  const todayKey = new Date().toISOString().split('T')[0];
+  const todayLog = getDailyLog(todayKey);
+
+  // Auto open recipe modal if URL param is present
   useEffect(() => {
     if (inspectParam) {
-      const match = RECIPES.find(
-        (r) => r.id.toLowerCase() === inspectParam.toLowerCase() || r.id.toLowerCase().includes(inspectParam.toLowerCase())
-      );
+      const match = RECIPES.find((r) => r.id === inspectParam);
       if (match) {
         setSelectedRecipe(match);
         setPortionMultiplier(1.0);
@@ -74,17 +62,22 @@ function RecipesContent() {
     }
   }, [inspectParam]);
 
-  // Sync user's profile dietary preference on initial load
+  // Keyboard shortcut to focus search with '/'
   useEffect(() => {
-    if (userProfile?.dietaryRestrictions?.[0]) {
-      const pref = userProfile.dietaryRestrictions[0];
-      if (pref === 'Vegetarian') setSelectedDietFilter('Vegetarian');
-      else if (pref === 'Vegan / Plant-Based') setSelectedDietFilter('Vegan');
-      else if (pref === 'Pescatarian') setSelectedDietFilter('Pescatarian');
-    }
-  }, [userProfile?.dietaryRestrictions]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && document.activeElement !== searchInputRef.current) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      } else if (e.key === 'Escape') {
+        setSelectedRecipe(null);
+        setIsSortOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-  // Close custom dropdown when clicking outside
+  // Close sort dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
@@ -124,7 +117,7 @@ function RecipesContent() {
   }, [selectedCategory, selectedDietFilter, searchQuery, sortBy]);
 
   const openRecipeModal = (recipe: Recipe) => {
-    retroAudio.playInspectConfirm();
+    retroAudio.playBlip();
     setSelectedRecipe(recipe);
     setPortionMultiplier(1.0);
   };
@@ -135,7 +128,7 @@ function RecipesContent() {
     }
     retroAudio.playInspectConfirm();
 
-    if (!userSession) {
+    if (!userSession && (!userProfile || !userProfile.onboardingCompleted)) {
       setPendingAction({
         type: 'LOG_RECIPE',
         payload: {
@@ -143,9 +136,9 @@ function RecipesContent() {
           protein: Math.round(recipe.protein * multiplier),
           calories: Math.round(recipe.calories * multiplier),
         },
-        returnUrl: '/recipes',
+        returnUrl: `/recipes?inspect=${encodeURIComponent(recipe.id)}`,
       });
-      router.push('/login?redirect=/recipes');
+      router.push(`/auth?redirect=${encodeURIComponent(`/recipes?inspect=${recipe.id}`)}`);
       return;
     }
 
@@ -177,10 +170,9 @@ function RecipesContent() {
           <div className="inline-flex items-center gap-2 mb-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all"
+              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Home</span>
+              <span>← Back to Home</span>
             </Link>
             <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
               16-Bit Fuel Catalog
@@ -227,14 +219,13 @@ function RecipesContent() {
             {/* Search Bar & Custom Sort Dropdown */}
             <div className="flex items-center gap-3">
               <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1A3629]" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search recipes..."
-                  className="w-full pl-10 pr-8 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
                 />
                 {!searchQuery && (
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
@@ -245,75 +236,66 @@ function RecipesContent() {
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono font-bold opacity-70 hover:opacity-100 cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    [x]
                   </button>
                 )}
               </div>
 
-              {/* Custom Sort Dropdown */}
+              {/* Custom Retro Sort Dropdown */}
               <div className="relative" ref={sortDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="px-4 py-2.5 rounded-xl border-2 text-xs font-mono font-bold flex items-center justify-between gap-2.5 cursor-pointer whitespace-nowrap transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]"
-                  aria-haspopup="listbox"
-                  aria-expanded={isSortOpen}
+                  className="px-4 py-2.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-2 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>
-                    {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
-                  </span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+                  <span>{SORT_OPTIONS.find((o) => o.id === sortBy)?.label}</span>
+                  <span className="text-[10px] font-mono font-bold">↓</span>
                 </button>
 
-                {/* Dropdown Menu Popup */}
                 {isSortOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] p-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-mono shadow-xl">
-                    {SORT_OPTIONS.map((option) => {
-                      const isSelected = sortBy === option.id;
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => {
-                            retroAudio.playBlip();
-                            setSortBy(option.id);
-                            setIsSortOpen(false);
-                          }}
-                          className={`w-full px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#1A3629] text-[#FFFDF9]'
-                              : 'text-[#2C4A3B] hover:bg-[#F4F0EA]'
-                          }`}
-                        >
-                          <span>{option.label}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5" />}
-                        </button>
-                      );
-                    })}
+                  <div className="absolute right-0 mt-2 w-48 rounded-xl border-2 shadow-2xl z-30 p-1.5 font-cabinet font-bold text-xs bg-[#FFFDF9] border-[#1A3629]">
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          retroAudio.playBlip();
+                          setSortBy(opt.id);
+                          setIsSortOpen(false);
+                        }}
+                        className={`w-full px-3 py-2 rounded-lg text-left flex items-center justify-between cursor-pointer ${
+                          sortBy === opt.id
+                            ? 'bg-[#1A3629] text-[#FFFDF9]'
+                            : 'text-[#1A3629] hover:bg-black/5'
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {sortBy === opt.id && <span className="font-mono text-xs">✓</span>}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Dedicated Diet Filter Row */}
+          {/* Secondary Sub-Filter Row: Diet Types */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-[11px] font-mono font-bold tracking-wider uppercase shrink-0 opacity-80">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-80 shrink-0">
               Diet Filter:
             </span>
             <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
-              {DIET_FILTERS.map((df) => {
-                const isSelected = selectedDietFilter === df.id;
+              {DIET_FILTERS.map((d) => {
+                const isSelected = selectedDietFilter === d.id;
                 return (
                   <button
-                    key={df.id}
+                    key={d.id}
                     type="button"
                     onClick={() => {
                       retroAudio.playBlip();
-                      setSelectedDietFilter(df.id);
+                      setSelectedDietFilter(d.id);
                     }}
                     className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                       isSelected
@@ -321,7 +303,7 @@ function RecipesContent() {
                         : 'text-[#2C4A3B] hover:text-[#1A3629]'
                     }`}
                   >
-                    {df.label}
+                    {d.label}
                   </button>
                 );
               })}
@@ -332,7 +314,6 @@ function RecipesContent() {
         {/* Recipe Cards Grid */}
         {filteredRecipes.length === 0 ? (
           <div className="text-center py-20 border-3 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-8">
-            <ChefHat className="w-12 h-12 mx-auto mb-3 opacity-60" />
             <h3 className="font-fraunces font-bold text-xl">No matching recipes</h3>
             <p className="text-sm font-cabinet font-medium mt-1 opacity-80">Try clearing your search query or adjusting your filter.</p>
             <button
@@ -366,19 +347,18 @@ function RecipesContent() {
                         {recipe.category}
                       </span>
                       
-                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold">
-                        <Sparkles className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629]">
                         <span>Focus {recipe.focusScore}</span>
                       </span>
                     </div>
 
-                    {/* Pixel Art Dish Presentation */}
-                    <div className="w-full flex items-center justify-center py-4 mb-4">
-                      <div className="w-44 h-44 relative flex items-center justify-center">
+                    {/* Standardized Continuous Plate Presentation */}
+                    <div className="w-full flex items-center justify-center py-2 mb-4">
+                      <div className="w-48 h-48 sm:w-52 sm:h-52 relative flex items-center justify-center">
                         <img
                           src={recipe.image}
                           alt={recipe.name}
-                          className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.14)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </div>
@@ -412,15 +392,9 @@ function RecipesContent() {
                       }`}
                     >
                       {isLogged ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>Logged to Today</span>
-                        </>
+                        <span>✓ Logged to Today</span>
                       ) : (
-                        <>
-                          <Plus className="w-4 h-4 stroke-[2.5]" />
-                          <span>Log to Today</span>
-                        </>
+                        <span>+ Log to Today</span>
                       )}
                     </button>
                   </div>
@@ -436,7 +410,7 @@ function RecipesContent() {
       {loggedToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
           <div className="px-5 py-3.5 rounded-xl border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3">
-            <Check className="w-4 h-4" />
+            <span className="font-mono font-bold">✓</span>
             <span>
               Added <strong>{loggedToast.name}</strong> ({loggedToast.portion}x portion · +{loggedToast.protein}g PRO) to today&apos;s log!
             </span>
@@ -457,10 +431,10 @@ function RecipesContent() {
             <button
               type="button"
               onClick={() => setSelectedRecipe(null)}
-              className="absolute right-6 top-6 rounded-full p-2 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] transition-all cursor-pointer"
+              className="absolute right-6 top-6 rounded-full px-3 py-1 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs transition-all cursor-pointer hover:bg-[#1A3629] hover:text-[#FFFDF9]"
               aria-label="Close details"
             >
-              <X className="w-4 h-4" />
+              [ESC]
             </button>
 
             {/* Pixel Art Image Anchor with Dynamic Portion Calibration */}
@@ -484,7 +458,7 @@ function RecipesContent() {
                         : 'scale(1)'
                       : 'scale(1)',
                   }}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-transform duration-300 ease-out"
+                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out"
                 />
               </div>
               <div className="mt-2 text-[10px] font-mono font-bold px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629] tracking-wider uppercase">
@@ -582,12 +556,9 @@ function RecipesContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
               {/* Ingredients */}
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <ChefHat className="w-4 h-4" />
-                  <h4 className="font-cabinet font-bold text-sm tracking-tight">
-                    Ingredients
-                  </h4>
-                </div>
+                <h4 className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629]">
+                  Ingredients
+                </h4>
                 <ul className="space-y-2">
                   {selectedRecipe.ingredients.map((ing, i) => (
                     <li key={i} className="flex items-start justify-between gap-2 text-xs border-b border-[#1A3629]/15 pb-1.5 font-cabinet font-medium">
@@ -600,12 +571,9 @@ function RecipesContent() {
 
               {/* Instructions */}
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  <h4 className="font-cabinet font-bold text-sm tracking-tight">
-                    Instructions
-                  </h4>
-                </div>
+                <h4 className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629]">
+                  Instructions
+                </h4>
                 <ol className="space-y-2.5">
                   {selectedRecipe.instructions.map((step, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-xs leading-relaxed font-cabinet font-medium">
@@ -629,9 +597,8 @@ function RecipesContent() {
                 }}
                 className="w-full py-4 px-6 rounded-xl border-3 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>
-                  Log Meal to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
+                  + Log Meal to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
                 </span>
               </button>
             </div>

@@ -296,14 +296,10 @@ function AuthContent() {
       <div className="absolute top-6 left-6 right-6 sm:top-8 sm:left-8 sm:right-8 z-20 flex items-center justify-between pointer-events-auto">
         <Link 
           href="/"
-          className="flex items-center gap-2.5 transition-all text-[#1A3629] hover:opacity-80 group"
+          className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
           aria-label="Back to home"
         >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-          <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
-            <Logo className="w-7 h-7" />
-          </div>
-          <span className="font-fraunces font-bold text-base hidden sm:inline-block">Cyath</span>
+          <span>← Back to Home</span>
         </Link>
       </div>
 

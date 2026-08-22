@@ -4,18 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
-import { TextType } from '@/components/reactbits/TextType';
 import { useHabitStore } from '@/store/useHabitStore';
-import {
-  Flame,
-  Activity,
-  Sparkles,
-  Zap,
-  ArrowRight,
-  TrendingUp,
-  Sliders,
-  ChevronRight,
-} from 'lucide-react';
 
 const STEP_LOOP = [
   {
@@ -24,7 +13,6 @@ const STEP_LOOP = [
     title: 'Choose Proven Daily Blueprints',
     description:
       'Start with science-backed daily routines you can actually stick to—like Morning Sunlight, Clean Protein Fueling, and Restful Sleep Wind-Downs.',
-    icon: Sliders,
     highlights: ['Simple daily habits', 'Personalized protein targets', 'Zero overwhelming clutter'],
   },
   {
@@ -33,7 +21,6 @@ const STEP_LOOP = [
     title: 'Fast, Frictionless Daily Check-In',
     description:
       'No barcode scanning or weighing every gram. Tap quick steppers (+15g, +30g protein), track your water, and rate how energized you feel in under a minute.',
-    icon: Zap,
     highlights: ['Quick one-tap logging', 'Easy 1–10 mood & energy check', 'No tracking burnout'],
   },
   {
@@ -42,7 +29,6 @@ const STEP_LOOP = [
     title: 'Discover What Fuels Your Good Days',
     description:
       'Cyath connects the dots between what you eat, how you sleep, and your peak focus days—so you know exactly which habits make you feel great.',
-    icon: TrendingUp,
     highlights: ['Clear food-to-energy insights', 'Interactive visual charts', 'Real momentum without guesswork'],
   },
 ];
@@ -94,23 +80,12 @@ export default function Home() {
         <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]">
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
-            {/* Hero Left Column: Clean Unboxed Typography & Chunky Neobrutalist CTAs */}
+            {/* Hero Left Column */}
             <div className="lg:col-span-6 w-full flex flex-col items-start justify-center">
               
-              {/* Headline with High-Contrast Vintage Serif & Typewriter */}
-              <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] min-h-[90px] sm:min-h-[110px] text-[#1A3629]">
-                <TextType
-                  text={[
-                    "Pixel-Perfect Health.",
-                    "Calibrated for High Performance.",
-                    "Behavioral Momentum Engineered."
-                  ]}
-                  typingSpeed={45}
-                  deletingSpeed={25}
-                  pauseDuration={2400}
-                  startOnVisible={true}
-                  cursorClassName="bg-[#1A3629]"
-                />
+              {/* Headline with High-Contrast Vintage Serif */}
+              <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] text-[#1A3629]">
+                Pixel-Perfect Health.
               </h1>
               
               {/* Editorial Body Text in Cabinet Grotesk */}
@@ -181,16 +156,10 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Micro-Card 3: Energy Rating Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
-                  <div 
-                    key={`focus-${currentDish.id}`}
-                    className="font-mono font-bold text-sm tabular-nums tracking-tight mb-1 flex items-center gap-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
-                  >
-                    <span>{currentDish.focus}</span>
-                    <span className="text-[10px] font-mono font-normal uppercase text-[#2C4A3B]">
-                      Focus Rating
-                    </span>
+                {/* Micro-Card 3: Discovery Rating */}
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                  <div className="font-mono font-bold text-xs uppercase tracking-wider text-[#1A3629]">
+                    <span className="text-sm font-black tabular-nums">{currentDish.focus}</span> FOCUS RATING
                   </div>
                   <div>
                     <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
@@ -238,7 +207,6 @@ export default function Home() {
             {/* 3 Interactive Step Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
               {STEP_LOOP.map((item, idx) => {
-                const Icon = item.icon;
                 const isActive = activeStepIndex === idx;
 
                 return (
@@ -271,10 +239,10 @@ export default function Home() {
                         </span>
                       </div>
 
-                      {/* Title & Icon */}
+                      {/* Title & Tag */}
                       <div className="flex items-start gap-3 mb-3">
-                        <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
-                          <Icon className="w-4 h-4 stroke-[2.5]" />
+                        <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                          {item.step}
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629]">
                           {item.title}
@@ -331,8 +299,8 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
-                          <TrendingUp className="w-4 h-4 stroke-[2.5]" />
+                        <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                          ↗
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                           Food &amp; Focus Patterns
@@ -408,9 +376,8 @@ export default function Home() {
 
                 <div className="flex items-center justify-between pt-4 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold text-[#2C4A3B]">
                   <span>Daily habit &amp; meal insights</span>
-                  <Link href="/correlations" className="hover:underline flex items-center gap-1">
-                    <span>View All Discoveries</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                  <Link href="/correlations" className="hover:underline flex items-center gap-1 text-[#1A3629]">
+                    <span>View All Discoveries →</span>
                   </Link>
                 </div>
               </div>
@@ -419,8 +386,8 @@ export default function Home() {
               <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
-                      <Sparkles className="w-4 h-4 stroke-[2.5]" />
+                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                      ⚡
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       16-Bit Food Fuel
@@ -432,14 +399,14 @@ export default function Home() {
 
                   <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-cabinet font-bold">Spiced Paneer Protein Bowl</span>
+                      <span className="text-xs font-cabinet font-bold">Herb Grilled Chicken &amp; Greens</span>
                       <span className="text-[11px] font-mono font-bold tabular-nums">48g PRO</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full border border-[#1A3629] bg-[#FFFDF9] overflow-hidden">
                       <div className="h-full w-3/4 bg-[#1A3629]" />
                     </div>
                     <span className="text-[11px] font-cabinet font-medium block leading-relaxed opacity-85">
-                      Clean plant protein and nourishing fats for sustained energy.
+                      Lean whole-food protein and micro-nutrients for steady physical stamina.
                     </span>
                   </div>
                 </div>
@@ -448,8 +415,7 @@ export default function Home() {
                   href="/recipes"
                   className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t-2 border-[#1A3629]/15 hover:text-[#3A6B52] transition-colors"
                 >
-                  <span>Browse Recipes Catalog</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Browse Recipes Catalog →</span>
                 </Link>
               </div>
 
@@ -457,8 +423,8 @@ export default function Home() {
               <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
-                      <Flame className="w-4 h-4 stroke-[2.5]" />
+                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                      ■
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       Stress-Free Streaks
@@ -491,8 +457,8 @@ export default function Home() {
               <div className="lg:col-span-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
-                      <Activity className="w-4 h-4 stroke-[2.5]" />
+                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                      ~
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       Daily Energy Journal
@@ -539,9 +505,8 @@ export default function Home() {
 
                 <div className="flex items-center justify-between pt-4 mt-6 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold">
                   <span>Synced directly to your Daily Planner</span>
-                  <Link href="/dashboard" className="hover:underline flex items-center gap-1">
-                    <span>Open Dashboard</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                  <Link href="/dashboard" className="hover:underline flex items-center gap-1 text-[#1A3629]">
+                    <span>Open Dashboard →</span>
                   </Link>
                 </div>
               </div>
@@ -687,8 +652,8 @@ export default function Home() {
           {/* Col 1 & 2: Brand & Mission */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
-              <span className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
-                Cyath
+              <span className="font-pixel font-bold text-2xl tracking-wider lowercase text-[#1A3629]">
+                cyath
               </span>
               <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold">
                 v1.0 Retro
@@ -760,7 +725,7 @@ export default function Home() {
 
         {/* Bottom copyright line */}
         <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold text-[#2C4A3B]">
-          <div>© {new Date().getFullYear()} Cyath. Handcrafted with retro precision.</div>
+          <div>© {new Date().getFullYear()} cyath. Handcrafted with retro precision.</div>
           <div>Zero tracking cookies · Secure local &amp; cloud storage</div>
         </div>
       </footer>

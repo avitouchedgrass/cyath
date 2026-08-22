@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
@@ -206,20 +207,20 @@ function OnboardingContent() {
         {/* Top Header Monogram & Step Indicator */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
-              <Logo className="w-9 h-9" />
-            </div>
-            <div>
-              <div className="text-xs font-mono font-bold text-[#1A3629]">Personal Setup</div>
-              <div className="text-[10px] font-mono text-[#1A3629]">
-                Step {step} of {totalSteps}
-              </div>
-            </div>
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-3.5 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <span>← Back to Home</span>
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
+            <span className="text-[10px] font-mono font-bold text-[#1A3629]">
+              Step {step} of {totalSteps}
+            </span>
             {/* Progress Bar */}
-            <div className="w-28 h-2.5 rounded-full border border-[#1A3629]/30 bg-[#E8DECF] overflow-hidden">
+            <div className="w-24 h-2.5 rounded-full border border-[#1A3629]/30 bg-[#E8DECF] overflow-hidden">
               <div
                 className="h-full bg-[#1A3629] transition-all duration-300"
                 style={{ width: `${(step / totalSteps) * 100}%` }}

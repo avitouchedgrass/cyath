@@ -110,12 +110,14 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
+  const [scanDirection, setScanDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
   const currentIndexRef = useRef(0);
   const isScanningRef = useRef(false);
+  const animFrameRef = useRef<number | null>(null);
 
   const triggerNextDish = (targetNext?: number) => {
     if (isScanningRef.current) return;
@@ -130,17 +132,32 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     setPrevIndex(prev);
     setCurrentIndex(next);
     currentIndexRef.current = next;
+    setScanDirection((dir) => (dir === 'horizontal' ? 'vertical' : 'horizontal'));
     setScanProgress(0);
 
     onDishChange?.(DISH_ITEMS[next], next);
     retroAudio.playScanWipe();
 
-    setTimeout(() => {
-      setIsScanning(false);
-      isScanningRef.current = false;
-      setPrevIndex(null);
-      setScanProgress(1.0);
-    }, 350);
+    const startTime = performance.now();
+    const duration = 850;
+
+    const animateScan = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1.0);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setScanProgress(eased);
+
+      if (progress < 1.0) {
+        animFrameRef.current = requestAnimationFrame(animateScan);
+      } else {
+        setIsScanning(false);
+        isScanningRef.current = false;
+        setPrevIndex(null);
+        setScanProgress(1.0);
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(animateScan);
   };
 
   useEffect(() => {
@@ -148,10 +165,11 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
 
     const interval = setInterval(() => {
       triggerNextDish();
-    }, 4500);
+    }, 4800);
 
     return () => {
       clearInterval(interval);
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
 
@@ -177,7 +195,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   return (
     <div className={`relative w-full flex flex-col items-center justify-center select-none ${className}`}>
       
-      {/* Massive Food Arena (Click anywhere to cycle or inspect) */}
+      {/* Massive Unboxed Food Arena (Pure Floating Art) */}
       <div 
         onClick={handleInspectRecipe}
         onKeyDown={(e) => {
@@ -202,19 +220,20 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           }}
         />
 
-        {/* Sharp Pixel Art Stage */}
-        <div className="relative w-full h-full z-10 [image-rendering:pixelated]">
+        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage */}
+        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
           <PixelWaveDish
             currentIndex={currentIndex}
             prevIndex={prevIndex}
             isScanning={isScanning}
+            scanDirection={scanDirection}
             scanProgress={scanProgress}
             dishImages={DISH_IMAGES}
             className="w-full h-full"
           />
         </div>
 
-        {/* Clean Tactile Inspect Recipe Pill Badge */}
+        {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
         <div className="absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[4px_4px_0px_#1A3629]">
           <span className="font-cabinet font-bold text-xs sm:text-sm">
             Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>

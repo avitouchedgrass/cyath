@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
+import { TextType } from '@/components/reactbits/TextType';
 import { useHabitStore } from '@/store/useHabitStore';
 
 const STEP_LOOP = [
@@ -83,10 +84,25 @@ export default function Home() {
             {/* Hero Left Column */}
             <div className="lg:col-span-6 w-full flex flex-col items-start justify-center">
               
-              {/* Headline with High-Contrast Vintage Serif */}
-              <h1 className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] text-[#1A3629]">
-                Pixel-Perfect Health.
-              </h1>
+              {/* Headline with High-Contrast Vintage Serif and TextType Animation */}
+              <div className="min-h-[80px] sm:min-h-[96px] lg:min-h-[115px] flex items-center">
+                <TextType
+                  text={[
+                    "Pixel-Perfect Health.",
+                    "Calibrated Daily Fuel.",
+                    "Simple 30-Sec Habits.",
+                    "Real Energy Momentum."
+                  ]}
+                  typingSpeed={55}
+                  deletingSpeed={30}
+                  pauseDuration={2500}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  cursorClassName="text-[#1A3629] font-light ml-1 inline-block"
+                  className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] text-[#1A3629]"
+                  as="h1"
+                />
+              </div>
               
               {/* Editorial Body Text in Cabinet Grotesk */}
               <p className="font-cabinet font-medium text-base sm:text-lg leading-relaxed mt-6 max-w-xl text-[#2C4A3B]">

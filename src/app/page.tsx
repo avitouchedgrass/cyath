@@ -97,8 +97,8 @@ export default function Home() {
                   deletingSpeed={30}
                   pauseDuration={2500}
                   showCursor={true}
-                  cursorCharacter="|"
-                  cursorClassName="text-[#1A3629] font-light ml-1 inline-block"
+                  cursorCharacter="▌"
+                  cursorClassName="text-[#1A3629] font-bold ml-1 inline-block select-none text-[0.8em] align-baseline opacity-90"
                   className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] text-[#1A3629]"
                   as="h1"
                 />

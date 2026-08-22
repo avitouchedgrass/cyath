@@ -135,11 +135,11 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     setScanDirection((dir) => (dir === 'horizontal' ? 'vertical' : 'horizontal'));
     setScanProgress(0);
 
-    onDishChange?.(DISH_ITEMS[next], next);
     retroAudio.playScanWipe();
 
     const startTime = performance.now();
     const duration = 850;
+    let hasTriggeredStatUpdate = false;
 
     const animateScan = (now: number) => {
       const elapsed = now - startTime;
@@ -147,9 +147,18 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
       const eased = 1 - Math.pow(1 - progress, 3);
       setScanProgress(eased);
 
+      // Synchronize stat update when the incoming dish reaches the screen midpoint
+      if (!hasTriggeredStatUpdate && progress >= 0.45) {
+        hasTriggeredStatUpdate = true;
+        onDishChange?.(DISH_ITEMS[next], next);
+      }
+
       if (progress < 1.0) {
         animFrameRef.current = requestAnimationFrame(animateScan);
       } else {
+        if (!hasTriggeredStatUpdate) {
+          onDishChange?.(DISH_ITEMS[next], next);
+        }
         setIsScanning(false);
         isScanningRef.current = false;
         setPrevIndex(null);
@@ -234,7 +243,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         </div>
 
         {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
-        <div className="absolute bottom-2 sm:bottom-6 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2.5 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[4px_4px_0px_#1A3629]">
+        <div className="absolute bottom-1 sm:bottom-3 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center gap-2 px-5 py-2 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
           <span className="font-cabinet font-bold text-xs sm:text-sm">
             Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>

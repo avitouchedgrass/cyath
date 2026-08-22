@@ -83,33 +83,81 @@ export function PixelWaveDish({
       const prevSrc = prevIndex !== null && prevIndex !== undefined ? dishImages[prevIndex] : null;
       const prevImg = prevSrc ? imagesRef.current[prevSrc] : null;
 
-      // Draw stationary plate with inner subtle food shimmer
+      // Draw stationary plate scaled to 84% and shifted upward so it never intersects with bottom inspect badge
       const drawDish = (img: HTMLImageElement | undefined) => {
         if (!img) return;
-        ctx.drawImage(img, 0, 0, width, height);
+        const scale = 0.84;
+        const dw = width * scale;
+        const dh = height * scale;
+        const dx = (width - dw) / 2;
+        const dy = (height - dh) / 2 - 22;
+        ctx.drawImage(img, dx, dy, dw, dh);
       };
 
       if (isScanning && prevImg && currentImg) {
-        // 1. Draw previous dish as base
-        drawDish(prevImg);
+        const p = Math.max(0, Math.min(1, scanProgress));
 
-        // 2. Clip and draw current dish based on scan direction
-        ctx.save();
-        ctx.beginPath();
         if (scanDirection === 'horizontal') {
-          // Left to right scan wipe
-          const clipWidth = width * Math.max(0, Math.min(1, scanProgress));
-          ctx.rect(0, 0, clipWidth, height);
-        } else {
-          // Top to bottom scan wipe
-          const clipHeight = height * Math.max(0, Math.min(1, scanProgress));
-          ctx.rect(0, 0, width, clipHeight);
-        }
-        ctx.clip();
+          const splitX = width * p;
 
-        // Draw new incoming dish in clipped region
-        drawDish(currentImg);
-        ctx.restore();
+          // 1. Draw Incoming Current Dish in Scanned Region [0 ... splitX]
+          if (splitX > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, splitX, height);
+            ctx.clip();
+            drawDish(currentImg);
+            ctx.restore();
+          }
+
+          // 2. Draw Outgoing Previous Dish in Unscanned Region [splitX ... width]
+          if (splitX < width) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(splitX, 0, width - splitX, height);
+            ctx.clip();
+            drawDish(prevImg);
+            ctx.restore();
+          }
+
+          // 3. Draw Laser Edge Scan Line along wipe boundary
+          if (splitX > 2 && splitX < width - 2) {
+            ctx.save();
+            ctx.fillStyle = '#1A3629';
+            ctx.fillRect(splitX - 1.5, 0, 3, height);
+            ctx.restore();
+          }
+        } else {
+          const splitY = height * p;
+
+          // 1. Draw Incoming Current Dish in Scanned Region [0 ... splitY]
+          if (splitY > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, width, splitY);
+            ctx.clip();
+            drawDish(currentImg);
+            ctx.restore();
+          }
+
+          // 2. Draw Outgoing Previous Dish in Unscanned Region [splitY ... height]
+          if (splitY < height) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, splitY, width, height - splitY);
+            ctx.clip();
+            drawDish(prevImg);
+            ctx.restore();
+          }
+
+          // 3. Draw Laser Edge Scan Line along wipe boundary
+          if (splitY > 2 && splitY < height - 2) {
+            ctx.save();
+            ctx.fillStyle = '#1A3629';
+            ctx.fillRect(0, splitY - 1.5, width, 3);
+            ctx.restore();
+          }
+        }
       } else if (currentImg) {
         // Idle state: Draw active dish
         drawDish(currentImg);

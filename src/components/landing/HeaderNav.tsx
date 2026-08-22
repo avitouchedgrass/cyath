@@ -41,10 +41,10 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none transition-all duration-300">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
-        {/* Left: Lowercase Pixel Text Logo (Unboxed, Big, Matching Width) */}
+        {/* Left: Authentic Lowercase Pixel Brand Text (Symmetrically aligned) */}
         <Link 
           href="/" 
-          className="font-pixel text-2xl sm:text-3xl font-bold lowercase tracking-wider text-[#1A3629] select-none hover:opacity-80 transition-opacity z-10" 
+          className="font-pixel text-3xl font-bold lowercase tracking-wider text-[#1A3629] select-none hover:opacity-80 transition-opacity z-10 flex items-center h-10" 
           aria-label="cyath home"
         >
           cyath
@@ -52,7 +52,7 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
 
         {/* Center: Tactile Pill Nav */}
         <nav 
-          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 transition-all duration-300 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full px-6 py-2 ${
+          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 transition-all duration-300 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full px-6 h-10 ${
             isScrolled 
               ? "shadow-[4px_4px_0px_#1A3629]" 
               : "shadow-[3px_3px_0px_#1A3629]"
@@ -82,14 +82,14 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center cursor-pointer min-w-[110px] sm:min-w-[124px]"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center cursor-pointer h-10 min-w-[116px]"
             >
               <span>Profile</span>
             </Link>
           ) : (
             <Link
               href={mounted && userSession ? "/dashboard" : "/login"}
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer min-w-[110px] sm:min-w-[124px]"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer h-10 min-w-[116px]"
             >
               <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
               <span>Dashboard</span>

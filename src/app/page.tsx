@@ -98,7 +98,7 @@ export default function Home() {
                 <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#3A6B52] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                   </button>
@@ -107,7 +107,7 @@ export default function Home() {
                 <Link href="/protocols" className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1A3629] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     Browse Blueprints
                   </button>
@@ -118,7 +118,7 @@ export default function Home() {
               <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 border-[#1A3629]/15 w-full">
                 
                 {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div className="flex items-center gap-1.5 mb-2">
                     {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
                       <span 
@@ -139,7 +139,7 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 2: Macro Fueling Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div 
                     key={currentDish.id}
                     className="font-mono font-bold text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
@@ -157,9 +157,9 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 3: Discovery Rating */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[105px] shadow-[3px_3px_0px_#1A3629] transition-all">
-                  <div className="font-mono font-bold text-xs uppercase tracking-wider text-[#1A3629]">
-                    <span className="text-sm font-black tabular-nums">{currentDish.focus}</span> FOCUS RATING
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                  <div className="font-mono font-bold text-xs tracking-tight text-[#1A3629] whitespace-nowrap">
+                    <span className="text-sm font-black tabular-nums">{currentDish.focus}</span> FOCUS LINK
                   </div>
                   <div>
                     <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">

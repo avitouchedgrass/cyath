@@ -463,14 +463,38 @@ function RecipesContent() {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Pixel Art Image Anchor */}
+            {/* Pixel Art Image Anchor with Dynamic Portion Calibration */}
             <div className="w-full flex flex-col items-center justify-center pt-2 pb-1">
-              <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center">
+              <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center transition-all duration-300">
                 <img
-                  src={selectedRecipe.image}
-                  alt={selectedRecipe.name}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(0,0,0,0.2)]"
+                  key={`${selectedRecipe.id}-${portionMultiplier}`}
+                  src={
+                    selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0] ||
+                    selectedRecipe.image
+                  }
+                  alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
+                  style={{
+                    transform: !selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0]
+                      ? portionMultiplier === 0.5
+                        ? 'scale(0.86)'
+                        : portionMultiplier === 1.5
+                        ? 'scale(1.10)'
+                        : portionMultiplier === 2.0
+                        ? 'scale(1.22)'
+                        : 'scale(1)'
+                      : 'scale(1)',
+                  }}
+                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-transform duration-300 ease-out"
                 />
+              </div>
+              <div className="mt-2 text-[10px] font-mono font-bold px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629] tracking-wider uppercase">
+                {portionMultiplier === 0.5
+                  ? '0.5x · Light Snack Serving'
+                  : portionMultiplier === 1.0
+                  ? '1.0x · Standard Calibration'
+                  : portionMultiplier === 1.5
+                  ? '1.5x · Hearty Training Portion'
+                  : '2.0x · Double Protein Feast'}
               </div>
             </div>
 

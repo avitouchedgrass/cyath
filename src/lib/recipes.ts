@@ -3,6 +3,7 @@ export interface Recipe {
   name: string;
   subtitle: string;
   image: string;
+  portionImages?: Partial<Record<0.5 | 1.0 | 1.5 | 2.0, string>>;
   calories: number;
   protein: number;
   carbs: number;
@@ -23,6 +24,11 @@ export const RECIPES: Recipe[] = [
     name: 'Herb Grilled Chicken & Crispy Greens',
     subtitle: 'Lean pasture-raised breast with rosemary and wilted greens',
     image: '/assets/food/grilled-chicken.png',
+    portionImages: {
+      0.5: '/assets/food/grilled-chicken-half.png',
+      1.0: '/assets/food/grilled-chicken.png',
+      2.0: '/assets/food/grilled-chicken-double.png',
+    },
     calories: 520,
     protein: 48,
     carbs: 16,
@@ -55,6 +61,11 @@ export const RECIPES: Recipe[] = [
     name: 'Truffle & Parmesan Tagliatelle',
     subtitle: 'Slow-digesting durum wheat with aged parmesan and truffle oil',
     image: '/assets/food/pasta.png',
+    portionImages: {
+      0.5: '/assets/food/pasta-half.png',
+      1.0: '/assets/food/pasta.png',
+      2.0: '/assets/food/pasta-double.png',
+    },
     calories: 610,
     protein: 18,
     carbs: 78,
@@ -87,6 +98,9 @@ export const RECIPES: Recipe[] = [
     name: 'Cast-Iron Skillet Eggs & Greens',
     subtitle: 'Pasture-raised farm eggs sunny-side up with charred asparagus',
     image: '/assets/food/skillet-eggs.png',
+    portionImages: {
+      1.0: '/assets/food/skillet-eggs.png',
+    },
     calories: 440,
     protein: 34,
     carbs: 12,
@@ -118,6 +132,9 @@ export const RECIPES: Recipe[] = [
     name: 'Smoked Citrus Fiesta Taco Bowl',
     subtitle: 'Grass-fed lean beef, black beans, sweet corn, and lime pico',
     image: '/assets/food/taco-bowl.png',
+    portionImages: {
+      1.0: '/assets/food/taco-bowl.png',
+    },
     calories: 560,
     protein: 42,
     carbs: 48,
@@ -150,6 +167,9 @@ export const RECIPES: Recipe[] = [
     name: 'Warm Ancient Grain & Avocado Bowl',
     subtitle: 'Tri-color quinoa, roasted sweet potatoes, and avocado wedges',
     image: '/assets/food/grain-bowl.png',
+    portionImages: {
+      1.0: '/assets/food/grain-bowl.png',
+    },
     calories: 490,
     protein: 22,
     carbs: 62,
@@ -181,7 +201,12 @@ export const RECIPES: Recipe[] = [
     id: 'avocado-sourdough-toast',
     name: 'Poached Egg & Whipped Avocado Sourdough',
     subtitle: 'Cold-fermented sourdough with chili flakes and microgreens',
-    image: '/assets/food/Avocado-Photoroom.png',
+    image: '/assets/food/avocado-toast.png',
+    portionImages: {
+      0.5: '/assets/food/avocado-toast-half.png',
+      1.0: '/assets/food/avocado-toast.png',
+      2.0: '/assets/food/avocado-toast-double.png',
+    },
     calories: 410,
     protein: 24,
     carbs: 38,
@@ -211,7 +236,12 @@ export const RECIPES: Recipe[] = [
     id: 'chimichurri-seared-steak',
     name: 'Cast-Iron Strip Steak with Fresh Chimichurri',
     subtitle: 'Dry-brined sirloin with raw parsley, oregano, and garlic vinaigrette',
-    image: '/assets/food/Chicken-Photoroom.png',
+    image: '/assets/food/steak-chimichurri.png',
+    portionImages: {
+      0.5: '/assets/food/steak-chimichurri-half.png',
+      1.0: '/assets/food/steak-chimichurri.png',
+      2.0: '/assets/food/steak-chimichurri-double.png',
+    },
     calories: 580,
     protein: 52,
     carbs: 6,
@@ -241,7 +271,10 @@ export const RECIPES: Recipe[] = [
     id: 'tamago-sesame-rice-bowl',
     name: 'Tamago Sesame Soft Egg Rice Bowl',
     subtitle: 'Steamed short-grain rice with furikake, soy glaze, and spring onions',
-    image: '/assets/food/EggRice-Photoroom.png',
+    image: '/assets/food/egg-rice-bowl.png',
+    portionImages: {
+      1.0: '/assets/food/egg-rice-bowl.png',
+    },
     calories: 460,
     protein: 26,
     carbs: 56,
@@ -271,7 +304,10 @@ export const RECIPES: Recipe[] = [
     id: 'garlic-prawn-linguine',
     name: 'Garlic Butter Prawn Linguine',
     subtitle: 'Wild-caught tiger prawns tossed with garlic, chili, and parsley',
-    image: '/assets/food/Pasta-Photoroom.png',
+    image: '/assets/food/prawn-linguine.png',
+    portionImages: {
+      1.0: '/assets/food/prawn-linguine.png',
+    },
     calories: 530,
     protein: 44,
     carbs: 54,

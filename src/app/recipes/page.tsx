@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { RECIPES, Recipe } from '@/lib/recipes';
+import { PixelSteam } from '@/components/landing/PixelSteam';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 
@@ -440,6 +441,7 @@ function RecipesContent() {
             {/* Pixel Art Image Anchor with Dynamic Portion Calibration */}
             <div className="w-full flex flex-col items-center justify-center pt-2 pb-1">
               <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center transition-all duration-300">
+                <PixelSteam active={true} intensity={1.3} />
                 <img
                   key={`${selectedRecipe.id}-${portionMultiplier}`}
                   src={
@@ -448,6 +450,7 @@ function RecipesContent() {
                   }
                   alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
                   style={{
+                    viewTransitionName: 'active-dish-plate',
                     transform: !selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0]
                       ? portionMultiplier === 0.5
                         ? 'scale(0.86)'
@@ -458,7 +461,7 @@ function RecipesContent() {
                         : 'scale(1)'
                       : 'scale(1)',
                   }}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out"
+                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out z-10"
                 />
               </div>
               <div className="mt-2 text-[10px] font-mono font-bold px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629] tracking-wider uppercase">

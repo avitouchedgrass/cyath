@@ -6,6 +6,7 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { deriveCorrelations } from '@/lib/correlation';
 import { retroAudio } from '@/lib/retroAudio';
+import { InteractiveCorrelationMatrix, MatrixDataPoint } from '@/components/correlations/InteractiveCorrelationMatrix';
 
 export default function CorrelationsPage() {
   const [timeHorizon, setTimeHorizon] = useState<7 | 14 | 30>(14);
@@ -24,60 +25,25 @@ export default function CorrelationsPage() {
 
   const activeCorrelation = correlations.find((c) => c.id === selectedCorrelationId) || correlations[0];
 
-  // Derive coordinate domains and trendline
-  const { minX, maxX, minY, maxY, trendline } = useMemo(() => {
-    const pts = activeCorrelation.points;
-    if (!pts || pts.length === 0) {
-      return { minX: 0, maxX: 150, minY: 1, maxY: 10, trendline: { y1: 82, y2: 18 } };
+  // Map active correlation points to matrix data points for physics simulation
+  const matrixPoints: MatrixDataPoint[] = useMemo(() => {
+    if (!activeCorrelation.points || activeCorrelation.points.length === 0) {
+      return [
+        { id: '1', x: 95, y: 5.4, label: 'Day 1' },
+        { id: '2', x: 120, y: 6.5, label: 'Day 2' },
+        { id: '3', x: 140, y: 7.2, label: 'Day 3' },
+        { id: '4', x: 160, y: 8.3, label: 'Day 4' },
+        { id: '5', x: 175, y: 8.9, label: 'Day 5' },
+        { id: '6', x: 190, y: 9.3, label: 'Day 6' },
+      ];
     }
 
-    const xs = pts.map((p) => p.x);
-    const ys = pts.map((p) => p.y);
-
-    const rawMinX = Math.min(...xs);
-    const rawMaxX = Math.max(...xs);
-    const rawMinY = Math.min(...ys);
-    const rawMaxY = Math.max(...ys);
-
-    const padX = (rawMaxX - rawMinX) * 0.12 || 5;
-    const padY = (rawMaxY - rawMinY) * 0.12 || 1;
-
-    const domainMinX = Math.max(0, rawMinX - padX);
-    const domainMaxX = rawMaxX + padX;
-    const domainMinY = Math.max(0, rawMinY - padY);
-    const domainMaxY = Math.min(10, rawMaxY + padY);
-
-    const n = pts.length;
-    const meanX = xs.reduce((a, b) => a + b, 0) / n;
-    const meanY = ys.reduce((a, b) => a + b, 0) / n;
-
-    let num = 0;
-    let den = 0;
-    for (let i = 0; i < n; i++) {
-      num += (xs[i] - meanX) * (ys[i] - meanY);
-      den += (xs[i] - meanX) * (xs[i] - meanX);
-    }
-    const m = den !== 0 ? num / den : 0;
-    const b = meanY - m * meanX;
-
-    const yStart = m * domainMinX + b;
-    const yEnd = m * domainMaxX + b;
-
-    const normalizePercentY = (val: number) => {
-      const clamped = Math.min(domainMaxY, Math.max(domainMinY, val));
-      return ((clamped - domainMinY) / (domainMaxY - domainMinY || 1)) * 76 + 12;
-    };
-
-    const y1 = 100 - normalizePercentY(yStart);
-    const y2 = 100 - normalizePercentY(yEnd);
-
-    return {
-      minX: domainMinX,
-      maxX: domainMaxX,
-      minY: domainMinY,
-      maxY: domainMaxY,
-      trendline: { y1: Math.min(92, Math.max(8, y1)), y2: Math.min(92, Math.max(8, y2)) },
-    };
+    return activeCorrelation.points.map((pt, idx) => ({
+      id: `${pt.date}-${idx}`,
+      x: pt.x,
+      y: pt.y,
+      label: pt.date.slice(5), // MM-DD
+    }));
   }, [activeCorrelation]);
 
   return (
@@ -108,25 +74,25 @@ export default function CorrelationsPage() {
                 }}
                 className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                   timeHorizon === days
-                    ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9]'
                     : 'text-[#2C4A3B] hover:text-[#1A3629]'
                 }`}
               >
-                {days}D Window
+                {days}D
               </button>
             ))}
           </div>
         </div>
 
-        {/* Title Header */}
-        <div className="mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
-            <span>Pattern Discovery Engine</span>
-          </div>
+        {/* Hero Section */}
+        <div className="mb-12">
+          <span className="px-3.5 py-1.5 rounded-full border-2 text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] inline-block mb-3 shadow-[2px_2px_0px_#1A3629]">
+            Behavioral Telemetry
+          </span>
           <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
-            Habit &amp; Energy Correlations
+            Correlation Engine
           </h1>
-          <p className="text-base sm:text-lg font-cabinet font-medium mt-2 max-w-2xl text-[#2C4A3B]">
+          <p className="text-sm sm:text-base font-cabinet font-medium text-[#2C4A3B] mt-2 max-w-2xl">
             Automated regression engine connecting your daily nutrition, sleep, and routines directly to your self-rated focus.
           </p>
         </div>
@@ -208,56 +174,14 @@ export default function CorrelationsPage() {
                 </div>
               </div>
 
-              {/* Scatter Chart Canvas */}
-              <div className="relative w-full h-80 sm:h-96 rounded-2xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] p-6 overflow-hidden select-none">
-                
-                {/* Axis Labels */}
-                <div className="absolute top-4 left-6 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2C4A3B]">
-                  ▲ {activeCorrelation.yLabel}
-                </div>
-                <div className="absolute bottom-3 right-6 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2C4A3B]">
-                  {activeCorrelation.xLabel} ▶
-                </div>
-
-                {/* SVG Regression Line */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-                  <line
-                    x1="12%"
-                    y1={`${trendline.y1}%`}
-                    x2="88%"
-                    y2={`${trendline.y2}%`}
-                    stroke="#1A3629"
-                    strokeWidth="3"
-                    strokeDasharray="6 6"
-                  />
-                </svg>
-
-                {/* Data Points */}
-                <div className="relative w-full h-full">
-                  {activeCorrelation.points.map((pt, idx) => {
-                    const xPct = ((pt.x - minX) / (maxX - minX || 1)) * 76 + 12;
-                    const yPct = 100 - (((pt.y - minY) / (maxY - minY || 1)) * 76 + 12);
-
-                    return (
-                      <div
-                        key={idx}
-                        className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
-                        style={{ left: `${xPct}%`, top: `${yPct}%` }}
-                      >
-                        <span className="block w-4 h-4 rounded-full border-2 border-[#FFFDF9] bg-[#1A3629] shadow-[2px_2px_0px_#1A3629] group-hover:scale-150 transition-transform" />
-                        
-                        {/* Tooltip on hover */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-30 whitespace-nowrap">
-                          <div className="px-3 py-1.5 rounded-lg border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono text-[10px] font-bold shadow-lg">
-                            <span>{pt.date}: </span>
-                            <span>{pt.x} → {pt.y}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              {/* Interactive Physics Scatter Matrix */}
+              <InteractiveCorrelationMatrix
+                key={activeCorrelation.id}
+                initialPoints={matrixPoints}
+                xLabel={activeCorrelation.xLabel}
+                yLabel={activeCorrelation.yLabel}
+                xUnit={activeCorrelation.id.includes('protein') ? 'g' : activeCorrelation.id.includes('sleep') ? 'h' : 'min'}
+              />
 
               {/* Actionable Takeaway Box */}
               <div className="p-5 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA] space-y-2">

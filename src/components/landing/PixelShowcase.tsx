@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { PixelWaveDish } from './PixelWaveDish';
+import { PixelSteam } from './PixelSteam';
 import { retroAudio } from '@/lib/retroAudio';
 
 export interface DishData {
@@ -114,6 +115,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isCrtEnabled, setIsCrtEnabled] = useState(false);
 
   const currentIndexRef = useRef(0);
   const isScanningRef = useRef(false);
@@ -183,12 +185,21 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   }, []);
 
   const currentDish = DISH_ITEMS[currentIndex];
+  const isHotDish = ['steak', 'chicken', 'prawn', 'pasta', 'eggs', 'taco'].includes(currentDish.id);
 
   const handleInspectRecipe = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     retroAudio.playInspectConfirm();
-    router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
+
+    // Cinematic View Transitions API with FLIP spring fallback
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
+      });
+    } else {
+      router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
+    }
   };
 
   const handleToggleSound = (e: React.MouseEvent) => {
@@ -201,10 +212,17 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     }
   };
 
+  const handleToggleCrt = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCrtEnabled((prev) => !prev);
+    retroAudio.playBlip();
+  };
+
   return (
     <div className={`relative w-full flex flex-col items-center justify-center select-none ${className}`}>
       
-      {/* Massive Unboxed Food Arena (Pure Floating Art) */}
+      {/* Massive Unboxed Food Arena (Pure Floating Art with View Transition Anchor) */}
       <div 
         onClick={handleInspectRecipe}
         onKeyDown={(e) => {
@@ -216,7 +234,12 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         role="button"
         tabIndex={0}
         aria-label={`Interactive pixel food plate: ${currentDish.name}. Click to inspect recipe in detail.`}
-        className="group relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[680px] aspect-square min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.02] focus-visible:outline-none"
+        className={`group relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[680px] aspect-square min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.02] focus-visible:outline-none ${
+          isCrtEnabled ? 'crt-phosphor-screen rounded-3xl overflow-hidden' : ''
+        }`}
+        style={{
+          viewTransitionName: 'active-dish-plate'
+        }}
       >
 
         {/* Subtle Ambient Diffuse Radial Glow */}
@@ -228,6 +251,9 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
             zIndex: 0
           }}
         />
+
+        {/* 16-Bit Ambient Pixel Steam Layer on Hot Dishes */}
+        <PixelSteam active={isHotDish && !isScanning} intensity={1.2} />
 
         {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage */}
         <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
@@ -251,14 +277,26 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
 
       </div>
 
-      {/* Retro 8-Bit Audio Indicator & Toggle Pill */}
-      <div className="mt-3 flex items-center gap-2 z-20">
+      {/* Retro 8-Bit Audio & CRT Screen Phosphor Controls */}
+      <div className="mt-3 flex items-center gap-2.5 z-20">
         <button
           type="button"
           onClick={handleToggleSound}
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
         >
           <span>{isMuted ? '8-BIT FX: OFF' : '8-BIT FX: ON'}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleToggleCrt}
+          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer ${
+            isCrtEnabled
+              ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+              : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]'
+          }`}
+        >
+          <span>{isCrtEnabled ? 'CRT SHADER: ON' : 'CRT SHADER: OFF'}</span>
         </button>
       </div>
 

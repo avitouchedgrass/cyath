@@ -114,6 +114,35 @@ body {
   font-family: var(--font-cabinet);
 }
 
+/* Native View Transitions API Styling */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-group(active-dish-plate) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* CRT Retro Phosphor Scanline Screen Filter */
+.crt-phosphor-screen {
+  position: relative;
+}
+
+.crt-phosphor-screen::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 40;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
 /* Accessibility: Intentional graceful reduced-motion alternatives */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

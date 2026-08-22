@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
 import { TextType } from '@/components/reactbits/TextType';
+import { InteractiveCorrelationMatrix } from '@/components/correlations/InteractiveCorrelationMatrix';
 import { useHabitStore } from '@/store/useHabitStore';
 
 const STEP_LOOP = [
@@ -333,60 +334,13 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Interactive Scatter Simulation Area */}
-                  <div className="h-56 sm:h-64 w-full border-2 border-[#1A3629]/20 bg-[#F4F0EA] rounded-xl p-4 relative overflow-hidden mb-4">
-                    {/* SVG Trendline */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-                      <line
-                        x1="10%"
-                        y1="82%"
-                        x2="90%"
-                        y2="18%"
-                        stroke="#1A3629"
-                        strokeWidth="3"
-                        strokeDasharray="6 6"
-                      />
-                    </svg>
-
-                    {/* Scatter Points */}
-                    <div className="relative w-full h-full">
-                      {SAMPLE_SCATTER_POINTS.map((pt, i) => {
-                        const isSelected = selectedScatterPoint === i;
-                        const leftPct = 10 + (i / 6) * 80;
-                        const bottomPct = 15 + (i / 6) * 70;
-
-                        return (
-                          <button
-                            key={pt.label}
-                            type="button"
-                            aria-label={`Data point for ${pt.x}g protein with ${pt.y} focus rating`}
-                            onClick={() => setSelectedScatterPoint(i)}
-                            className="absolute -translate-x-1/2 translate-y-1/2 p-2.5 cursor-pointer transition-transform hover:scale-125 focus-visible:outline-none rounded-full"
-                            style={{ left: `${leftPct}%`, bottom: `${bottomPct}%` }}
-                          >
-                            <span
-                              className={`block rounded-full transition-all border-2 ${
-                                isSelected
-                                  ? 'w-5 h-5 bg-[#1A3629] border-[#FFFDF9] shadow-[2px_2px_0px_#1A3629]'
-                                  : 'w-3.5 h-3.5 bg-[#FFFDF9] border-[#1A3629]'
-                              }`}
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Active point hover pill */}
-                    {selectedScatterPoint !== null && (
-                      <div className="absolute top-4 left-4 p-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] text-xs font-mono shadow-md">
-                        <span className="block text-[10px] uppercase font-bold tracking-wider opacity-70">
-                          {SAMPLE_SCATTER_POINTS[selectedScatterPoint].label} Discovery
-                        </span>
-                        <span className="font-bold tabular-nums">
-                          {SAMPLE_SCATTER_POINTS[selectedScatterPoint].x}g Protein → {SAMPLE_SCATTER_POINTS[selectedScatterPoint].y} / 10 Focus
-                        </span>
-                      </div>
-                    )}
+                  {/* Interactive Physics Scatter Matrix with Live Dynamic Forecasting */}
+                  <div className="w-full mb-4">
+                    <InteractiveCorrelationMatrix
+                      xLabel="Protein Fuel"
+                      yLabel="Focus Score"
+                      xUnit="g"
+                    />
                   </div>
                 </div>
 

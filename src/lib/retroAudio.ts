@@ -119,6 +119,33 @@ class RetroAudioEngine {
       // Ignore
     }
   }
+
+  // Dynamic harmonic pitch for data point physics and slider interaction
+  public playPitch(freq: number, duration = 0.08) {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(Math.max(120, Math.min(1800, freq)), now);
+
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch {
+      // Ignore
+    }
+  }
 }
 
 export const retroAudio = new RetroAudioEngine();

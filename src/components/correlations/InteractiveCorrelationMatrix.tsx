@@ -41,15 +41,20 @@ export function InteractiveCorrelationMatrix({
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [simulatedX, setSimulatedX] = useState<number>(165);
   const [hoveredPointId, setHoveredPointId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Compute live statistical regression & correlation coefficient
   const stats = useMemo(() => {
     const n = points.length;
     if (n < 2) {
-      return { m: 0.03, b: 2.5, r: 0.85, rSquared: 0.72, minX: 80, maxX: 220, minY: 1, maxY: 10 };
+      return { m: 0.03, b: 2.5, r: 0.85, rSquared: 0.72, minX: 70, maxX: 220, minY: 1, maxY: 10 };
     }
 
     const xs = points.map((p) => p.x);
@@ -77,7 +82,7 @@ export function InteractiveCorrelationMatrix({
 
     const m = denX !== 0 ? num / denX : 0;
     const b = meanY - m * meanX;
-    const r = (denX > 0 && denY > 0) ? num / Math.sqrt(denX * denY) : 0.8;
+    const r = denX > 0 && denY > 0 ? num / Math.sqrt(denX * denY) : 0.8;
     const rSquared = Math.max(0, Math.min(1, r * r));
 
     return { m, b, r, rSquared, minX, maxX, minY, maxY };
@@ -89,25 +94,28 @@ export function InteractiveCorrelationMatrix({
     return Math.max(1.0, Math.min(10.0, Number(val.toFixed(1))));
   }, [simulatedX, stats]);
 
+  // Notify parent on change safely
+  const onForecastChangeRef = useRef(onForecastChange);
   useEffect(() => {
-    onForecastChange?.(predictedFocus, simulatedX);
-  }, [predictedFocus, simulatedX, onForecastChange]);
+    onForecastChangeRef.current = onForecastChange;
+  }, [onForecastChange]);
 
-  // Coordinate mapping utilities
-  const getCoords = useCallback(
-    (xVal: number, yVal: number, width: number, height: number) => {
-      const padX = 40;
-      const padY = 32;
-      const plotW = width - padX * 2;
-      const plotH = height - padY * 2;
+  useEffect(() => {
+    if (mounted && onForecastChangeRef.current) {
+      onForecastChangeRef.current(predictedFocus, simulatedX);
+    }
+  }, [predictedFocus, simulatedX, mounted]);
 
-      const normX = (xVal - stats.minX) / (stats.maxX - stats.minX || 1);
-      const normY = (yVal - stats.minY) / (stats.maxY - stats.minY || 1);
+  // Normalized percent position utilities (100% deterministic, zero SSR ref access)
+  const getPercentCoords = useCallback(
+    (xVal: number, yVal: number) => {
+      const normX = Math.max(0, Math.min(1, (xVal - stats.minX) / (stats.maxX - stats.minX || 1)));
+      const normY = Math.max(0, Math.min(1, (yVal - stats.minY) / (stats.maxY - stats.minY || 1)));
 
-      const px = padX + normX * plotW;
-      const py = height - padY - normY * plotH;
+      const leftPct = normX * 80 + 10; // 10% to 90%
+      const topPct = 100 - (normY * 74 + 13); // 13% to 87%
 
-      return { px, py };
+      return { leftPct, topPct };
     },
     [stats]
   );
@@ -116,7 +124,11 @@ export function InteractiveCorrelationMatrix({
   const handlePointerDown = (id: string, e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    try {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore
+    }
     setDraggingId(id);
     isDraggingRef.current = true;
     retroAudio.playBlip();
@@ -126,10 +138,12 @@ export function InteractiveCorrelationMatrix({
     if (!isDraggingRef.current || !draggingId || !containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const padX = 40;
-    const padY = 32;
-    const plotW = rect.width - padX * 2;
-    const plotH = rect.height - padY * 2;
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    const padX = rect.width * 0.1;
+    const padY = rect.height * 0.13;
+    const plotW = rect.width * 0.8;
+    const plotH = rect.height * 0.74;
 
     const clickX = e.clientX - rect.left - padX;
     const clickY = rect.height - (e.clientY - rect.top) - padY;
@@ -144,7 +158,7 @@ export function InteractiveCorrelationMatrix({
       prev.map((pt) => (pt.id === draggingId ? { ...pt, x: newX, y: newY } : pt))
     );
 
-    // Audio pitch feedback based on Y-axis (Focus) position
+    // Audio pitch feedback
     retroAudio.playPitch(280 + newY * 55, 0.04);
   };
 
@@ -171,6 +185,14 @@ export function InteractiveCorrelationMatrix({
     setSimulatedX(165);
     retroAudio.playBlip();
   };
+
+  // Trendline endpoints in SVG percentage coordinates
+  const yStartVal = stats.m * stats.minX + stats.b;
+  const yEndVal = stats.m * stats.maxX + stats.b;
+
+  const y1Percent = 100 - (Math.max(0, Math.min(1, (yStartVal - stats.minY) / (stats.maxY - stats.minY || 1))) * 74 + 13);
+  const y2Percent = 100 - (Math.max(0, Math.min(1, (yEndVal - stats.minY) / (stats.maxY - stats.minY || 1))) * 74 + 13);
+  const simulatedLineX = Math.max(10, Math.min(90, ((simulatedX - stats.minX) / (stats.maxX - stats.minX || 1)) * 80 + 10));
 
   return (
     <div className={`flex flex-col gap-4 w-full select-none ${className}`}>
@@ -205,7 +227,7 @@ export function InteractiveCorrelationMatrix({
         onPointerUp={handlePointerUp}
         className="relative w-full h-64 sm:h-72 rounded-2xl border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] p-4 overflow-hidden touch-none cursor-crosshair"
       >
-        {/* Subtle SVG Grid Lines */}
+        {/* SVG Grid Lines & Trendlines (100% Deterministic Percentage Coordinates) */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
           <defs>
             <pattern id="matrix-grid" width="30" height="30" patternUnits="userSpaceOnUse">
@@ -216,20 +238,10 @@ export function InteractiveCorrelationMatrix({
 
           {/* Dynamic Linear Regression Trendline */}
           <line
-            x1="40"
-            y1={
-              containerRef.current
-                ? containerRef.current.clientHeight - 32 - ((stats.m * stats.minX + stats.b - stats.minY) / (stats.maxY - stats.minY || 1)) * (containerRef.current.clientHeight - 64)
-                : 200
-            }
-            x2={
-              containerRef.current ? containerRef.current.clientWidth - 40 : 400
-            }
-            y2={
-              containerRef.current
-                ? containerRef.current.clientHeight - 32 - ((stats.m * stats.maxX + stats.b - stats.minY) / (stats.maxY - stats.minY || 1)) * (containerRef.current.clientHeight - 64)
-                : 50
-            }
+            x1="10%"
+            y1={`${y1Percent.toFixed(1)}%`}
+            x2="90%"
+            y2={`${y2Percent.toFixed(1)}%`}
             stroke="#1A3629"
             strokeWidth="3"
             strokeDasharray="6 4"
@@ -237,18 +249,16 @@ export function InteractiveCorrelationMatrix({
           />
 
           {/* Live Simulated Tracker Line */}
-          {containerRef.current && (
-            <line
-              x1={40 + ((simulatedX - stats.minX) / (stats.maxX - stats.minX || 1)) * (containerRef.current.clientWidth - 80)}
-              y1="10"
-              x2={40 + ((simulatedX - stats.minX) / (stats.maxX - stats.minX || 1)) * (containerRef.current.clientWidth - 80)}
-              y2={containerRef.current.clientHeight - 20}
-              stroke="#3A6B52"
-              strokeWidth="2"
-              strokeDasharray="3 3"
-              className="opacity-70"
-            />
-          )}
+          <line
+            x1={`${simulatedLineX.toFixed(1)}%`}
+            y1="8%"
+            x2={`${simulatedLineX.toFixed(1)}%`}
+            y2="92%"
+            stroke="#3A6B52"
+            strokeWidth="2"
+            strokeDasharray="3 3"
+            className="opacity-70"
+          />
         </svg>
 
         {/* Axis Labels */}
@@ -260,57 +270,51 @@ export function InteractiveCorrelationMatrix({
         </div>
 
         {/* Interactive Draggable Data Point Nodes */}
-        {containerRef.current &&
-          points.map((pt) => {
-            const isDragging = draggingId === pt.id;
-            const isHovered = hoveredPointId === pt.id;
-            const { px, py } = getCoords(
-              pt.x,
-              pt.y,
-              containerRef.current?.clientWidth || 300,
-              containerRef.current?.clientHeight || 200
-            );
+        {points.map((pt) => {
+          const isDragging = draggingId === pt.id;
+          const isHovered = hoveredPointId === pt.id;
+          const { leftPct, topPct } = getPercentCoords(pt.x, pt.y);
 
-            return (
+          return (
+            <div
+              key={pt.id}
+              onPointerDown={(e) => handlePointerDown(pt.id, e)}
+              onMouseEnter={() => {
+                setHoveredPointId(pt.id);
+                retroAudio.playBlip();
+              }}
+              onMouseLeave={() => setHoveredPointId(null)}
+              style={{
+                left: `${leftPct}%`,
+                top: `${topPct}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              className={`absolute z-30 cursor-grab active:cursor-grabbing p-1.5 touch-none group transition-transform ${
+                isDragging ? 'scale-125 z-40' : 'hover:scale-110'
+              }`}
+            >
+              {/* Node Pill */}
               <div
-                key={pt.id}
-                onPointerDown={(e) => handlePointerDown(pt.id, e)}
-                onMouseEnter={() => {
-                  setHoveredPointId(pt.id);
-                  retroAudio.playBlip();
-                }}
-                onMouseLeave={() => setHoveredPointId(null)}
-                style={{
-                  left: `${px}px`,
-                  top: `${py}px`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-                className={`absolute z-30 cursor-grab active:cursor-grabbing p-1.5 touch-none group transition-transform ${
-                  isDragging ? 'scale-125 z-40' : 'hover:scale-110'
+                className={`w-6 h-6 rounded-full border-2 border-[#1A3629] flex items-center justify-center font-mono font-bold text-[10px] shadow-[2px_2px_0px_#1A3629] transition-colors ${
+                  isDragging || isHovered
+                    ? 'bg-[#1A3629] text-[#FFFDF9]'
+                    : 'bg-[#FFFDF9] text-[#1A3629]'
                 }`}
               >
-                {/* Node Pill */}
-                <div
-                  className={`w-6 h-6 rounded-full border-2 border-[#1A3629] flex items-center justify-center font-mono font-bold text-[10px] shadow-[2px_2px_0px_#1A3629] transition-colors ${
-                    isDragging || isHovered
-                      ? 'bg-[#1A3629] text-[#FFFDF9]'
-                      : 'bg-[#FFFDF9] text-[#1A3629]'
-                  }`}
-                >
-                  {pt.y.toFixed(0)}
-                </div>
-
-                {/* Floating Tooltip */}
-                <div
-                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 rounded-md border border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono text-[9px] font-bold whitespace-nowrap shadow-[2px_2px_0px_#1A3629] pointer-events-none transition-opacity ${
-                    isDragging || isHovered ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  {pt.label}: {pt.x}{xUnit} · {pt.y}/10
-                </div>
+                {pt.y.toFixed(0)}
               </div>
-            );
-          })}
+
+              {/* Floating Tooltip */}
+              <div
+                className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 rounded-md border border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono text-[9px] font-bold whitespace-nowrap shadow-[2px_2px_0px_#1A3629] pointer-events-none transition-opacity ${
+                  isDragging || isHovered ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {pt.label}: {pt.x}{xUnit} · {pt.y}/10
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Real-time Predictive Simulation Slider */}

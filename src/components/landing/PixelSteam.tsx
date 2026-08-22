@@ -71,6 +71,11 @@ export function PixelSteam({ active = true, className = "", intensity = 1.0 }: P
       const width = rect.width;
       const height = rect.height;
 
+      if (width <= 0 || height <= 0) {
+        animRef.current = requestAnimationFrame(render);
+        return;
+      }
+
       if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
         canvas.width = Math.floor(width * dpr);
         canvas.height = Math.floor(height * dpr);

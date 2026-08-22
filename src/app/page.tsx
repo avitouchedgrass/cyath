@@ -35,20 +35,9 @@ const STEP_LOOP = [
   },
 ];
 
-const SAMPLE_SCATTER_POINTS = [
-  { x: 90, y: 5.2, label: 'Day 1' },
-  { x: 110, y: 5.8, label: 'Day 2' },
-  { x: 130, y: 6.9, label: 'Day 3' },
-  { x: 145, y: 7.4, label: 'Day 4' },
-  { x: 160, y: 8.2, label: 'Day 5' },
-  { x: 175, y: 8.9, label: 'Day 6' },
-  { x: 190, y: 9.4, label: 'Day 7' },
-];
-
 export default function Home() {
   const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
-  const [selectedScatterPoint, setSelectedScatterPoint] = useState<number | null>(4);
   const [previewEnergy, setPreviewEnergy] = useState(8);
   const [previewFocus, setPreviewFocus] = useState(9);
   const [mounted, setMounted] = useState(false);
@@ -57,13 +46,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    const interval = setInterval(() => {
-      setCurrentDish((prev) => {
-        const idx = DISH_ITEMS.findIndex((d) => d.id === prev.id);
-        return DISH_ITEMS[(idx + 1) % DISH_ITEMS.length];
-      });
-    }, 4500);
-    return () => clearInterval(interval);
   }, []);
 
   const isLoggedIn = mounted && !!userSession;

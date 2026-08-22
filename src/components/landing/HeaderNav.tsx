@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Logo } from "../ui/Logo";
 import { useHabitStore } from "@/store/useHabitStore";
 import { User } from "lucide-react";
 
@@ -43,11 +42,13 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none transition-all duration-300">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
-        {/* Left: Monogram Logo */}
-        <Link href="/" className="flex items-center group z-10 p-1 hover:opacity-85 transition-opacity" aria-label="Home">
-          <div className="filter brightness-0 [filter:invert(18%)_sepia(22%)_saturate(1478%)_hue-rotate(97deg)_brightness(96%)_contrast(92%)]">
-            <Logo className="w-10 h-10 sm:w-11 sm:h-11" />
-          </div>
+        {/* Left: Pixel Font "cyath" Brand Pill */}
+        <Link 
+          href="/" 
+          className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-pixel font-bold text-xs sm:text-sm tracking-wider shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center justify-center min-w-[110px] sm:min-w-[124px] cursor-pointer z-10" 
+          aria-label="Cyath Home"
+        >
+          <span>cyath</span>
         </Link>
 
         {/* Center: Tactile Pill Nav */}
@@ -82,7 +83,7 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-4 sm:px-5 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-4 sm:px-5 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer min-w-[110px] sm:min-w-[124px] justify-center"
             >
               <User className="w-3.5 h-3.5" />
               <span>Profile</span>
@@ -90,7 +91,7 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           ) : (
             <Link
               href={mounted && userSession ? "/dashboard" : "/login"}
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-5 sm:px-6 py-2 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all flex items-center gap-2 cursor-pointer min-w-[110px] sm:min-w-[124px] justify-center"
             >
               <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
               <span>Dashboard</span>

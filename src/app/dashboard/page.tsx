@@ -7,6 +7,8 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
+import { XpHud } from '@/components/progression/XpHud';
+import { QuestPanel } from '@/components/progression/QuestPanel';
 
 
 export default function DashboardPage() {
@@ -281,6 +283,9 @@ export default function DashboardPage() {
             <span>{calculatedStreak} Day Streak</span>
           </div>
         </div>
+
+        {/* Progression HUD */}
+        <XpHud />
 
         {/* 1. 28-Day Consistency Matrix (Flat Bento Box, 2px border, No Shadow) */}
         <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 transition-all">
@@ -708,6 +713,9 @@ export default function DashboardPage() {
           </div>
 
         </div>
+
+        {/* Active Daily Quests & Weekly Challenge */}
+        <QuestPanel />
 
       </main>
     </div>

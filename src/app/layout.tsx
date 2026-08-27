@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono, Fraunces, Pixelify_Sans } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { XpToastLayer } from "@/components/progression/XpToastLayer";
+import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import "./globals.css";
 
 const inter = Inter({
@@ -57,6 +59,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-[#1A3629] selection:text-[#FFFDF9]">
         <AuthProvider>
           {children}
+          <XpToastLayer />
+          <LevelUpModal />
         </AuthProvider>
       </body>
     </html>

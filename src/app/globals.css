@@ -30,6 +30,40 @@
   --animate-count-pop: countPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-card-enter: cardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-pulse-glow: pulseGlow 3s ease-in-out infinite;
+  --animate-float-slow: floatSlow 5s ease-in-out infinite;
+  --animate-flame-pulse: flamePulse 2.5s ease-in-out infinite;
+  --animate-ember-shimmer: emberShimmer 3s ease-in-out infinite;
+
+  @keyframes floatSlow {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(0.8deg);
+    }
+  }
+
+  @keyframes flamePulse {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 8px rgba(217, 119, 6, 0.25));
+    }
+    50% {
+      transform: scale(1.03);
+      filter: drop-shadow(0 0 16px rgba(217, 119, 6, 0.55));
+    }
+  }
+
+  @keyframes emberShimmer {
+    0%, 100% {
+      opacity: 0.9;
+    }
+    50% {
+      opacity: 1;
+      filter: brightness(1.12);
+    }
+  }
+
 
   @keyframes pixelFloatWave {
     0% {

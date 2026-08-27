@@ -7,6 +7,7 @@ import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
+import { XpHud } from '@/components/progression/XpHud';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -147,6 +148,11 @@ export default function ProfilePage() {
             ✓ {syncStatus}
           </div>
         )}
+
+        {/* Progression HUD */}
+        <div className="mb-8">
+          <XpHud />
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">

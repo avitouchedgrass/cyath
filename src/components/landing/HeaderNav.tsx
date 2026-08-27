@@ -4,12 +4,14 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
+import { XpHudBadge } from "@/components/progression/XpHudBadge";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
+  theme?: 'light' | 'dark';
 }
 
-export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
+export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -34,17 +36,20 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
     { name: "Protocols", href: "/protocols" },
     { name: "Recipes", href: "/recipes" },
     { name: "Correlations", href: "/correlations" },
+    { name: "Progress", href: "/progress" },
     { name: "Methodology", href: "/#methodology" },
   ];
+
+  const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-6 lg:px-12 pointer-events-none transition-all duration-300">
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
-        {/* Left: Authentic Lowercase Pixel Brand Text (Symmetrically aligned) */}
+        {/* Left: Authentic Lowercase Pixel Brand Text */}
         <Link 
           href="/" 
-          className="font-pixel text-3xl font-bold lowercase tracking-wider text-[#1A3629] select-none hover:opacity-80 transition-opacity z-10 flex items-center h-10" 
+          className={`font-pixel text-3xl font-bold lowercase tracking-wider ${logoColor} select-none hover:opacity-80 transition-opacity z-10 flex items-center h-10`} 
           aria-label="cyath home"
         >
           cyath
@@ -77,8 +82,10 @@ export function HeaderNav({ onOpenAuth }: HeaderNavProps) {
           })}
         </nav>
 
-        {/* Right: Actions */}
+        {/* Right: Progression HUD Badge + Actions */}
         <div className="flex items-center gap-3 z-10">
+          {mounted && <XpHudBadge />}
+
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"

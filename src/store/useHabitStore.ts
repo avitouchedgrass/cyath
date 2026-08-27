@@ -1,6 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
+import {
+  XP_AWARDS,
+  GOALS,
+  STREAK_FREEZE,
+} from '@/lib/progression/config';
+import {
+  calculateLevel,
+  calculateStreakStatus,
+  getDailyQuests,
+} from '@/lib/progression/engine';
+import { progressionEvents } from '@/lib/progression/events';
+import { retroAudio } from '@/lib/retroAudio';
 
 export interface HabitItem {
   id: string;
@@ -15,8 +27,8 @@ export interface DailyLogData {
   totalCaloriesLogged: number;
   hydrationLiters: number;
   sleepHours: number;
-  energyLevel: number; // 1 - 10
-  moodScore: number;   // 1 - 10
+  energyLevel: number;
+  moodScore: number;
   notes: string;
   loggedRecipeIds: string[];
 }
@@ -39,6 +51,13 @@ export interface UserProfile {
   onboardingCompleted: boolean;
 }
 
+export interface XpHistoryItem {
+  id: string;
+  amount: number;
+  reason: string;
+  timestamp: string;
+}
+
 export const DEFAULT_HABITS: HabitItem[] = [
   { id: 'sunlight', title: 'Morning Sunlight & Electrolytes (15m)', category: 'morning', targetDaysPerWeek: 7 },
   { id: 'protein_target', title: 'Hit Daily Protein Target (120g+)', category: 'nutrition', targetDaysPerWeek: 7 },
@@ -49,19 +68,24 @@ export const DEFAULT_HABITS: HabitItem[] = [
 ];
 
 export interface HabitStoreState {
-  currentDate: string; // YYYY-MM-DD
+  currentDate: string;
   habits: HabitItem[];
   logsByDate: Record<string, DailyLogData>;
+  totalXp: number;
   streakCount: number;
+  streakFreezeStock: number;
+  claimedMilestones: number[];
+  completedQuestIdsByDate: Record<string, string[]>;
+  xpHistory: XpHistoryItem[];
   isSyncing: boolean;
   activeProtocolIds: string[];
   userSession: { id: string; email?: string } | null;
   userProfile: UserProfile | null;
   pendingAction: PendingUserAction | null;
 
-  // Actions
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
+  reconcileUserSession: (session: { id: string; email?: string } | null) => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
   setPendingAction: (action: PendingUserAction | null) => void;
   clearPendingAction: () => void;
@@ -79,6 +103,8 @@ export interface HabitStoreState {
   setNotes: (notes: string, date?: string) => void;
   logRecipeToDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
+  gainXp: (amount: number, reason: string, source?: string) => { oldLevel: number; newLevel: number; leveledUp: boolean };
+  claimQuest: (questId: string, date?: string) => void;
   getDailyLog: (date?: string) => DailyLogData;
   syncWithSupabase: (date?: string) => Promise<void>;
   initDemoSession: () => void;
@@ -107,7 +133,15 @@ export const useHabitStore = create<HabitStoreState>()(
       logsByDate: {
         [getTodayString()]: createEmptyDailyLog(),
       },
+      totalXp: 180,
       streakCount: 5,
+      streakFreezeStock: 1,
+      claimedMilestones: [3],
+      completedQuestIdsByDate: {},
+      xpHistory: [
+        { id: 'initial_1', amount: 15, reason: 'Habit Completed', timestamp: new Date().toISOString() },
+        { id: 'initial_2', amount: 25, reason: 'Dawn Ignition Quest', timestamp: new Date().toISOString() },
+      ],
       isSyncing: false,
       activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
       userSession: null,
@@ -116,7 +150,55 @@ export const useHabitStore = create<HabitStoreState>()(
 
       setDate: (date) => set({ currentDate: date }),
 
-      setUserSession: (session) => set({ userSession: session }),
+      setUserSession: (session) => {
+        set({ userSession: session });
+        if (session && !session.id.startsWith('guest_')) {
+          get().reconcileUserSession(session);
+        }
+      },
+
+      reconcileUserSession: async (session) => {
+        if (!session || session.id.startsWith('guest_')) return;
+        try {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('total_xp, streak_count, streak_freeze_stock, full_name, age, sex, height_cm, weight_kg, primary_goal, allergies, dietary_restrictions, onboarding_completed')
+            .eq('user_id', session.id)
+            .maybeSingle();
+
+          if (profile) {
+            const remoteXp = profile.total_xp ?? 0;
+            const currentLocalXp = get().totalXp;
+            const finalXp = Math.max(remoteXp, currentLocalXp);
+
+            set({
+              totalXp: finalXp,
+              streakCount: Math.max(profile.streak_count ?? 0, get().streakCount),
+              streakFreezeStock: Math.min(STREAK_FREEZE.maxStock, profile.streak_freeze_stock ?? get().streakFreezeStock),
+              userProfile: {
+                fullName: profile.full_name ?? '',
+                age: profile.age ?? 25,
+                sex: profile.sex ?? 'other',
+                heightCm: profile.height_cm ?? 175,
+                weightKg: profile.weight_kg ?? 70,
+                primaryGoal: profile.primary_goal ?? 'focus',
+                allergies: profile.allergies ?? [],
+                dietaryRestrictions: profile.dietary_restrictions ?? [],
+                onboardingCompleted: profile.onboarding_completed ?? false,
+              },
+            });
+
+            if (finalXp > remoteXp) {
+              await supabase
+                .from('user_profiles')
+                .update({ total_xp: finalXp })
+                .eq('user_id', session.id);
+            }
+          }
+        } catch {
+          // Graceful fallback to local state
+        }
+      },
 
       updateUserProfile: (profile) => {
         const current = get().userProfile || {
@@ -134,7 +216,6 @@ export const useHabitStore = create<HabitStoreState>()(
         const updated = { ...current, ...profile };
         set({ userProfile: updated });
 
-        // Sync with Supabase user_profiles if user is signed in
         const userId = get().userSession?.id;
         if (userId && !userId.startsWith('guest_')) {
           (async () => {
@@ -150,6 +231,9 @@ export const useHabitStore = create<HabitStoreState>()(
                 allergies: updated.allergies,
                 dietary_restrictions: updated.dietaryRestrictions,
                 onboarding_completed: updated.onboardingCompleted,
+                total_xp: get().totalXp,
+                streak_count: get().streakCount,
+                streak_freeze_stock: get().streakFreezeStock,
                 updated_at: new Date().toISOString(),
               }, { onConflict: 'user_id' });
             } catch {
@@ -160,7 +244,6 @@ export const useHabitStore = create<HabitStoreState>()(
       },
 
       setPendingAction: (action) => set({ pendingAction: action }),
-
       clearPendingAction: () => set({ pendingAction: null }),
 
       executePendingAction: () => {
@@ -190,7 +273,6 @@ export const useHabitStore = create<HabitStoreState>()(
           ? currentActive.filter((id) => id !== protocolId)
           : [...currentActive, protocolId];
 
-        // If activating and habits are provided, merge any missing habits
         let updatedHabits = [...get().habits];
         if (!isAlreadyActive && habitsToAdd && habitsToAdd.length > 0) {
           habitsToAdd.forEach((h) => {
@@ -211,23 +293,149 @@ export const useHabitStore = create<HabitStoreState>()(
         return get().logsByDate[targetDate] || createEmptyDailyLog();
       },
 
+      gainXp: (amount, reason, source = 'app') => {
+        const currentXp = get().totalXp;
+        const newXp = Math.max(0, currentXp + amount);
+        const oldLevelInfo = calculateLevel(currentXp);
+        const newLevelInfo = calculateLevel(newXp);
+        const leveledUp = newLevelInfo.level > oldLevelInfo.level;
+
+        const newHistoryItem: XpHistoryItem = {
+          id: `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          amount,
+          reason,
+          timestamp: new Date().toISOString(),
+        };
+
+        const updatedHistory = [newHistoryItem, ...get().xpHistory].slice(0, 25);
+
+        set({
+          totalXp: newXp,
+          xpHistory: updatedHistory,
+        });
+
+        progressionEvents.emit('xp:gained', {
+          amount,
+          reason,
+          totalXp: newXp,
+        });
+
+        if (leveledUp) {
+          retroAudio.playTierUpgrade();
+          progressionEvents.emit('level:up', {
+            oldLevel: oldLevelInfo.level,
+            newLevel: newLevelInfo.level,
+            title: newLevelInfo.title,
+            unlockedTitle: newLevelInfo.title !== oldLevelInfo.title ? newLevelInfo.title : undefined,
+          });
+        }
+
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          (async () => {
+            try {
+              await supabase.from('user_profiles').update({
+                total_xp: newXp,
+                updated_at: new Date().toISOString(),
+              }).eq('user_id', userId);
+
+              await supabase.from('xp_events').insert({
+                user_id: userId,
+                amount,
+                reason,
+                source,
+              });
+            } catch {
+              // Graceful local degradation
+            }
+          })();
+        }
+
+        return {
+          oldLevel: oldLevelInfo.level,
+          newLevel: newLevelInfo.level,
+          leveledUp,
+        };
+      },
+
+      claimQuest: (questId, date) => {
+        const targetDate = date || get().currentDate;
+        const currentClaimed = get().completedQuestIdsByDate[targetDate] || [];
+        if (currentClaimed.includes(questId)) return;
+
+        const log = get().getDailyLog(targetDate);
+        const quests = getDailyQuests(targetDate, log, get().habits);
+        const quest = quests.find((q) => q.id === questId);
+
+        if (quest && quest.completed) {
+          set((state) => ({
+            completedQuestIdsByDate: {
+              ...state.completedQuestIdsByDate,
+              [targetDate]: [...currentClaimed, questId],
+            },
+          }));
+
+          retroAudio.playTierUpgrade();
+          get().gainXp(quest.xpAward, `Quest: ${quest.title}`, 'quest');
+          progressionEvents.emit('quest:completed', {
+            questId,
+            title: quest.title,
+            xpAwarded: quest.xpAward,
+          });
+        }
+      },
+
       toggleHabit: (habitId, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const willBeDone = !currentLog.habitsCompleted[habitId];
         const updatedHabits = {
           ...currentLog.habitsCompleted,
-          [habitId]: !currentLog.habitsCompleted[habitId],
+          [habitId]: willBeDone,
         };
 
-        set((state) => ({
-          logsByDate: {
-            ...state.logsByDate,
-            [targetDate]: {
-              ...currentLog,
-              habitsCompleted: updatedHabits,
-            },
+        const updatedLogs = {
+          ...get().logsByDate,
+          [targetDate]: {
+            ...currentLog,
+            habitsCompleted: updatedHabits,
           },
-        }));
+        };
+
+        const streakStatus = calculateStreakStatus(
+          updatedLogs,
+          targetDate,
+          get().streakFreezeStock
+        );
+
+        set({
+          logsByDate: updatedLogs,
+          streakCount: streakStatus.currentStreak,
+          streakFreezeStock: streakStatus.freezeStock,
+        });
+
+        if (willBeDone) {
+          get().gainXp(XP_AWARDS.habitComplete, 'Habit Completed', 'habit');
+
+          const allDone = get().habits.length > 0 && get().habits.every((h) => updatedHabits[h.id]);
+          if (allDone) {
+            get().gainXp(XP_AWARDS.perfectDay, 'Flawless Execution (All Habits)', 'perfect_day');
+          }
+
+          if (streakStatus.milestoneAchievedToday) {
+            const milestone = streakStatus.milestoneAchievedToday;
+            const claimed = get().claimedMilestones;
+            if (!claimed.includes(milestone.days)) {
+              set({ claimedMilestones: [...claimed, milestone.days] });
+              get().gainXp(milestone.xp, `Streak Milestone: ${milestone.name} (${milestone.days} Days)`, 'streak');
+              progressionEvents.emit('streak:milestone', {
+                days: milestone.days,
+                milestoneName: milestone.name,
+                xpAwarded: milestone.xp,
+              });
+            }
+          }
+        }
 
         get().syncWithSupabase(targetDate);
       },
@@ -253,12 +461,22 @@ export const useHabitStore = create<HabitStoreState>()(
       setProtein: (amount, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const prevProtein = currentLog.totalProteinLogged || 0;
+        const safeAmount = Math.max(0, amount);
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, totalProteinLogged: Math.max(0, amount) },
+            [targetDate]: { ...currentLog, totalProteinLogged: safeAmount },
           },
         }));
+
+        if (prevProtein < GOALS.proteinGrams && safeAmount >= GOALS.proteinGrams) {
+          get().gainXp(XP_AWARDS.proteinGoal, 'Protein Target Reached (120g+)', 'nutrition');
+        } else if (prevProtein < GOALS.proteinGrams / 2 && safeAmount >= GOALS.proteinGrams / 2 && safeAmount < GOALS.proteinGrams) {
+          get().gainXp(XP_AWARDS.proteinPartial, 'Protein Milestone (60g+)', 'nutrition');
+        }
+
         get().syncWithSupabase(targetDate);
       },
 
@@ -277,48 +495,77 @@ export const useHabitStore = create<HabitStoreState>()(
       setHydration: (liters, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const prevHydration = currentLog.hydrationLiters || 0;
+        const safeLiters = Math.max(0, Math.round(liters * 100) / 100);
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
-            [targetDate]: { ...currentLog, hydrationLiters: Math.max(0, Math.round(liters * 100) / 100) },
+            [targetDate]: { ...currentLog, hydrationLiters: safeLiters },
           },
         }));
+
+        if (prevHydration < GOALS.hydrationLiters && safeLiters >= GOALS.hydrationLiters) {
+          get().gainXp(XP_AWARDS.hydrationGoal, 'Hydration Target Achieved (2.0L+)', 'hydration');
+        }
+
         get().syncWithSupabase(targetDate);
       },
 
       setSleep: (hours, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const prevSleep = currentLog.sleepHours || 0;
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
             [targetDate]: { ...currentLog, sleepHours: hours },
           },
         }));
+
+        if (prevSleep < GOALS.sleepHours && hours >= GOALS.sleepHours) {
+          get().gainXp(XP_AWARDS.sleepGoal, 'Sleep Restoration Goal (7h+)', 'sleep');
+        }
+
         get().syncWithSupabase(targetDate);
       },
 
       setEnergy: (level, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const firstLog = !currentLog.energyLevel;
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
             [targetDate]: { ...currentLog, energyLevel: level },
           },
         }));
+
+        if (firstLog) {
+          get().gainXp(XP_AWARDS.energyLog, 'Daily Energy Calibration', 'energy');
+        }
+
         get().syncWithSupabase(targetDate);
       },
 
       setMood: (score, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const firstLog = !currentLog.moodScore;
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
             [targetDate]: { ...currentLog, moodScore: score },
           },
         }));
+
+        if (firstLog) {
+          get().gainXp(XP_AWARDS.moodLog, 'Daily Mindset Reflection', 'mood');
+        }
+
         get().syncWithSupabase(targetDate);
       },
 
@@ -350,6 +597,8 @@ export const useHabitStore = create<HabitStoreState>()(
             },
           },
         }));
+
+        get().gainXp(XP_AWARDS.recipeLogged, 'Whole Food Dish Prepared', 'recipe');
         get().syncWithSupabase(targetDate);
       },
 
@@ -383,7 +632,7 @@ export const useHabitStore = create<HabitStoreState>()(
 
         const currentSession = get().userSession;
         if (!currentSession || currentSession.id.startsWith('guest_')) {
-          return; // Demo sessions do not sync to Supabase
+          return;
         }
 
         try {
@@ -396,6 +645,7 @@ export const useHabitStore = create<HabitStoreState>()(
 
           const userId = session.user.id;
           set({ isSyncing: true });
+          
           await supabase.from('daily_logs').upsert({
             user_id: userId,
             log_date: targetDate,
@@ -410,6 +660,14 @@ export const useHabitStore = create<HabitStoreState>()(
             logged_recipes: log.loggedRecipeIds,
             updated_at: new Date().toISOString(),
           }, { onConflict: 'user_id,log_date' });
+
+          await supabase.from('user_profiles').upsert({
+            user_id: userId,
+            total_xp: get().totalXp,
+            streak_count: get().streakCount,
+            streak_freeze_stock: get().streakFreezeStock,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
         } catch {
           // Graceful fallback to local persistence
         } finally {
@@ -433,6 +691,16 @@ export const useHabitStore = create<HabitStoreState>()(
             onboardingCompleted: true,
           },
           habits: DEFAULT_HABITS,
+          totalXp: 1450,
+          streakCount: 5,
+          streakFreezeStock: 1,
+          claimedMilestones: [3],
+          completedQuestIdsByDate: {},
+          xpHistory: [
+            { id: 'd1', amount: 50, reason: 'Streak Milestone: Kindling', timestamp: new Date().toISOString() },
+            { id: 'd2', amount: 30, reason: 'Quest: Structural Synthesis', timestamp: new Date().toISOString() },
+            { id: 'd3', amount: 20, reason: 'Whole Food Dish Prepared', timestamp: new Date().toISOString() },
+          ],
           activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
           logsByDate: {
             [today]: {
@@ -454,7 +722,6 @@ export const useHabitStore = create<HabitStoreState>()(
               loggedRecipeIds: ['steak-eggs-skillet'],
             },
           },
-          streakCount: 3,
           pendingAction: null,
         });
       },
@@ -464,6 +731,7 @@ export const useHabitStore = create<HabitStoreState>()(
         if (userId && !userId.startsWith('guest_')) {
           try {
             await supabase.from('daily_logs').delete().eq('user_id', userId);
+            await supabase.from('xp_events').delete().eq('user_id', userId);
             await supabase.from('user_profiles').delete().eq('user_id', userId);
             await supabase.auth.signOut();
           } catch (err) {
@@ -473,10 +741,15 @@ export const useHabitStore = create<HabitStoreState>()(
         set({
           userSession: null,
           userProfile: null,
+          totalXp: 0,
+          streakCount: 0,
+          streakFreezeStock: 1,
+          claimedMilestones: [],
+          completedQuestIdsByDate: {},
+          xpHistory: [],
           logsByDate: { [getTodayString()]: createEmptyDailyLog() },
           habits: DEFAULT_HABITS,
           activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
-          streakCount: 0,
           pendingAction: null,
         });
       },
@@ -484,7 +757,6 @@ export const useHabitStore = create<HabitStoreState>()(
     {
       name: 'cyath-habit-store-v2',
       partialize: (state) => {
-        // If current session is a demo user (starts with 'guest_'), do NOT persist guest changes to localStorage!
         if (state.userSession?.id.startsWith('guest_')) {
           return {
             userSession: null,
@@ -493,6 +765,11 @@ export const useHabitStore = create<HabitStoreState>()(
             activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
             logsByDate: { [getTodayString()]: createEmptyDailyLog() },
             streakCount: 0,
+            streakFreezeStock: 1,
+            claimedMilestones: [],
+            totalXp: 0,
+            xpHistory: [],
+            completedQuestIdsByDate: {},
             pendingAction: null,
             currentDate: state.currentDate,
           };

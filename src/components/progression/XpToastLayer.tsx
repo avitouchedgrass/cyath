@@ -14,6 +14,7 @@ export function XpToastLayer() {
 
   useEffect(() => {
     const unsub = progressionEvents.on('xp:gained', (data) => {
+      if (data.amount <= 0) return;
       const id = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const newToast: XpToast = {
         id,
@@ -46,11 +47,11 @@ export function XpToastLayer() {
           key={toast.id}
           className="pointer-events-auto flex items-center gap-3 px-4 py-2.5 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-xl shadow-[4px_4px_0px_#1A3629] animate-card-enter transition-all"
         >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#EAE3D2] border border-[#1A3629] font-pixel text-xs font-bold text-[#D97706]">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#EAE3D2] border border-[#1A3629] font-cabinet text-xs font-black text-[#D97706]">
             XP
           </div>
           <div className="flex flex-col">
-            <span className="font-pixel text-sm font-bold text-[#1A3629] tracking-wide">
+            <span className="font-cabinet text-sm font-bold text-[#1A3629]">
               +{toast.amount} XP
             </span>
             <span className="font-sans text-xs text-[#4A5D4E] line-clamp-1 max-w-[200px]">

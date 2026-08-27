@@ -8,8 +8,6 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
-import { QuestPanel } from '@/components/progression/QuestPanel';
-
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -59,21 +57,21 @@ export default function DashboardPage() {
     const hour = new Date().getHours();
     if (hour < 11) {
       return {
-        badge: 'MORNING PHASE',
+        badge: 'MORNING',
         title: 'Morning Jumpstart',
-        description: 'Drink 500ml water, get 15m natural sunlight, and have a high-protein breakfast.',
+        description: 'Drink 500ml water, natural sunlight, and bioavailable protein.',
       };
     } else if (hour < 17) {
       return {
-        badge: 'AFTERNOON PHASE',
+        badge: 'AFTERNOON',
         title: 'Deep Focus Block',
-        description: 'Single-task on priority goals, stay hydrated, and take a brisk walking break.',
+        description: 'Single-task priority goals, hydrate, and take a walking break.',
       };
     } else {
       return {
-        badge: 'EVENING PHASE',
+        badge: 'EVENING',
         title: 'Restful Wind-Down',
-        description: 'Dim bright screens, enjoy a warm herbal tea, and cool down your bedroom.',
+        description: 'Dim bright screens, enjoy warm herbal tea, and cool down the room.',
       };
     }
   }, []);
@@ -109,12 +107,6 @@ export default function DashboardPage() {
         if ((log.energyLevel || 0) > 0 || (log.moodScore || 0) > 0 || (log.sleepHours || 0) > 0) {
           reflectionDone = 1;
         }
-      } else if (i > 0 && !userSession) {
-        const seed = [4, 6, 5, 8, 3, 7, 6, 9, 5, 4, 7, 6, 8, 5, 6, 7, 8, 4, 9, 6, 5, 7, 8, 6, 7, 5, 8, 6][i % 28] || 4;
-        habitsDone = Math.min(habits.length, Math.max(1, Math.round(seed * 0.4)));
-        mealsDone = seed > 5 ? 2 : 1;
-        hydrationDone = 1;
-        reflectionDone = 1;
       }
 
       if (dateKey === currentDate) {
@@ -148,26 +140,13 @@ export default function DashboardPage() {
       });
     }
     return days;
-  }, [logsByDate, habits, currentDate, completedCount, todayLog, userSession]);
+  }, [logsByDate, habits, currentDate, completedCount, todayLog]);
 
   const totalHeatmapActions = useMemo(() => {
     return heatmapDays.reduce((sum, d) => sum + d.totalActions, 0);
   }, [heatmapDays]);
 
   const avgDailyActions = (totalHeatmapActions / (heatmapDays.length || 1)).toFixed(1);
-
-  // Streak Calculation
-  const calculatedStreak = useMemo(() => {
-    let streak = 0;
-    for (let i = heatmapDays.length - 1; i >= 0; i--) {
-      if (heatmapDays[i].totalActions >= 3) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return Math.max(1, streak);
-  }, [heatmapDays]);
 
   // Handlers
   const handleToggleHabit = (habitId: string) => {
@@ -223,29 +202,17 @@ export default function DashboardPage() {
     setEnergy(val, currentDate);
   };
 
-  const handleSetMood = (val: number) => {
-    if (!userSession) {
-      router.push('/login?redirect=/dashboard');
-      return;
-    }
-    setMood(val, currentDate);
-  };
-
-  const handleSetSleep = (val: number) => {
+  const handleSetSleep = (hours: number) => {
     retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
     }
-    setSleep(val, currentDate);
+    setSleep(hours, currentDate);
   };
 
   const handleRemoveRecipe = (recipeId: string, protein: number, calories: number) => {
     retroAudio.playBlip();
-    if (!userSession) {
-      router.push('/login?redirect=/dashboard');
-      return;
-    }
     removeRecipeFromDay(recipeId, protein, calories, currentDate);
   };
 
@@ -258,60 +225,61 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       <HeaderNav />
 
       {/* Main Container */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 pt-28 pb-24 flex flex-col gap-8">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-10 pt-24 pb-20 flex flex-col gap-6">
         
-        {/* Top Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
+        {/* Top Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1A3629]/15 pb-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-                Daily Planner · {currentDate} {isSyncing && '· Syncing...'}
+                {currentDate} {isSyncing && '· Syncing...'}
               </span>
             </div>
             <h1 className="font-fraunces font-black text-3xl md:text-4xl tracking-tight text-[#1A3629]">
-              Your Daily Planner &amp; Habits
+              Daily Planner
             </h1>
           </div>
 
-          {/* Reserved Tactile Shadow for Top Streak Badge */}
-          <div className="self-start sm:self-auto px-4 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono font-bold text-xs flex items-center gap-2 shadow-[3px_3px_0px_#1A3629]">
-            <span className="text-sm">★</span>
-            <span>{calculatedStreak} Day Streak</span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/sanctuary"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <span>Visit Sanctuary →</span>
+            </Link>
           </div>
         </div>
 
-        {/* Progression HUD */}
+        {/* Progression HUD Bridge */}
         <XpHud />
 
-        {/* 1. 28-Day Consistency Matrix (Flat Bento Box, 2px border, No Shadow) */}
-        <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 transition-all">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        {/* 1. 28-Day Consistency Matrix */}
+        <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
                 28-Day Consistency Matrix
               </span>
-              <h2 className="font-fraunces font-bold text-xl tracking-tight text-[#1A3629]">
-                Daily Check-in Activity
+              <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                Habit Check-in History
               </h2>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1A3629]/70">
-              <span>Total Actions: <strong className="text-[#1A3629]">{totalHeatmapActions}</strong></span>
+            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1A3629]/70 tabular-nums">
+              <span>Actions: <strong className="text-[#1A3629]">{totalHeatmapActions}</strong></span>
               <span>·</span>
-              <span>Daily Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
+              <span>Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
             </div>
           </div>
 
-          {/* Heatmap Grid - Inactive Days Unbordered & Subtly Muted */}
-          <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-2">
+          {/* Heatmap Grid */}
+          <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-1.5">
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
-              
-              // Only active/completed days get borders/fills. Inactive = no borders/backgrounds
               const levelClasses = {
                 0: 'bg-transparent border border-transparent text-[#1A3629]/40 hover:bg-black/5',
                 1: 'bg-[#E8E0D2] border border-[#1A3629]/30 text-[#1A3629]',
@@ -321,178 +289,148 @@ export default function DashboardPage() {
               }[day.level];
 
               return (
-                <div key={day.dateStr} className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      retroAudio.playBlip();
-                      setDate(day.dateStr);
-                    }}
-                    className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
-                      isSelected
-                        ? 'ring-2 ring-[#1A3629] scale-105 font-bold'
-                        : 'hover:scale-105'
-                    }`}
-                  >
-                    <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
-                      {day.dayNum}
-                    </span>
-                    <span className="text-[8px] font-mono mt-0.5 uppercase leading-none opacity-80">
-                      {day.dayName.charAt(0)}
-                    </span>
-                  </button>
-                </div>
+                <button
+                  key={day.dateStr}
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setDate(day.dateStr);
+                  }}
+                  className={`w-full aspect-square rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
+                    isSelected ? 'ring-2 ring-[#1A3629] scale-105 font-bold shadow-xs' : 'hover:scale-105'
+                  }`}
+                  title={`${day.dateStr}: ${day.totalActions} total actions`}
+                >
+                  <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
+                    {day.dayNum}
+                  </span>
+                  <span className="text-[8px] font-mono mt-0.5 uppercase leading-none opacity-80">
+                    {day.dayName.charAt(0)}
+                  </span>
+                </button>
               );
             })}
           </div>
         </div>
 
-        {/* 2. 3-Column Dashboard Bento (Flat Bento Boxes, 2px border, No Shadows) */}
+        {/* 2. Distilled 3-Column Daily Action Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
-          {/* COLUMN 1: Habit Checklist */}
-          <div className="flex flex-col gap-6">
-            
-            {/* Daily Progress Arc (Calibrated Technical Dial) */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 text-center transition-all flex flex-col items-center">
-              <div className="w-full flex items-center justify-between text-xs font-mono font-bold mb-3">
-                <span className="text-[10px] uppercase tracking-widest text-[#1A3629]/60">DAILY PROGRESS</span>
-                <span>{completedCount} / {habits.length} DONE</span>
+          {/* COLUMN 1: Today's Habits (Distilled with Integrated Progress) */}
+          <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-3">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
+                  Core Routine
+                </span>
+                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                  Today&apos;s Habits
+                </h2>
               </div>
 
-              {/* Thinned 50% Calibrated Progress Gauge (strokeWidth 4) */}
-              <div className="relative w-40 h-24 flex items-end justify-center my-1">
-                <svg className="w-40 h-24" viewBox="0 0 120 70">
-                  <path
-                    d="M 15,60 A 45,45 0 0,1 105,60"
-                    fill="none"
-                    stroke="currentColor"
-                    className="text-[#1A3629]/15"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M 15,60 A 45,45 0 0,1 105,60"
-                    fill="none"
-                    stroke="#1A3629"
-                    strokeWidth="4"
-                    strokeDasharray="141.37"
-                    strokeDashoffset={141.37 - (141.37 * completionPercentage) / 100}
-                    strokeLinecap="round"
-                    className="transition-all duration-700 ease-out"
-                  />
-                </svg>
+              <button
+                type="button"
+                onClick={() => setShowAddHabit(!showAddHabit)}
+                className="px-3 py-1 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-cabinet font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              >
+                + Add Habit
+              </button>
+            </div>
 
-                <div className="absolute bottom-1 flex flex-col items-center">
-                  <span className="font-mono text-3xl font-bold tabular-nums text-[#1A3629]">
-                    {completionPercentage}%
-                  </span>
-                </div>
+            {/* Integrated Sleek Progress Track */}
+            <div className="flex flex-col gap-1.5 bg-[#FAF6EE] p-3 rounded-xl border border-[#1A3629]/15">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-[#1A3629]">Completion</span>
+                <span className="font-bold text-[#10B981] tabular-nums">
+                  {completedCount}/{habits.length} Done ({completionPercentage}%)
+                </span>
+              </div>
+              <div className="w-full h-2 bg-[#EAE3D2] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#10B981] rounded-full transition-all duration-500"
+                  style={{ width: `${completionPercentage}%` }}
+                />
               </div>
             </div>
 
-            {/* Habit Checklist (Flat Bento Box) */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                    Routine Checklist
-                  </span>
-                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                    Today&apos;s Habits
-                  </h2>
-                </div>
-
-                {/* Primary CTA (+ Add) with Tactile Shadow & Active Click Depression */}
+            {/* Add Custom Habit Form */}
+            {showAddHabit && (
+              <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-2 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE]">
+                <input
+                  type="text"
+                  placeholder="Habit title (e.g. 15m walk)..."
+                  value={newHabitTitle}
+                  onChange={(e) => setNewHabitTitle(e.target.value)}
+                  className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none placeholder-[#1A3629]/40 text-[#1A3629] px-2"
+                  autoFocus
+                />
                 <button
-                  type="button"
-                  onClick={() => setShowAddHabit(!showAddHabit)}
-                  className="px-3.5 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold flex items-center gap-1 shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#3A6B52] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all cursor-pointer"
+                  type="submit"
+                  className="px-3 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold cursor-pointer"
                 >
-                  <span>+ Add</span>
+                  Save
                 </button>
-              </div>
+              </form>
+            )}
 
-              {/* Add Custom Habit Form */}
-              {showAddHabit && (
-                <form onSubmit={handleAddHabitSubmit} className="flex gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA]/60">
-                  <input
-                    type="text"
-                    placeholder="E.g., 20 Min Morning Walk..."
-                    value={newHabitTitle}
-                    onChange={(e) => setNewHabitTitle(e.target.value)}
-                    className="flex-1 bg-transparent text-xs font-cabinet font-bold focus:outline-none placeholder-[#1A3629]/40 text-[#1A3629]"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="px-3 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold cursor-pointer"
+            {/* Habits Checklist */}
+            <div className="flex flex-col gap-1">
+              {habits.map((habit) => {
+                const isDone = !!todayLog.habitsCompleted[habit.id];
+                return (
+                  <div
+                    key={habit.id}
+                    onClick={() => handleToggleHabit(habit.id)}
+                    className="group flex items-center justify-between py-2 px-2.5 rounded-xl hover:bg-[#FAF6EE] transition-colors cursor-pointer"
                   >
-                    Save
-                  </button>
-                </form>
-              )}
-
-              {/* Flat Habit Items with Subtle Background Hover */}
-              <div className="flex flex-col gap-1">
-                {habits.map((habit) => {
-                  const isDone = !!todayLog.habitsCompleted[habit.id];
-                  return (
-                    <div
-                      key={habit.id}
-                      onClick={() => handleToggleHabit(habit.id)}
-                      className="group flex items-center justify-between py-2.5 px-3 rounded-lg bg-transparent hover:bg-black/5 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center font-mono text-xs font-bold transition-all ${
-                          isDone
-                            ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
-                            : 'border-[#1A3629]/40 group-hover:border-[#1A3629]'
-                        }`}>
-                          {isDone && '✓'}
-                        </div>
-                        <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] ${
-                          isDone ? 'line-through opacity-50' : ''
-                        }`}>
-                          {habit.title}
-                        </span>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                        isDone
+                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                          : 'border-[#1A3629]/40 bg-white group-hover:border-[#1A3629]'
+                      }`}>
+                        {isDone && '✓'}
                       </div>
-
-                      {habit.category === 'custom' && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteHabit(habit.id);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 px-1.5 py-0.5 text-[10px] font-mono font-bold text-red-600 hover:text-red-800 transition-opacity cursor-pointer ml-2 border border-red-600/30 rounded"
-                        >
-                          DEL
-                        </button>
-                      )}
+                      <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] ${
+                        isDone ? 'line-through opacity-50' : ''
+                      }`}>
+                        {habit.title}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
 
+                    {habit.category === 'custom' && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteHabit(habit.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 px-1.5 py-0.5 text-[9px] font-mono font-bold text-red-600 hover:text-red-800 transition-opacity cursor-pointer border border-red-600/30 rounded"
+                      >
+                        DEL
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* COLUMN 2: Daily Focus & Food Journal */}
+          {/* COLUMN 2: Routine Focus & Food Log */}
           <div className="flex flex-col gap-6">
             
-            {/* Daily Phase (Flat Bento Box, 2px border, No Shadow) */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
-              <div className="flex items-center justify-between">
+            {/* Daily Phase & Quick Notes */}
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3">
+              <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
                 <div>
                   <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                    Routine Stage
+                    Phase Focus
                   </span>
-                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                  <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
                     {routineWindow.title}
                   </h2>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA]/80 text-[10px] font-mono font-bold uppercase text-[#1A3629]">
+                <span className="px-2 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#FAF6EE] text-[9px] font-mono font-bold uppercase text-[#1A3629]">
                   {routineWindow.badge}
                 </span>
               </div>
@@ -501,62 +439,54 @@ export default function DashboardPage() {
                 {routineWindow.description}
               </p>
 
-              {/* Reflection Notes */}
-              <div className="pt-2 border-t border-[#1A3629]/10 flex flex-col gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
-                  Daily Notes &amp; Observations
-                </span>
-                <textarea
-                  value={todayLog.notes || ''}
-                  onChange={(e) => setNotes(e.target.value, currentDate)}
-                  placeholder="Note energy peaks, workout notes, or meals..."
-                  rows={3}
-                  className="w-full p-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629]"
-                />
-              </div>
+              <textarea
+                value={todayLog.notes || ''}
+                onChange={(e) => setNotes(e.target.value, currentDate)}
+                placeholder="Quick observations, energy reflections, or workout notes..."
+                rows={2}
+                className="w-full p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629]"
+              />
             </div>
 
-            {/* Logged Whole-Food Meals (Flat Bento Box, 2px border, No Shadow) */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-4 transition-all">
-              <div className="flex items-center justify-between">
+            {/* Logged Whole-Food Meals */}
+            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3">
+              <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
                 <div>
                   <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                    Nutrition Fuel
+                    Nutrition
                   </span>
-                  <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                  <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
                     Logged Whole Foods
                   </h2>
                 </div>
                 <Link 
                   href="/recipes" 
-                  className="text-xs font-mono font-bold hover:underline flex items-center gap-1 text-[#1A3629]"
+                  className="text-xs font-mono font-bold text-[#10B981] hover:underline"
                 >
-                  <span>Catalog →</span>
+                  + Add Meal →
                 </Link>
               </div>
 
               {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 ? (
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                   {todayLog.loggedRecipeIds.map((rId) => {
                     const recipe = RECIPES.find((r) => r.id === rId);
                     if (!recipe) return null;
                     return (
                       <div
                         key={rId}
-                        className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 gap-3"
+                        className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE]/50 gap-2"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
-                            <img
-                              src={recipe.image}
-                              alt={recipe.name}
-                              className="w-full h-full object-contain [image-rendering:pixelated]"
-                            />
-                          </div>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <img
+                            src={recipe.image}
+                            alt={recipe.name}
+                            className="w-8 h-8 rounded-md object-contain [image-rendering:pixelated] shrink-0"
+                          />
                           <div className="flex flex-col min-w-0">
                             <span className="text-xs font-cabinet font-bold truncate text-[#1A3629]">{recipe.name}</span>
-                            <span className="text-[11px] font-mono font-bold opacity-75 mt-0.5 text-[#2C4A3B]">
-                              [{recipe.protein}g PRO · {recipe.calories} KCAL]
+                            <span className="text-[10px] font-mono font-bold text-[#2C4A3B]">
+                              {recipe.protein}g PRO · {recipe.calories} KCAL
                             </span>
                           </div>
                         </div>
@@ -564,27 +494,20 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="px-2 py-1 rounded text-xs font-mono font-bold opacity-70 hover:opacity-100 hover:text-red-600 transition-colors cursor-pointer"
+                          className="text-xs font-mono font-bold opacity-60 hover:opacity-100 hover:text-red-600 cursor-pointer p-1"
                           aria-label="Remove meal"
                         >
-                          [x]
+                          ✕
                         </button>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <div className="p-6 text-center rounded-xl border border-dashed border-[#1A3629]/20 bg-[#F4F0EA]/30 flex flex-col items-center justify-center gap-3">
-                  <p className="text-xs font-cabinet font-medium text-[#2C4A3B]">
-                    No whole-food meals logged yet today.
-                  </p>
-                  
-                  {/* Primary CTA */}
-                  <Link
-                    href="/recipes"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-cabinet font-bold shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#3A6B52] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all cursor-pointer"
-                  >
-                    <span>Browse Recipe Catalog →</span>
+                <div className="py-4 text-center text-xs font-cabinet font-medium text-[#4A5D4E] bg-[#FAF6EE]/30 rounded-xl border border-dashed border-[#1A3629]/15">
+                  No meals logged yet today.{' '}
+                  <Link href="/recipes" className="font-bold text-[#1A3629] underline">
+                    Browse recipes
                   </Link>
                 </div>
               )}
@@ -592,130 +515,103 @@ export default function DashboardPage() {
 
           </div>
 
-          {/* COLUMN 3: Daily Metrics & Telemetry */}
-          <div className="flex flex-col gap-6">
-            
-            {/* Nutrition & Water Card */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-5 transition-all">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                  Daily Fuel
+          {/* COLUMN 3: Distilled Biometrics & Telemetry (Consolidated into 1 Card) */}
+          <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
+            <div className="border-b border-[#1A3629]/15 pb-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
+                Daily Check-in
+              </span>
+              <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                Biometrics &amp; Energy
+              </h2>
+            </div>
+
+            {/* Protein Target */}
+            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-[#1A3629]">Protein</span>
+                <span className="tabular-nums font-bold text-[#10B981]">
+                  {todayLog.totalProteinLogged}g <span className="text-[#8C9B90] font-normal">/ 160g</span>
                 </span>
-                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                  Protein &amp; Hydration
-                </h2>
               </div>
-
-              {/* Protein Steppers */}
-              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] text-[#1A3629]/60">Protein Target</span>
-                  <span>
-                    {todayLog.totalProteinLogged}g <span className="opacity-50">/ 160g</span>
-                  </span>
-                </div>
-
-                {/* Flat Secondary Action Pills */}
-                <div className="grid grid-cols-3 gap-2">
-                  {[15, 30, 45].map((amt) => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                      className="border border-[#1A3629]/30 hover:bg-[#1A3629]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
-                    >
-                      +{amt}g
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hydration Steppers */}
-              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span className="uppercase text-[10px] text-[#1A3629]/60">Water Intake</span>
-                  <span>
-                    {todayLog.hydrationLiters.toFixed(1)}L <span className="opacity-50">/ 3.5L</span>
-                  </span>
-                </div>
-
-                {/* Flat Secondary Action Pills */}
-                <div className="grid grid-cols-3 gap-2">
-                  {[0.25, 0.5, 1.0].map((amt) => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                      className="border border-[#1A3629]/30 hover:bg-[#1A3629]/10 rounded-lg py-1.5 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
-                    >
-                      +{amt}L
-                    </button>
-                  ))}
-                </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[15, 30, 45].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
+                    className="border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white rounded-lg py-1 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                  >
+                    +{amt}g
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Energy & Focus Dials */}
-            <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-6 flex flex-col gap-5 transition-all">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                  Daily Check-in
+            {/* Hydration */}
+            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-[#1A3629]">Water Intake</span>
+                <span className="tabular-nums font-bold text-[#2563EB]">
+                  {todayLog.hydrationLiters.toFixed(1)}L <span className="text-[#8C9B90] font-normal">/ 3.0L</span>
                 </span>
-                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                  Energy &amp; Sleep
-                </h2>
               </div>
-
-              {/* Energy Level */}
-              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span>Energy Rating</span>
-                  <span>{todayLog.energyLevel} / 10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={todayLog.energyLevel}
-                  onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                  className="w-full accent-[#1A3629] h-1.5 rounded-full cursor-pointer"
-                />
-              </div>
-
-              {/* Sleep Duration */}
-              <div className="p-4 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA]/40 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono font-bold">
-                  <span>Sleep Duration</span>
-                  <span>{todayLog.sleepHours} hrs</span>
-                </div>
-
-                {/* Flat Secondary Action Buttons */}
-                <div className="flex items-center gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
+                {[0.25, 0.5, 1.0].map((amt) => (
                   <button
+                    key={amt}
                     type="button"
-                    onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                    className="flex-1 py-1.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#1A3629]/10 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                    onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
+                    className="border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white rounded-lg py-1 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
                   >
-                    -0.5h
+                    +{amt}L
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                    className="flex-1 py-1.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#1A3629]/10 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
-                  >
-                    +0.5h
-                  </button>
-                </div>
+                ))}
               </div>
-
             </div>
 
+            {/* Energy Rating Slider */}
+            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-[#1A3629]">Energy Rating</span>
+                <span className="font-bold text-[#D97706] tabular-nums">{todayLog.energyLevel}/10</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={todayLog.energyLevel}
+                onChange={(e) => handleSetEnergy(Number(e.target.value))}
+                className="w-full accent-[#1A3629] h-1.5 rounded-full cursor-pointer"
+              />
+            </div>
+
+            {/* Sleep Hours Stepper */}
+            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-[#1A3629]">Sleep Duration</span>
+                <span className="tabular-nums font-bold text-[#1A3629]">{todayLog.sleepHours} hrs</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
+                  className="flex-1 py-1 rounded-lg border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                >
+                  -0.5h
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
+                  className="flex-1 py-1 rounded-lg border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                >
+                  +0.5h
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>
-
-        {/* Active Daily Quests & Weekly Challenge */}
-        <QuestPanel />
 
       </main>
     </div>

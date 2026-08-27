@@ -38,10 +38,10 @@ export function LevelUpModal() {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/70 backdrop-blur-sm animate-fade-in"
     >
       <div className="relative w-full max-w-md bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#1A3629] text-center flex flex-col items-center">
-        {/* Floating Ember Glow */}
+        {/* Floating Level Badge */}
         <div className="w-20 h-20 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex items-center justify-center mb-5 -mt-12 bg-gradient-to-br from-[#F5E6C8] to-[#EBD5B3]">
-          <span className="font-pixel text-4xl font-bold text-[#D97706] animate-pulse">
-            ★
+          <span className="font-cabinet text-2xl font-black text-[#1A3629]">
+            Lv.{data.newLevel}
           </span>
         </div>
 
@@ -80,7 +80,7 @@ export function LevelUpModal() {
         <button
           onClick={handleClose}
           type="button"
-          className="w-full py-3 px-6 bg-[#1A3629] text-[#FFFDF9] font-pixel text-sm font-bold tracking-wider rounded-xl border-2 border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+          className="w-full py-3 px-6 bg-[#1A3629] text-[#FFFDF9] font-cabinet text-sm font-bold rounded-xl border-2 border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
         >
           Continue Journey →
         </button>

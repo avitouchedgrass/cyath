@@ -90,8 +90,8 @@ export function QuestPanel() {
                 isClaimed
                   ? 'bg-[#F4EDE0]/50 border-[#1A3629]/30 opacity-80'
                   : quest.completed
-                  ? 'bg-[#FFFDF9] border-[#D97706] shadow-[4px_4px_0px_#D97706]'
-                  : 'bg-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#1A3629]'
+                  ? 'bg-[#FFFDF9] border-[#D97706] shadow-[3px_3px_0px_#D97706]'
+                  : 'bg-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
               }`}
             >
               <div>
@@ -99,7 +99,7 @@ export function QuestPanel() {
                   <span className="px-2 py-0.5 rounded-md bg-[#FAF6EE] border border-[#1A3629]/20 font-mono text-[10px] font-bold uppercase text-[#4A5D4E]">
                     {quest.category}
                   </span>
-                  <span className="font-pixel text-xs font-bold text-[#D97706]">
+                  <span className="font-cabinet text-xs font-bold text-[#D97706]">
                     +{quest.xpAward} XP
                   </span>
                 </div>
@@ -137,7 +137,7 @@ export function QuestPanel() {
                   <button
                     type="button"
                     onClick={() => claimQuest(quest.id, currentDate)}
-                    className="w-full py-2 bg-[#D97706] text-[#FFFDF9] font-pixel text-xs font-bold tracking-wider rounded-xl border-2 border-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+                    className="w-full py-2 bg-[#D97706] text-[#FFFDF9] font-cabinet text-xs font-bold rounded-xl border-2 border-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
                   >
                     Claim +{quest.xpAward} XP!
                   </button>
@@ -153,7 +153,7 @@ export function QuestPanel() {
       </div>
 
       {/* Weekly Challenge Banner */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#FAF6EE] to-[#F5EEDF] border-2 border-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#FAF6EE] to-[#F5EEDF] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div className="max-w-xl">
           <div className="flex items-center gap-2 mb-1">
             <img
@@ -193,7 +193,7 @@ export function QuestPanel() {
             <span className="block font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
               Reward
             </span>
-            <span className="font-pixel text-sm font-bold text-[#D97706]">
+            <span className="font-cabinet text-sm font-bold text-[#D97706]">
               +{WEEKLY_CHALLENGE_XP} XP
             </span>
           </div>

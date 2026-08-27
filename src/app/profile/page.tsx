@@ -103,7 +103,7 @@ export default function ProfilePage() {
         {/* User Identity Banner */}
         <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center font-pixel font-bold text-xl text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
+            <div className="w-16 h-16 rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center font-cabinet font-black text-xl text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
               {displayName.slice(0, 2).toUpperCase()}
             </div>
             <div>

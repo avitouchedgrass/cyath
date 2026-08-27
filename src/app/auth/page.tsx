@@ -97,10 +97,13 @@ function AuthContent() {
     }
 
     const { success, executedAction } = executePendingAction();
+    const redirectUrl = searchParams.get('redirect');
     const needsOnboarding = !userProfile || !userProfile.onboardingCompleted;
 
     if (success && executedAction?.returnUrl) {
       router.push(executedAction.returnUrl);
+    } else if (redirectUrl) {
+      router.push(redirectUrl);
     } else if (needsOnboarding) {
       router.push('/onboarding');
     } else {
@@ -696,7 +699,7 @@ function AuthContent() {
                 onClick={handleGuestAccess}
                 className="text-xs font-mono font-bold text-[#1A3629] opacity-75 hover:opacity-100 hover:underline cursor-pointer"
               >
-                ⚡ Explore Demo Without Account
+                Explore Demo Without Account
               </button>
             </div>
           </div>

@@ -36,7 +36,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
     { name: "Protocols", href: "/protocols" },
     { name: "Recipes", href: "/recipes" },
     { name: "Correlations", href: "/correlations" },
-    { name: "Progress", href: "/progress" },
+    { name: "Sanctuary", href: "/sanctuary" },
     { name: "Methodology", href: "/#methodology" },
   ];
 

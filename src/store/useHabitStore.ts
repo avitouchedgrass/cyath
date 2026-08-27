@@ -125,6 +125,33 @@ const createEmptyDailyLog = (): DailyLogData => ({
   loggedRecipeIds: [],
 });
 
+interface UserLocalProgressData {
+  totalXp: number;
+  streakCount: number;
+  streakFreezeStock: number;
+  claimedMilestones: number[];
+  completedQuestIdsByDate: Record<string, string[]>;
+  xpHistory: XpHistoryItem[];
+  logsByDate?: Record<string, DailyLogData>;
+}
+
+const saveUserLocalProgress = (userId: string, data: UserLocalProgressData) => {
+  if (typeof window === 'undefined' || !userId || userId.startsWith('guest_')) return;
+  try {
+    localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(data));
+  } catch {}
+};
+
+const getUserLocalProgress = (userId: string): UserLocalProgressData | null => {
+  if (typeof window === 'undefined' || !userId || userId.startsWith('guest_')) return null;
+  try {
+    const raw = localStorage.getItem(`cyath_user_progression_${userId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const useHabitStore = create<HabitStoreState>()(
   persist(
     (set, get) => ({
@@ -133,15 +160,12 @@ export const useHabitStore = create<HabitStoreState>()(
       logsByDate: {
         [getTodayString()]: createEmptyDailyLog(),
       },
-      totalXp: 180,
-      streakCount: 5,
-      streakFreezeStock: 1,
-      claimedMilestones: [3],
+      totalXp: 0,
+      streakCount: 0,
+      streakFreezeStock: 0,
+      claimedMilestones: [],
       completedQuestIdsByDate: {},
-      xpHistory: [
-        { id: 'initial_1', amount: 15, reason: 'Habit Completed', timestamp: new Date().toISOString() },
-        { id: 'initial_2', amount: 25, reason: 'Dawn Ignition Quest', timestamp: new Date().toISOString() },
-      ],
+      xpHistory: [],
       isSyncing: false,
       activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
       userSession: null,
@@ -151,9 +175,45 @@ export const useHabitStore = create<HabitStoreState>()(
       setDate: (date) => set({ currentDate: date }),
 
       setUserSession: (session) => {
+        const prevSession = get().userSession;
+        if (prevSession && !prevSession.id.startsWith('guest_')) {
+          saveUserLocalProgress(prevSession.id, {
+            totalXp: get().totalXp,
+            streakCount: get().streakCount,
+            streakFreezeStock: get().streakFreezeStock,
+            claimedMilestones: get().claimedMilestones,
+            completedQuestIdsByDate: get().completedQuestIdsByDate,
+            xpHistory: get().xpHistory,
+            logsByDate: get().logsByDate,
+          });
+        }
+
         set({ userSession: session });
+
         if (session && !session.id.startsWith('guest_')) {
+          const cached = getUserLocalProgress(session.id);
+          if (cached) {
+            set({
+              totalXp: cached.totalXp ?? 0,
+              streakCount: cached.streakCount ?? 0,
+              streakFreezeStock: cached.streakFreezeStock ?? 0,
+              claimedMilestones: cached.claimedMilestones ?? [],
+              completedQuestIdsByDate: cached.completedQuestIdsByDate ?? {},
+              xpHistory: cached.xpHistory ?? [],
+              ...(cached.logsByDate ? { logsByDate: cached.logsByDate } : {}),
+            });
+          }
           get().reconcileUserSession(session);
+        } else if (!session) {
+          set({
+            totalXp: 0,
+            streakCount: 0,
+            streakFreezeStock: 0,
+            claimedMilestones: [],
+            completedQuestIdsByDate: {},
+            xpHistory: [],
+            userProfile: null,
+          });
         }
       },
 
@@ -166,15 +226,21 @@ export const useHabitStore = create<HabitStoreState>()(
             .eq('user_id', session.id)
             .maybeSingle();
 
+          const cached = getUserLocalProgress(session.id);
+          const currentLocalXp = cached?.totalXp ?? get().totalXp;
+          const currentLocalStreak = cached?.streakCount ?? get().streakCount;
+          const currentLocalFreeze = cached?.streakFreezeStock ?? get().streakFreezeStock;
+
           if (profile) {
             const remoteXp = profile.total_xp ?? 0;
-            const currentLocalXp = get().totalXp;
             const finalXp = Math.max(remoteXp, currentLocalXp);
+            const finalStreak = Math.max(profile.streak_count ?? 0, currentLocalStreak);
+            const finalFreeze = Math.min(STREAK_FREEZE.maxStock, Math.max(profile.streak_freeze_stock ?? 0, currentLocalFreeze));
 
             set({
               totalXp: finalXp,
-              streakCount: Math.max(profile.streak_count ?? 0, get().streakCount),
-              streakFreezeStock: Math.min(STREAK_FREEZE.maxStock, profile.streak_freeze_stock ?? get().streakFreezeStock),
+              streakCount: finalStreak,
+              streakFreezeStock: finalFreeze,
               userProfile: {
                 fullName: profile.full_name ?? '',
                 age: profile.age ?? 25,
@@ -188,12 +254,48 @@ export const useHabitStore = create<HabitStoreState>()(
               },
             });
 
-            if (finalXp > remoteXp) {
+            saveUserLocalProgress(session.id, {
+              totalXp: finalXp,
+              streakCount: finalStreak,
+              streakFreezeStock: finalFreeze,
+              claimedMilestones: get().claimedMilestones,
+              completedQuestIdsByDate: get().completedQuestIdsByDate,
+              xpHistory: get().xpHistory,
+              logsByDate: get().logsByDate,
+            });
+
+            if (finalXp > remoteXp || finalStreak > (profile.streak_count ?? 0)) {
               await supabase
                 .from('user_profiles')
-                .update({ total_xp: finalXp })
-                .eq('user_id', session.id);
+                .upsert({
+                  user_id: session.id,
+                  total_xp: finalXp,
+                  streak_count: finalStreak,
+                  streak_freeze_stock: finalFreeze,
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'user_id' });
             }
+          } else if (currentLocalXp > 0) {
+            // No profile row in Supabase yet, but user has accumulated progress: create it now
+            await supabase
+              .from('user_profiles')
+              .upsert({
+                user_id: session.id,
+                total_xp: currentLocalXp,
+                streak_count: currentLocalStreak,
+                streak_freeze_stock: currentLocalFreeze,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'user_id' });
+          } else {
+            // Fresh account with zero progress
+            set({
+              totalXp: 0,
+              streakCount: 0,
+              streakFreezeStock: 0,
+              claimedMilestones: [],
+              completedQuestIdsByDate: {},
+              xpHistory: [],
+            });
           }
         } catch {
           // Graceful fallback to local state
@@ -332,12 +434,25 @@ export const useHabitStore = create<HabitStoreState>()(
 
         const userId = get().userSession?.id;
         if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, {
+            totalXp: newXp,
+            streakCount: get().streakCount,
+            streakFreezeStock: get().streakFreezeStock,
+            claimedMilestones: get().claimedMilestones,
+            completedQuestIdsByDate: get().completedQuestIdsByDate,
+            xpHistory: updatedHistory,
+            logsByDate: get().logsByDate,
+          });
+
           (async () => {
             try {
-              await supabase.from('user_profiles').update({
+              await supabase.from('user_profiles').upsert({
+                user_id: userId,
                 total_xp: newXp,
+                streak_count: get().streakCount,
+                streak_freeze_stock: get().streakFreezeStock,
                 updated_at: new Date().toISOString(),
-              }).eq('user_id', userId);
+              }, { onConflict: 'user_id' });
 
               await supabase.from('xp_events').insert({
                 user_id: userId,
@@ -388,7 +503,8 @@ export const useHabitStore = create<HabitStoreState>()(
       toggleHabit: (habitId, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
-        const willBeDone = !currentLog.habitsCompleted[habitId];
+        const wasDone = !!currentLog.habitsCompleted[habitId];
+        const willBeDone = !wasDone;
         const updatedHabits = {
           ...currentLog.habitsCompleted,
           [habitId]: willBeDone,
@@ -414,11 +530,13 @@ export const useHabitStore = create<HabitStoreState>()(
           streakFreezeStock: streakStatus.freezeStock,
         });
 
+        const hadPerfectDay = get().habits.length > 0 && get().habits.every((h) => !!currentLog.habitsCompleted[h.id]);
+        const nowPerfectDay = get().habits.length > 0 && get().habits.every((h) => !!updatedHabits[h.id]);
+
         if (willBeDone) {
           get().gainXp(XP_AWARDS.habitComplete, 'Habit Completed', 'habit');
 
-          const allDone = get().habits.length > 0 && get().habits.every((h) => updatedHabits[h.id]);
-          if (allDone) {
+          if (!hadPerfectDay && nowPerfectDay) {
             get().gainXp(XP_AWARDS.perfectDay, 'Flawless Execution (All Habits)', 'perfect_day');
           }
 
@@ -434,6 +552,13 @@ export const useHabitStore = create<HabitStoreState>()(
                 xpAwarded: milestone.xp,
               });
             }
+          }
+        } else {
+          // Deselecting habit: deduct the awarded XP to prevent infinite spam farming
+          get().gainXp(-XP_AWARDS.habitComplete, 'Habit Deselected', 'habit');
+
+          if (hadPerfectDay && !nowPerfectDay) {
+            get().gainXp(-XP_AWARDS.perfectDay, 'Flawless Execution Revoked', 'perfect_day');
           }
         }
 
@@ -471,10 +596,21 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        if (prevProtein < GOALS.proteinGrams && safeAmount >= GOALS.proteinGrams) {
-          get().gainXp(XP_AWARDS.proteinGoal, 'Protein Target Reached (120g+)', 'nutrition');
-        } else if (prevProtein < GOALS.proteinGrams / 2 && safeAmount >= GOALS.proteinGrams / 2 && safeAmount < GOALS.proteinGrams) {
+        const hadFull = prevProtein >= GOALS.proteinGrams;
+        const hadHalf = prevProtein >= GOALS.proteinGrams / 2 && !hadFull;
+        const nowFull = safeAmount >= GOALS.proteinGrams;
+        const nowHalf = safeAmount >= GOALS.proteinGrams / 2 && !nowFull;
+
+        if (!hadFull && nowFull) {
+          const delta = hadHalf ? (XP_AWARDS.proteinGoal - XP_AWARDS.proteinPartial) : XP_AWARDS.proteinGoal;
+          get().gainXp(delta, 'Protein Target Reached (120g+)', 'nutrition');
+        } else if (hadFull && !nowFull) {
+          const delta = nowHalf ? (XP_AWARDS.proteinGoal - XP_AWARDS.proteinPartial) : XP_AWARDS.proteinGoal;
+          get().gainXp(-delta, 'Protein Target Revoked', 'nutrition');
+        } else if (!hadHalf && nowHalf && !hadFull) {
           get().gainXp(XP_AWARDS.proteinPartial, 'Protein Milestone (60g+)', 'nutrition');
+        } else if (hadHalf && !nowHalf && !nowFull) {
+          get().gainXp(-XP_AWARDS.proteinPartial, 'Protein Milestone Revoked', 'nutrition');
         }
 
         get().syncWithSupabase(targetDate);
@@ -505,8 +641,13 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        if (prevHydration < GOALS.hydrationLiters && safeLiters >= GOALS.hydrationLiters) {
+        const hadHydration = prevHydration >= GOALS.hydrationLiters;
+        const nowHydration = safeLiters >= GOALS.hydrationLiters;
+
+        if (!hadHydration && nowHydration) {
           get().gainXp(XP_AWARDS.hydrationGoal, 'Hydration Target Achieved (2.0L+)', 'hydration');
+        } else if (hadHydration && !nowHydration) {
+          get().gainXp(-XP_AWARDS.hydrationGoal, 'Hydration Target Revoked', 'hydration');
         }
 
         get().syncWithSupabase(targetDate);
@@ -524,8 +665,13 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        if (prevSleep < GOALS.sleepHours && hours >= GOALS.sleepHours) {
+        const hadSleep = prevSleep >= GOALS.sleepHours;
+        const nowSleep = hours >= GOALS.sleepHours;
+
+        if (!hadSleep && nowSleep) {
           get().gainXp(XP_AWARDS.sleepGoal, 'Sleep Restoration Goal (7h+)', 'sleep');
+        } else if (hadSleep && !nowSleep) {
+          get().gainXp(-XP_AWARDS.sleepGoal, 'Sleep Goal Revoked', 'sleep');
         }
 
         get().syncWithSupabase(targetDate);
@@ -668,6 +814,16 @@ export const useHabitStore = create<HabitStoreState>()(
             streak_freeze_stock: get().streakFreezeStock,
             updated_at: new Date().toISOString(),
           }, { onConflict: 'user_id' });
+
+          saveUserLocalProgress(userId, {
+            totalXp: get().totalXp,
+            streakCount: get().streakCount,
+            streakFreezeStock: get().streakFreezeStock,
+            claimedMilestones: get().claimedMilestones,
+            completedQuestIdsByDate: get().completedQuestIdsByDate,
+            xpHistory: get().xpHistory,
+            logsByDate: get().logsByDate,
+          });
         } catch {
           // Graceful fallback to local persistence
         } finally {
@@ -691,16 +847,12 @@ export const useHabitStore = create<HabitStoreState>()(
             onboardingCompleted: true,
           },
           habits: DEFAULT_HABITS,
-          totalXp: 1450,
-          streakCount: 5,
-          streakFreezeStock: 1,
-          claimedMilestones: [3],
+          totalXp: 0,
+          streakCount: 0,
+          streakFreezeStock: 0,
+          claimedMilestones: [],
           completedQuestIdsByDate: {},
-          xpHistory: [
-            { id: 'd1', amount: 50, reason: 'Streak Milestone: Kindling', timestamp: new Date().toISOString() },
-            { id: 'd2', amount: 30, reason: 'Quest: Structural Synthesis', timestamp: new Date().toISOString() },
-            { id: 'd3', amount: 20, reason: 'Whole Food Dish Prepared', timestamp: new Date().toISOString() },
-          ],
+          xpHistory: [],
           activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
           logsByDate: {
             [today]: {

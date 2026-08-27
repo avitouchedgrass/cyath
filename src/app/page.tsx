@@ -103,12 +103,12 @@ export default function Home() {
                   </button>
                 </Link>
 
-                <Link href="/protocols" className="w-full sm:w-auto">
+                <Link href="/sanctuary" className="w-full sm:w-auto">
                   <button
                     type="button"
                     className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1A3629] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
-                    Browse Blueprints
+                    Visit Your Sanctuary
                   </button>
                 </Link>
               </div>
@@ -339,7 +339,7 @@ export default function Home() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
-                      ⚡
+                      ✦
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       16-Bit Food Fuel
@@ -622,6 +622,9 @@ export default function Home() {
             <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
               <li>
                 <Link href="/dashboard" className="hover:underline">Daily Planner</Link>
+              </li>
+              <li>
+                <Link href="/sanctuary" className="hover:underline">Island Sanctuary</Link>
               </li>
               <li>
                 <Link href="/correlations" className="hover:underline">Personal Discoveries</Link>

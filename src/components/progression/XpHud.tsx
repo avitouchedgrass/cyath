@@ -11,14 +11,14 @@ export function XpHud() {
   const progress = calculateLevel(totalXp);
 
   return (
-    <div className="w-full bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[6px_6px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
+    <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
       {/* Left: Level & Title */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center">
           <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
             LVL
           </span>
-          <span className="font-pixel text-xl font-bold text-[#1A3629] leading-none">
+          <span className="font-cabinet text-2xl font-black text-[#1A3629] leading-none">
             {progress.level}
           </span>
         </div>
@@ -71,10 +71,10 @@ export function XpHud() {
       <div className="flex items-center gap-3 self-end md:self-center">
         <StreakBadge />
         <Link
-          href="/progress"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-pixel text-xs font-bold tracking-wider border-2 border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+          href="/sanctuary"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet text-xs font-bold border-2 border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
         >
-          <span>Progress Roadmap →</span>
+          <span>Island Sanctuary →</span>
         </Link>
       </div>
     </div>

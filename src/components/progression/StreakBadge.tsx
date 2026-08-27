@@ -30,7 +30,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
             className="w-full h-full object-cover [image-rendering:pixelated]"
           />
         </div>
-        <span className="font-pixel text-xs font-bold text-[#1A3629]">
+        <span className="font-cabinet text-xs font-bold text-[#1A3629]">
           {streakCount} {streakCount === 1 ? 'Day' : 'Days'}
         </span>
 
@@ -52,7 +52,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
       {(open || showDetails) && (
         <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 p-4 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl shadow-[4px_4px_0px_#1A3629] z-40 text-left animate-card-enter">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-pixel text-xs font-bold text-[#1A3629] uppercase tracking-wider">
+            <span className="font-cabinet text-xs font-bold text-[#1A3629] uppercase tracking-wider">
               Consistency Streak
             </span>
             <span className="text-xs font-mono font-bold text-[#D97706]">

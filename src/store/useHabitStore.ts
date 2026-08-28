@@ -13,6 +13,7 @@ import {
 } from '@/lib/progression/engine';
 import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
+import { Recipe } from '@/lib/recipes';
 
 export interface HabitItem {
   id: string;
@@ -79,6 +80,7 @@ export interface HabitStoreState {
   xpHistory: XpHistoryItem[];
   isSyncing: boolean;
   activeProtocolIds: string[];
+  customRecipes: Recipe[];
   userSession: { id: string; email?: string } | null;
   userProfile: UserProfile | null;
   pendingAction: PendingUserAction | null;
@@ -101,6 +103,9 @@ export interface HabitStoreState {
   setEnergy: (level: number, date?: string) => void;
   setMood: (score: number, date?: string) => void;
   setNotes: (notes: string, date?: string) => void;
+  addCustomRecipe: (recipe: Recipe) => void;
+  updateCustomRecipe: (id: string, updates: Partial<Recipe>) => void;
+  deleteCustomRecipe: (id: string) => void;
   logRecipeToDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   gainXp: (amount: number, reason: string, source?: string) => { oldLevel: number; newLevel: number; leveledUp: boolean };
@@ -133,12 +138,27 @@ interface UserLocalProgressData {
   completedQuestIdsByDate: Record<string, string[]>;
   xpHistory: XpHistoryItem[];
   logsByDate?: Record<string, DailyLogData>;
+  customRecipes?: Recipe[];
+  userProfile?: UserProfile | null;
 }
 
-const saveUserLocalProgress = (userId: string, data: UserLocalProgressData) => {
+const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressData>) => {
   if (typeof window === 'undefined' || !userId || userId.startsWith('guest_')) return;
   try {
-    localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(data));
+    const raw = localStorage.getItem(`cyath_user_progression_${userId}`);
+    const existing: Partial<UserLocalProgressData> = raw ? JSON.parse(raw) : {};
+    const merged: UserLocalProgressData = {
+      totalXp: data.totalXp !== undefined ? data.totalXp : (existing.totalXp ?? 0),
+      streakCount: data.streakCount !== undefined ? data.streakCount : (existing.streakCount ?? 0),
+      streakFreezeStock: data.streakFreezeStock !== undefined ? data.streakFreezeStock : (existing.streakFreezeStock ?? 1),
+      claimedMilestones: data.claimedMilestones !== undefined ? data.claimedMilestones : (existing.claimedMilestones ?? []),
+      completedQuestIdsByDate: data.completedQuestIdsByDate !== undefined ? data.completedQuestIdsByDate : (existing.completedQuestIdsByDate ?? {}),
+      xpHistory: data.xpHistory !== undefined ? data.xpHistory : (existing.xpHistory ?? []),
+      logsByDate: data.logsByDate !== undefined ? data.logsByDate : (existing.logsByDate ?? {}),
+      customRecipes: data.customRecipes !== undefined ? data.customRecipes : (existing.customRecipes ?? []),
+      userProfile: data.userProfile !== undefined ? data.userProfile : (existing.userProfile ?? null),
+    };
+    localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
 };
 
@@ -168,6 +188,7 @@ export const useHabitStore = create<HabitStoreState>()(
       xpHistory: [],
       isSyncing: false,
       activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+      customRecipes: [],
       userSession: null,
       userProfile: null,
       pendingAction: null,
@@ -185,6 +206,8 @@ export const useHabitStore = create<HabitStoreState>()(
             completedQuestIdsByDate: get().completedQuestIdsByDate,
             xpHistory: get().xpHistory,
             logsByDate: get().logsByDate,
+            customRecipes: get().customRecipes,
+            userProfile: get().userProfile,
           });
         }
 
@@ -196,11 +219,13 @@ export const useHabitStore = create<HabitStoreState>()(
             set({
               totalXp: cached.totalXp ?? 0,
               streakCount: cached.streakCount ?? 0,
-              streakFreezeStock: cached.streakFreezeStock ?? 0,
+              streakFreezeStock: cached.streakFreezeStock ?? 1,
               claimedMilestones: cached.claimedMilestones ?? [],
               completedQuestIdsByDate: cached.completedQuestIdsByDate ?? {},
               xpHistory: cached.xpHistory ?? [],
+              customRecipes: cached.customRecipes ?? [],
               ...(cached.logsByDate ? { logsByDate: cached.logsByDate } : {}),
+              ...(cached.userProfile ? { userProfile: cached.userProfile } : {}),
             });
           }
           get().reconcileUserSession(session);
@@ -220,38 +245,137 @@ export const useHabitStore = create<HabitStoreState>()(
       reconcileUserSession: async (session) => {
         if (!session || session.id.startsWith('guest_')) return;
         try {
-          const { data: profile } = await supabase
+          const cached = getUserLocalProgress(session.id);
+          const currentLocalXp = cached?.totalXp ?? get().totalXp;
+          const currentLocalStreak = cached?.streakCount ?? get().streakCount;
+          const currentLocalFreeze = cached?.streakFreezeStock ?? get().streakFreezeStock;
+          const currentLocalProfile = cached?.userProfile ?? get().userProfile;
+          const currentLocalRecipes = cached?.customRecipes ?? get().customRecipes;
+
+          // 1. Fetch remote user profile
+          const { data: profile, error: profileErr } = await supabase
             .from('user_profiles')
             .select('total_xp, streak_count, streak_freeze_stock, full_name, age, sex, height_cm, weight_kg, primary_goal, allergies, dietary_restrictions, onboarding_completed')
             .eq('user_id', session.id)
             .maybeSingle();
 
-          const cached = getUserLocalProgress(session.id);
-          const currentLocalXp = cached?.totalXp ?? get().totalXp;
-          const currentLocalStreak = cached?.streakCount ?? get().streakCount;
-          const currentLocalFreeze = cached?.streakFreezeStock ?? get().streakFreezeStock;
+          // 2. Fetch remote custom recipes
+          const { data: remoteRecipes, error: recipeErr } = await supabase
+            .from('custom_recipes')
+            .select('*')
+            .eq('user_id', session.id);
+
+          // 3. Fetch remote daily logs
+          const { data: remoteLogs } = await supabase
+            .from('daily_logs')
+            .select('*')
+            .eq('user_id', session.id);
+
+          // Merge custom recipes safely
+          let finalRecipes = [...currentLocalRecipes];
+          if (remoteRecipes && remoteRecipes.length > 0) {
+            const remoteMapped: Recipe[] = remoteRecipes.map((r) => ({
+              id: r.id,
+              name: r.name,
+              subtitle: r.subtitle || '',
+              image: r.image,
+              rawImage: r.raw_image || undefined,
+              calories: r.calories,
+              protein: Number(r.protein),
+              carbs: Number(r.carbs),
+              fats: Number(r.fats),
+              prepTimeMinutes: r.prep_time_minutes,
+              category: r.category,
+              dietType: r.diet_type,
+              tags: r.tags || [],
+              focusScore: r.focus_score || '9.0/10',
+              description: r.description || '',
+              ingredients: r.ingredients || [],
+              instructions: r.instructions || [],
+              isCustom: true,
+              reasoningSteps: r.reasoning_steps || [],
+            }));
+
+            const recipeMap = new Map<string, Recipe>();
+            remoteMapped.forEach((r) => recipeMap.set(r.id, r));
+            currentLocalRecipes.forEach((r) => recipeMap.set(r.id, r));
+            finalRecipes = Array.from(recipeMap.values());
+          }
+
+          // If local has custom recipes not yet in remote, upload them
+          if (currentLocalRecipes.length > 0 && !recipeErr) {
+            for (const r of currentLocalRecipes) {
+              try {
+                await supabase.from('custom_recipes').upsert({
+                  id: r.id,
+                  user_id: session.id,
+                  name: r.name,
+                  subtitle: r.subtitle || '',
+                  image: r.image,
+                  raw_image: r.rawImage || null,
+                  calories: r.calories,
+                  protein: r.protein,
+                  carbs: r.carbs,
+                  fats: r.fats,
+                  prep_time_minutes: r.prepTimeMinutes,
+                  category: r.category,
+                  diet_type: r.dietType,
+                  tags: r.tags || [],
+                  focus_score: r.focusScore || '9.0/10',
+                  description: r.description || '',
+                  ingredients: r.ingredients || [],
+                  instructions: r.instructions || [],
+                  reasoning_steps: r.reasoningSteps || [],
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'id' });
+              } catch {}
+            }
+          }
+
+          // Merge daily logs if remote logs exist
+          const mergedLogs = { ...get().logsByDate };
+          if (remoteLogs && remoteLogs.length > 0) {
+            remoteLogs.forEach((l) => {
+              mergedLogs[l.log_date] = {
+                habitsCompleted: l.habits_completed || {},
+                totalProteinLogged: Number(l.total_protein || 0),
+                totalCaloriesLogged: Number(l.total_calories || 0),
+                hydrationLiters: Number(l.hydration_liters || 0),
+                sleepHours: Number(l.sleep_hours || 7.5),
+                energyLevel: l.energy_level || 7,
+                moodScore: l.mood_score || 7,
+                notes: l.notes || '',
+                loggedRecipeIds: l.logged_recipes || [],
+              };
+            });
+          }
 
           if (profile) {
             const remoteXp = profile.total_xp ?? 0;
             const finalXp = Math.max(remoteXp, currentLocalXp);
             const finalStreak = Math.max(profile.streak_count ?? 0, currentLocalStreak);
             const finalFreeze = Math.min(STREAK_FREEZE.maxStock, Math.max(profile.streak_freeze_stock ?? 0, currentLocalFreeze));
+            const isOnboardingDone = profile.onboarding_completed || currentLocalProfile?.onboardingCompleted || false;
+
+            const finalProfile: UserProfile = {
+              fullName: profile.full_name || currentLocalProfile?.fullName || '',
+              age: profile.age || currentLocalProfile?.age || 25,
+              sex: profile.sex || currentLocalProfile?.sex || 'other',
+              heightCm: profile.height_cm || currentLocalProfile?.heightCm || 175,
+              weightKg: profile.weight_kg || currentLocalProfile?.weightKg || 70,
+              primaryGoal: profile.primary_goal || currentLocalProfile?.primaryGoal || 'focus',
+              allergies: profile.allergies?.length ? profile.allergies : (currentLocalProfile?.allergies || []),
+              dietaryRestrictions: profile.dietary_restrictions?.length ? profile.dietary_restrictions : (currentLocalProfile?.dietaryRestrictions || []),
+              onboardingCompleted: isOnboardingDone,
+            };
 
             set({
               totalXp: finalXp,
               streakCount: finalStreak,
               streakFreezeStock: finalFreeze,
-              userProfile: {
-                fullName: profile.full_name ?? '',
-                age: profile.age ?? 25,
-                sex: profile.sex ?? 'other',
-                heightCm: profile.height_cm ?? 175,
-                weightKg: profile.weight_kg ?? 70,
-                primaryGoal: profile.primary_goal ?? 'focus',
-                allergies: profile.allergies ?? [],
-                dietaryRestrictions: profile.dietary_restrictions ?? [],
-                onboardingCompleted: profile.onboarding_completed ?? false,
-              },
+              customRecipes: finalRecipes,
+              logsByDate: mergedLogs,
+              userProfile: finalProfile,
             });
 
             saveUserLocalProgress(session.id, {
@@ -261,44 +385,86 @@ export const useHabitStore = create<HabitStoreState>()(
               claimedMilestones: get().claimedMilestones,
               completedQuestIdsByDate: get().completedQuestIdsByDate,
               xpHistory: get().xpHistory,
-              logsByDate: get().logsByDate,
+              logsByDate: mergedLogs,
+              customRecipes: finalRecipes,
+              userProfile: finalProfile,
             });
 
-            if (finalXp > remoteXp || finalStreak > (profile.streak_count ?? 0)) {
+            if (finalXp > remoteXp || finalStreak > (profile.streak_count ?? 0) || (isOnboardingDone && !profile.onboarding_completed)) {
+              try {
+                await supabase
+                  .from('user_profiles')
+                  .upsert({
+                    user_id: session.id,
+                    total_xp: finalXp,
+                    streak_count: finalStreak,
+                    streak_freeze_stock: finalFreeze,
+                    onboarding_completed: isOnboardingDone,
+                    full_name: finalProfile.fullName,
+                    updated_at: new Date().toISOString(),
+                  }, { onConflict: 'user_id' });
+              } catch {}
+            }
+          } else if (!profileErr && (currentLocalXp > 0 || currentLocalProfile?.onboardingCompleted)) {
+            // Profile row missing in Supabase, but user has accumulated progress: create it now
+            try {
               await supabase
                 .from('user_profiles')
                 .upsert({
                   user_id: session.id,
-                  total_xp: finalXp,
-                  streak_count: finalStreak,
-                  streak_freeze_stock: finalFreeze,
+                  total_xp: currentLocalXp,
+                  streak_count: currentLocalStreak,
+                  streak_freeze_stock: currentLocalFreeze,
+                  onboarding_completed: currentLocalProfile?.onboardingCompleted ?? false,
+                  full_name: currentLocalProfile?.fullName ?? '',
+                  age: currentLocalProfile?.age ?? 25,
+                  sex: currentLocalProfile?.sex ?? 'other',
+                  height_cm: currentLocalProfile?.heightCm ?? 175,
+                  weight_kg: currentLocalProfile?.weightKg ?? 70,
+                  primary_goal: currentLocalProfile?.primaryGoal ?? 'focus',
+                  allergies: currentLocalProfile?.allergies ?? [],
+                  dietary_restrictions: currentLocalProfile?.dietaryRestrictions ?? [],
                   updated_at: new Date().toISOString(),
                 }, { onConflict: 'user_id' });
-            }
-          } else if (currentLocalXp > 0) {
-            // No profile row in Supabase yet, but user has accumulated progress: create it now
-            await supabase
-              .from('user_profiles')
-              .upsert({
-                user_id: session.id,
-                total_xp: currentLocalXp,
-                streak_count: currentLocalStreak,
-                streak_freeze_stock: currentLocalFreeze,
-                updated_at: new Date().toISOString(),
-              }, { onConflict: 'user_id' });
-          } else {
-            // Fresh account with zero progress
+            } catch {}
+
             set({
-              totalXp: 0,
-              streakCount: 0,
-              streakFreezeStock: 0,
-              claimedMilestones: [],
-              completedQuestIdsByDate: {},
-              xpHistory: [],
+              customRecipes: finalRecipes,
+              userProfile: currentLocalProfile,
             });
+            saveUserLocalProgress(session.id, {
+              customRecipes: finalRecipes,
+              userProfile: currentLocalProfile,
+            });
+          } else {
+            // If table query returned error (e.g. table not created yet) OR user already has local progress, DO NOT WIPE!
+            if (currentLocalProfile || currentLocalXp > 0 || currentLocalRecipes.length > 0) {
+              set({
+                totalXp: currentLocalXp,
+                streakCount: currentLocalStreak,
+                streakFreezeStock: currentLocalFreeze,
+                customRecipes: finalRecipes,
+                userProfile: currentLocalProfile,
+              });
+              saveUserLocalProgress(session.id, {
+                customRecipes: finalRecipes,
+                userProfile: currentLocalProfile,
+              });
+            } else if (!profileErr) {
+              // Only truly fresh account with zero error
+              set({
+                totalXp: 0,
+                streakCount: 0,
+                streakFreezeStock: 1,
+                claimedMilestones: [],
+                completedQuestIdsByDate: {},
+                xpHistory: [],
+                customRecipes: [],
+              });
+            }
           }
-        } catch {
-          // Graceful fallback to local state
+        } catch (err) {
+          console.warn('Reconcile session error:', err);
         }
       },
 
@@ -320,6 +486,7 @@ export const useHabitStore = create<HabitStoreState>()(
 
         const userId = get().userSession?.id;
         if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, { userProfile: updated });
           (async () => {
             try {
               await supabase.from('user_profiles').upsert({
@@ -727,6 +894,102 @@ export const useHabitStore = create<HabitStoreState>()(
         get().syncWithSupabase(targetDate);
       },
 
+      addCustomRecipe: (recipe) => {
+        const updated = [recipe, ...get().customRecipes.filter((r) => r.id !== recipe.id)];
+        set({ customRecipes: updated });
+
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, { customRecipes: updated });
+          (async () => {
+            try {
+              await supabase.from('custom_recipes').upsert({
+                id: recipe.id,
+                user_id: userId,
+                name: recipe.name,
+                subtitle: recipe.subtitle || '',
+                image: recipe.image,
+                raw_image: recipe.rawImage || null,
+                calories: recipe.calories,
+                protein: recipe.protein,
+                carbs: recipe.carbs,
+                fats: recipe.fats,
+                prep_time_minutes: recipe.prepTimeMinutes,
+                category: recipe.category,
+                diet_type: recipe.dietType,
+                tags: recipe.tags || [],
+                focus_score: recipe.focusScore || '9.0/10',
+                description: recipe.description || '',
+                ingredients: recipe.ingredients || [],
+                instructions: recipe.instructions || [],
+                reasoning_steps: recipe.reasoningSteps || [],
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'id' });
+            } catch (err) {
+              console.warn('Failed to sync custom recipe to Supabase:', err);
+            }
+          })();
+        }
+      },
+
+      updateCustomRecipe: (id, updates) => {
+        const updated = get().customRecipes.map((r) => (r.id === id ? { ...r, ...updates } : r));
+        set({ customRecipes: updated });
+
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, { customRecipes: updated });
+          const target = updated.find((r) => r.id === id);
+          if (target) {
+            (async () => {
+              try {
+                await supabase.from('custom_recipes').upsert({
+                  id: target.id,
+                  user_id: userId,
+                  name: target.name,
+                  subtitle: target.subtitle || '',
+                  image: target.image,
+                  raw_image: target.rawImage || null,
+                  calories: target.calories,
+                  protein: target.protein,
+                  carbs: target.carbs,
+                  fats: target.fats,
+                  prep_time_minutes: target.prepTimeMinutes,
+                  category: target.category,
+                  diet_type: target.dietType,
+                  tags: target.tags || [],
+                  focus_score: target.focusScore || '9.0/10',
+                  description: target.description || '',
+                  ingredients: target.ingredients || [],
+                  instructions: target.instructions || [],
+                  reasoning_steps: target.reasoningSteps || [],
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'id' });
+              } catch (err) {
+                console.warn('Failed to update custom recipe in Supabase:', err);
+              }
+            })();
+          }
+        }
+      },
+
+      deleteCustomRecipe: (id) => {
+        const updated = get().customRecipes.filter((r) => r.id !== id);
+        set({ customRecipes: updated });
+
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, { customRecipes: updated });
+          (async () => {
+            try {
+              await supabase.from('custom_recipes').delete().eq('id', id).eq('user_id', userId);
+            } catch (err) {
+              console.warn('Failed to delete custom recipe from Supabase:', err);
+            }
+          })();
+        }
+      },
+
       logRecipeToDay: (recipeId, protein, calories, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
@@ -823,6 +1086,8 @@ export const useHabitStore = create<HabitStoreState>()(
             completedQuestIdsByDate: get().completedQuestIdsByDate,
             xpHistory: get().xpHistory,
             logsByDate: get().logsByDate,
+            customRecipes: get().customRecipes,
+            userProfile: get().userProfile,
           });
         } catch {
           // Graceful fallback to local persistence
@@ -884,10 +1149,17 @@ export const useHabitStore = create<HabitStoreState>()(
           try {
             await supabase.from('daily_logs').delete().eq('user_id', userId);
             await supabase.from('xp_events').delete().eq('user_id', userId);
+            await supabase.from('custom_recipes').delete().eq('user_id', userId);
+            await supabase.from('habits').delete().eq('user_id', userId);
             await supabase.from('user_profiles').delete().eq('user_id', userId);
             await supabase.auth.signOut();
           } catch (err) {
             console.error('Failed to clear remote account data:', err);
+          }
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.removeItem(`cyath_user_progression_${userId}`);
+            } catch {}
           }
         }
         set({
@@ -903,6 +1175,7 @@ export const useHabitStore = create<HabitStoreState>()(
           habits: DEFAULT_HABITS,
           activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
           pendingAction: null,
+          customRecipes: [],
         });
       },
     }),

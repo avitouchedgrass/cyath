@@ -84,8 +84,10 @@ function OnboardingContent() {
   useEffect(() => {
     if (isEditing && (!userSession || userSession.id.startsWith('guest_'))) {
       router.push('/login?redirect=/onboarding?edit=true');
+    } else if (!isEditing && userProfile?.onboardingCompleted) {
+      router.replace('/dashboard');
     }
-  }, [isEditing, userSession, router]);
+  }, [isEditing, userSession, userProfile, router]);
 
   // Form State
   const [fullName, setFullName] = useState(userProfile?.fullName || '');

@@ -35,6 +35,10 @@ CREATE POLICY "Users can insert own profile"
   ON public.user_profiles FOR INSERT 
   WITH CHECK (auth.uid() = user_id);
 
+CREATE POLICY "Users can delete own profile" 
+  ON public.user_profiles FOR DELETE 
+  USING (auth.uid() = user_id);
+
 -- 2. Create Habits Table
 CREATE TABLE IF NOT EXISTS public.habits (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -103,7 +107,38 @@ CREATE POLICY "Users can delete own xp events"
   ON public.xp_events FOR DELETE 
   USING (auth.uid() = user_id);
 
--- 6. Trigger to automatically initialize profile on user signup
+-- 6. Create Custom Recipes Table (Cross-device and cross-browser sync)
+CREATE TABLE IF NOT EXISTS public.custom_recipes (
+  id TEXT PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  subtitle TEXT DEFAULT '',
+  image TEXT NOT NULL,
+  raw_image TEXT,
+  calories INTEGER DEFAULT 500,
+  protein NUMERIC DEFAULT 30,
+  carbs NUMERIC DEFAULT 45,
+  fats NUMERIC DEFAULT 15,
+  prep_time_minutes INTEGER DEFAULT 20,
+  category TEXT DEFAULT 'High Protein',
+  diet_type TEXT DEFAULT 'omnivore',
+  tags TEXT[] DEFAULT '{}',
+  focus_score TEXT DEFAULT '9.0/10',
+  description TEXT DEFAULT '',
+  ingredients JSONB DEFAULT '[]'::jsonb,
+  instructions TEXT[] DEFAULT '{}',
+  reasoning_steps TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.custom_recipes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage own custom recipes" 
+  ON public.custom_recipes FOR ALL 
+  USING (auth.uid() = user_id);
+
+-- 7. Trigger to automatically initialize profile on user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
@@ -119,3 +154,4 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+

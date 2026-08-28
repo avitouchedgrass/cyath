@@ -85,25 +85,33 @@ function AuthContent() {
     };
   }, [isVerificationSent, email]);
 
-  const completeAuthentication = (user?: { id: string; email?: string }) => {
+  const completeAuthentication = async (user?: { id: string; email?: string }) => {
     retroAudio.playInspectConfirm();
-    const { setUserSession, executePendingAction, userProfile } = useHabitStore.getState();
+    const { setUserSession, executePendingAction } = useHabitStore.getState();
     if (user) {
       setUserSession(user);
+      await useHabitStore.getState().reconcileUserSession(user);
     } else {
       useHabitStore.getState().initDemoSession();
       router.push('/dashboard');
       return;
     }
 
+    const currentProfile = useHabitStore.getState().userProfile;
     const { success, executedAction } = executePendingAction();
-    const redirectUrl = searchParams.get('redirect');
-    const needsOnboarding = !userProfile || !userProfile.onboardingCompleted;
+    const rawRedirect = searchParams.get('redirect');
+    // Sanitize redirect URL to prevent Open Redirect (CWE-601)
+    const isSafeRelativeUrl = (url: string | null): boolean => {
+      if (!url) return false;
+      return url.startsWith('/') && !url.startsWith('//') && !url.includes('\\');
+    };
+    const safeRedirect = isSafeRelativeUrl(rawRedirect) ? rawRedirect : null;
+    const needsOnboarding = !currentProfile || !currentProfile.onboardingCompleted;
 
     if (success && executedAction?.returnUrl) {
       router.push(executedAction.returnUrl);
-    } else if (redirectUrl) {
-      router.push(redirectUrl);
+    } else if (safeRedirect) {
+      router.push(safeRedirect);
     } else if (needsOnboarding) {
       router.push('/onboarding');
     } else {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier, xpToReachLevel } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 
@@ -14,6 +14,14 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
   const currentIsland = getIslandTier(currentLevel);
   const nextIsland = getNextIslandTier(currentLevel);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(currentIsland.tier - 1);
+
+  // Preload all island tier assets immediately so rapid phase scrubbing never experiences image pop-in
+  useEffect(() => {
+    ISLAND_TIERS.forEach((tier) => {
+      const img = new Image();
+      img.src = tier.image;
+    });
+  }, []);
 
   const displayedIsland = ISLAND_TIERS[selectedPhaseIndex] || currentIsland;
   const isUnlocked = currentLevel >= displayedIsland.minLevel;
@@ -39,16 +47,53 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
         {/* Soft Ambient Sky Glow */}
         <div className="absolute w-80 h-80 sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-t from-[#A7F3D0]/25 via-[#FEF3C7]/20 to-transparent blur-3xl pointer-events-none" />
 
-        {/* Floating Island Asset with Stronger Float Keyframe and Hover Lift */}
-        <div className="relative z-10 w-[300px] sm:w-[420px] md:w-[480px] lg:w-[520px] xl:w-[560px] max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-500 hover:scale-[1.04] cursor-default group/island">
-          <img
-            key={displayedIsland.tier}
-            src={displayedIsland.image}
-            alt={displayedIsland.name}
-            className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_24px_30px_rgba(26,54,41,0.22)] animate-[fadeScale_0.35s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-300 ${
-              !isUnlocked ? 'grayscale contrast-125 opacity-60' : 'opacity-100 group-hover/island:brightness-105'
-            }`}
-          />
+        {/* Floating Island Asset with Idle Float Keyframe */}
+        <div className="relative z-10 w-[300px] sm:w-[420px] md:w-[480px] lg:w-[520px] xl:w-[560px] max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] cursor-default group/island">
+          {/* Interactive Frame with Hover Lift and Right-Click Protection Shield */}
+          <div
+            className="relative w-full h-full flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] select-none"
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            {ISLAND_TIERS.map((tier, index) => {
+              const isSelected = index === selectedPhaseIndex;
+              const isTierUnlocked = currentLevel >= tier.minLevel;
+
+              return (
+                <div
+                  key={tier.tier}
+                  aria-hidden={!isSelected}
+                  className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-300 ease-out select-none pointer-events-none ${
+                    isSelected
+                      ? 'opacity-100 scale-100 z-10'
+                      : 'opacity-0 scale-95 z-0'
+                  }`}
+                >
+                  <img
+                    src={tier.image}
+                    alt={tier.name}
+                    draggable={false}
+                    loading="eager"
+                    decoding="async"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_24px_30px_rgba(26,54,41,0.22)] select-none pointer-events-none transition-all duration-300 ${
+                      !isTierUnlocked
+                        ? 'grayscale contrast-125 opacity-60'
+                        : 'opacity-100 group-hover/island:brightness-105'
+                    }`}
+                  />
+                </div>
+              );
+            })}
+
+            {/* Shield overlay preventing right-click save, copy, or drag */}
+            <div
+              className="absolute inset-0 z-20 select-none cursor-default"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
         {/* Soft ground shadow beneath floating island, synchronized with island float */}

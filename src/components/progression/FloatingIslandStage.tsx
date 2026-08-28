@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 
@@ -12,6 +12,13 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
   const currentIsland = getIslandTier(currentLevel);
   const nextIsland = getNextIslandTier(currentLevel);
   const [inspectedTier, setInspectedTier] = useState<IslandTier | null>(null);
+
+  useEffect(() => {
+    ISLAND_TIERS.forEach((tier) => {
+      const img = new Image();
+      img.src = tier.image;
+    });
+  }, []);
 
   const displayedIsland = inspectedTier || currentIsland;
   const isUnlocked = currentLevel >= displayedIsland.minLevel;
@@ -56,14 +63,47 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
         {/* Soft Ambient Horizon Glow */}
         <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-t from-[#FEF3C7]/40 to-transparent blur-3xl pointer-events-none" />
 
-        {/* Floating Island Asset (Very Subtle CSS Float Animation) */}
-        <div className="relative z-10 w-64 sm:w-84 md:w-96 max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-transform duration-500">
-          <img
-            src={displayedIsland.image}
-            alt={displayedIsland.name}
-            className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_12px_16px_rgba(26,54,41,0.12)] transition-opacity duration-300 ${
-              !isUnlocked ? 'grayscale contrast-125 opacity-70' : 'opacity-100'
-            }`}
+        {/* Floating Island Asset with Transition Layers and Right-Click Protection */}
+        <div 
+          className="relative z-10 w-64 sm:w-84 md:w-96 max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-transform duration-500 select-none"
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          {ISLAND_TIERS.map((tier) => {
+            const isSelected = tier.tier === displayedIsland.tier;
+            const isTierUnlocked = currentLevel >= tier.minLevel;
+
+            return (
+              <div
+                key={tier.tier}
+                aria-hidden={!isSelected}
+                className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-300 ease-out select-none pointer-events-none ${
+                  isSelected
+                    ? 'opacity-100 scale-100 z-10'
+                    : 'opacity-0 scale-95 z-0'
+                }`}
+              >
+                <img
+                  src={tier.image}
+                  alt={tier.name}
+                  draggable={false}
+                  loading="eager"
+                  decoding="async"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
+                  className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_12px_16px_rgba(26,54,41,0.12)] select-none pointer-events-none transition-all duration-300 ${
+                    !isTierUnlocked ? 'grayscale contrast-125 opacity-70' : 'opacity-100'
+                  }`}
+                />
+              </div>
+            );
+          })}
+
+          {/* Shield overlay preventing right-click save, copy, or drag */}
+          <div
+            className="absolute inset-0 z-20 select-none cursor-default"
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
+            aria-hidden="true"
           />
         </div>
 

@@ -238,6 +238,8 @@ export const useHabitStore = create<HabitStoreState>()(
             completedQuestIdsByDate: {},
             xpHistory: [],
             userProfile: null,
+            customRecipes: [],
+            logsByDate: { [getTodayString()]: createEmptyDailyLog() },
           });
         }
       },
@@ -1182,7 +1184,7 @@ export const useHabitStore = create<HabitStoreState>()(
     {
       name: 'cyath-habit-store-v2',
       partialize: (state) => {
-        if (state.userSession?.id.startsWith('guest_')) {
+        if (!state.userSession || state.userSession.id.startsWith('guest_')) {
           return {
             userSession: null,
             userProfile: null,
@@ -1197,6 +1199,7 @@ export const useHabitStore = create<HabitStoreState>()(
             completedQuestIdsByDate: {},
             pendingAction: null,
             currentDate: state.currentDate,
+            customRecipes: [],
           };
         }
         return state;

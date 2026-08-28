@@ -66,24 +66,54 @@ function RecipesContent() {
     setMounted(true);
   }, []);
 
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
+
   const todayKey = new Date().toISOString().split('T')[0];
-  const todayLog = getDailyLog(todayKey);
+  const todayLog = isAuthenticated ? getDailyLog(todayKey) : {
+    habitsCompleted: {},
+    totalProteinLogged: 0,
+    totalCaloriesLogged: 0,
+    hydrationLiters: 0,
+    sleepHours: 8,
+    energyLevel: 7,
+    moodScore: 7,
+    notes: '',
+    loggedRecipeIds: [],
+  };
 
   const allRecipes = useMemo(() => {
+    if (!isAuthenticated) return RECIPES;
     return [...(customRecipes || []), ...RECIPES];
-  }, [customRecipes]);
+  }, [isAuthenticated, customRecipes]);
+
+  const visibleCategories = useMemo(() => {
+    if (!isAuthenticated) {
+      return CATEGORIES.filter((c) => c !== 'Custom');
+    }
+    return CATEGORIES;
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated && selectedCategory === 'Custom') {
+      setSelectedCategory('All');
+    }
+  }, [isAuthenticated, selectedCategory]);
 
   // Auto open recipe modal if URL param is present
   useEffect(() => {
     if (inspectParam) {
       const match = allRecipes.find((r) => r.id === inspectParam);
       if (match) {
+        if (!isAuthenticated && match.isCustom) {
+          router.push(`/auth?redirect=${encodeURIComponent(`/recipes?inspect=${inspectParam}`)}`);
+          return;
+        }
         setSelectedRecipe(match);
         setPortionMultiplier(1.0);
         setShowingRawPhoto(false);
       }
     }
-  }, [inspectParam, allRecipes]);
+  }, [inspectParam, allRecipes, isAuthenticated, router]);
 
   // Keyboard shortcut to focus search with '/'
   useEffect(() => {
@@ -219,7 +249,14 @@ function RecipesContent() {
           <div className="flex items-center gap-3 self-center sm:self-auto shrink-0">
             <button
               type="button"
-              onClick={() => setIsScanModalOpen(true)}
+              onClick={() => {
+                retroAudio.playBlip();
+                if (!isAuthenticated) {
+                  router.push('/auth?redirect=/recipes');
+                  return;
+                }
+                setIsScanModalOpen(true);
+              }}
               className="inline-flex items-center gap-2 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#10B981] border-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
               <span>Scan Meal with AI</span>
@@ -227,7 +264,14 @@ function RecipesContent() {
 
             <button
               type="button"
-              onClick={() => setIsManualModalOpen(true)}
+              onClick={() => {
+                retroAudio.playBlip();
+                if (!isAuthenticated) {
+                  router.push('/auth?redirect=/recipes');
+                  return;
+                }
+                setIsManualModalOpen(true);
+              }}
               className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
               <span>+ Custom Recipe</span>
@@ -314,7 +358,7 @@ function RecipesContent() {
               Category:
             </span>
             <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl border-2 bg-[#FFFDF9] border-[#1A3629]/25 shrink-0">
-              {CATEGORIES.map((cat) => {
+              {visibleCategories.map((cat) => {
                 const isSelected = selectedCategory === cat;
                 return (
                   <button

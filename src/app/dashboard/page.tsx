@@ -37,7 +37,11 @@ export default function DashboardPage() {
     customRecipes,
   } = useHabitStore();
 
-  const allRecipes = useMemo(() => [...(customRecipes || []), ...RECIPES], [customRecipes]);
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
+  const allRecipes = useMemo(() => {
+    if (!isAuthenticated) return RECIPES;
+    return [...(customRecipes || []), ...RECIPES];
+  }, [isAuthenticated, customRecipes]);
 
   useEffect(() => {
     setMounted(true);
@@ -474,7 +478,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-2">
                   {todayLog.loggedRecipeIds.map((rId, index) => {
                     const recipe = allRecipes.find((r) => r.id === rId);
-                    if (!recipe) return null;
+                    if (!recipe || (!isAuthenticated && recipe.isCustom)) return null;
                     return (
                       <div
                         key={`${rId}-${index}`}

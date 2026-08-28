@@ -75,6 +75,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
 
     expect(useHabitStore.getState().userSession).toBeNull();
     expect(useHabitStore.getState().userProfile).toBeNull();
+    expect(useHabitStore.getState().customRecipes).toEqual([]);
 
     // 5. Log back in with the same user account
     useHabitStore.getState().setUserSession({ id: testUserId, email: 'alex@example.com' });

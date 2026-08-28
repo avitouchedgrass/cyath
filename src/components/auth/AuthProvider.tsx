@@ -18,12 +18,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: session.user.email,
           });
         } else {
-          // If no authenticated Supabase session, reset any leftover demo session on page refresh
+          // If no authenticated Supabase session, purge custom recipes and reset logs for guest
           const current = useHabitStore.getState().userSession;
-          if (current?.id.startsWith('guest_')) {
+          if (current && !current.id.startsWith('guest_')) {
+            setUserSession(null);
+          } else {
             useHabitStore.setState({
               userSession: null,
               userProfile: null,
+              customRecipes: [],
               logsByDate: { [new Date().toISOString().split('T')[0]]: {
                 habitsCompleted: {},
                 totalProteinLogged: 0,

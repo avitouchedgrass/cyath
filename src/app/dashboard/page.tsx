@@ -34,7 +34,10 @@ export default function DashboardPage() {
     userSession,
     setPendingAction,
     isSyncing,
+    customRecipes,
   } = useHabitStore();
+
+  const allRecipes = useMemo(() => [...(customRecipes || []), ...RECIPES], [customRecipes]);
 
   useEffect(() => {
     setMounted(true);
@@ -469,12 +472,12 @@ export default function DashboardPage() {
 
               {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  {todayLog.loggedRecipeIds.map((rId) => {
-                    const recipe = RECIPES.find((r) => r.id === rId);
+                  {todayLog.loggedRecipeIds.map((rId, index) => {
+                    const recipe = allRecipes.find((r) => r.id === rId);
                     if (!recipe) return null;
                     return (
                       <div
-                        key={rId}
+                        key={`${rId}-${index}`}
                         className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE]/50 gap-2"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">

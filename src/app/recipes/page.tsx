@@ -8,8 +8,10 @@ import { RECIPES, Recipe } from '@/lib/recipes';
 import { PixelSteam } from '@/components/landing/PixelSteam';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
+import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 
-const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
+const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
 
 const DIET_FILTERS = [
@@ -31,7 +33,17 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const inspectParam = searchParams.get('inspect') || searchParams.get('recipe');
 
-  const { logRecipeToDay, getDailyLog, userSession, setPendingAction, userProfile } = useHabitStore();
+  const {
+    logRecipeToDay,
+    getDailyLog,
+    userSession,
+    setPendingAction,
+    userProfile,
+    customRecipes,
+    addCustomRecipe,
+    deleteCustomRecipe,
+  } = useHabitStore();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDietFilter, setSelectedDietFilter] = useState<string>('All');
@@ -41,6 +53,11 @@ function RecipesContent() {
   const [portionMultiplier, setPortionMultiplier] = useState<number>(1.0);
   const [loggedToast, setLoggedToast] = useState<{ name: string; protein: number; portion: number } | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [showingRawPhoto, setShowingRawPhoto] = useState(false);
+
+  // Modals for scanning & custom entry
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
@@ -52,16 +69,21 @@ function RecipesContent() {
   const todayKey = new Date().toISOString().split('T')[0];
   const todayLog = getDailyLog(todayKey);
 
+  const allRecipes = useMemo(() => {
+    return [...(customRecipes || []), ...RECIPES];
+  }, [customRecipes]);
+
   // Auto open recipe modal if URL param is present
   useEffect(() => {
     if (inspectParam) {
-      const match = RECIPES.find((r) => r.id === inspectParam);
+      const match = allRecipes.find((r) => r.id === inspectParam);
       if (match) {
         setSelectedRecipe(match);
         setPortionMultiplier(1.0);
+        setShowingRawPhoto(false);
       }
     }
-  }, [inspectParam]);
+  }, [inspectParam, allRecipes]);
 
   // Keyboard shortcut to focus search with '/'
   useEffect(() => {
@@ -91,8 +113,11 @@ function RecipesContent() {
 
   // Filter and sort recipes
   const filteredRecipes = useMemo(() => {
-    return RECIPES.filter((r) => {
-      const matchesCategory = selectedCategory === 'All' || r.category === selectedCategory;
+    return allRecipes.filter((r) => {
+      const matchesCategory =
+        selectedCategory === 'All' ||
+        (selectedCategory === 'Custom' ? r.isCustom : r.category === selectedCategory);
+
       const matchesDiet =
         selectedDietFilter === 'All' ||
         (selectedDietFilter === 'Vegetarian' && (r.dietType === 'vegetarian' || r.dietType === 'vegan')) ||
@@ -115,12 +140,13 @@ function RecipesContent() {
       if (sortBy === 'time') return a.prepTimeMinutes - b.prepTimeMinutes;
       return 0;
     });
-  }, [selectedCategory, selectedDietFilter, searchQuery, sortBy]);
+  }, [allRecipes, selectedCategory, selectedDietFilter, searchQuery, sortBy]);
 
   const openRecipeModal = (recipe: Recipe) => {
     retroAudio.playBlip();
     setSelectedRecipe(recipe);
     setPortionMultiplier(1.0);
+    setShowingRawPhoto(false);
   };
 
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
@@ -166,91 +192,91 @@ function RecipesContent() {
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
         
-        {/* Header Title Section */}
-        <div className="mb-10 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-            >
-              <span>← Back to Home</span>
-            </Link>
-            <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-              16-Bit Fuel Catalog
-            </span>
-          </div>
-
-          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
-            Whole-Food Fuel Recipes
-          </h1>
-          <p className="text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed text-[#2C4A3B]">
-            Hearty whole foods illustrated in clean retro pixel art. Simple to make, packed with clean protein, and ready to log in one tap.
-          </p>
-        </div>
-
-        {/* Control Row: Categories + Search + Sort */}
-        <div className="flex flex-col gap-4 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-            {/* Category Filter Pills */}
-            <div className="overflow-x-auto pb-1 scrollbar-none">
-              <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl border-2 bg-[#FFFDF9] border-[#1A3629]">
-                {CATEGORIES.map((cat) => {
-                  const isSelected = selectedCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => {
-                        retroAudio.playBlip();
-                        setSelectedCategory(cat);
-                      }}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                          : 'text-[#2C4A3B] hover:text-[#1A3629]'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
+        {/* Header Title Section & Action Bar */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 text-center sm:text-left border-b-2 border-[#1A3629]/15 pb-6">
+          <div className="flex-1 min-w-0">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+              >
+                <span>← Back to Home</span>
+              </Link>
+              <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
+                16-Bit Fuel Catalog
+              </span>
             </div>
 
-            {/* Search Bar & Custom Sort Dropdown */}
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1 sm:w-64">
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search recipes..."
-                  className="w-full px-4 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
-                />
-                {!searchQuery && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
-                    /
-                  </span>
-                )}
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono font-bold opacity-70 hover:opacity-100 cursor-pointer"
-                  >
-                    [x]
-                  </button>
-                )}
+            <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
+              Whole-Food Fuel Recipes
+            </h1>
+            <p className="text-base sm:text-lg font-cabinet font-medium mt-2 max-w-2xl leading-relaxed text-[#2C4A3B]">
+              Hearty whole foods illustrated in clean retro pixel art. Simple to make, packed with clean protein, and ready to log in one tap.
+            </p>
+          </div>
+
+          {/* Action Buttons for Custom Recipe & AI Vision Scan */}
+          <div className="flex items-center gap-3 self-center sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsScanModalOpen(true)}
+              className="inline-flex items-center gap-2 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#10B981] border-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <span>Scan Meal with AI</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsManualModalOpen(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <span>+ Custom Recipe</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Unified Discovery & Filtering Console */}
+        <div className="flex flex-col gap-3.5 mb-8 p-4 sm:p-5 rounded-3xl border-3 border-[#1A3629] bg-[#FAF6EE] shadow-[5px_5px_0px_#1A3629]">
+          {/* Deck 1: Search Bar + Sort Dropdown + Dish Counter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search recipes, ingredients, macros..."
+                className="w-full pl-4 pr-12 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
+              />
+              {!searchQuery ? (
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
+                  /
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold opacity-70 hover:opacity-100 cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Counter Pill + Custom Sort Dropdown */}
+            <div className="flex items-center gap-2.5 shrink-0 justify-between sm:justify-end">
+              <div className="px-3.5 py-2 rounded-xl border-2 border-[#1A3629]/25 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629] whitespace-nowrap">
+                {filteredRecipes.length} {filteredRecipes.length === 1 ? 'Dish' : 'Dishes'}
               </div>
 
-              {/* Custom Retro Sort Dropdown */}
               <div className="relative" ref={sortDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="px-4 py-2.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-2 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
+                  className="px-3.5 py-2 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-2 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
                 >
+                  <span className="text-[#4A5D4E] text-[11px]">Sort:</span>
                   <span>{SORT_OPTIONS.find((o) => o.id === sortBy)?.label}</span>
                   <span className="text-[10px] font-mono font-bold">↓</span>
                 </button>
@@ -282,12 +308,41 @@ function RecipesContent() {
             </div>
           </div>
 
-          {/* Secondary Sub-Filter Row: Diet Types */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-80 shrink-0">
-              Diet Filter:
+          {/* Deck 2: Primary Category Taxonomies */}
+          <div className="pt-2.5 border-t border-[#1A3629]/15 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-70 shrink-0">
+              Category:
             </span>
-            <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
+            <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl border-2 bg-[#FFFDF9] border-[#1A3629]/25 shrink-0">
+              {CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setSelectedCategory(cat);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                        : 'text-[#2C4A3B] hover:text-[#1A3629]'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Deck 3: Dietary Sub-Preferences */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-70 shrink-0">
+              Diet:
+            </span>
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/20 shrink-0">
               {DIET_FILTERS.map((d) => {
                 const isSelected = selectedDietFilter === d.id;
                 return (
@@ -298,9 +353,9 @@ function RecipesContent() {
                       retroAudio.playBlip();
                       setSelectedDietFilter(d.id);
                     }}
-                    className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3 py-0.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[1px_1px_0px_#3A6B52]'
                         : 'text-[#2C4A3B] hover:text-[#1A3629]'
                     }`}
                   >
@@ -314,9 +369,11 @@ function RecipesContent() {
 
         {/* Recipe Cards Grid */}
         {filteredRecipes.length === 0 ? (
-          <div className="text-center py-20 border-3 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-8">
-            <h3 className="font-fraunces font-bold text-xl">No matching recipes</h3>
-            <p className="text-sm font-cabinet font-medium mt-1 opacity-80">Try clearing your search query or adjusting your filter.</p>
+          <div className="text-center py-20 border-3 border-[#1A3629] bg-[#FFFDF9] rounded-3xl p-8 shadow-[5px_5px_0px_#1A3629]">
+            <h3 className="font-fraunces font-bold text-2xl text-[#1A3629]">No matching fuel recipes</h3>
+            <p className="text-sm font-cabinet font-medium mt-2 text-[#2C4A3B]">
+              No dishes match your active search and dietary filter combinations.
+            </p>
             <button
               type="button"
               onClick={() => {
@@ -324,7 +381,7 @@ function RecipesContent() {
                 setSelectedCategory('All');
                 setSelectedDietFilter('All');
               }}
-              className="mt-4 px-5 py-2.5 rounded-xl border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] font-cabinet font-bold text-xs cursor-pointer transition-all"
+              className="mt-5 px-6 py-2.5 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] font-cabinet font-bold text-xs cursor-pointer shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 transition-all"
             >
               Reset All Filters
             </button>
@@ -341,20 +398,26 @@ function RecipesContent() {
                   className="group cursor-pointer border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex flex-col justify-between"
                 >
                   {/* Card Body */}
-                  <div>
+                  <div className="flex flex-col flex-1">
                     {/* Header Badges & Focus Score */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-[10px] font-mono font-bold tracking-wider border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] px-2.5 py-0.5 rounded-full uppercase">
-                        {recipe.category}
+                    <div className="flex items-center justify-between mb-3 gap-2 min-h-[28px]">
+                      <span
+                        className={`text-[10px] font-mono font-bold tracking-wider border-2 px-2.5 py-0.5 rounded-full uppercase whitespace-nowrap ${
+                          recipe.isCustom
+                            ? 'border-[#10B981] bg-[#ECFDF5] text-[#065F46]'
+                            : 'border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]'
+                        }`}
+                      >
+                        {recipe.isCustom ? `Custom · ${recipe.category}` : recipe.category}
                       </span>
-                      
-                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629]">
+
+                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629] shrink-0 whitespace-nowrap">
                         <span>Focus {recipe.focusScore}</span>
                       </span>
                     </div>
 
                     {/* Standardized Continuous Plate Presentation */}
-                    <div className="w-full flex items-center justify-center py-2 mb-4">
+                    <div className="w-full flex items-center justify-center py-2 my-auto">
                       <div className="w-48 h-48 sm:w-52 sm:h-52 relative flex items-center justify-center">
                         <img
                           src={recipe.image}
@@ -364,22 +427,33 @@ function RecipesContent() {
                       </div>
                     </div>
 
-                    {/* Title & Subtitle in Cabinet Grotesk */}
-                    <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug mb-1 text-[#1A3629]">
-                      {recipe.name}
-                    </h3>
-                    <p className="text-xs font-cabinet font-medium leading-relaxed line-clamp-2 mb-6 text-[#2C4A3B]">
-                      {recipe.subtitle}
-                    </p>
+                    {/* Title & Subtitle with fixed vertical envelope for aligned baselines */}
+                    <div className="flex flex-col justify-start mb-4 min-h-[4.25rem]">
+                      <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629] line-clamp-1">
+                        {recipe.name}
+                      </h3>
+                      <p className="text-xs font-cabinet font-medium leading-relaxed line-clamp-2 mt-1 text-[#2C4A3B]">
+                        {recipe.subtitle}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Card Footer & Macro Tag */}
-                  <div>
-                    {/* Monospace Macro Summary Tag */}
-                    <div className="flex items-center justify-center mb-3">
-                      <span className="w-full text-center text-xs font-mono font-bold py-2 rounded-xl border-2 tracking-wider tabular-nums bg-[#F4F0EA] border-[#1A3629]/20 text-[#1A3629]">
-                        [{recipe.protein}G PRO · {recipe.calories} KCAL · {recipe.prepTimeMinutes}M]
-                      </span>
+                  {/* Card Footer: Structured Macro Grid Strip + Action Button */}
+                  <div className="mt-auto pt-2">
+                    {/* 3-Column Macro Strip with Crisp Dividers */}
+                    <div className="grid grid-cols-3 divide-x-2 divide-[#1A3629]/15 border-2 border-[#1A3629]/20 bg-[#F4F0EA] rounded-xl py-2 px-1 mb-3 text-center shadow-inner">
+                      <div className="px-1">
+                        <span className="block text-[9px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">PROTEIN</span>
+                        <span className="font-mono text-xs font-bold text-[#1A3629] tabular-nums">{recipe.protein}g</span>
+                      </div>
+                      <div className="px-1">
+                        <span className="block text-[9px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">CALORIES</span>
+                        <span className="font-mono text-xs font-bold text-[#1A3629] tabular-nums">{recipe.calories}</span>
+                      </div>
+                      <div className="px-1">
+                        <span className="block text-[9px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">PREP TIME</span>
+                        <span className="font-mono text-xs font-bold text-[#1A3629] tabular-nums">{recipe.prepTimeMinutes}m</span>
+                      </div>
                     </div>
 
                     {/* Log Button */}
@@ -428,25 +502,52 @@ function RecipesContent() {
           />
 
           <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-4 border-[#1A3629] bg-[#FFFDF9] p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedRecipe(null)}
-              className="absolute right-6 top-6 rounded-full px-3 py-1 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs transition-all cursor-pointer hover:bg-[#1A3629] hover:text-[#FFFDF9]"
-              aria-label="Close details"
-            >
-              [ESC]
-            </button>
+            {/* Modal Header Controls */}
+            <div className="absolute right-6 top-6 flex items-center gap-2 z-20">
+              {selectedRecipe.isCustom && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Delete custom recipe "${selectedRecipe.name}"? This action cannot be undone.`)) {
+                      deleteCustomRecipe(selectedRecipe.id);
+                      setSelectedRecipe(null);
+                      setLoggedToast({
+                        name: `${selectedRecipe.name} (Deleted)`,
+                        protein: 0,
+                        portion: 1.0,
+                      });
+                      setTimeout(() => setLoggedToast(null), 3000);
+                    }
+                  }}
+                  className="rounded-full px-3 py-1 border-2 border-red-500 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white font-mono font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+                  title="Delete this custom recipe"
+                >
+                  <span>Delete Recipe</span>
+                </button>
+              )}
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedRecipe(null)}
+                className="rounded-full px-3 py-1 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs transition-all cursor-pointer hover:bg-[#1A3629] hover:text-[#FFFDF9]"
+                aria-label="Close details"
+              >
+                [ESC]
+              </button>
+            </div>
 
             {/* Pixel Art Image Anchor with Dynamic Portion Calibration */}
             <div className="w-full flex flex-col items-center justify-center pt-2 pb-1">
               <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center transition-all duration-300">
                 <PixelSteam active={true} intensity={1.3} />
                 <img
-                  key={`${selectedRecipe.id}-${portionMultiplier}`}
+                  key={`${selectedRecipe.id}-${portionMultiplier}-${showingRawPhoto}`}
                   src={
-                    selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0] ||
-                    selectedRecipe.image
+                    showingRawPhoto && selectedRecipe.rawImage
+                      ? selectedRecipe.rawImage
+                      : selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0] ||
+                        selectedRecipe.image
                   }
                   alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
                   style={{
@@ -461,17 +562,35 @@ function RecipesContent() {
                         : 'scale(1)'
                       : 'scale(1)',
                   }}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out z-10"
+                  className={`w-full h-full object-contain drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out z-10 ${
+                    showingRawPhoto ? 'rounded-2xl' : '[image-rendering:pixelated]'
+                  }`}
                 />
               </div>
-              <div className="mt-2 text-[10px] font-mono font-bold px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629] tracking-wider uppercase">
-                {portionMultiplier === 0.5
-                  ? '0.5x · Light Snack Serving'
-                  : portionMultiplier === 1.0
-                  ? '1.0x · Standard Calibration'
-                  : portionMultiplier === 1.5
-                  ? '1.5x · Hearty Training Portion'
-                  : '2.0x · Double Protein Feast'}
+
+              <div className="flex items-center gap-2 mt-2">
+                <div className="text-[10px] font-mono font-bold px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629] tracking-wider uppercase">
+                  {portionMultiplier === 0.5
+                    ? '0.5x · Light Snack Serving'
+                    : portionMultiplier === 1.0
+                    ? '1.0x · Standard Calibration'
+                    : portionMultiplier === 1.5
+                    ? '1.5x · Hearty Training Portion'
+                    : '2.0x · Double Protein Feast'}
+                </div>
+
+                {selectedRecipe.rawImage && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowingRawPhoto(!showingRawPhoto);
+                      retroAudio.playBlip();
+                    }}
+                    className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] tracking-wider uppercase cursor-pointer transition-all flex items-center gap-1"
+                  >
+                    <span>{showingRawPhoto ? 'Retro Plate' : 'Original Photo'}</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -555,6 +674,23 @@ function RecipesContent() {
               </div>
             </div>
 
+            {/* AI Computer Vision Reasoning Trace */}
+            {selectedRecipe.reasoningSteps && selectedRecipe.reasoningSteps.length > 0 && (
+              <div className="p-4 rounded-xl border-2 border-[#10B981]/40 bg-[#ECFDF5]/60 flex flex-col gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#065F46] flex items-center gap-1.5">
+                  <span>AI Computer Vision Reasoning Trace</span>
+                </span>
+                <ul className="flex flex-col gap-1.5">
+                  {selectedRecipe.reasoningSteps.map((step, idx) => (
+                    <li key={idx} className="text-xs font-cabinet text-[#1A3629] leading-relaxed flex items-start gap-1.5">
+                      <span className="text-[#10B981] font-mono font-bold">↳</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Ingredients & Method Sections */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
               {/* Ingredients */}
@@ -590,15 +726,37 @@ function RecipesContent() {
               </div>
             </div>
 
-            {/* Prominent Action Button */}
-            <div className="sticky bottom-0 pt-4">
+            {/* Prominent Action Buttons - Flush Docked Sticky Bar */}
+            <div className="sticky -bottom-6 sm:-bottom-8 -mx-6 sm:-mx-8 pt-4 pb-6 sm:pb-8 px-6 sm:px-8 bg-[#FFFDF9]/95 backdrop-blur-md border-t-2 border-[#1A3629]/15 flex items-center gap-3 mt-4 z-20">
+              {selectedRecipe.isCustom && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Delete custom recipe "${selectedRecipe.name}"? This action cannot be undone.`)) {
+                      deleteCustomRecipe(selectedRecipe.id);
+                      setSelectedRecipe(null);
+                      setLoggedToast({
+                        name: `${selectedRecipe.name} (Deleted)`,
+                        protein: 0,
+                        portion: 1.0,
+                      });
+                      setTimeout(() => setLoggedToast(null), 3000);
+                    }
+                  }}
+                  className="py-3.5 px-4 rounded-xl border-2 border-red-500 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white font-cabinet font-bold text-xs transition-all shadow-[2px_2px_0px_rgba(239,68,68,0.4)] hover:-translate-y-0.5 flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                  title="Delete this custom recipe"
+                >
+                  <span>Delete</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => {
                   handleQuickLog(selectedRecipe, portionMultiplier);
                   setSelectedRecipe(null);
                 }}
-                className="w-full py-4 px-6 rounded-xl border-3 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-1 py-3.5 px-6 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm transition-all shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>
                   + Log Meal to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
@@ -610,6 +768,35 @@ function RecipesContent() {
         </div>
       )}
 
+      {/* AI Computer Vision Scanner Modal */}
+      <ScanRecipeModal
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
+        onSaveRecipe={(newRecipe) => {
+          addCustomRecipe(newRecipe);
+          setLoggedToast({
+            name: newRecipe.name,
+            protein: newRecipe.protein,
+            portion: 1.0,
+          });
+          setTimeout(() => setLoggedToast(null), 4000);
+        }}
+      />
+
+      {/* Manual Custom Recipe Creation Modal */}
+      <CustomRecipeModal
+        isOpen={isManualModalOpen}
+        onClose={() => setIsManualModalOpen(false)}
+        onSaveRecipe={(newRecipe) => {
+          addCustomRecipe(newRecipe);
+          setLoggedToast({
+            name: newRecipe.name,
+            protein: newRecipe.protein,
+            portion: 1.0,
+          });
+          setTimeout(() => setLoggedToast(null), 4000);
+        }}
+      />
     </div>
   );
 }

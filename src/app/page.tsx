@@ -103,12 +103,12 @@ export default function Home() {
                   </button>
                 </Link>
 
-                <Link href="/sanctuary" className="w-full sm:w-auto">
+                <Link href="/recipes" className="w-full sm:w-auto">
                   <button
                     type="button"
                     className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1A3629] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
-                    Visit Your Sanctuary
+                    Browse Recipes
                   </button>
                 </Link>
               </div>
@@ -580,12 +580,12 @@ export default function Home() {
                 </button>
               </Link>
 
-              <Link href="/dashboard" className="w-full sm:w-auto">
+              <Link href="/recipes" className="w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
                 >
-                  Explore Live Demo
+                  Browse Recipes
                 </button>
               </Link>
             </div>

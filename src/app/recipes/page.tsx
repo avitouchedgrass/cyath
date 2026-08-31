@@ -247,30 +247,19 @@ function RecipesContent() {
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
         
         {/* Header Title Section & Action Bar */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 text-center sm:text-left border-b-2 border-[#1A3629]/15 pb-6">
-          <div className="flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 mb-3">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-              >
-                <span>← Back to Home</span>
-              </Link>
-              <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-                16-Bit Fuel Catalog
-              </span>
-            </div>
-
-            <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
-              Whole-Food Fuel Recipes
+        {/* Header Title Section & Action Bar */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-[#1A3629]/15 pb-5">
+          <div>
+            <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
+              Whole-Food Recipes
             </h1>
-            <p className="text-base sm:text-lg font-cabinet font-medium mt-2 max-w-2xl leading-relaxed text-[#2C4A3B]">
-              Hearty whole foods illustrated in clean retro pixel art. Simple to make, packed with clean protein, and ready to log in one tap.
+            <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
+              Nutrient-dense whole foods illustrated in 16-bit pixel art. One-tap macro logging.
             </p>
           </div>
 
           {/* Action Buttons for Custom Recipe & AI Vision Scan */}
-          <div className="flex items-center gap-3 self-center sm:self-auto shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -281,7 +270,7 @@ function RecipesContent() {
                 }
                 setIsScanModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#10B981] border-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 text-xs font-cabinet font-bold px-4 py-2 rounded-full border-2 bg-[#10B981] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
               <span>Scan Meal with AI</span>
             </button>
@@ -296,17 +285,17 @@ function RecipesContent() {
                 }
                 setIsManualModalOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-2.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-2 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
               <span>+ Custom Recipe</span>
             </button>
           </div>
         </div>
 
-        {/* Unified Discovery & Filtering Console */}
-        <div className="flex flex-col gap-3.5 mb-8 p-4 sm:p-5 rounded-3xl border-3 border-[#1A3629] bg-[#FAF6EE] shadow-[5px_5px_0px_#1A3629]">
-          {/* Deck 1: Search Bar + Sort Dropdown + Dish Counter */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Distilled Discovery & Filtering Console */}
+        <div className="flex flex-col gap-3 mb-8 p-3.5 sm:p-4 rounded-2xl border-2 border-[#1A3629] bg-[#FAF6EE] shadow-[3px_3px_0px_#1A3629]">
+          {/* Row 1: Search Bar + Dish Counter + Sort Dropdown */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
             {/* Search Input */}
             <div className="relative flex-1">
               <input
@@ -315,17 +304,17 @@ function RecipesContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search recipes, ingredients, macros..."
-                className="w-full pl-4 pr-12 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
+                className="w-full pl-3.5 pr-10 py-2 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
               />
               {!searchQuery ? (
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
                   /
                 </span>
               ) : (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold opacity-70 hover:opacity-100 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono font-bold opacity-70 hover:opacity-100 cursor-pointer"
                 >
                   ✕
                 </button>
@@ -333,8 +322,8 @@ function RecipesContent() {
             </div>
 
             {/* Counter Pill + Custom Sort Dropdown */}
-            <div className="flex items-center gap-2.5 shrink-0 justify-between sm:justify-end">
-              <div className="px-3.5 py-2 rounded-xl border-2 border-[#1A3629]/25 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629] whitespace-nowrap">
+            <div className="flex items-center gap-2 shrink-0 justify-between sm:justify-end">
+              <div className="px-3 py-1.5 rounded-xl border-2 border-[#1A3629]/25 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629] whitespace-nowrap">
                 {filteredRecipes.length} {filteredRecipes.length === 1 ? 'Dish' : 'Dishes'}
               </div>
 
@@ -345,7 +334,7 @@ function RecipesContent() {
                   aria-expanded={isSortOpen}
                   aria-label={`Sort recipes by ${SORT_OPTIONS.find((o) => o.id === sortBy)?.label}`}
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="px-3.5 py-2 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-2 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
+                  className="px-3 py-1.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-1.5 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
                 >
                   <span className="text-[#4A5D4E] text-[11px]">Sort:</span>
                   <span>{SORT_OPTIONS.find((o) => o.id === sortBy)?.label}</span>
@@ -383,62 +372,51 @@ function RecipesContent() {
             </div>
           </div>
 
-          {/* Deck 2: Primary Category Taxonomies */}
-          <div className="pt-2.5 border-t border-[#1A3629]/15 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-70 shrink-0">
-              Category:
-            </span>
-            <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl border-2 bg-[#FFFDF9] border-[#1A3629]/25 shrink-0">
-              {visibleCategories.map((cat) => {
-                const isSelected = selectedCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => {
-                      retroAudio.playBlip();
-                      setSelectedCategory(cat);
-                    }}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                        : 'text-[#2C4A3B] hover:text-[#1A3629]'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* Row 2: Unified Filter Chips */}
+          <div className="pt-2 border-t border-[#1A3629]/15 flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            {visibleCategories.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setSelectedCategory(cat);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                    isSelected
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[1px_1px_0px_#3A6B52]'
+                      : 'bg-[#FFFDF9] text-[#2C4A3B] border-[#1A3629]/20 hover:border-[#1A3629]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
 
-          {/* Deck 3: Dietary Sub-Preferences */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] opacity-70 shrink-0">
-              Diet:
-            </span>
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/20 shrink-0">
-              {DIET_FILTERS.map((d) => {
-                const isSelected = selectedDietFilter === d.id;
-                return (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => {
-                      retroAudio.playBlip();
-                      setSelectedDietFilter(d.id);
-                    }}
-                    className={`px-3 py-0.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[1px_1px_0px_#3A6B52]'
-                        : 'text-[#2C4A3B] hover:text-[#1A3629]'
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                );
-              })}
-            </div>
+            <span className="text-[#1A3629]/30 font-mono text-xs px-1 select-none">|</span>
+
+            {DIET_FILTERS.filter(d => d.id !== 'All').map((d) => {
+              const isSelected = selectedDietFilter === d.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setSelectedDietFilter(isSelected ? 'All' : d.id);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                    isSelected
+                      ? 'bg-[#10B981] text-[#FFFDF9] border-[#1A3629] shadow-[1px_1px_0px_#1A3629]'
+                      : 'bg-[#FFFDF9] text-[#4A5D4E] border-[#1A3629]/20 hover:border-[#1A3629]'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

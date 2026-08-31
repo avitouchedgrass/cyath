@@ -212,7 +212,7 @@ export function StoveSageChatbot() {
         userName: userProfile?.fullName || 'Pilgrim',
         primaryGoal: userProfile?.primaryGoal || 'Daily Well-Being',
         todayProteinLogged: todayLog.totalProteinLogged || 0,
-        dailyProteinTarget: 120,
+        dailyProteinTarget: userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140,
         habitsSummary,
         activeProtocols: activeProtocolIds,
         totalXp,

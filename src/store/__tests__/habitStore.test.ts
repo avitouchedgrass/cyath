@@ -195,4 +195,32 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(completedCount).toBe(totalCount);
     expect(completedCount).toBeLessThanOrEqual(totalCount);
   });
+
+  it('does not leak previous account or demo session progress into a new user account', async () => {
+    // 1. User 1 logs in and earns XP & habits
+    const user1 = 'user_veteran_1';
+    useHabitStore.getState().setUserSession({ id: user1, email: 'veteran@example.com' });
+    useHabitStore.getState().gainXp(1400, 'Test Veteran XP');
+    useHabitStore.getState().addCustomHabit('Advanced Kettlebell Swing', 'movement');
+    expect(useHabitStore.getState().totalXp).toBe(1400);
+
+    // 2. User 1 logs out
+    useHabitStore.getState().setUserSession(null);
+    expect(useHabitStore.getState().totalXp).toBe(0);
+
+    // 3. User 2 (brand new Google sign in) logs in
+    const user2 = 'user_newcomer_2';
+    useHabitStore.getState().setUserSession({ id: user2, email: 'newcomer@gmail.com' });
+    await useHabitStore.getState().reconcileUserSession({ id: user2, email: 'newcomer@gmail.com' });
+
+    // User 2 MUST have 0 XP and clean state!
+    expect(useHabitStore.getState().totalXp).toBe(0);
+    expect(useHabitStore.getState().streakCount).toBe(0);
+    expect(useHabitStore.getState().habits.some((h) => h.title === 'Advanced Kettlebell Swing')).toBe(false);
+
+    // 4. Switching back to User 1 restores User 1's progress
+    useHabitStore.getState().setUserSession({ id: user1, email: 'veteran@example.com' });
+    expect(useHabitStore.getState().totalXp).toBe(1400);
+    expect(useHabitStore.getState().habits.some((h) => h.title === 'Advanced Kettlebell Swing')).toBe(true);
+  });
 });

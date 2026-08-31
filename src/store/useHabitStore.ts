@@ -228,8 +228,22 @@ export const useHabitStore = create<HabitStoreState>()(
               xpHistory: cached.xpHistory ?? [],
               customRecipes: cached.customRecipes ?? [],
               habits: cached.habits && cached.habits.length > 0 ? cached.habits : DEFAULT_HABITS,
-              ...(cached.logsByDate ? { logsByDate: cached.logsByDate } : {}),
-              ...(cached.userProfile ? { userProfile: cached.userProfile } : {}),
+              logsByDate: cached.logsByDate ?? { [getTodayString()]: createEmptyDailyLog() },
+              userProfile: cached.userProfile ?? null,
+            });
+          } else {
+            // Completely fresh session for this user ID on this browser
+            set({
+              totalXp: 0,
+              streakCount: 0,
+              streakFreezeStock: 1,
+              claimedMilestones: [],
+              completedQuestIdsByDate: {},
+              xpHistory: [],
+              customRecipes: [],
+              habits: DEFAULT_HABITS,
+              logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+              userProfile: null,
             });
           }
           get().reconcileUserSession(session);
@@ -253,12 +267,12 @@ export const useHabitStore = create<HabitStoreState>()(
         if (!session || session.id.startsWith('guest_')) return;
         try {
           const cached = getUserLocalProgress(session.id);
-          const currentLocalXp = cached?.totalXp ?? get().totalXp;
-          const currentLocalStreak = cached?.streakCount ?? get().streakCount;
-          const currentLocalFreeze = cached?.streakFreezeStock ?? get().streakFreezeStock;
-          const currentLocalProfile = cached?.userProfile ?? get().userProfile;
-          const currentLocalRecipes = cached?.customRecipes ?? get().customRecipes;
-          const currentLocalHabits = cached?.habits && cached.habits.length > 0 ? cached.habits : get().habits;
+          const currentLocalXp = cached ? (cached.totalXp ?? 0) : 0;
+          const currentLocalStreak = cached ? (cached.streakCount ?? 0) : 0;
+          const currentLocalFreeze = cached ? (cached.streakFreezeStock ?? 1) : 1;
+          const currentLocalProfile = cached ? (cached.userProfile ?? null) : null;
+          const currentLocalRecipes = cached ? (cached.customRecipes ?? []) : [];
+          const currentLocalHabits = cached?.habits && cached.habits.length > 0 ? cached.habits : DEFAULT_HABITS;
 
           // 1. Fetch remote user profile
           const { data: profile, error: profileErr } = await supabase
@@ -415,8 +429,8 @@ export const useHabitStore = create<HabitStoreState>()(
                   }, { onConflict: 'user_id' });
               } catch {}
             }
-          } else if (!profileErr && (currentLocalXp > 0 || currentLocalProfile?.onboardingCompleted)) {
-            // Profile row missing in Supabase, but user has accumulated progress: create it now
+          } else if (cached && (currentLocalXp > 0 || currentLocalProfile?.onboardingCompleted)) {
+            // User had cached local progress on this machine: upload/persist it
             try {
               await supabase
                 .from('user_profiles')
@@ -439,44 +453,35 @@ export const useHabitStore = create<HabitStoreState>()(
             } catch {}
 
             set({
+              totalXp: currentLocalXp,
+              streakCount: currentLocalStreak,
+              streakFreezeStock: currentLocalFreeze,
               customRecipes: finalRecipes,
               userProfile: currentLocalProfile,
               habits: currentLocalHabits,
             });
             saveUserLocalProgress(session.id, {
+              totalXp: currentLocalXp,
+              streakCount: currentLocalStreak,
+              streakFreezeStock: currentLocalFreeze,
               customRecipes: finalRecipes,
               userProfile: currentLocalProfile,
               habits: currentLocalHabits,
             });
           } else {
-            // If table query returned error (e.g. table not created yet) OR user already has local progress, DO NOT WIPE!
-            if (currentLocalProfile || currentLocalXp > 0 || currentLocalRecipes.length > 0 || currentLocalHabits.length > 0) {
-              set({
-                totalXp: currentLocalXp,
-                streakCount: currentLocalStreak,
-                streakFreezeStock: currentLocalFreeze,
-                customRecipes: finalRecipes,
-                userProfile: currentLocalProfile,
-                habits: currentLocalHabits,
-              });
-              saveUserLocalProgress(session.id, {
-                customRecipes: finalRecipes,
-                userProfile: currentLocalProfile,
-                habits: currentLocalHabits,
-              });
-            } else if (!profileErr) {
-              // Only truly fresh account with zero error
-              set({
-                totalXp: 0,
-                streakCount: 0,
-                streakFreezeStock: 1,
-                claimedMilestones: [],
-                completedQuestIdsByDate: {},
-                xpHistory: [],
-                customRecipes: [],
-                habits: DEFAULT_HABITS,
-              });
-            }
+            // Brand new account with zero cached progress
+            set({
+              totalXp: 0,
+              streakCount: 0,
+              streakFreezeStock: 1,
+              claimedMilestones: [],
+              completedQuestIdsByDate: {},
+              xpHistory: [],
+              customRecipes: [],
+              habits: DEFAULT_HABITS,
+              logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+              userProfile: null,
+            });
           }
         } catch (err) {
           console.warn('Reconcile session error:', err);

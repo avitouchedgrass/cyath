@@ -182,15 +182,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     e.preventDefault();
     e.stopPropagation();
     retroAudio.playInspectConfirm();
-
-    // Cinematic View Transitions API with FLIP spring fallback
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      (document as any).startViewTransition(() => {
-        router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
-      });
-    } else {
-      router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
-    }
+    router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
   };
 
   const handleToggleSound = (e: React.MouseEvent) => {

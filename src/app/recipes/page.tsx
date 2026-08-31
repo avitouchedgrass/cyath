@@ -92,13 +92,7 @@ function RecipesContent() {
 
   const closeRecipeModal = () => {
     retroAudio.playBlip();
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
-        setSelectedRecipe(null);
-      });
-    } else {
-      setSelectedRecipe(null);
-    }
+    setSelectedRecipe(null);
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.has('inspect') || params.has('recipe')) {
@@ -190,17 +184,9 @@ function RecipesContent() {
 
   const openRecipeModal = (recipe: Recipe) => {
     retroAudio.playBlip();
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
-        setSelectedRecipe(recipe);
-        setPortionMultiplier(1.0);
-        setShowingRawPhoto(false);
-      });
-    } else {
-      setSelectedRecipe(recipe);
-      setPortionMultiplier(1.0);
-      setShowingRawPhoto(false);
-    }
+    setSelectedRecipe(recipe);
+    setPortionMultiplier(1.0);
+    setShowingRawPhoto(false);
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       params.set('inspect', recipe.id);
@@ -484,9 +470,6 @@ function RecipesContent() {
                           alt={recipe.name}
                           loading="lazy"
                           decoding="async"
-                          style={{
-                            viewTransitionName: selectedRecipe?.id === recipe.id ? 'active-dish-plate' : 'none',
-                          }}
                           className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.14)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -616,7 +599,6 @@ function RecipesContent() {
                   }
                   alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
                   style={{
-                    viewTransitionName: 'active-dish-plate',
                     transform: !selectedRecipe.portionImages?.[portionMultiplier as 0.5 | 1.0 | 1.5 | 2.0]
                       ? portionMultiplier === 0.5
                         ? 'scale(0.86)'

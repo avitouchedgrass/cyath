@@ -8,7 +8,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
-import { Cloud, LogOut, RefreshCw, Sparkles, UserCheck } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -26,11 +26,14 @@ export default function ProfilePage() {
     userProfile,
     logsByDate,
     activeProtocolIds,
+    deleteAccountData,
   } = useHabitStore();
 
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -65,6 +68,19 @@ export default function ProfilePage() {
       setTimeout(() => setSyncStatus(null), 3500);
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    retroAudio.playBlip();
+    setIsDeleting(true);
+    try {
+      await deleteAccountData();
+      router.push('/');
+    } catch (err) {
+      console.error('Delete account error:', err);
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -200,7 +216,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Account Details & Blueprints Configuration */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
             <div>
@@ -280,7 +296,95 @@ export default function ProfilePage() {
 
         </div>
 
+        {/* Danger Zone: Account & Data Deletion */}
+        <div className="border-3 border-[#DC2626] bg-[#FEF2F2] shadow-[4px_4px_0px_#DC2626] rounded-2xl p-6 sm:p-7">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#FFFDF9] border-2 border-[#DC2626] flex items-center justify-center shrink-0 shadow-xs">
+                <ShieldAlert className="w-5 h-5 text-[#DC2626]" />
+              </div>
+              <div>
+                <h3 className="font-fraunces font-bold text-lg text-[#991B1B]">
+                  Account &amp; Telemetry Management
+                </h3>
+                <p className="text-xs font-cabinet font-medium text-[#7F1D1D] mt-0.5 max-w-xl leading-relaxed">
+                  Permanently delete your profile, custom recipes, XP progression history, and all daily habit logs from both local storage and cloud databases.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                setShowDeleteModal(true);
+              }}
+              className="px-4 py-2.5 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 shrink-0 self-stretch sm:self-auto justify-center"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Account Data</span>
+            </button>
+          </div>
+        </div>
+
       </main>
+
+      {/* Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="max-w-md w-full border-3 border-[#DC2626] bg-[#FFFDF9] shadow-[8px_8px_0px_#DC2626] rounded-3xl p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200">
+            
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/20 hover:bg-[#F4F0EA] cursor-pointer"
+            >
+              <X className="w-4 h-4 text-[#1A3629]" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-[#FEF2F2] border-2 border-[#DC2626] flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6 text-[#DC2626]" />
+            </div>
+
+            <h3 className="font-fraunces font-black text-2xl text-[#1A3629] mb-2">
+              Permanently Delete Account?
+            </h3>
+
+            <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] leading-relaxed mb-6">
+              This action is <strong>irreversible</strong>. All your daily habits, Pearson correlation data, custom recipes, XP progression, and cloud backups will be permanently purged.
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <span>Deleting...</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Everything</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

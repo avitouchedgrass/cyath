@@ -8,6 +8,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
+import { Cloud, LogOut, RefreshCw, Sparkles, UserCheck } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -70,82 +71,87 @@ export default function ProfilePage() {
   if (!mounted) return null;
 
   const isGuest = !userSession || userSession.id.startsWith('guest_');
-  const userEmail = userSession?.email || (isGuest ? 'demo.user@cyath.app' : 'user@cyath.app');
+  const userEmail = userSession?.email || (isGuest ? 'guest.explorer@cyath.app' : 'user@cyath.app');
   const displayName = userProfile?.fullName || (isGuest ? 'Demo Explorer' : userEmail.split('@')[0]);
   const goalTitle = userProfile?.primaryGoal && GOAL_TITLES[userProfile.primaryGoal]
     ? GOAL_TITLES[userProfile.primaryGoal]
     : 'Daily Well-Being';
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       <HeaderNav />
 
       {/* Main Container */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-10 pt-28 pb-24">
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-10 pt-28 pb-24">
         
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-[#1A3629]/15">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-          >
-            <span>← Return to Daily Planner</span>
-          </Link>
+        {/* Header Section */}
+        <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
+              Explorer Dossier
+            </h1>
+            <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
+              Your personal wellness telemetry sheet, calibrated baseline targets, and cloud synchronization.
+            </p>
+          </div>
 
           <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer self-start sm:self-auto"
           >
-            <span>Back to Home →</span>
+            <span>Open Daily Planner →</span>
           </Link>
         </div>
 
         {/* User Identity Banner */}
-        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center font-cabinet font-black text-xl text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
+        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 sm:border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center font-cabinet font-black text-xl text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
               {displayName.slice(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
+                <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                   {displayName}
-                </h1>
+                </h2>
                 {isGuest && (
-                  <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629] bg-[#F4F0EA] text-[10px] font-mono font-bold">
+                  <span className="px-2 py-0.5 rounded-md border border-[#1A3629] bg-[#F4F0EA] text-[10px] font-mono font-bold">
                     GUEST
                   </span>
                 )}
               </div>
-              <p className="font-mono text-xs text-[#2C4A3B]">
-                {userEmail} · Goal: {goalTitle}
+              <p className="font-mono text-xs text-[#4A5D4E]">
+                {userEmail} · Goal: <strong className="text-[#1A3629] font-bold">{goalTitle}</strong>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleForceSync}
               disabled={isSyncing}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all cursor-pointer disabled:opacity-60"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? 'Syncing...' : 'Sync Cloud'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleSignOut}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
+              <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
             </button>
           </div>
         </div>
 
         {syncStatus && (
-          <div className="mb-6 p-4 rounded-xl border-2 border-[#1A3629] bg-[#E8DECF] text-xs font-mono font-bold text-[#1A3629]">
-            ✓ {syncStatus}
+          <div className="mb-6 p-3.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-xs font-mono font-bold text-[#065F46] flex items-center gap-2 shadow-xs">
+            <Sparkles className="w-4 h-4 text-[#10B981]" />
+            <span>{syncStatus}</span>
           </div>
         )}
 
@@ -155,22 +161,22 @@ export default function ProfilePage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 opacity-75">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
               Days Calibrated
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
               {totalDaysLogged}
             </div>
             <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Logged journal entries
+              Active journal entries
             </span>
           </div>
 
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 opacity-75">
-              Habits Checked
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
+              Habits Executed
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
               {totalHabitsCompleted}
@@ -180,8 +186,8 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 opacity-75">
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
               Total Protein Fuel
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
@@ -199,35 +205,35 @@ export default function ProfilePage() {
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
             <div>
               <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
-                Calibrated Blueprint
+                Calibrated Blueprint Targets
               </h2>
               <div className="space-y-3 font-mono text-xs">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span>Target Daily Protein:</span>
-                  <span className="font-bold">
+                  <span className="text-[#4A5D4E]">Target Daily Protein:</span>
+                  <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
                   </span>
                 </div>
                 <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span>Target Hydration:</span>
-                  <span className="font-bold">
+                  <span className="text-[#4A5D4E]">Target Hydration:</span>
+                  <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? (userProfile.weightKg * 0.04).toFixed(1) : '2.5'}L / day
                   </span>
                 </div>
                 <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span>Target Sleep:</span>
-                  <span className="font-bold">8.0 hours</span>
+                  <span className="text-[#4A5D4E]">Target Sleep:</span>
+                  <span className="font-bold text-[#1A3629]">8.0 hours</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Active Blueprints:</span>
-                  <span className="font-bold">{activeProtocolIds?.length || 1} Imported</span>
+                  <span className="text-[#4A5D4E]">Equipped Cartridges:</span>
+                  <span className="font-bold text-[#10B981]">{activeProtocolIds?.length || 1} Active</span>
                 </div>
               </div>
             </div>
 
             <Link
               href="/onboarding"
-              className="mt-6 w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-cabinet font-bold text-xs text-center shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 transition-all block"
+              className="mt-6 w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-cabinet font-bold text-xs text-center shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block"
             >
               Re-Calibrate Daily Targets →
             </Link>
@@ -236,32 +242,39 @@ export default function ProfilePage() {
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
             <div>
               <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
-                Quick Links
+                Core Pillars Navigation
               </h2>
               <ul className="space-y-2.5 font-cabinet font-bold text-xs">
                 <li>
-                  <Link href="/protocols" className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Explore Daily Blueprints</span>
-                    <span>→</span>
+                  <Link href="/protocols" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Protocol Cartridges</span>
+                    <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/recipes" className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>16-Bit Food Recipes</span>
-                    <span>→</span>
+                  <Link href="/recipes" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Whole-Food Fuel Recipes</span>
+                    <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/correlations" className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Pattern Discovery Engine</span>
-                    <span>→</span>
+                  <Link href="/correlations" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Correlation Engine</span>
+                    <span className="font-mono text-xs">→</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/sanctuary" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Sanctuary Floating Island</span>
+                    <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
               </ul>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#1A3629]/15 text-[11px] font-mono text-[#2C4A3B]">
-              Cyath Retro System v1.0 · Storage Mode: Local + Cloud
+            <div className="mt-4 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
+              <span>Cyath Engine v2.0</span>
+              <span>Local-First · Encrypted</span>
             </div>
           </div>
 

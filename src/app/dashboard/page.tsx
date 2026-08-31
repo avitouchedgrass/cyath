@@ -476,6 +476,19 @@ export default function DashboardPage() {
               </form>
             )}
 
+            {/* 100% Habit Completion Celebration Banner */}
+            {completedCount === habits.length && habits.length > 0 && (
+              <div className="p-3 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] flex items-center justify-between shadow-xs animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-black text-[#10B981]">★</span>
+                  <span className="text-xs font-cabinet font-bold">All habits checked! Daily routine calibrated.</span>
+                </div>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#10B981] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#10B981]/30 shrink-0">
+                  100% Mastery
+                </span>
+              </div>
+            )}
+
             {/* Habits Checklist */}
             <div className="flex flex-col gap-1">
               {habits.map((habit) => {
@@ -484,23 +497,23 @@ export default function DashboardPage() {
                   <div
                     key={habit.id}
                     onClick={() => handleToggleHabit(habit.id)}
-                    className={`group flex items-center justify-between py-2 px-2.5 rounded-xl transition-colors ${
+                    className={`group flex items-center justify-between py-2 px-2.5 rounded-xl transition-all ${
                       !isViewingToday
                         ? 'opacity-70 cursor-not-allowed'
                         : 'hover:bg-[#FAF6EE] cursor-pointer'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center font-mono text-xs font-black transition-all ${
                         isDone
-                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] scale-105 shadow-xs'
                           : !isViewingToday
                           ? 'border-[#1A3629]/20 bg-gray-100'
-                          : 'border-[#1A3629]/40 bg-white group-hover:border-[#1A3629]'
+                          : 'border-[#1A3629]/40 bg-[#FFFDF9] group-hover:border-[#1A3629] group-hover:scale-105'
                       }`}>
-                        {isDone && '✓'}
+                        {isDone ? '✓' : ''}
                       </div>
-                      <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] ${
+                      <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] transition-opacity ${
                         isDone ? 'line-through opacity-50' : ''
                       }`}>
                         {habit.title}
@@ -548,16 +561,25 @@ export default function DashboardPage() {
                 {routineWindow.description}
               </p>
 
-              <textarea
-                value={todayLog.notes || ''}
-                onChange={(e) => handleSetNotes(e.target.value)}
-                disabled={!isViewingToday}
-                placeholder={isViewingToday ? "Quick observations, energy reflections, or workout notes..." : "Read-only notes for past day."}
-                rows={2}
-                className={`w-full p-2.5 rounded-xl border border-[#1A3629]/20 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629] ${
-                  !isViewingToday ? 'bg-gray-100/70 cursor-not-allowed opacity-80' : 'bg-[#FAF6EE]/50'
-                }`}
-              />
+              <div className="relative">
+                <textarea
+                  value={todayLog.notes || ''}
+                  onChange={(e) => handleSetNotes(e.target.value)}
+                  disabled={!isViewingToday}
+                  placeholder={isViewingToday ? "Quick observations, energy reflections, or workout notes..." : "Read-only notes for past day."}
+                  rows={2}
+                  className={`w-full p-2.5 rounded-xl border text-xs font-cabinet font-medium focus:outline-none focus:ring-2 focus:ring-[#1A3629]/10 resize-none text-[#1A3629] transition-all ${
+                    !isViewingToday 
+                      ? 'bg-gray-100/70 border-[#1A3629]/15 cursor-not-allowed opacity-80' 
+                      : 'bg-[#FFFDF9] border-[#1A3629]/25 placeholder-[#4A5D4E]/60 focus:border-[#1A3629]'
+                  }`}
+                />
+                {isViewingToday && todayLog.notes && (
+                  <span className="absolute right-2.5 bottom-2 text-[9px] font-mono font-bold text-[#4A5D4E] select-none pointer-events-none">
+                    ● Saved
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Logged Whole-Food Meals */}

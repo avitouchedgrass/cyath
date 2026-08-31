@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore, HabitItem } from '@/store/useHabitStore';
@@ -13,9 +12,9 @@ import {
   Zap,
   Check,
   Plus,
-  ArrowLeft,
   ChevronRight,
   X,
+  Sparkles,
 } from 'lucide-react';
 
 interface ProtocolBlueprint {
@@ -25,6 +24,12 @@ interface ProtocolBlueprint {
   category: 'Morning' | 'Focus' | 'Sleep' | 'Movement';
   icon: 'sun' | 'brain' | 'moon' | 'zap';
   timeframe: string;
+  themeColor: {
+    badgeBg: string;
+    badgeText: string;
+    border: string;
+    accent: string;
+  };
   habits: { title: string; hint: string }[];
   standardHabits: HabitItem[];
   whyItWorks: string;
@@ -35,14 +40,20 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'morning-activation',
     name: 'Morning Sunlight & Energy',
-    shortSummary: 'Clears morning grogginess and naturally resets your internal clock in 15 minutes.',
+    shortSummary: 'Clears morning grogginess and naturally resets your internal circadian timer in 15 minutes.',
     category: 'Morning',
     icon: 'sun',
-    timeframe: 'First 30m of your day',
+    timeframe: 'First 30m of day',
+    themeColor: {
+      badgeBg: 'bg-[#FEF3C7]',
+      badgeText: 'text-[#92400E]',
+      border: 'border-[#D97706]/40',
+      accent: '#D97706',
+    },
     habits: [
-      { title: '15m outdoor morning sunlight', hint: 'Natural light exposure' },
-      { title: '500ml water + pinch of sea salt', hint: 'Morning rehydration' },
-      { title: 'Cold splash or quick rinse', hint: 'Natural wakeup reflex' },
+      { title: '15m outdoor morning sunlight', hint: 'Circadian anchor' },
+      { title: '500ml water + pinch of sea salt', hint: 'Electrolyte rehydration' },
+      { title: 'Cold splash or quick rinse', hint: 'Natural alertness reflex' },
     ],
     standardHabits: [
       { id: 'sunlight', title: 'Morning Sunlight Exposure (15m)', category: 'morning', targetDaysPerWeek: 7 },
@@ -59,14 +70,20 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'cognitive-flow',
     name: 'Deep Focus Sprint',
-    shortSummary: 'Protects your attention for high-priority creative and deep focus work.',
+    shortSummary: 'Protects your cognitive bandwidth for high-leverage creative and analytical work.',
     category: 'Focus',
     icon: 'brain',
-    timeframe: 'Morning to Early Afternoon',
+    timeframe: 'Morning to Midday',
+    themeColor: {
+      badgeBg: 'bg-[#EFF6FF]',
+      badgeText: 'text-[#1E40AF]',
+      border: 'border-[#2563EB]/40',
+      accent: '#2563EB',
+    },
     habits: [
-      { title: 'Zero phone input first 30 mins', hint: 'Start in flow' },
-      { title: 'High-protein breakfast (35g+)', hint: 'Steady blood sugar' },
-      { title: '90-min single-task work block', hint: 'Zero distractions' },
+      { title: 'Zero phone input first 30 mins', hint: 'Protect cognitive focus' },
+      { title: 'High-protein breakfast (35g+)', hint: 'Stabilize blood glucose' },
+      { title: '90-min single-task work block', hint: 'Ultradian deep sprint' },
     ],
     standardHabits: [
       { id: 'zero_phone', title: 'Zero Phone First 30 Mins', category: 'mindset', targetDaysPerWeek: 7 },
@@ -83,14 +100,20 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'deep-rem-sleep',
     name: 'Restful Sleep Wind-Down',
-    shortSummary: 'Calms your nervous system for deeper, uninterrupted, and refreshing sleep.',
+    shortSummary: 'Calms your sympathetic nervous system for deeper, uninterrupted restorative sleep.',
     category: 'Sleep',
     icon: 'moon',
-    timeframe: '60 mins before bed',
+    timeframe: '60 mins prior to bed',
+    themeColor: {
+      badgeBg: 'bg-[#EEF2FF]',
+      badgeText: 'text-[#3730A3]',
+      border: 'border-[#4F46E5]/40',
+      accent: '#4F46E5',
+    },
     habits: [
       { title: 'Screens off 60 mins before bed', hint: 'Digital sunset' },
       { title: 'Cool bedroom temperature (~67°F)', hint: 'Deep sleep trigger' },
-      { title: 'Magnesium or herbal chamomile tea', hint: 'Calming wind-down' },
+      { title: 'Magnesium or herbal chamomile tea', hint: 'GABA activation' },
     ],
     standardHabits: [
       { id: 'digital_sunset', title: 'Digital Sunset (Screens Off 60m Prior)', category: 'recovery', targetDaysPerWeek: 7 },
@@ -107,14 +130,20 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'cellular-mobility',
     name: 'Daily Movement & Posture',
-    shortSummary: 'Keeps your joints supple and undoes the stiffness of long sitting sessions.',
+    shortSummary: 'Keeps spinal joints supple and reverses the compression of long seated sessions.',
     category: 'Movement',
     icon: 'zap',
     timeframe: 'Throughout the day',
+    themeColor: {
+      badgeBg: 'bg-[#ECFDF5]',
+      badgeText: 'text-[#065F46]',
+      border: 'border-[#10B981]/40',
+      accent: '#059669',
+    },
     habits: [
-      { title: '10-min post-meal walk', hint: 'Smooth digestion' },
-      { title: '30-sec spine decompression hang', hint: 'Posture relief' },
-      { title: '5-min deep hip opener stretch', hint: 'Release tension' },
+      { title: '10-min post-meal walk', hint: 'Glucose clearance' },
+      { title: '30-sec spine decompression hang', hint: 'Spinal disc relief' },
+      { title: '5-min deep hip opener stretch', hint: 'Pelvic mobility' },
     ],
     standardHabits: [
       { id: 'post_meal_walk', title: '10-Min Post-Meal Walk', category: 'nutrition', targetDaysPerWeek: 7 },
@@ -166,48 +195,41 @@ export default function ProtocolsPage() {
     setToastMessage(
       isAlreadyActive
         ? `Removed ${protocol.name} from your planner.`
-        : `Added ${protocol.name} habits to your Daily Planner!`
+        : `Equipped ${protocol.name} to your Daily Planner!`
     );
 
     setTimeout(() => setToastMessage(null), 3500);
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       {/* Navigation Header */}
       <HeaderNav />
 
       {/* Main Container */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-28 pb-20">
         
-        {/* Header Title */}
-        <div className="mb-10 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-            >
-              <span>← Back to Home</span>
-            </Link>
-            <span className="px-3 py-1 rounded-full border-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-              Daily Blueprints
-            </span>
+        {/* Header Title Section */}
+        <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
+              Protocol Cartridges
+            </h1>
+            <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
+              Engineered daily habit blueprints calibrated for circadian alignment, deep focus, and restorative sleep.
+            </p>
           </div>
 
-          <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629]">
-            Daily Routine Blueprints
-          </h1>
-          <p className="text-base sm:text-lg font-cabinet font-medium mt-3 max-w-2xl leading-relaxed text-[#2C4A3B]">
-            Proven daily habits you can import directly into your planner. No overwhelming multi-hour routines—just simple, high-impact check-ins.
-          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-3 py-1 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629]">
+              {activeProtocolIds.length} of {CURATED_PROTOCOLS.length} Equipped
+            </span>
+          </div>
         </div>
 
         {/* Category Filters */}
         <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider opacity-80 shrink-0">
-            Filter:
-          </span>
-          <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/30">
+          <div className="inline-flex items-center gap-1.5 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/25 shadow-[2px_2px_0px_#1A3629]">
             {(['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const).map((filter) => {
               const isSelected = selectedFilter === filter;
               return (
@@ -220,7 +242,7 @@ export default function ProtocolsPage() {
                   }}
                   className={`px-3.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[1px_1px_0px_#3A6B52]'
                       : 'text-[#2C4A3B] hover:text-[#1A3629]'
                   }`}
                 >
@@ -248,51 +270,55 @@ export default function ProtocolsPage() {
             return (
               <div
                 key={protocol.id}
-                className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5"
               >
                 <div>
-                  {/* Top Row: Icon & Status Badge */}
+                  {/* Top Row: Icon Badge & Category Tag */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] flex items-center justify-center">
-                      {getIcon()}
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] flex items-center justify-center shadow-xs">
+                        {getIcon()}
+                      </div>
+                      <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider ${protocol.themeColor.badgeBg} ${protocol.themeColor.badgeText} ${protocol.themeColor.border}`}>
+                        {protocol.category} Blueprint
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-[10px] font-mono font-bold uppercase tracking-wider">
-                        {protocol.category}
+                    {isActivated ? (
+                      <span className="px-2.5 py-1 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] text-[10px] font-mono font-bold uppercase flex items-center gap-1 shadow-xs">
+                        <Check className="w-3 h-3" />
+                        <span>Equipped</span>
                       </span>
-                      {isActivated && (
-                        <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] text-[10px] font-mono font-bold uppercase flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          <span>Active</span>
-                        </span>
-                      )}
-                    </div>
+                    ) : (
+                      <span className="text-[10px] font-mono font-bold text-[#4A5D4E]">
+                        {protocol.timeframe}
+                      </span>
+                    )}
                   </div>
 
                   {/* Title & Short Summary */}
-                  <h3 className="font-fraunces font-black text-2xl tracking-tight leading-snug mb-2 text-[#1A3629]">
+                  <h3 className="font-fraunces font-black text-2xl tracking-tight leading-snug mb-1.5 text-[#1A3629]">
                     {protocol.name}
                   </h3>
-                  <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed mb-6 text-[#2C4A3B]">
+                  <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed mb-5 text-[#2C4A3B]">
                     {protocol.shortSummary}
                   </p>
 
                   {/* Daily Habits Checklist Preview */}
-                  <div className="space-y-2.5 mb-6">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider opacity-70 block mb-1">
-                      Daily Checklist ({protocol.timeframe}):
+                  <div className="space-y-2 mb-6">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E] block mb-1">
+                      Included Routine Actions:
                     </span>
                     {protocol.habits.map((habit, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] text-xs font-cabinet font-bold"
+                        className="flex items-center justify-between p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] text-xs font-cabinet font-bold"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs text-[#3A6B52]">•</span>
+                          <span className="font-mono text-xs text-[#3A6B52] font-black">●</span>
                           <span>{habit.title}</span>
                         </div>
-                        <span className="text-[10px] font-mono font-normal opacity-70">
+                        <span className="text-[10px] font-mono font-normal text-[#4A5D4E]">
                           {habit.hint}
                         </span>
                       </div>
@@ -310,7 +336,7 @@ export default function ProtocolsPage() {
                     }}
                     className="text-xs font-mono font-bold hover:underline flex items-center gap-1 cursor-pointer text-[#1A3629]"
                   >
-                    <span>Read Why It Works</span>
+                    <span>Read Field Guide</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
@@ -326,12 +352,12 @@ export default function ProtocolsPage() {
                     {isActivated ? (
                       <>
                         <Check className="w-3.5 h-3.5" />
-                        <span>Remove Routine</span>
+                        <span>Unequip Cartridge</span>
                       </>
                     ) : (
                       <>
                         <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>Add to Planner</span>
+                        <span>Equip to Planner</span>
                       </>
                     )}
                   </button>
@@ -347,7 +373,7 @@ export default function ProtocolsPage() {
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
           <div className="px-5 py-3.5 rounded-xl border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3">
-            <Check className="w-4 h-4" />
+            <Sparkles className="w-4 h-4 text-[#10B981]" />
             <span>{toastMessage}</span>
           </div>
         </div>
@@ -366,15 +392,15 @@ export default function ProtocolsPage() {
             <button
               type="button"
               onClick={() => setSelectedProtocolForModal(null)}
-              className="absolute right-6 top-6 rounded-full p-2 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] transition-all cursor-pointer"
-              aria-label="Close"
+              className="absolute right-6 top-6 rounded-full p-2 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] transition-all cursor-pointer hover:bg-[#E8DECF]"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <span className="px-2.5 py-0.5 rounded-md border-2 border-[#1A3629] bg-[#F4F0EA] text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 text-[#1A3629]">
-                {selectedProtocolForModal.category} Blueprint
+              <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 ${selectedProtocolForModal.themeColor.badgeBg} ${selectedProtocolForModal.themeColor.badgeText} ${selectedProtocolForModal.themeColor.border}`}>
+                {selectedProtocolForModal.category} Field Guide
               </span>
               <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 {selectedProtocolForModal.name}
@@ -383,18 +409,18 @@ export default function ProtocolsPage() {
 
             {/* Why It Works Section */}
             <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
-              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider mb-1 opacity-75">
+              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider mb-1 text-[#4A5D4E]">
                 The Science in Plain English
               </h4>
-              <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#1A3629]">
                 {selectedProtocolForModal.whyItWorks}
               </p>
             </div>
 
             {/* Key Takeaways */}
             <div className="space-y-2.5">
-              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider opacity-75">
-                Key Takeaways
+              <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#4A5D4E]">
+                Key Routine Principles
               </h4>
               {selectedProtocolForModal.simpleHighlights.map((hl, i) => (
                 <div key={i} className="flex items-start gap-2.5 text-xs font-cabinet font-medium leading-relaxed">
@@ -412,21 +438,21 @@ export default function ProtocolsPage() {
                   handleToggleProtocol(selectedProtocolForModal);
                   setSelectedProtocolForModal(null);
                 }}
-                className={`w-full py-4 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                className={`w-full py-3.5 px-6 rounded-xl border-3 font-cabinet font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeProtocolIds.includes(selectedProtocolForModal.id)
                     ? 'bg-[#E8DECF] text-[#1A3629] border-[#1A3629]'
-                    : 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5'
+                    : 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5'
                 }`}
               >
                 {activeProtocolIds.includes(selectedProtocolForModal.id) ? (
                   <>
                     <Check className="w-4 h-4" />
-                    <span>Remove from Daily Planner</span>
+                    <span>Unequip from Planner</span>
                   </>
                 ) : (
                   <>
                     <Plus className="w-4 h-4 stroke-[2.5]" />
-                    <span>Add All Habits to My Daily Planner</span>
+                    <span>Equip All Habits to Daily Planner</span>
                   </>
                 )}
               </button>

@@ -6,16 +6,18 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe } from '@/lib/recipes';
 
+interface ChatAction {
+  type: 'ADD_HABIT' | 'ADD_RECIPE' | 'SET_METRIC' | 'LOG_RECIPE';
+  summary: string;
+  payload: any;
+  status: 'pending' | 'applied' | 'dismissed';
+}
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  actions?: Array<{
-    type: 'ADD_HABIT' | 'ADD_RECIPE' | 'SET_METRIC' | 'LOG_RECIPE';
-    summary: string;
-    payload: any;
-    executed?: boolean;
-  }>;
+  actions?: ChatAction[];
 }
 
 export function StoveSageChatbot() {
@@ -145,6 +147,44 @@ export function StoveSageChatbot() {
     }
   };
 
+  const handleApplyAction = (messageId: string, actionIndex: number) => {
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id !== messageId || !msg.actions) return msg;
+        const targetAction = msg.actions[actionIndex];
+        if (!targetAction || targetAction.status !== 'pending') return msg;
+
+        const success = executeAction(targetAction);
+        const updatedActions = [...msg.actions];
+        updatedActions[actionIndex] = {
+          ...targetAction,
+          status: success ? 'applied' : 'dismissed',
+        };
+
+        return { ...msg, actions: updatedActions };
+      })
+    );
+  };
+
+  const handleDismissAction = (messageId: string, actionIndex: number) => {
+    retroAudio.playBlip();
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id !== messageId || !msg.actions) return msg;
+        const targetAction = msg.actions[actionIndex];
+        if (!targetAction || targetAction.status !== 'pending') return msg;
+
+        const updatedActions = [...msg.actions];
+        updatedActions[actionIndex] = {
+          ...targetAction,
+          status: 'dismissed',
+        };
+
+        return { ...msg, actions: updatedActions };
+      })
+    );
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputQuery).trim();
     if (!query || isLoading) return;
@@ -198,17 +238,17 @@ export function StoveSageChatbot() {
         throw new Error(data.error || 'Failed to reach StoveSage');
       }
 
-      // Execute returned actions automatically
-      const executedActions = (data.actions || []).map((action: any) => {
-        const success = executeAction(action);
-        return { ...action, executed: success };
-      });
+      // Do not automatically execute actions - present them to the user with a choice to Add or Dismiss
+      const pendingActions = (data.actions || []).map((action: any) => ({
+        ...action,
+        status: 'pending' as 'pending' | 'applied' | 'dismissed',
+      }));
 
       const botMessage: ChatMessage = {
         id: `bot-${Date.now()}`,
         role: 'assistant',
         content: data.reply || "A wave of magic surges! Your request has been forged.",
-        actions: executedActions,
+        actions: pendingActions,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -347,16 +387,48 @@ export function StoveSageChatbot() {
                       {msg.content}
                     </div>
 
-                    {/* Dispatched Actions Badges */}
+                    {/* Interactive Action Confirmation Cards */}
                     {msg.actions && msg.actions.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-[#1A3629]/15 flex flex-col gap-1.5">
+                      <div className="mt-3 pt-2.5 border-t border-[#1A3629]/15 flex flex-col gap-2">
                         {msg.actions.map((act, i) => (
                           <div
                             key={i}
-                            className="flex items-center gap-1.5 text-[11px] font-mono font-bold bg-[#E8DECF]/80 text-[#1A3629] px-2.5 py-1 rounded-lg border border-[#1A3629]/25 shadow-xs"
+                            className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-xs"
                           >
-                            <span className="text-[#10B981]">✓</span>
-                            <span>{act.summary || `Executed ${act.type}`}</span>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[11px] font-cabinet font-bold text-[#1A3629] leading-snug">
+                                {act.summary || `Proposed ${act.type}`}
+                              </span>
+                              {act.status === 'applied' && (
+                                <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0">
+                                  Added
+                                </span>
+                              )}
+                              {act.status === 'dismissed' && (
+                                <span className="text-[10px] font-mono font-bold text-[#8C9B90] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
+                                  Skipped
+                                </span>
+                              )}
+                            </div>
+
+                            {act.status === 'pending' && (
+                              <div className="flex items-center gap-1.5 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleApplyAction(msg.id, i)}
+                                  className="flex-1 py-1 px-2.5 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                >
+                                  {act.type === 'ADD_HABIT' ? 'Add Habit' : act.type === 'ADD_RECIPE' ? 'Add Recipe' : 'Apply'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDismissAction(msg.id, i)}
+                                  className="py-1 px-2.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
+                                >
+                                  Dismiss
+                                </button>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

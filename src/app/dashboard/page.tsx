@@ -37,6 +37,7 @@ export default function DashboardPage() {
     setPendingAction,
     isSyncing,
     customRecipes,
+    userProfile,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -47,7 +48,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (isAuthenticated && (!userProfile || !userProfile.onboardingCompleted)) {
+      router.push('/onboarding');
+    }
+  }, [isAuthenticated, userProfile, router]);
 
   const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const isViewingToday = currentDate === todayDateStr;

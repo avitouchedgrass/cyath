@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { X } from 'lucide-react';
 
 interface WalkthroughStage {
   route: string;
@@ -25,7 +26,7 @@ const TOUR_STAGES: WalkthroughStage[] = [
     totalSteps: 4,
     title: 'Daily Rituals',
     dialogue:
-      "Welcome to your Dashboard, your metabolic command deck. Every habit you check off rewards you with XP, levels up your character, and builds your streak.",
+      'Welcome to your Dashboard, your metabolic command deck. Every habit you check off rewards you with XP, levels up your character, and builds your streak.',
     actionHint: 'Check habits, track your hydration and sleep, and keep your streak alive.',
     targetFocusLabel: 'Dashboard Habits & Metrics',
   },
@@ -47,7 +48,7 @@ const TOUR_STAGES: WalkthroughStage[] = [
     totalSteps: 4,
     title: 'Evidence-Based Protocols',
     dialogue:
-      "Protocols are backed by circadian biology and sports science. Activating any protocol seamlessly adds its habit stack directly to your daily dashboard.",
+      'Protocols are backed by circadian biology and sports science. Activating any protocol seamlessly adds its habit stack directly to your daily dashboard.',
     actionHint: 'Choose from Morning Sunlight, Cognitive Flow, or Deep Sleep stacks.',
     targetFocusLabel: 'Curated Behavioral Blueprints',
   },
@@ -58,7 +59,7 @@ const TOUR_STAGES: WalkthroughStage[] = [
     totalSteps: 4,
     title: 'Interactive Correlations',
     dialogue:
-      "Cyath connects your protein, hydration, and sleep logs directly with your focus and energy scores. Click my floating sprite anytime if you need advice.",
+      'Cyath connects your protein, hydration, and sleep logs directly with your focus and energy scores. Click my floating sprite anytime if you need advice.',
     actionHint: 'You have completed the walkthrough tour. Start tracking your progress.',
     targetFocusLabel: 'Scientific Correlation Matrix',
   },
@@ -67,16 +68,20 @@ const TOUR_STAGES: WalkthroughStage[] = [
 export function StoveSageWalkthrough() {
   const router = useRouter();
   const pathname = usePathname();
-  const { userSession } = useHabitStore();
+  const { userSession, userProfile } = useHabitStore();
 
   const [isActive, setIsActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const storageKey = `cyath_stovesage_walkthrough_completed_${userSession?.id || 'guest'}`;
 
-  // Initial trigger check for new users when landing on dashboard
+  // Initial trigger check for new users when landing on dashboard after onboarding
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Do not trigger on non-dashboard or incomplete onboarding
+    const isNewUserOnboarding = userSession && !userSession.id.startsWith('guest_') && (!userProfile || !userProfile.onboardingCompleted);
+    if (isNewUserOnboarding) return;
 
     const hasCompleted = localStorage.getItem(storageKey);
     if (!hasCompleted && pathname === '/dashboard') {
@@ -85,10 +90,19 @@ export function StoveSageWalkthrough() {
         setCurrentStepIndex(0);
         window.dispatchEvent(new CustomEvent('stovesage-walkthrough-start'));
         retroAudio.playInspectConfirm();
-      }, 1200);
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [storageKey, pathname]);
+  }, [storageKey, pathname, userSession, userProfile]);
+
+  // Sync active step when user navigates manually between pages
+  useEffect(() => {
+    if (!isActive) return;
+    const stageIndex = TOUR_STAGES.findIndex((stage) => stage.route === pathname);
+    if (stageIndex !== -1 && stageIndex !== currentStepIndex) {
+      setCurrentStepIndex(stageIndex);
+    }
+  }, [pathname, isActive, currentStepIndex]);
 
   // Listen for manual trigger (e.g. from chatbot "Guide" button)
   useEffect(() => {
@@ -132,7 +146,9 @@ export function StoveSageWalkthrough() {
   const handleComplete = () => {
     retroAudio.playInspectConfirm();
     if (typeof window !== 'undefined') {
-      localStorage.setItem(storageKey, 'true');
+      try {
+        localStorage.setItem(storageKey, 'true');
+      } catch {}
       window.dispatchEvent(new CustomEvent('stovesage-walkthrough-end'));
     }
     setIsActive(false);
@@ -159,9 +175,12 @@ export function StoveSageWalkthrough() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isActive, currentStepIndex]);
 
+  // Don't render if not active or if on excluded routes
   if (!isActive) return null;
+  const isExcludedRoute = ['/onboarding', '/auth', '/login', '/sanctuary', '/profile'].includes(pathname);
+  if (isExcludedRoute) return null;
 
-  const currentStage = TOUR_STAGES[currentStepIndex];
+  const currentStage = TOUR_STAGES[currentStepIndex] || TOUR_STAGES[0];
   const isLast = currentStepIndex === TOUR_STAGES.length - 1;
 
   return (
@@ -170,6 +189,16 @@ export function StoveSageWalkthrough() {
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto w-[92vw] max-w-2xl animate-in slide-in-from-bottom-4 duration-200">
         <div className="relative bg-[#FFFDF9] border-3 border-[#1A3629] rounded-2xl p-5 shadow-[6px_6px_0px_#1A3629] flex items-center gap-5">
           
+          {/* Close X Button */}
+          <button
+            type="button"
+            onClick={handleComplete}
+            className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#FFFDF9] border-2 border-[#1A3629] text-[#1A3629] flex items-center justify-center shadow-[2px_2px_0px_#1A3629] hover:bg-[#FAF6EE] cursor-pointer"
+            aria-label="Close walkthrough"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
           {/* StoveSage Sprite */}
           <div className="relative shrink-0 flex flex-col items-center">
             <div className="relative w-16 h-24 sm:w-20 sm:h-28 animate-[bounce_2.5s_ease-in-out_infinite]">
@@ -240,7 +269,7 @@ export function StoveSageWalkthrough() {
 
             {/* Action Bar */}
             <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10">
-              <span className="text-[11px] font-mono text-[#3A6B52] font-semibold">
+              <span className="text-[11px] font-mono text-[#3A6B52] font-semibold truncate max-w-[240px] sm:max-w-none">
                 {currentStage.actionHint}
               </span>
 
@@ -271,4 +300,3 @@ export function StoveSageWalkthrough() {
     </div>
   );
 }
-

@@ -4,17 +4,19 @@ import React from 'react';
 import Link from 'next/link';
 import { useHabitStore } from '@/store/useHabitStore';
 import { calculateLevel } from '@/lib/progression/engine';
+import { getIslandTier } from '@/lib/progression/config';
 import { StreakBadge } from './StreakBadge';
 
 export function XpHud() {
   const { totalXp } = useHabitStore();
   const progress = calculateLevel(totalXp);
+  const islandTier = getIslandTier(progress.level);
 
   return (
     <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
-      {/* Left: Level & Title */}
+      {/* Left: Level, Sanctuary Stage & Title */}
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center shrink-0">
           <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
             LVL
           </span>
@@ -23,10 +25,13 @@ export function XpHud() {
           </span>
         </div>
 
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#D97706]">
-              Title Rank
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
+              Progression · Level {progress.level}
+            </span>
+            <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#ECFDF5] border-[#10B981]/40 text-[#065F46]">
+              {progress.title}
             </span>
             {progress.isMaxLevel && (
               <span className="px-2 py-0.5 rounded-full bg-[#D97706] text-[#FFFDF9] font-mono text-[9px] font-bold">
@@ -34,11 +39,16 @@ export function XpHud() {
               </span>
             )}
           </div>
-          <h2 className="font-fraunces font-bold text-2xl text-[#1A3629] tracking-tight">
-            {progress.title}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="font-fraunces font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+              {progress.title}
+            </h2>
+            <span className="font-mono text-xs text-[#4A5D4E]">
+              · Phase {islandTier.tier}: {islandTier.name}
+            </span>
+          </div>
           {progress.nextTitle && (
-            <p className="font-mono text-xs text-[#4A5D4E]">
+            <p className="font-mono text-[11px] text-[#4A5D4E]">
               Next rank: {progress.nextTitle}
             </p>
           )}

@@ -2,6 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useHabitStore } from '../useHabitStore';
 import { Recipe } from '@/lib/recipes';
 
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          maybeSingle: async () => ({ data: null, error: new Error('Network error') }),
+          order: async () => ({ data: null, error: new Error('Network error') }),
+        }),
+      }),
+      upsert: async () => ({ error: new Error('Network error') }),
+    }),
+  },
+}));
+
 const storeMap = new Map<string, string>();
 const localStorageMock = {
   getItem: (key: string) => storeMap.get(key) ?? null,
@@ -133,5 +147,52 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(useHabitStore.getState().totalXp).toBe(450);
     expect(useHabitStore.getState().streakCount).toBe(5);
     expect(useHabitStore.getState().userProfile?.onboardingCompleted).toBe(true);
+  });
+
+  it('persists custom habits across logout and re-login, avoiding impossible habit counts in Sanctuary', () => {
+    const testUserId = 'user_habits_999';
+
+    // 1. Log in
+    useHabitStore.getState().setUserSession({ id: testUserId, email: 'habituser@example.com' });
+    const initialCount = useHabitStore.getState().habits.length;
+
+    // 2. Add custom habit
+    useHabitStore.getState().addCustomHabit('Cold Plunge 3 mins', 'recovery');
+    const updatedHabits = useHabitStore.getState().habits;
+    expect(updatedHabits.length).toBe(initialCount + 1);
+
+    const customHabit = updatedHabits.find((h) => h.title === 'Cold Plunge 3 mins');
+    expect(customHabit).toBeDefined();
+
+    // 3. Mark all habits completed (including the custom habit)
+    const today = useHabitStore.getState().currentDate;
+    updatedHabits.forEach((h) => {
+      useHabitStore.getState().toggleHabit(h.id, today);
+    });
+
+    const todayLog = useHabitStore.getState().getDailyLog(today);
+    expect(todayLog.habitsCompleted[customHabit!.id]).toBe(true);
+
+    // 4. Log out
+    useHabitStore.getState().setUserSession(null);
+    expect(useHabitStore.getState().userSession).toBeNull();
+    // In logged-out state, habits resets to default
+    expect(useHabitStore.getState().habits.length).toBe(initialCount);
+
+    // 5. Log back in with the same account
+    useHabitStore.getState().setUserSession({ id: testUserId, email: 'habituser@example.com' });
+
+    // Custom habit MUST be restored!
+    const restoredHabits = useHabitStore.getState().habits;
+    expect(restoredHabits.length).toBe(initialCount + 1);
+    expect(restoredHabits.some((h) => h.title === 'Cold Plunge 3 mins')).toBe(true);
+
+    // Sanctuary count calculation: completed habits strictly filtered by active habits
+    const restoredLog = useHabitStore.getState().getDailyLog(today);
+    const completedCount = restoredHabits.filter((h) => !!restoredLog.habitsCompleted[h.id]).length;
+    const totalCount = restoredHabits.length;
+
+    expect(completedCount).toBe(totalCount);
+    expect(completedCount).toBeLessThanOrEqual(totalCount);
   });
 });

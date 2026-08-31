@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState('');
+  const [historyRange, setHistoryRange] = useState<7 | 28>(7);
 
   const {
     habits,
@@ -47,6 +48,8 @@ export default function DashboardPage() {
     setMounted(true);
   }, []);
 
+  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const isViewingToday = currentDate === todayDateStr;
   const todayLog = getDailyLog(currentDate);
 
   // Calculate stats
@@ -83,12 +86,13 @@ export default function DashboardPage() {
     }
   }, []);
 
-  // 28-Day Heatmap Days
+  // Heatmap Days: Toggle-able between 7 and 28 days (default 7 days)
   const heatmapDays = useMemo(() => {
     const today = new Date();
     const days = [];
+    const count = historyRange;
 
-    for (let i = 27; i >= 0; i--) {
+    for (let i = count - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().split('T')[0];
@@ -142,12 +146,12 @@ export default function DashboardPage() {
         hydrationDone,
         reflectionDone,
         level,
-        isToday: dateKey === new Date().toISOString().split('T')[0],
+        isToday: dateKey === todayDateStr,
         isSelected: dateKey === currentDate,
       });
     }
     return days;
-  }, [logsByDate, habits, currentDate, completedCount, todayLog]);
+  }, [historyRange, logsByDate, habits, currentDate, completedCount, todayLog, todayDateStr]);
 
   const totalHeatmapActions = useMemo(() => {
     return heatmapDays.reduce((sum, d) => sum + d.totalActions, 0);
@@ -155,8 +159,9 @@ export default function DashboardPage() {
 
   const avgDailyActions = (totalHeatmapActions / (heatmapDays.length || 1)).toFixed(1);
 
-  // Handlers
+  // Handlers - guarded strictly to today's date so past days are read-only
   const handleToggleHabit = (habitId: string) => {
+    if (!isViewingToday) return;
     retroAudio.playBlip();
     if (!userSession) {
       setPendingAction({
@@ -184,6 +189,7 @@ export default function DashboardPage() {
   };
 
   const handleSetProtein = (amount: number) => {
+    if (!isViewingToday) return;
     retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
@@ -193,6 +199,7 @@ export default function DashboardPage() {
   };
 
   const handleSetHydration = (amount: number) => {
+    if (!isViewingToday) return;
     retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
@@ -202,6 +209,7 @@ export default function DashboardPage() {
   };
 
   const handleSetEnergy = (val: number) => {
+    if (!isViewingToday) return;
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -210,6 +218,7 @@ export default function DashboardPage() {
   };
 
   const handleSetSleep = (hours: number) => {
+    if (!isViewingToday) return;
     retroAudio.playBlip();
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
@@ -219,8 +228,14 @@ export default function DashboardPage() {
   };
 
   const handleRemoveRecipe = (recipeId: string, protein: number, calories: number) => {
+    if (!isViewingToday) return;
     retroAudio.playBlip();
     removeRecipeFromDay(recipeId, protein, calories, currentDate);
+  };
+
+  const handleSetNotes = (notes: string) => {
+    if (!isViewingToday) return;
+    setNotes(notes, currentDate);
   };
 
   if (!mounted) {
@@ -245,6 +260,15 @@ export default function DashboardPage() {
               <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
                 {currentDate} {isSyncing && '· Syncing...'}
               </span>
+              {!isViewingToday ? (
+                <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FEF3C7] border-[#D97706]/40 text-[#92400E]">
+                  Viewing Past Day · Read-Only
+                </span>
+              ) : (
+                <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#ECFDF5] border-[#10B981]/40 text-[#065F46]">
+                  Today · Active Log
+                </span>
+              )}
             </div>
             <h1 className="font-fraunces font-black text-3xl md:text-4xl tracking-tight text-[#1A3629]">
               Daily Planner
@@ -252,6 +276,18 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {!isViewingToday && (
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setDate(todayDateStr);
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              >
+                <span>Return to Today →</span>
+              </button>
+            )}
             <Link
               href="/sanctuary"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
@@ -264,27 +300,65 @@ export default function DashboardPage() {
         {/* Progression HUD Bridge */}
         <XpHud />
 
-        {/* 1. 28-Day Consistency Matrix */}
+        {/* 1. Habit Check-in History (Toggle-able between 7 and 28 days) */}
         <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
-                28-Day Consistency Matrix
+                {historyRange}-Day Consistency Matrix
               </span>
               <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                 Habit Check-in History
               </h2>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1A3629]/70 tabular-nums">
-              <span>Actions: <strong className="text-[#1A3629]">{totalHeatmapActions}</strong></span>
-              <span>·</span>
-              <span>Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* 7 Days vs 28 Days Toggle */}
+              <div className="inline-flex items-center p-0.5 rounded-lg border-2 border-[#1A3629] bg-[#F4F0EA]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setHistoryRange(7);
+                  }}
+                  className={`px-3 py-1 rounded-md text-xs font-mono font-bold transition-all cursor-pointer ${
+                    historyRange === 7
+                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                      : 'text-[#1A3629]/70 hover:text-[#1A3629]'
+                  }`}
+                >
+                  7 Days
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    setHistoryRange(28);
+                  }}
+                  className={`px-3 py-1 rounded-md text-xs font-mono font-bold transition-all cursor-pointer ${
+                    historyRange === 28
+                      ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                      : 'text-[#1A3629]/70 hover:text-[#1A3629]'
+                  }`}
+                >
+                  28 Days
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1A3629]/70 tabular-nums border-l border-[#1A3629]/20 pl-3">
+                <span>Actions: <strong className="text-[#1A3629]">{totalHeatmapActions}</strong></span>
+                <span>·</span>
+                <span>Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
+              </div>
             </div>
           </div>
 
           {/* Heatmap Grid */}
-          <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-1.5">
+          <div className={`grid gap-1.5 ${
+            historyRange === 7
+              ? 'grid-cols-7'
+              : 'grid-cols-7 sm:grid-cols-14 lg:grid-cols-28'
+          }`}>
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
               const levelClasses = {
@@ -306,7 +380,7 @@ export default function DashboardPage() {
                   className={`w-full aspect-square rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
                     isSelected ? 'ring-2 ring-[#1A3629] scale-105 font-bold shadow-xs' : 'hover:scale-105'
                   }`}
-                  title={`${day.dateStr}: ${day.totalActions} total actions`}
+                  title={`${day.dateStr}: ${day.totalActions} actions ${day.isToday ? '(Today)' : '(Read-only)'}`}
                 >
                   <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
                     {day.dayNum}
@@ -318,6 +392,22 @@ export default function DashboardPage() {
               );
             })}
           </div>
+
+          {!isViewingToday && (
+            <div className="mt-3 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-xs font-mono text-[#92400E] bg-[#FEF3C7]/60 px-3 py-2 rounded-lg border border-[#D97706]/30">
+              <span>Viewing past log for {currentDate}. Checkbox toggles and progress edits are restricted to the current day.</span>
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setDate(todayDateStr);
+                }}
+                className="underline font-bold text-[#1A3629] hover:text-[#000] ml-2 shrink-0 cursor-pointer"
+              >
+                Jump to Today
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 2. Distilled 3-Column Daily Action Grid */}
@@ -388,12 +478,18 @@ export default function DashboardPage() {
                   <div
                     key={habit.id}
                     onClick={() => handleToggleHabit(habit.id)}
-                    className="group flex items-center justify-between py-2 px-2.5 rounded-xl hover:bg-[#FAF6EE] transition-colors cursor-pointer"
+                    className={`group flex items-center justify-between py-2 px-2.5 rounded-xl transition-colors ${
+                      !isViewingToday
+                        ? 'opacity-70 cursor-not-allowed'
+                        : 'hover:bg-[#FAF6EE] cursor-pointer'
+                    }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center font-mono text-xs font-bold transition-all ${
                         isDone
                           ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                          : !isViewingToday
+                          ? 'border-[#1A3629]/20 bg-gray-100'
                           : 'border-[#1A3629]/40 bg-white group-hover:border-[#1A3629]'
                       }`}>
                         {isDone && '✓'}
@@ -405,7 +501,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    {habit.category === 'custom' && (
+                    {habit.category === 'custom' && isViewingToday && (
                       <button
                         type="button"
                         onClick={(e) => {
@@ -448,10 +544,13 @@ export default function DashboardPage() {
 
               <textarea
                 value={todayLog.notes || ''}
-                onChange={(e) => setNotes(e.target.value, currentDate)}
-                placeholder="Quick observations, energy reflections, or workout notes..."
+                onChange={(e) => handleSetNotes(e.target.value)}
+                disabled={!isViewingToday}
+                placeholder={isViewingToday ? "Quick observations, energy reflections, or workout notes..." : "Read-only notes for past day."}
                 rows={2}
-                className="w-full p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE]/50 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629]"
+                className={`w-full p-2.5 rounded-xl border border-[#1A3629]/20 text-xs font-cabinet font-medium focus:outline-none resize-none placeholder-[#1A3629]/40 text-[#1A3629] ${
+                  !isViewingToday ? 'bg-gray-100/70 cursor-not-allowed opacity-80' : 'bg-[#FAF6EE]/50'
+                }`}
               />
             </div>
 
@@ -466,12 +565,14 @@ export default function DashboardPage() {
                     Logged Whole Foods
                   </h2>
                 </div>
-                <Link 
-                  href="/recipes" 
-                  className="text-xs font-mono font-bold text-[#10B981] hover:underline"
-                >
-                  + Add Meal →
-                </Link>
+                {isViewingToday && (
+                  <Link 
+                    href="/recipes" 
+                    className="text-xs font-mono font-bold text-[#10B981] hover:underline"
+                  >
+                    + Add Meal →
+                  </Link>
+                )}
               </div>
 
               {todayLog.loggedRecipeIds && todayLog.loggedRecipeIds.length > 0 ? (
@@ -498,24 +599,32 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
-                          className="text-xs font-mono font-bold opacity-60 hover:opacity-100 hover:text-red-600 cursor-pointer p-1"
-                          aria-label="Remove meal"
-                        >
-                          ✕
-                        </button>
+                        {isViewingToday && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveRecipe(recipe.id, recipe.protein, recipe.calories)}
+                            className="text-xs font-mono font-bold opacity-60 hover:opacity-100 hover:text-red-600 cursor-pointer p-1"
+                            aria-label="Remove meal"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
                     );
                   })}
                 </div>
               ) : (
                 <div className="py-4 text-center text-xs font-cabinet font-medium text-[#4A5D4E] bg-[#FAF6EE]/30 rounded-xl border border-dashed border-[#1A3629]/15">
-                  No meals logged yet today.{' '}
-                  <Link href="/recipes" className="font-bold text-[#1A3629] underline">
-                    Browse recipes
-                  </Link>
+                  {isViewingToday ? (
+                    <>
+                      No meals logged yet today.{' '}
+                      <Link href="/recipes" className="font-bold text-[#1A3629] underline">
+                        Browse recipes
+                      </Link>
+                    </>
+                  ) : (
+                    'No meals logged on this day.'
+                  )}
                 </div>
               )}
             </div>
@@ -546,8 +655,13 @@ export default function DashboardPage() {
                   <button
                     key={amt}
                     type="button"
+                    disabled={!isViewingToday}
                     onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
-                    className="border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white rounded-lg py-1 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                    className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
+                      !isViewingToday
+                        ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
+                        : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                    }`}
                   >
                     +{amt}g
                   </button>
@@ -568,8 +682,13 @@ export default function DashboardPage() {
                   <button
                     key={amt}
                     type="button"
+                    disabled={!isViewingToday}
                     onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
-                    className="border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white rounded-lg py-1 text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                    className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
+                      !isViewingToday
+                        ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
+                        : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                    }`}
                   >
                     +{amt}L
                   </button>
@@ -588,8 +707,11 @@ export default function DashboardPage() {
                 min="1"
                 max="10"
                 value={todayLog.energyLevel}
+                disabled={!isViewingToday}
                 onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                className="w-full accent-[#1A3629] h-1.5 rounded-full cursor-pointer"
+                className={`w-full accent-[#1A3629] h-1.5 rounded-full ${
+                  !isViewingToday ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                }`}
               />
             </div>
 
@@ -602,15 +724,25 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  disabled={!isViewingToday}
                   onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                  className="flex-1 py-1 rounded-lg border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                  className={`flex-1 py-1 rounded-lg border text-xs font-mono font-bold transition-colors ${
+                    !isViewingToday
+                      ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
+                      : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                  }`}
                 >
                   -0.5h
                 </button>
                 <button
                   type="button"
+                  disabled={!isViewingToday}
                   onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                  className="flex-1 py-1 rounded-lg border border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-xs font-mono font-bold text-[#1A3629] transition-colors cursor-pointer"
+                  className={`flex-1 py-1 rounded-lg border text-xs font-mono font-bold transition-colors ${
+                    !isViewingToday
+                      ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
+                      : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                  }`}
                 >
                   +0.5h
                 </button>

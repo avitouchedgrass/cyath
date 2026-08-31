@@ -140,6 +140,7 @@ interface UserLocalProgressData {
   logsByDate?: Record<string, DailyLogData>;
   customRecipes?: Recipe[];
   userProfile?: UserProfile | null;
+  habits?: HabitItem[];
 }
 
 const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressData>) => {
@@ -157,6 +158,7 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       logsByDate: data.logsByDate !== undefined ? data.logsByDate : (existing.logsByDate ?? {}),
       customRecipes: data.customRecipes !== undefined ? data.customRecipes : (existing.customRecipes ?? []),
       userProfile: data.userProfile !== undefined ? data.userProfile : (existing.userProfile ?? null),
+      habits: data.habits !== undefined ? data.habits : (existing.habits ?? DEFAULT_HABITS),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -208,6 +210,7 @@ export const useHabitStore = create<HabitStoreState>()(
             logsByDate: get().logsByDate,
             customRecipes: get().customRecipes,
             userProfile: get().userProfile,
+            habits: get().habits,
           });
         }
 
@@ -224,6 +227,7 @@ export const useHabitStore = create<HabitStoreState>()(
               completedQuestIdsByDate: cached.completedQuestIdsByDate ?? {},
               xpHistory: cached.xpHistory ?? [],
               customRecipes: cached.customRecipes ?? [],
+              habits: cached.habits && cached.habits.length > 0 ? cached.habits : DEFAULT_HABITS,
               ...(cached.logsByDate ? { logsByDate: cached.logsByDate } : {}),
               ...(cached.userProfile ? { userProfile: cached.userProfile } : {}),
             });
@@ -239,6 +243,7 @@ export const useHabitStore = create<HabitStoreState>()(
             xpHistory: [],
             userProfile: null,
             customRecipes: [],
+            habits: DEFAULT_HABITS,
             logsByDate: { [getTodayString()]: createEmptyDailyLog() },
           });
         }
@@ -253,6 +258,7 @@ export const useHabitStore = create<HabitStoreState>()(
           const currentLocalFreeze = cached?.streakFreezeStock ?? get().streakFreezeStock;
           const currentLocalProfile = cached?.userProfile ?? get().userProfile;
           const currentLocalRecipes = cached?.customRecipes ?? get().customRecipes;
+          const currentLocalHabits = cached?.habits && cached.habits.length > 0 ? cached.habits : get().habits;
 
           // 1. Fetch remote user profile
           const { data: profile, error: profileErr } = await supabase
@@ -378,6 +384,7 @@ export const useHabitStore = create<HabitStoreState>()(
               customRecipes: finalRecipes,
               logsByDate: mergedLogs,
               userProfile: finalProfile,
+              habits: currentLocalHabits,
             });
 
             saveUserLocalProgress(session.id, {
@@ -390,6 +397,7 @@ export const useHabitStore = create<HabitStoreState>()(
               logsByDate: mergedLogs,
               customRecipes: finalRecipes,
               userProfile: finalProfile,
+              habits: currentLocalHabits,
             });
 
             if (finalXp > remoteXp || finalStreak > (profile.streak_count ?? 0) || (isOnboardingDone && !profile.onboarding_completed)) {
@@ -433,24 +441,28 @@ export const useHabitStore = create<HabitStoreState>()(
             set({
               customRecipes: finalRecipes,
               userProfile: currentLocalProfile,
+              habits: currentLocalHabits,
             });
             saveUserLocalProgress(session.id, {
               customRecipes: finalRecipes,
               userProfile: currentLocalProfile,
+              habits: currentLocalHabits,
             });
           } else {
             // If table query returned error (e.g. table not created yet) OR user already has local progress, DO NOT WIPE!
-            if (currentLocalProfile || currentLocalXp > 0 || currentLocalRecipes.length > 0) {
+            if (currentLocalProfile || currentLocalXp > 0 || currentLocalRecipes.length > 0 || currentLocalHabits.length > 0) {
               set({
                 totalXp: currentLocalXp,
                 streakCount: currentLocalStreak,
                 streakFreezeStock: currentLocalFreeze,
                 customRecipes: finalRecipes,
                 userProfile: currentLocalProfile,
+                habits: currentLocalHabits,
               });
               saveUserLocalProgress(session.id, {
                 customRecipes: finalRecipes,
                 userProfile: currentLocalProfile,
+                habits: currentLocalHabits,
               });
             } else if (!profileErr) {
               // Only truly fresh account with zero error
@@ -462,6 +474,7 @@ export const useHabitStore = create<HabitStoreState>()(
                 completedQuestIdsByDate: {},
                 xpHistory: [],
                 customRecipes: [],
+                habits: DEFAULT_HABITS,
               });
             }
           }
@@ -557,6 +570,11 @@ export const useHabitStore = create<HabitStoreState>()(
           activeProtocolIds: newActive,
           habits: updatedHabits,
         });
+
+        const session = get().userSession;
+        if (session && !session.id.startsWith('guest_')) {
+          saveUserLocalProgress(session.id, { habits: updatedHabits });
+        }
       },
 
       getDailyLog: (date) => {
@@ -670,7 +688,13 @@ export const useHabitStore = create<HabitStoreState>()(
       },
 
       toggleHabit: (habitId, date) => {
+        const todayStr = getTodayString();
         const targetDate = date || get().currentDate;
+        // Strict guard: users can only check boxes or toggle progress for the current day
+        if (targetDate !== todayStr) {
+          return;
+        }
+
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
         const wasDone = !!currentLog.habitsCompleted[habitId];
         const willBeDone = !wasDone;
@@ -741,15 +765,23 @@ export const useHabitStore = create<HabitStoreState>()(
           category,
           targetDaysPerWeek: 7,
         };
-        set((state) => ({
-          habits: [...state.habits, newHabit],
-        }));
+        const updated = [...get().habits, newHabit];
+        set({ habits: updated });
+
+        const session = get().userSession;
+        if (session && !session.id.startsWith('guest_')) {
+          saveUserLocalProgress(session.id, { habits: updated });
+        }
       },
 
       deleteHabit: (habitId) => {
-        set((state) => ({
-          habits: state.habits.filter((h) => h.id !== habitId),
-        }));
+        const updated = get().habits.filter((h) => h.id !== habitId);
+        set({ habits: updated });
+
+        const session = get().userSession;
+        if (session && !session.id.startsWith('guest_')) {
+          saveUserLocalProgress(session.id, { habits: updated });
+        }
       },
 
       setProtein: (amount, date) => {
@@ -1138,7 +1170,7 @@ export const useHabitStore = create<HabitStoreState>()(
               energyLevel: 8,
               moodScore: 8,
               notes: 'Demo sandbox session initialized.',
-              loggedRecipeIds: ['steak-eggs-skillet'],
+              loggedRecipeIds: ['herb-grilled-chicken'],
             },
           },
           pendingAction: null,

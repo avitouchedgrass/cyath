@@ -34,9 +34,9 @@ export default function SanctuaryPage() {
 
   const todayLog = getDailyLog(currentDate);
   const totalHabitsCount = habits.length;
-  const completedHabitsCount = todayLog?.habitsCompleted
-    ? Object.values(todayLog.habitsCompleted).filter(Boolean).length
-    : 0;
+  const completedHabitsCount = useMemo(() => {
+    return habits.filter((h) => !!todayLog?.habitsCompleted?.[h.id]).length;
+  }, [habits, todayLog?.habitsCompleted]);
 
   if (!mounted || !isLoggedIn) {
     return (

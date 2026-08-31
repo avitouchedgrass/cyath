@@ -657,9 +657,9 @@ export default function Home() {
             </ul>
           </div>
 
-          {/* Col 5: Account & Settings */}
+          {/* Col 5: Account & Legal */}
           <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Account</div>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Account &amp; Legal</div>
             <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
               <li>
                 <Link href="/auth" className="hover:underline">Sign Up</Link>
@@ -668,10 +668,10 @@ export default function Home() {
                 <Link href="/login" className="hover:underline">Log In</Link>
               </li>
               <li>
-                <Link href="/profile" className="hover:underline">Profile &amp; Settings</Link>
+                <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
               </li>
               <li>
-                <Link href="/onboarding" className="hover:underline">Personalize Goals</Link>
+                <Link href="/terms" className="hover:underline">Terms of Service</Link>
               </li>
             </ul>
           </div>
@@ -681,7 +681,11 @@ export default function Home() {
         {/* Bottom copyright line */}
         <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold text-[#2C4A3B]">
           <div>© {new Date().getFullYear()} cyath. Handcrafted with retro precision.</div>
-          <div>Zero tracking cookies · Secure local &amp; cloud storage</div>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:underline">Terms of Service</Link>
+          </div>
         </div>
       </footer>
     </div>

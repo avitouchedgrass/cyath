@@ -12,6 +12,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/sanctuary',
     '/dashboard',
     '/login',
+    '/privacy',
+    '/terms',
   ];
 
   return routes.map((route) => ({

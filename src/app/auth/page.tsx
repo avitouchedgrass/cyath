@@ -718,6 +718,18 @@ function AuthContent() {
           </div>
         )}
 
+        <div className="text-center mt-6 text-[11px] font-mono text-[#4A5D4E]">
+          By continuing, you agree to Cyath&apos;s{' '}
+          <Link href="/terms" className="underline hover:text-[#1A3629]">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="underline hover:text-[#1A3629]">
+            Privacy Policy
+          </Link>
+          .
+        </div>
+
       </div>
     </div>
   );

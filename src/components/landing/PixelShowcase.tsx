@@ -18,15 +18,6 @@ export interface DishData {
 
 export const DISH_ITEMS: DishData[] = [
   {
-    id: 'steak',
-    recipeId: 'chimichurri-seared-steak',
-    name: 'Cast-Iron Strip Steak with Chimichurri',
-    image: '/assets/food/steak-chimichurri-1.0.png',
-    protein: '52g',
-    calories: '580',
-    focus: '9.3/10',
-  },
-  {
     id: 'chicken',
     recipeId: 'herb-grilled-chicken',
     name: 'Herb Grilled Chicken & Crispy Greens',
@@ -185,7 +176,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   }, []);
 
   const currentDish = DISH_ITEMS[currentIndex];
-  const isHotDish = ['steak', 'chicken', 'prawn', 'pasta', 'eggs', 'taco'].includes(currentDish.id);
+  const isHotDish = ['chicken', 'prawn', 'pasta', 'eggs', 'taco'].includes(currentDish.id);
 
   const handleInspectRecipe = (e: React.MouseEvent) => {
     e.preventDefault();

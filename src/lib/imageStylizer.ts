@@ -10,10 +10,22 @@ export const SPRITE_OPTIONS = [
   { id: 'chicken-curry', name: 'Chicken Curry', url: '/assets/food/chicken-curry-1.0.png' },
   { id: 'egg-curry', name: 'Egg Curry', url: '/assets/food/egg-curry-1.0.png' },
   { id: 'moong-khichdi', name: 'Moong Khichdi', url: '/assets/food/moong-khichdi-1.0.png' },
+  { id: 'soya-pulao', name: 'Soya Matar Pulao', url: '/assets/food/soya-pulao-1.0.png' },
+  { id: 'desi-shakshuka', name: 'Desi Shakshuka', url: '/assets/food/desi-shakshuka-1.0.png' },
+  { id: 'paneer-kathi-roll', name: 'Paneer Kathi Roll', url: '/assets/food/paneer-kathi-roll-1.0.png' },
+  { id: 'egg-fried-rice', name: 'Egg Fried Rice', url: '/assets/food/egg-fried-rice-1.0.png' },
+  { id: 'curd-rice', name: 'Tempered Curd Rice', url: '/assets/food/curd-rice-1.0.png' },
+  { id: 'masala-oats', name: 'Savory Masala Oats', url: '/assets/food/masala-oats-1.0.png' },
+  { id: 'pepper-chicken', name: 'Pepper Chicken Roast', url: '/assets/food/pepper-chicken-1.0.png' },
+  { id: 'besan-chilla', name: 'Paneer Besan Chilla', url: '/assets/food/besan-chilla-1.0.png' },
+  { id: 'kala-chana', name: 'Kala Chana Sundal', url: '/assets/food/kala-chana-1.0.png' },
+  { id: 'peanut-butter-oats', name: 'Peanut Butter Oats', url: '/assets/food/peanut-butter-oats-1.0.png' },
+  { id: 'masala-french-toast', name: 'Masala French Toast', url: '/assets/food/masala-french-toast-1.0.png' },
+  { id: 'chickpea-salad', name: 'Mediterranean Chickpea Salad', url: '/assets/food/chickpea-salad-1.0.png' },
+  { id: 'chicken-tikka', name: 'Tawa Chicken Tikka', url: '/assets/food/chicken-tikka-1.0.png' },
   { id: 'grilled-chicken', name: 'Grilled Chicken', url: '/assets/food/grilled-chicken-1.0.png' },
   { id: 'grain-bowl', name: 'Ancient Grain Bowl', url: '/assets/food/grain-bowl-1.0.png' },
   { id: 'egg-rice-bowl', name: 'Egg Rice Bowl', url: '/assets/food/egg-rice-bowl-1.0.png' },
-  { id: 'steak-chimichurri', name: 'Steak Chimichurri', url: '/assets/food/steak-chimichurri-1.0.png' },
   { id: 'taco-bowl', name: 'Taco Fiesta Bowl', url: '/assets/food/taco-bowl-1.0.png' },
   { id: 'prawn-linguine', name: 'Prawn Linguine', url: '/assets/food/prawn-linguine-1.0.png' },
   { id: 'avocado-toast', name: 'Avocado Toast', url: '/assets/food/avocado-toast-1.0.png' },
@@ -24,6 +36,45 @@ export const SPRITE_OPTIONS = [
 export function getBestMatchingSprite(name: string, category: string, dietType: string): string {
   const query = `${name} ${category} ${dietType}`.toLowerCase();
 
+  if (query.includes('soya') || query.includes('soy chunk') || query.includes('pulao') || query.includes('nutrela')) {
+    return '/assets/food/soya-pulao-1.0.png';
+  }
+  if (query.includes('shakshuka')) {
+    return '/assets/food/desi-shakshuka-1.0.png';
+  }
+  if (query.includes('kathi roll') || query.includes('frankie') || query.includes('wrap') || query.includes('roll')) {
+    return '/assets/food/paneer-kathi-roll-1.0.png';
+  }
+  if (query.includes('fried rice')) {
+    return '/assets/food/egg-fried-rice-1.0.png';
+  }
+  if (query.includes('curd rice') || query.includes('dahi chawal') || query.includes('thayir sadam')) {
+    return '/assets/food/curd-rice-1.0.png';
+  }
+  if (query.includes('masala oats') || (query.includes('oat') && (query.includes('egg') || query.includes('savory')))) {
+    return '/assets/food/masala-oats-1.0.png';
+  }
+  if (query.includes('peanut butter') || (query.includes('oat') && query.includes('banana'))) {
+    return '/assets/food/peanut-butter-oats-1.0.png';
+  }
+  if (query.includes('french toast') || (query.includes('bread') && query.includes('egg'))) {
+    return '/assets/food/masala-french-toast-1.0.png';
+  }
+  if (query.includes('pepper chicken') || query.includes('chettinad')) {
+    return '/assets/food/pepper-chicken-1.0.png';
+  }
+  if (query.includes('chilla') || query.includes('cheela') || query.includes('besan')) {
+    return '/assets/food/besan-chilla-1.0.png';
+  }
+  if (query.includes('sundal') || query.includes('kala chana') || query.includes('black chickpea')) {
+    return '/assets/food/kala-chana-1.0.png';
+  }
+  if (query.includes('chickpea salad') || (query.includes('chickpea') && query.includes('salad'))) {
+    return '/assets/food/chickpea-salad-1.0.png';
+  }
+  if (query.includes('tikka') || query.includes('kebab') || query.includes('skewer')) {
+    return '/assets/food/chicken-tikka-1.0.png';
+  }
   if (query.includes('rajma') || query.includes('kidney bean') || query.includes('chawal')) {
     return '/assets/food/rajma-chawal-1.0.png';
   }
@@ -39,8 +90,8 @@ export function getBestMatchingSprite(name: string, category: string, dietType: 
   if (query.includes('chicken') || query.includes('turkey') || query.includes('poultry')) {
     return '/assets/food/grilled-chicken-1.0.png';
   }
-  if (query.includes('steak') || query.includes('beef') || query.includes('meat') || query.includes('chimichurri')) {
-    return '/assets/food/steak-chimichurri-1.0.png';
+  if (query.includes('chicken') || query.includes('poultry') || query.includes('tikka')) {
+    return '/assets/food/grilled-chicken-1.0.png';
   }
   if (query.includes('taco') || query.includes('burrito') || query.includes('fajita') || query.includes('salsa')) {
     return '/assets/food/taco-bowl-1.0.png';

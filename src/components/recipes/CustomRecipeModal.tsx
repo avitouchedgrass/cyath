@@ -27,12 +27,18 @@ const DIET_OPTIONS: Recipe['dietType'][] = [
 ];
 
 const DEFAULT_PLATES = [
-  { label: 'Grilled Chicken Plate', url: '/assets/food/grilled-chicken-1.0.png' },
+  { label: 'Grilled Chicken', url: '/assets/food/grilled-chicken-1.0.png' },
   { label: 'Egg Rice Bowl', url: '/assets/food/egg-rice-bowl-1.0.png' },
-  { label: 'Ancient Grain Bowl', url: '/assets/food/grain-bowl-1.0.png' },
+  { label: 'Ancient Grain', url: '/assets/food/grain-bowl-1.0.png' },
   { label: 'Rajma Chawal', url: '/assets/food/rajma-chawal-1.0.png' },
   { label: 'Paneer Bhurji', url: '/assets/food/paneer-bhurji-1.0.png' },
   { label: 'Tariwala Chicken', url: '/assets/food/chicken-curry-1.0.png' },
+  { label: 'Soya Pulao', url: '/assets/food/soya-pulao-1.0.png' },
+  { label: 'Desi Shakshuka', url: '/assets/food/desi-shakshuka-1.0.png' },
+  { label: 'Paneer Roll', url: '/assets/food/paneer-kathi-roll-1.0.png' },
+  { label: 'Egg Fried Rice', url: '/assets/food/egg-fried-rice-1.0.png' },
+  { label: 'Curd Rice', url: '/assets/food/curd-rice-1.0.png' },
+  { label: 'Chicken Tikka', url: '/assets/food/chicken-tikka-1.0.png' },
 ];
 
 export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe }: CustomRecipeModalProps) {

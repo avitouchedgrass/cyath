@@ -99,6 +99,19 @@ function RecipesContent() {
     }
   }, [isAuthenticated, selectedCategory]);
 
+  const closeRecipeModal = () => {
+    setSelectedRecipe(null);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('inspect') || params.has('recipe')) {
+        params.delete('inspect');
+        params.delete('recipe');
+        const query = params.toString();
+        window.history.replaceState(null, '', query ? `?${query}` : window.location.pathname);
+      }
+    }
+  };
+
   // Auto open recipe modal if URL param is present
   useEffect(() => {
     if (inspectParam) {
@@ -108,10 +121,15 @@ function RecipesContent() {
           router.push(`/auth?redirect=${encodeURIComponent(`/recipes?inspect=${inspectParam}`)}`);
           return;
         }
-        setSelectedRecipe(match);
-        setPortionMultiplier(1.0);
-        setShowingRawPhoto(false);
+        setSelectedRecipe((prev) => {
+          if (prev?.id === match.id) return prev;
+          setPortionMultiplier(1.0);
+          setShowingRawPhoto(false);
+          return match;
+        });
       }
+    } else {
+      setSelectedRecipe((prev) => (prev ? null : null));
     }
   }, [inspectParam, allRecipes, isAuthenticated, router]);
 
@@ -122,7 +140,7 @@ function RecipesContent() {
         e.preventDefault();
         searchInputRef.current?.focus();
       } else if (e.key === 'Escape') {
-        setSelectedRecipe(null);
+        closeRecipeModal();
         setIsSortOpen(false);
       }
     };
@@ -177,6 +195,12 @@ function RecipesContent() {
     setSelectedRecipe(recipe);
     setPortionMultiplier(1.0);
     setShowingRawPhoto(false);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.set('inspect', recipe.id);
+      params.delete('recipe');
+      window.history.replaceState(null, '', `?${params.toString()}`);
+    }
   };
 
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
@@ -541,7 +565,7 @@ function RecipesContent() {
       {selectedRecipe && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            onClick={() => setSelectedRecipe(null)}
+            onClick={closeRecipeModal}
             className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
@@ -554,7 +578,7 @@ function RecipesContent() {
                   onClick={() => {
                     if (confirm(`Delete custom recipe "${selectedRecipe.name}"? This action cannot be undone.`)) {
                       deleteCustomRecipe(selectedRecipe.id);
-                      setSelectedRecipe(null);
+                      closeRecipeModal();
                       setLoggedToast({
                         name: `${selectedRecipe.name} (Deleted)`,
                         protein: 0,
@@ -573,7 +597,7 @@ function RecipesContent() {
               {/* Close Button */}
               <button
                 type="button"
-                onClick={() => setSelectedRecipe(null)}
+                onClick={closeRecipeModal}
                 className="rounded-full px-3 py-1 border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs transition-all cursor-pointer hover:bg-[#1A3629] hover:text-[#FFFDF9]"
                 aria-label="Close details"
               >
@@ -778,7 +802,7 @@ function RecipesContent() {
                   onClick={() => {
                     if (confirm(`Delete custom recipe "${selectedRecipe.name}"? This action cannot be undone.`)) {
                       deleteCustomRecipe(selectedRecipe.id);
-                      setSelectedRecipe(null);
+                      closeRecipeModal();
                       setLoggedToast({
                         name: `${selectedRecipe.name} (Deleted)`,
                         protein: 0,
@@ -798,7 +822,7 @@ function RecipesContent() {
                 type="button"
                 onClick={() => {
                   handleQuickLog(selectedRecipe, portionMultiplier);
-                  setSelectedRecipe(null);
+                  closeRecipeModal();
                 }}
                 className="flex-1 py-3.5 px-6 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm transition-all shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
               >

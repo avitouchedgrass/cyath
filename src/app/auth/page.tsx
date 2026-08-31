@@ -276,10 +276,15 @@ function AuthContent() {
     retroAudio.playBlip();
 
     try {
+      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+          redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       if (error) throw error;

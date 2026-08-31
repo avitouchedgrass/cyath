@@ -42,8 +42,35 @@ const pixelFont = Pixelify_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Cyath - Pixel-Perfect Health",
-  description: "A full-stack web platform combining behavioral psychology with physical health tracking.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.app'),
+  title: {
+    default: 'Cyath · 16-Bit Metabolic Health & Habit Tracking',
+    template: '%s · Cyath',
+  },
+  description:
+    'A retro neobrutalist metabolic health platform combining behavioral habit tracking, whole-food culinary recipes, and a 16-bit RPG sanctuary diorama.',
+  keywords: [
+    'metabolic health',
+    'habit tracker',
+    'high protein recipes',
+    'gamified wellness',
+    'retro pixel art',
+    'circadian protocols',
+  ],
+  authors: [{ name: 'Cyath' }],
+  openGraph: {
+    title: 'Cyath · 16-Bit Metabolic Health & Habit Tracking',
+    description:
+      'Gamified daily wellness combining behavioral psychology, whole-food fuel recipes, and an evolving pixel-art sanctuary.',
+    url: 'https://cyath.app',
+    siteName: 'Cyath',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cyath · 16-Bit Metabolic Health',
+    description: 'Track habits, calibrate protein, and evolve your 16-bit floating sanctuary.',
+  },
 };
 
 export default function RootLayout({

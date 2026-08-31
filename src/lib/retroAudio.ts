@@ -56,6 +56,34 @@ class RetroAudioEngine {
     }
   }
 
+  // Soft, satisfying organic chime for XP badge absorption (warm & subtle)
+  public playXpAbsorb() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.05); // G5 gentle melodic rise
+
+      gain.gain.setValueAtTime(0.035, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch {
+      // Ignore
+    }
+  }
+
   // 8-bit frequency sweep / scan sound (dish transition / pixel wave)
   public playScanWipe() {
     if (this.isMuted) return;

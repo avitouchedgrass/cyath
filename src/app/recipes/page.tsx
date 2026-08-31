@@ -198,7 +198,7 @@ function RecipesContent() {
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
-      xpParticleEmitter.emit(e.clientX, e.clientY, 16);
+      xpParticleEmitter.emit(e.clientX, e.clientY, 4);
     }
     retroAudio.playInspectConfirm();
 

@@ -169,7 +169,7 @@ export default function DashboardPage() {
     if (!isViewingToday) return;
     retroAudio.playBlip();
     if (e && !todayLog.habitsCompleted[habitId]) {
-      xpParticleEmitter.emit(e.clientX, e.clientY, 14);
+      xpParticleEmitter.emit(e.clientX, e.clientY, 4);
     }
     if (!userSession) {
       setPendingAction({
@@ -200,7 +200,7 @@ export default function DashboardPage() {
     if (!isViewingToday) return;
     retroAudio.playBlip();
     if (e) {
-      xpParticleEmitter.emit(e.clientX, e.clientY, 10);
+      xpParticleEmitter.emit(e.clientX, e.clientY, 4);
     }
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
@@ -213,7 +213,7 @@ export default function DashboardPage() {
     if (!isViewingToday) return;
     retroAudio.playBlip();
     if (e) {
-      xpParticleEmitter.emit(e.clientX, e.clientY, 10);
+      xpParticleEmitter.emit(e.clientX, e.clientY, 4);
     }
     if (!userSession) {
       router.push('/login?redirect=/dashboard');

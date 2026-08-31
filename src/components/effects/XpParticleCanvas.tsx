@@ -74,7 +74,7 @@ export function XpParticleCanvas() {
         void targetElem.offsetWidth;
         targetElem.classList.add('animate-count-pop');
       }
-      retroAudio.playBlip();
+      retroAudio.playXpAbsorb();
     };
 
     const render = () => {
@@ -90,53 +90,53 @@ export function XpParticleCanvas() {
         const p = particlesRef.current[i];
         p.age++;
 
-        // Burst phase: gravity + radial dispersion
+        // Burst phase: subtle dispersion
         if (p.age < p.burstDuration) {
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.22; // subtle gravity
-          p.vx *= 0.94; // air resistance
-          p.vy *= 0.94;
+          p.vy += 0.15; // gentle gravity
+          p.vx *= 0.92; // air resistance
+          p.vy *= 0.92;
         } else {
-          // Flight phase: accelerated homing pull toward target badge
+          // Flight phase: smooth homing pull toward target badge
           const dx = target.x - p.x;
           const dy = target.y - p.y;
           const dist = Math.hypot(dx, dy);
 
-          if (dist < 24) {
-            // Particle hit the target!
+          if (dist < 20) {
+            // Particle arrived at target
             if (!hasImpacted) {
               triggerBadgeImpact();
               hasImpacted = true;
             }
-            continue; // Remove particle on impact
+            continue; // Absorb particle
           }
 
-          // Homing acceleration with spring-like curve
-          const speed = Math.min(22, Math.max(8, dist * 0.09));
+          // Smooth curved acceleration
+          const speed = Math.min(18, Math.max(6, dist * 0.08));
           const angle = Math.atan2(dy, dx);
-          
-          p.vx = p.vx * 0.75 + Math.cos(angle) * speed * 0.25;
-          p.vy = p.vy * 0.75 + Math.sin(angle) * speed * 0.25;
+
+          p.vx = p.vx * 0.8 + Math.cos(angle) * speed * 0.2;
+          p.vy = p.vy * 0.8 + Math.sin(angle) * speed * 0.2;
 
           p.x += p.vx;
           p.y += p.vy;
         }
 
-        // Draw pixel-art particle
+        // Draw refined micro particle
         ctx.fillStyle = p.color;
         const half = Math.floor(p.size / 2);
 
         if (p.isStar) {
-          // Draw crisp 8-bit cross star (+)
-          ctx.fillRect(Math.floor(p.x) - half, Math.floor(p.y), p.size, 2);
-          ctx.fillRect(Math.floor(p.x), Math.floor(p.y) - half, 2, p.size);
+          // Delicate cross spark (+)
+          ctx.fillRect(Math.floor(p.x) - half, Math.floor(p.y), p.size, 1);
+          ctx.fillRect(Math.floor(p.x), Math.floor(p.y) - half, 1, p.size);
         } else {
-          // Draw crisp pixel square
+          // Crisp micro pixel
           ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
         }
 
-        // Keep particle if it hasn't expired or hit target
+        // Keep particle if not expired
         if (p.age < p.maxAge) {
           remainingParticles.push(p);
         }
@@ -153,33 +153,34 @@ export function XpParticleCanvas() {
       }
     };
 
-    const handleEmission = ({ x, y, amount = 12 }: { x: number; y: number; amount?: number }) => {
+    const handleEmission = ({ x, y, amount = 4 }: { x: number; y: number; amount?: number }) => {
       // Check reduced motion preference
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         triggerBadgeImpact();
         return;
       }
 
-      const count = Math.min(20, Math.max(8, amount));
+      // Keep particles minimal and subtle (4-5 micro particles max)
+      const count = Math.min(5, Math.max(3, Math.floor((amount || 4) * 0.4)));
       const newParticles: Particle[] = [];
 
       for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
-        const speed = 4 + Math.random() * 7;
-        const size = Math.random() > 0.4 ? 4 : 6;
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+        const speed = 2.5 + Math.random() * 3.5;
+        const size = Math.random() > 0.5 ? 2 : 3;
         const color = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
 
         newParticles.push({
           x,
           y,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 2.5, // slight upward kick
+          vy: Math.sin(angle) * speed - 1.5,
           size,
           color,
           age: 0,
-          maxAge: 90, // ~1.5s max flight window
-          burstDuration: 12 + Math.floor(Math.random() * 8), // ~250ms explosion
-          isStar: Math.random() > 0.5,
+          maxAge: 70, // ~1s max flight window
+          burstDuration: 8 + Math.floor(Math.random() * 6), // ~180ms subtle explosion
+          isStar: Math.random() > 0.4,
         });
       }
 

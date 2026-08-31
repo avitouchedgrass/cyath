@@ -5,6 +5,7 @@ import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
 import { StoveSageWalkthrough } from "@/components/stovesage/StoveSageWalkthrough";
+import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,6 +62,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-[#1A3629] selection:text-[#FFFDF9]">
         <AuthProvider>
           {children}
+          <XpParticleCanvas />
           <XpToastLayer />
           <LevelUpModal />
           <StoveSageWalkthrough />

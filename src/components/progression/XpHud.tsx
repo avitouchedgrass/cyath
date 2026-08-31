@@ -16,7 +16,10 @@ export function XpHud() {
     <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
       {/* Left: Level, Sanctuary Stage & Title */}
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center shrink-0">
+        <div 
+          id="xp-hud-target"
+          className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center shrink-0 transition-transform"
+        >
           <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
             LVL
           </span>

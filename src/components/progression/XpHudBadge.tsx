@@ -11,6 +11,7 @@ export function XpHudBadge() {
 
   return (
     <Link
+      id="xp-hud-badge-target"
       href="/sanctuary"
       className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none group"
       title={`Level ${progress.level} ${progress.title}: ${progress.currentLevelXp}/${progress.xpForNextLevel} XP`}

@@ -8,6 +8,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
+import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -160,9 +161,12 @@ export default function DashboardPage() {
   const avgDailyActions = (totalHeatmapActions / (heatmapDays.length || 1)).toFixed(1);
 
   // Handlers - guarded strictly to today's date so past days are read-only
-  const handleToggleHabit = (habitId: string) => {
+  const handleToggleHabit = (habitId: string, e?: React.MouseEvent) => {
     if (!isViewingToday) return;
     retroAudio.playBlip();
+    if (e && !todayLog.habitsCompleted[habitId]) {
+      xpParticleEmitter.emit(e.clientX, e.clientY, 14);
+    }
     if (!userSession) {
       setPendingAction({
         type: 'TOGGLE_HABIT',
@@ -188,9 +192,12 @@ export default function DashboardPage() {
     setShowAddHabit(false);
   };
 
-  const handleSetProtein = (amount: number) => {
+  const handleSetProtein = (amount: number, e?: React.MouseEvent) => {
     if (!isViewingToday) return;
     retroAudio.playBlip();
+    if (e) {
+      xpParticleEmitter.emit(e.clientX, e.clientY, 10);
+    }
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -198,9 +205,12 @@ export default function DashboardPage() {
     setProtein(amount, currentDate);
   };
 
-  const handleSetHydration = (amount: number) => {
+  const handleSetHydration = (amount: number, e?: React.MouseEvent) => {
     if (!isViewingToday) return;
     retroAudio.playBlip();
+    if (e) {
+      xpParticleEmitter.emit(e.clientX, e.clientY, 10);
+    }
     if (!userSession) {
       router.push('/login?redirect=/dashboard');
       return;
@@ -496,7 +506,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={habit.id}
-                    onClick={() => handleToggleHabit(habit.id)}
+                    onClick={(e) => handleToggleHabit(habit.id, e)}
                     className={`group flex items-center justify-between py-2 px-2.5 rounded-xl transition-all ${
                       !isViewingToday
                         ? 'opacity-70 cursor-not-allowed'
@@ -684,7 +694,7 @@ export default function DashboardPage() {
                     key={amt}
                     type="button"
                     disabled={!isViewingToday}
-                    onClick={() => handleSetProtein(todayLog.totalProteinLogged + amt)}
+                    onClick={(e) => handleSetProtein(todayLog.totalProteinLogged + amt, e)}
                     className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
                       !isViewingToday
                         ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
@@ -711,7 +721,7 @@ export default function DashboardPage() {
                     key={amt}
                     type="button"
                     disabled={!isViewingToday}
-                    onClick={() => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)))}
+                    onClick={(e) => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)), e)}
                     className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
                       !isViewingToday
                         ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'

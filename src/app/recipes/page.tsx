@@ -10,6 +10,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
+import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -39,6 +40,7 @@ function RecipesContent() {
     userSession,
     setPendingAction,
     userProfile,
+    currentDate,
     customRecipes,
     addCustomRecipe,
     deleteCustomRecipe,
@@ -67,19 +69,8 @@ function RecipesContent() {
   }, []);
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
-
   const todayKey = new Date().toISOString().split('T')[0];
-  const todayLog = isAuthenticated ? getDailyLog(todayKey) : {
-    habitsCompleted: {},
-    totalProteinLogged: 0,
-    totalCaloriesLogged: 0,
-    hydrationLiters: 0,
-    sleepHours: 8,
-    energyLevel: 7,
-    moodScore: 7,
-    notes: '',
-    loggedRecipeIds: [],
-  };
+  const todayLog = getDailyLog(currentDate || todayKey);
 
   const allRecipes = useMemo(() => {
     if (!isAuthenticated) return RECIPES;
@@ -100,7 +91,14 @@ function RecipesContent() {
   }, [isAuthenticated, selectedCategory]);
 
   const closeRecipeModal = () => {
-    setSelectedRecipe(null);
+    retroAudio.playBlip();
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
+        setSelectedRecipe(null);
+      });
+    } else {
+      setSelectedRecipe(null);
+    }
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.has('inspect') || params.has('recipe')) {
@@ -192,9 +190,17 @@ function RecipesContent() {
 
   const openRecipeModal = (recipe: Recipe) => {
     retroAudio.playBlip();
-    setSelectedRecipe(recipe);
-    setPortionMultiplier(1.0);
-    setShowingRawPhoto(false);
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
+        setSelectedRecipe(recipe);
+        setPortionMultiplier(1.0);
+        setShowingRawPhoto(false);
+      });
+    } else {
+      setSelectedRecipe(recipe);
+      setPortionMultiplier(1.0);
+      setShowingRawPhoto(false);
+    }
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       params.set('inspect', recipe.id);
@@ -206,6 +212,7 @@ function RecipesContent() {
   const handleQuickLog = (recipe: Recipe, multiplier: number = 1.0, e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
+      xpParticleEmitter.emit(e.clientX, e.clientY, 16);
     }
     retroAudio.playInspectConfirm();
 
@@ -477,6 +484,9 @@ function RecipesContent() {
                           alt={recipe.name}
                           loading="lazy"
                           decoding="async"
+                          style={{
+                            viewTransitionName: selectedRecipe?.id === recipe.id ? 'active-dish-plate' : 'none',
+                          }}
                           className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.14)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>

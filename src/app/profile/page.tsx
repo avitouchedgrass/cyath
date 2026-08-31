@@ -8,7 +8,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
-import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -27,13 +27,15 @@ export default function ProfilePage() {
     logsByDate,
     activeProtocolIds,
     deleteAccountData,
+    resetUserProgress,
   } = useHabitStore();
 
   const [mounted, setMounted] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -50,12 +52,12 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     retroAudio.playBlip();
     try {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'global' });
     } catch (err) {
       console.error('Sign out error:', err);
     }
     setUserSession(null);
-    router.push('/');
+    window.location.href = '/';
   };
 
   const handleForceSync = async () => {
@@ -71,15 +73,32 @@ export default function ProfilePage() {
     }
   };
 
+  const handleResetProgress = async () => {
+    retroAudio.playBlip();
+    setIsProcessing(true);
+    try {
+      await resetUserProgress();
+      setShowResetModal(false);
+      setSyncStatus('Progress reset to Level 1 (0 XP)!');
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+    } catch (err) {
+      console.error('Reset progress error:', err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     retroAudio.playBlip();
-    setIsDeleting(true);
+    setIsProcessing(true);
     try {
       await deleteAccountData();
       window.location.href = '/';
     } catch (err) {
       console.error('Delete account error:', err);
-      setIsDeleting(false);
+      setIsProcessing(false);
       setShowDeleteModal(false);
     }
   };
@@ -296,7 +315,7 @@ export default function ProfilePage() {
 
         </div>
 
-        {/* Danger Zone: Account & Data Deletion */}
+        {/* Danger Zone: Account & Data Reset */}
         <div className="border-3 border-[#DC2626] bg-[#FEF2F2] shadow-[4px_4px_0px_#DC2626] rounded-2xl p-6 sm:p-7">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
@@ -305,31 +324,92 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h3 className="font-fraunces font-bold text-lg text-[#991B1B]">
-                  Account &amp; Telemetry Management
+                  Danger Zone · Account Telemetry &amp; Reset
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#7F1D1D] mt-0.5 max-w-xl leading-relaxed">
-                  Permanently delete your profile, custom recipes, XP progression history, and all daily habit logs from both local storage and cloud databases.
+                  Reset your account progression back to Level 1 (0 XP) with fresh daily habits, or permanently purge all database records.
                 </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                setShowDeleteModal(true);
-              }}
-              className="px-4 py-2.5 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 shrink-0 self-stretch sm:self-auto justify-center"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete Account Data</span>
-            </button>
+            <div className="flex items-center gap-2.5 w-full sm:w-auto self-stretch sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setShowResetModal(true);
+                }}
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#D97706] bg-[#FEF3C7] text-[#92400E] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#D97706] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset to Level 1</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setShowDeleteModal(true);
+                }}
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Account</span>
+              </button>
+            </div>
           </div>
         </div>
 
       </main>
 
-      {/* Confirmation Modal */}
+      {/* Reset Progress Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="max-w-md w-full border-3 border-[#D97706] bg-[#FFFDF9] shadow-[8px_8px_0px_#D97706] rounded-3xl p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setShowResetModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/20 hover:bg-[#F4F0EA] cursor-pointer"
+            >
+              <X className="w-4 h-4 text-[#1A3629]" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] border-2 border-[#D97706] flex items-center justify-center mb-4">
+              <RotateCcw className="w-6 h-6 text-[#92400E]" />
+            </div>
+
+            <h3 className="font-fraunces font-black text-2xl text-[#1A3629] mb-2">
+              Reset Progress to Level 1?
+            </h3>
+
+            <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] leading-relaxed mb-6">
+              This will reset your XP to <strong>0 XP</strong>, restore your island sanctuary to its starter state, and clear logged habit history for this account.
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                disabled={isProcessing}
+                className="flex-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetProgress}
+                disabled={isProcessing}
+                className="flex-1 py-3 rounded-xl border-2 border-[#D97706] bg-[#D97706] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#78350F] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isProcessing ? <span>Resetting...</span> : <span>Confirm Reset (0 XP)</span>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="max-w-md w-full border-3 border-[#DC2626] bg-[#FFFDF9] shadow-[8px_8px_0px_#DC2626] rounded-3xl p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200">
@@ -358,7 +438,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                disabled={isDeleting}
+                disabled={isProcessing}
                 className="flex-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
               >
                 Cancel
@@ -367,10 +447,10 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={handleDeleteAccount}
-                disabled={isDeleting}
+                disabled={isProcessing}
                 className="flex-1 py-3 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isDeleting ? (
+                {isProcessing ? (
                   <span>Deleting...</span>
                 ) : (
                   <>

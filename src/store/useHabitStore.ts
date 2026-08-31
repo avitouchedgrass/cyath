@@ -114,6 +114,7 @@ export interface HabitStoreState {
   syncWithSupabase: (date?: string) => Promise<void>;
   initDemoSession: () => void;
   deleteAccountData: () => Promise<void>;
+  resetUserProgress: () => Promise<void>;
 }
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -1259,6 +1260,63 @@ export const useHabitStore = create<HabitStoreState>()(
           activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
           pendingAction: null,
           customRecipes: [],
+        });
+      },
+
+      resetUserProgress: async () => {
+        const userId = get().userSession?.id;
+        if (userId && !userId.startsWith('guest_')) {
+          try {
+            await Promise.allSettled([
+              supabase.from('daily_logs').delete().eq('user_id', userId),
+              supabase.from('xp_events').delete().eq('user_id', userId),
+              supabase.from('custom_recipes').delete().eq('user_id', userId),
+              supabase.from('user_profiles').update({
+                total_xp: 0,
+                streak_count: 0,
+                streak_freeze_stock: 1,
+                onboarding_completed: false,
+                full_name: '',
+                updated_at: new Date().toISOString(),
+              }).eq('user_id', userId),
+            ]);
+            saveUserLocalProgress(userId, {
+              totalXp: 0,
+              streakCount: 0,
+              streakFreezeStock: 1,
+              claimedMilestones: [],
+              completedQuestIdsByDate: {},
+              xpHistory: [],
+              customRecipes: [],
+              habits: DEFAULT_HABITS,
+              logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+              userProfile: null,
+            });
+          } catch (err) {
+            console.error('Failed to reset user progress:', err);
+          }
+        }
+        if (typeof window !== 'undefined') {
+          try {
+            if (userId) {
+              localStorage.removeItem(`cyath_user_progression_${userId}`);
+            }
+            localStorage.removeItem('cyath-habit-store-v2');
+          } catch {}
+        }
+        set({
+          totalXp: 0,
+          streakCount: 0,
+          streakFreezeStock: 1,
+          claimedMilestones: [],
+          completedQuestIdsByDate: {},
+          xpHistory: [],
+          logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+          habits: DEFAULT_HABITS,
+          activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
+          pendingAction: null,
+          customRecipes: [],
+          userProfile: null,
         });
       },
     }),

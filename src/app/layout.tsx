@@ -3,6 +3,8 @@ import { Inter, Playfair_Display, JetBrains_Mono, Fraunces, Pixelify_Sans } from
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
+import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
+import { StoveSageWalkthrough } from "@/components/stovesage/StoveSageWalkthrough";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,6 +63,8 @@ export default function RootLayout({
           {children}
           <XpToastLayer />
           <LevelUpModal />
+          <StoveSageWalkthrough />
+          <StoveSageChatbot />
         </AuthProvider>
       </body>
     </html>

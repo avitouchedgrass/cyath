@@ -341,6 +341,9 @@ function RecipesContent() {
               <div className="relative" ref={sortDropdownRef}>
                 <button
                   type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={isSortOpen}
+                  aria-label={`Sort recipes by ${SORT_OPTIONS.find((o) => o.id === sortBy)?.label}`}
                   onClick={() => setIsSortOpen(!isSortOpen)}
                   className="px-3.5 py-2 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-2 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
                 >
@@ -350,7 +353,11 @@ function RecipesContent() {
                 </button>
 
                 {isSortOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl border-2 shadow-2xl z-30 p-1.5 font-cabinet font-bold text-xs bg-[#FFFDF9] border-[#1A3629]">
+                  <div 
+                    role="listbox" 
+                    aria-label="Sort options"
+                    className="absolute right-0 mt-2 w-48 rounded-xl border-2 shadow-2xl z-30 p-1.5 font-cabinet font-bold text-xs bg-[#FFFDF9] border-[#1A3629]"
+                  >
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.id}
@@ -490,6 +497,8 @@ function RecipesContent() {
                         <img
                           src={recipe.image}
                           alt={recipe.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.14)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>

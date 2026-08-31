@@ -15,6 +15,13 @@
   --color-brand: #FFFFFF;
   --color-brand-contrast: #000000;
 
+  /* Core Brand Neobrutalist Tokens */
+  --color-ink: #1A3629;
+  --color-ink-muted: #4A5D4E;
+  --color-parchment: #F4F0EA;
+  --color-parchment-deep: #E8DECF;
+  --color-cream: #FFFDF9;
+
   /* Typography Font Stacks */
   --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
   --font-fraunces: var(--font-fraunces), "Fraunces", Georgia, serif;
@@ -213,9 +220,25 @@ body {
 /* Accessibility: Intentional graceful reduced-motion alternatives */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
-    animation-duration: 0.001s !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001s !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Silence continuous floating and ambient oscillating loops */
+  .animate-\[bounce_1\.5s_infinite\],
+  .animate-spin,
+  [class*="animate-island-float"],
+  [class*="animate-shadow-float"],
+  [class*="animate-pixel-float"],
+  [class*="animate-float-slow"],
+  [class*="animate-pulse-glow"],
+  [class*="animate-flame-pulse"],
+  [class*="animate-ember-shimmer"] {
+    animation: none !important;
+  }
+
+  /* Preserve fast, accessible feedback on interactive state transitions */
+  * {
+    transition-duration: 150ms !important;
   }
 }

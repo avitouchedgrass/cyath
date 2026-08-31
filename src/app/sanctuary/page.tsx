@@ -112,7 +112,7 @@ export default function SanctuaryPage() {
 
               <div className="divide-y divide-[#1A3629]/10">
                 {xpHistory.length === 0 ? (
-                  <div className="py-4 text-center font-mono text-[11px] text-[#8C9B90]">
+                  <div className="py-4 text-center font-mono text-[11px] text-[#4A5D4E]">
                     No recent habit logs recorded.
                   </div>
                 ) : (
@@ -122,7 +122,7 @@ export default function SanctuaryPage() {
                         <span className="font-cabinet text-xs font-bold text-[#1A3629] block truncate">
                           {item.reason}
                         </span>
-                        <span className="font-mono text-[10px] text-[#8C9B90] tabular-nums">
+                        <span className="font-mono text-[10px] text-[#4A5D4E] tabular-nums">
                           {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>

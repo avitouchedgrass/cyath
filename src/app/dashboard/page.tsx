@@ -314,9 +314,14 @@ export default function DashboardPage() {
 
             <div className="flex flex-wrap items-center gap-3">
               {/* 7 Days vs 28 Days Toggle */}
-              <div className="inline-flex items-center p-0.5 rounded-lg border-2 border-[#1A3629] bg-[#F4F0EA]">
+              <div 
+                role="group" 
+                aria-label="Habit check-in history duration"
+                className="inline-flex items-center p-0.5 rounded-lg border-2 border-[#1A3629] bg-[#F4F0EA]"
+              >
                 <button
                   type="button"
+                  aria-pressed={historyRange === 7}
                   onClick={() => {
                     retroAudio.playBlip();
                     setHistoryRange(7);
@@ -331,6 +336,7 @@ export default function DashboardPage() {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={historyRange === 28}
                   onClick={() => {
                     retroAudio.playBlip();
                     setHistoryRange(28);
@@ -647,7 +653,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="font-bold text-[#1A3629]">Protein</span>
                 <span className="tabular-nums font-bold text-[#10B981]">
-                  {todayLog.totalProteinLogged}g <span className="text-[#8C9B90] font-normal">/ 160g</span>
+                  {todayLog.totalProteinLogged}g <span className="text-[#4A5D4E] font-medium">/ 160g</span>
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-1.5">
@@ -674,7 +680,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="font-bold text-[#1A3629]">Water Intake</span>
                 <span className="tabular-nums font-bold text-[#2563EB]">
-                  {todayLog.hydrationLiters.toFixed(1)}L <span className="text-[#8C9B90] font-normal">/ 3.0L</span>
+                  {todayLog.hydrationLiters.toFixed(1)}L <span className="text-[#4A5D4E] font-medium">/ 3.0L</span>
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-1.5">

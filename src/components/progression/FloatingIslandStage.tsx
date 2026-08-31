@@ -38,7 +38,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
             </span>
           )}
           {!isUnlocked && (
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C9B90] bg-[#EAE3D2] px-2 py-0.5 rounded-full">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] bg-[#EAE3D2] px-2 py-0.5 rounded-full">
               Unlocks at Level {displayedIsland.minLevel}
             </span>
           )}
@@ -141,7 +141,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
                     ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] -translate-y-0.5'
                     : unlocked
                     ? 'bg-[#FAF6EE] text-[#1A3629] border border-[#1A3629]/30 hover:border-[#1A3629]'
-                    : 'bg-[#F4EDE0]/50 text-[#8C9B90] border border-[#1A3629]/15 opacity-60'
+                    : 'bg-[#F4EDE0]/50 text-[#4A5D4E] border border-[#1A3629]/20'
                 }`}
                 title={`${tier.name} (Level ${tier.minLevel}+)`}
               >

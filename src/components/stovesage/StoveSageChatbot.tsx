@@ -405,7 +405,7 @@ export function StoveSageChatbot() {
                                 </span>
                               )}
                               {act.status === 'dismissed' && (
-                                <span className="text-[10px] font-mono font-bold text-[#8C9B90] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
+                                <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
                                   Skipped
                                 </span>
                               )}

@@ -62,7 +62,7 @@ export function StreakCardMini() {
                 ? 'bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629]'
                 : day.isToday
                 ? 'bg-[#FAF6EE] text-[#1A3629] border-2 border-[#1A3629]'
-                : 'bg-transparent text-[#8C9B90] border border-transparent'
+                : 'bg-transparent text-[#4A5D4E] border border-transparent'
             }`}
           >
             <span className="font-mono text-[9px] uppercase font-bold leading-none">
@@ -86,7 +86,7 @@ export function StreakCardMini() {
         <span className={`font-bold px-2 py-0.5 rounded-md border tabular-nums ${
           streakFreezeStock > 0
             ? 'text-[#2563EB] bg-[#EFF6FF] border-[#2563EB]/30'
-            : 'text-[#8C9B90] bg-[#FAF6EE] border-[#1A3629]/20'
+            : 'text-[#4A5D4E] bg-[#FAF6EE] border-[#1A3629]/20'
         }`}>
           {streakFreezeStock}/{STREAK_FREEZE.maxStock} Ready
         </span>

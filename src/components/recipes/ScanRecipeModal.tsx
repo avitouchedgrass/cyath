@@ -302,7 +302,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                     <img src="/assets/food/grilled-chicken-1.0.png" alt="Grilled Chicken" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
                       <span className="text-xs font-cabinet font-bold text-[#1A3629] block truncate">Grilled Chicken</span>
-                      <span className="text-[10px] font-mono text-[#8C9B90]">High Protein</span>
+                      <span className="text-[10px] font-mono text-[#4A5D4E]">High Protein</span>
                     </div>
                   </button>
 
@@ -314,7 +314,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                     <img src="/assets/food/grain-bowl-1.0.png" alt="Quinoa Bowl" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
                       <span className="text-xs font-cabinet font-bold text-[#1A3629] block truncate">Quinoa Bowl</span>
-                      <span className="text-[10px] font-mono text-[#8C9B90]">Steady Carbs</span>
+                      <span className="text-[10px] font-mono text-[#4A5D4E]">Steady Carbs</span>
                     </div>
                   </button>
 
@@ -326,7 +326,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                     <img src="/assets/food/paneer-bhurji-1.0.png" alt="Paneer Bhurji" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
                       <span className="text-xs font-cabinet font-bold text-[#1A3629] block truncate">Paneer Bhurji</span>
-                      <span className="text-[10px] font-mono text-[#8C9B90]">Ghar Ka Khana</span>
+                      <span className="text-[10px] font-mono text-[#4A5D4E]">Ghar Ka Khana</span>
                     </div>
                   </button>
                 </div>

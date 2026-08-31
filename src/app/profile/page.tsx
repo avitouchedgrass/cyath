@@ -76,7 +76,7 @@ export default function ProfilePage() {
     setIsDeleting(true);
     try {
       await deleteAccountData();
-      router.push('/');
+      window.location.href = '/';
     } catch (err) {
       console.error('Delete account error:', err);
       setIsDeleting(false);

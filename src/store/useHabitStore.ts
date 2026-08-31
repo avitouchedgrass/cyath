@@ -1184,23 +1184,67 @@ export const useHabitStore = create<HabitStoreState>()(
 
       deleteAccountData: async () => {
         const userId = get().userSession?.id;
+
+        // 1. Call server API to delete account telemetry
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            await fetch('/api/auth/delete-account', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+          }
+        } catch (err) {
+          console.warn('Backend delete-account call warning:', err);
+        }
+
+        // 2. Direct client-side cleanup on Supabase tables as fallback
         if (userId && !userId.startsWith('guest_')) {
           try {
-            await supabase.from('daily_logs').delete().eq('user_id', userId);
-            await supabase.from('xp_events').delete().eq('user_id', userId);
-            await supabase.from('custom_recipes').delete().eq('user_id', userId);
-            await supabase.from('habits').delete().eq('user_id', userId);
-            await supabase.from('user_profiles').delete().eq('user_id', userId);
-            await supabase.auth.signOut();
+            await Promise.allSettled([
+              supabase.from('daily_logs').delete().eq('user_id', userId),
+              supabase.from('xp_events').delete().eq('user_id', userId),
+              supabase.from('custom_recipes').delete().eq('user_id', userId),
+              supabase.from('habits').delete().eq('user_id', userId),
+              supabase.from('user_profiles').delete().eq('user_id', userId),
+            ]);
+            await supabase.from('user_profiles').upsert({
+              user_id: userId,
+              total_xp: 0,
+              streak_count: 0,
+              streak_freeze_stock: 1,
+              onboarding_completed: false,
+              full_name: '',
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id' });
           } catch (err) {
             console.error('Failed to clear remote account data:', err);
           }
-          if (typeof window !== 'undefined') {
-            try {
-              localStorage.removeItem(`cyath_user_progression_${userId}`);
-            } catch {}
-          }
         }
+
+        // 3. Clear all browser local storage cache keys
+        if (typeof window !== 'undefined') {
+          try {
+            if (userId) {
+              localStorage.removeItem(`cyath_user_progression_${userId}`);
+            }
+            Object.keys(localStorage).forEach((key) => {
+              if (key.startsWith('cyath_user_progression_') || key === 'cyath-habit-store-v2') {
+                localStorage.removeItem(key);
+              }
+            });
+          } catch {}
+        }
+
+        // 4. Sign out from Supabase global session
+        try {
+          await supabase.auth.signOut({ scope: 'global' });
+        } catch {}
+
+        // 5. Reset in-memory store completely
         set({
           userSession: null,
           userProfile: null,

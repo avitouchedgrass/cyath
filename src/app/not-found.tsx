@@ -26,7 +26,7 @@ export default function NotFound() {
             Lost in the Mists
           </h1>
           <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] mt-2 leading-relaxed">
-            StoveSage consulted the grimoire, but this coordinate has vanished from the sanctuary map.
+            The coordinate you requested has vanished or does not exist on the map.
           </p>
         </div>
 

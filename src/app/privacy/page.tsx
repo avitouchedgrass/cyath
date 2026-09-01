@@ -95,14 +95,14 @@ export default function PrivacyPage() {
               <li>Calculating daily macro targets, habit completion rates, and streak progression.</li>
               <li>Rendering your 16-bit Sanctuary floating island diorama and XP progression levels.</li>
               <li>Generating offline Pearson correlation statistics between your habits and subjective focus scores.</li>
-              <li>Powering StoveSage AI assistant queries when explicitly prompted by you.</li>
+              <li>Powering the AI Plate Scanner when you choose to photograph a meal.</li>
             </ul>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-fraunces font-bold text-2xl text-[#1A3629]">4. AI Assistant (StoveSage) &amp; Third-Party Services</h2>
+            <h2 className="font-fraunces font-bold text-2xl text-[#1A3629]">4. AI Food Vision &amp; Third-Party Services</h2>
             <p className="text-[#2C4A3B]">
-              When interacting with the optional StoveSage AI wizard, prompt text and relevant macro targets are transmitted securely to Google Gemini APIs to formulate recipe and habit recommendations. We do not sell your conversational data to advertisers or use it for cross-site behavioral profiling.
+              When using the optional AI Plate Scanner in the recipe catalog, image data of your food plate is transmitted securely to Google Gemini Vision APIs to calculate nutritional macro estimates. We do not sell your image data to advertisers or use it for cross-site behavioral profiling.
             </p>
           </section>
 

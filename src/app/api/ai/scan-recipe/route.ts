@@ -60,9 +60,10 @@ Output strictly valid JSON matching this schema:
 }`;
 
 const CANDIDATE_MODELS = [
-  'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
   'gemini-2.5-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+  'gemini-2.0-flash',
   'gemini-flash-latest',
 ];
 
@@ -137,17 +138,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unsupported image format. Please upload a JPEG, PNG, or WebP image.' }, { status: 415 });
     }
 
-    // Resolve API key from request or environment
-    const activeKey = apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    // Resolve server-side API key for all users
+    const activeKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || apiKey;
 
     if (!activeKey) {
       return NextResponse.json(
         {
-          error:
-            'Google Gemini API key required for live AI vision. Please provide a free key from Google AI Studio (https://aistudio.google.com) or set GEMINI_API_KEY in .env.local.',
-          requiresKey: true,
+          error: 'AI Plate Scanner is temporarily unavailable on this deployment. Please verify server environment variables.',
         },
-        { status: 401 }
+        { status: 503 }
       );
     }
 

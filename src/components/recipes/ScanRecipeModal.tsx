@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Recipe } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import {
@@ -22,8 +22,6 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
   const [step, setStep] = useState<ScanStep>('upload');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string>('image/jpeg');
-  const [apiKeyInput, setApiKeyInput] = useState<string>('');
-  const [showApiKeyField, setShowApiKeyField] = useState<boolean>(false);
   const [scanStatusIndex, setScanStatusIndex] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -38,16 +36,6 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-load saved Gemini key from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedKey = localStorage.getItem('cyath_gemini_api_key');
-      if (savedKey) {
-        setApiKeyInput(savedKey);
-      }
-    }
-  }, []);
-
   const currentDisplayedImage = useMemo(() => {
     if (photoStyle === 'matched_sprite') {
       return matchedSpriteImage;
@@ -58,23 +46,11 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
     return pixelPlateImage || selectedImage || '/assets/food/grain-bowl-1.0.png';
   }, [photoStyle, matchedSpriteImage, retroFrameImage, pixelPlateImage, selectedImage]);
 
-  const handleApiKeyChange = (val: string) => {
-    setApiKeyInput(val);
-    if (typeof window !== 'undefined') {
-      if (val.trim()) {
-        localStorage.setItem('cyath_gemini_api_key', val.trim());
-      } else {
-        localStorage.removeItem('cyath_gemini_api_key');
-      }
-    }
-  };
-
   const SCAN_LOGS = [
-    'Connecting to Google Gemini Vision Neural Mesh...',
-    'Decomposing Plate Topology & Contrast...',
-    'Segmenting Protein & Complex Carbohydrate Density...',
-    'Calibrating Amino Mass & Thermal Prep Curves...',
-    'Synthesizing Cyath Metabolic Manifest...',
+    'Analyzing food plate photo...',
+    'Identifying ingredients & portions...',
+    'Calculating protein & macronutrients...',
+    'Formulating whole-food recipe...',
   ];
 
   if (!isOpen) return null;
@@ -127,7 +103,6 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
         body: JSON.stringify({
           image: imgData,
           mimeType: mime,
-          apiKey: apiKeyInput.trim() || undefined,
         }),
       });
 
@@ -148,55 +123,50 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
         setMatchedSpriteImage(bestSprite);
 
         try {
-          const [plateUri, frameUri] = await Promise.all([
-            generatePixelatedPlate(imgData),
-            generateRetroFramedBadge(imgData),
-          ]);
-          setPixelPlateImage(plateUri);
-          setRetroFrameImage(frameUri);
-        } catch (err) {
-          console.warn('Canvas stylizer failed:', err);
+          const pixelatedPlate = await generatePixelatedPlate(imgData);
+          setPixelPlateImage(pixelatedPlate);
+        } catch {
+          setPixelPlateImage(bestSprite);
         }
 
-        setExtractedRecipe({
-          ...data.recipe,
-          id: `custom-${Date.now()}`,
-          image: imgData,
-          rawImage: imgData,
-          isCustom: true,
-        });
-        retroAudio.playInspectConfirm();
+        try {
+          const framed = await generateRetroFramedBadge(imgData);
+          setRetroFrameImage(framed);
+        } catch {
+          setRetroFrameImage(null);
+        }
+
+        setExtractedRecipe(data.recipe);
         setStep('review');
+        retroAudio.playInspectConfirm();
       } else {
-        throw new Error('Vision model did not return structured recipe data.');
+        throw new Error('Could not formulate nutritional profile from this image.');
       }
     } catch (err: any) {
       clearInterval(interval);
-      console.error('Scan failed:', err);
-      setErrorMsg(err?.message || 'Vision scan encountered an error. Please verify your Gemini API key.');
+      console.error('Vision scan error:', err);
+      setErrorMsg(err.message || 'Vision analysis failed. Please try another clear photograph.');
       setStep('upload');
-      setShowApiKeyField(true);
     }
   };
 
-  const handleFinalSave = () => {
-    if (!extractedRecipe || !extractedRecipe.name) return;
+  const handleSaveAndClose = () => {
+    if (!extractedRecipe) return;
 
     const fullRecipe: Recipe = {
-      id: extractedRecipe.id || `custom-${Date.now()}`,
-      name: extractedRecipe.name || 'Custom Plate',
-      subtitle: extractedRecipe.subtitle || 'User crafted custom meal',
-      image: currentDisplayedImage,
-      rawImage: selectedImage || undefined,
-      calories: Number(extractedRecipe.calories) || 500,
-      protein: Number(extractedRecipe.protein) || 30,
-      carbs: Number(extractedRecipe.carbs) || 45,
-      fats: Number(extractedRecipe.fats) || 15,
-      prepTimeMinutes: Number(extractedRecipe.prepTimeMinutes) || 20,
+      id: `scanned-${Date.now()}`,
+      name: extractedRecipe.name || 'Custom Scanned Plate',
+      subtitle: extractedRecipe.subtitle || 'AI Vision Formulated Whole-Food Plate',
       category: extractedRecipe.category || 'High Protein',
       dietType: extractedRecipe.dietType || 'omnivore',
-      tags: extractedRecipe.tags || ['Custom Meal', 'Vision Scanned'],
+      calories: extractedRecipe.calories || 450,
+      protein: extractedRecipe.protein || 35,
+      carbs: extractedRecipe.carbs || 40,
+      fats: extractedRecipe.fats || 15,
+      prepTimeMinutes: extractedRecipe.prepTimeMinutes || 20,
       focusScore: extractedRecipe.focusScore || '9.0/10',
+      tags: extractedRecipe.tags && extractedRecipe.tags.length > 0 ? extractedRecipe.tags : ['High Protein', 'Custom'],
+      image: currentDisplayedImage,
       description: extractedRecipe.description || 'Personal calibrated meal scanned with Cyath AI vision.',
       ingredients: extractedRecipe.ingredients && extractedRecipe.ingredients.length > 0
         ? extractedRecipe.ingredients
@@ -218,12 +188,9 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
       <div className="relative w-full max-w-2xl bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl shadow-[8px_8px_0px_#1A3629] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header Ribbon */}
         <div className="px-6 py-4 border-b-2 border-[#1A3629] bg-[#FAF6EE] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-3 h-3 rounded-full bg-[#10B981] border border-[#1A3629] animate-pulse" />
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
-              AI Neural Vision Scanner · Multimodal Food Reasoning
-            </span>
-          </div>
+          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
+            Scan Meal with AI
+          </span>
 
           <button
             type="button"
@@ -242,10 +209,10 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
             <div className="flex flex-col gap-5">
               <div className="text-center sm:text-left">
                 <h3 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
-                  Scan Any Meal with AI
+                  Scan Any Meal
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-1">
-                  Upload a photo of your plate. Our computer vision model identifies ingredients, calculates calories & macros, and extracts culinary instructions.
+                  Upload a photo of your plate to automatically estimate ingredients, protein, and calories.
                 </p>
               </div>
 
@@ -284,7 +251,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   Click or drag photo here to scan
                 </span>
                 <span className="text-[11px] font-mono text-[#8C9B90] mt-1">
-                  Supports JPEG, PNG, WebP (camera photos, food delivery, home cooking)
+                  Supports JPEG, PNG, WebP
                 </span>
               </div>
 
@@ -332,30 +299,13 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 </div>
               </div>
 
-              {/* Engine Status Banner */}
-              <div className="p-3.5 rounded-2xl border-2 border-[#1A3629]/25 bg-[#FAF6EE] flex items-center justify-between shadow-[2px_2px_0px_#1A3629]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
-                  <div>
-                    <span className="text-xs font-cabinet font-bold text-[#1A3629] block">
-                      Cyath Neural Computer Vision
-                    </span>
-                    <span className="text-[10px] font-mono text-[#4A5D4E]">
-                      Live Multimodal Gemini Reasoning Engine
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#065F46] bg-[#ECFDF5] px-2.5 py-1 rounded-full border border-[#10B981]">
-                  Active
-                </span>
-              </div>
             </div>
           )}
 
-          {/* STEP 2: SCANNING (CRT HUD + REASONING PROGRESS) */}
+          {/* STEP 2: SCANNING (PROGRESS LOGS) */}
           {step === 'scanning' && (
             <div className="flex flex-col items-center justify-center py-8 gap-5 text-center">
-              {/* Image Preview with Scanning Beam */}
+              {/* Image Preview */}
               <div className="relative w-44 h-44 rounded-2xl border-3 border-[#1A3629] overflow-hidden bg-[#1A3629] shadow-[5px_5px_0px_#1A3629]">
                 {selectedImage && (
                   <img
@@ -364,28 +314,15 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                     className="w-full h-full object-cover opacity-85 [image-rendering:pixelated]"
                   />
                 )}
-
-                {/* Laser scanline beam */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#10B981]/40 to-transparent h-8 w-full animate-[bounce_1.5s_infinite] pointer-events-none" />
-                <div className="absolute inset-0 border border-[#10B981]/50 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#10B981]/25 to-transparent animate-[scanline_1.8s_ease-in-out_infinite]" />
               </div>
 
-              {/* Terminal Logs Ticker */}
-              <div className="w-full max-w-md bg-[#1A3629] text-[#A7F3D0] rounded-xl p-4 font-mono text-xs text-left shadow-inner border border-[#10B981]/30">
-                <div className="flex items-center justify-between border-b border-[#10B981]/25 pb-2 mb-2 text-[10px] text-[#34D399]">
-                  <span>CYATH_VISION_ENGINE_V2</span>
-                  <span className="animate-pulse">● LIVE_FEED</span>
-                </div>
-                <div className="flex flex-col gap-1.5 min-h-[50px]">
-                  <p className="text-[11px] leading-relaxed text-[#FFFDF9]">
-                    &gt; {SCAN_LOGS[scanStatusIndex]}
-                  </p>
-                </div>
+              {/* Status Ticker */}
+              <div className="w-full max-w-md bg-[#1A3629] text-[#A7F3D0] rounded-xl p-4 font-mono text-xs text-left shadow-inner border border-[#1A3629]">
+                <p className="text-[12px] leading-relaxed text-[#FFFDF9]">
+                  &gt; {SCAN_LOGS[scanStatusIndex]}
+                </p>
               </div>
-
-              <span className="text-xs font-cabinet font-medium text-[#4A5D4E]">
-                Neural reasoning in progress · Estimating weights & amino balance...
-              </span>
             </div>
           )}
 
@@ -408,7 +345,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   <div className="flex-1 min-w-0 flex flex-col gap-1 w-full">
                     <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase bg-[#10B981] text-[#FFFDF9] border-[#1A3629]">
-                        AI Verified
+                        Verified
                       </span>
                       <span className="px-2 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
                         {extractedRecipe.category}
@@ -519,108 +456,102 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 </div>
               </div>
 
-              {/* Chain of Thought Reasoning Steps */}
-              {extractedRecipe.reasoningSteps && extractedRecipe.reasoningSteps.length > 0 && (
-                <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9] flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1A3629]">
-                    <span>Visual Recognition Reasoning Trace:</span>
-                  </div>
-                  <ul className="flex flex-col gap-1.5">
-                    {extractedRecipe.reasoningSteps.map((stepText, idx) => (
-                      <li key={idx} className="text-[11px] font-cabinet text-[#2C4A3B] leading-relaxed flex items-start gap-2">
-                        <span className="text-[#10B981] font-mono font-bold">↳</span>
-                        <span>{stepText}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Editable Macros Grid */}
+              {/* Macros Dashboard Strip */}
               <div className="grid grid-cols-4 gap-2 text-center">
-                <div className="p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
-                  <span className="text-[10px] font-mono font-bold block text-[#1A3629]">PROTEIN</span>
-                  <div className="flex items-center justify-center gap-0.5 mt-0.5">
-                    <input
-                      type="number"
-                      value={extractedRecipe.protein ?? 0}
-                      onChange={(e) => setExtractedRecipe({ ...extractedRecipe, protein: Number(e.target.value) })}
-                      className="w-12 text-center font-mono text-base font-bold text-[#1A3629] bg-transparent border-b border-transparent hover:border-[#1A3629] outline-none"
-                    />
-                    <span className="text-xs font-mono font-bold">g</span>
-                  </div>
+                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                  <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Calories</span>
+                  <input
+                    type="number"
+                    value={extractedRecipe.calories || 0}
+                    onChange={(e) => setExtractedRecipe({ ...extractedRecipe, calories: Number(e.target.value) })}
+                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                  />
+                  <span className="text-[9px] font-mono text-[#4A5D4E]">kcal</span>
                 </div>
 
-                <div className="p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
-                  <span className="text-[10px] font-mono font-bold block text-[#1A3629]">CALORIES</span>
-                  <div className="flex items-center justify-center gap-0.5 mt-0.5">
-                    <input
-                      type="number"
-                      value={extractedRecipe.calories ?? 0}
-                      onChange={(e) => setExtractedRecipe({ ...extractedRecipe, calories: Number(e.target.value) })}
-                      className="w-14 text-center font-mono text-base font-bold text-[#1A3629] bg-transparent border-b border-transparent hover:border-[#1A3629] outline-none"
-                    />
-                  </div>
+                <div className="p-2.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5]">
+                  <span className="text-[10px] font-mono font-bold text-[#065F46] uppercase block">Protein</span>
+                  <input
+                    type="number"
+                    value={extractedRecipe.protein || 0}
+                    onChange={(e) => setExtractedRecipe({ ...extractedRecipe, protein: Number(e.target.value) })}
+                    className="font-fraunces font-black text-lg text-[#065F46] w-full text-center bg-transparent outline-none"
+                  />
+                  <span className="text-[9px] font-mono text-[#065F46]">grams</span>
                 </div>
 
-                <div className="p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
-                  <span className="text-[10px] font-mono font-bold block text-[#1A3629]">CARBS</span>
-                  <div className="flex items-center justify-center gap-0.5 mt-0.5">
-                    <input
-                      type="number"
-                      value={extractedRecipe.carbs ?? 0}
-                      onChange={(e) => setExtractedRecipe({ ...extractedRecipe, carbs: Number(e.target.value) })}
-                      className="w-12 text-center font-mono text-base font-bold text-[#1A3629] bg-transparent border-b border-transparent hover:border-[#1A3629] outline-none"
-                    />
-                    <span className="text-xs font-mono font-bold">g</span>
-                  </div>
+                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                  <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Carbs</span>
+                  <input
+                    type="number"
+                    value={extractedRecipe.carbs || 0}
+                    onChange={(e) => setExtractedRecipe({ ...extractedRecipe, carbs: Number(e.target.value) })}
+                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                  />
+                  <span className="text-[9px] font-mono text-[#4A5D4E]">grams</span>
                 </div>
 
-                <div className="p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
-                  <span className="text-[10px] font-mono font-bold block text-[#1A3629]">FATS</span>
-                  <div className="flex items-center justify-center gap-0.5 mt-0.5">
-                    <input
-                      type="number"
-                      value={extractedRecipe.fats ?? 0}
-                      onChange={(e) => setExtractedRecipe({ ...extractedRecipe, fats: Number(e.target.value) })}
-                      className="w-12 text-center font-mono text-base font-bold text-[#1A3629] bg-transparent border-b border-transparent hover:border-[#1A3629] outline-none"
-                    />
-                    <span className="text-xs font-mono font-bold">g</span>
-                  </div>
+                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                  <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Fats</span>
+                  <input
+                    type="number"
+                    value={extractedRecipe.fats || 0}
+                    onChange={(e) => setExtractedRecipe({ ...extractedRecipe, fats: Number(e.target.value) })}
+                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                  />
+                  <span className="text-[9px] font-mono text-[#4A5D4E]">grams</span>
                 </div>
               </div>
 
-              {/* Ingredients List */}
-              <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]">
-                  Identified Ingredients & Estimated Portions
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {extractedRecipe.ingredients?.map((ing, i) => (
-                    <div key={i} className="flex items-center justify-between bg-[#FFFDF9] px-2.5 py-1.5 rounded-lg border border-[#1A3629]/15 text-xs font-mono">
-                      <span className="text-[#1A3629] font-medium">{ing.item}</span>
-                      <span className="text-[#10B981] font-bold">{ing.amount}</span>
-                    </div>
-                  ))}
+              {/* Ingredients & Instructions Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Ingredients */}
+                <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/15 bg-[#FFFDF9] flex flex-col gap-2">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
+                    Decomposed Ingredients ({extractedRecipe.ingredients?.length || 0})
+                  </span>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {(extractedRecipe.ingredients || []).map((ing, idx) => (
+                      <div key={idx} className="text-xs font-cabinet flex items-center justify-between border-b border-[#1A3629]/10 pb-1">
+                        <span className="font-bold text-[#1A3629] truncate">{ing.item}</span>
+                        <span className="font-mono text-[11px] text-[#4A5D4E] shrink-0 ml-2">{ing.amount}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Instructions */}
+                <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/15 bg-[#FFFDF9] flex flex-col gap-2">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
+                    Prep Instructions ({extractedRecipe.instructions?.length || 0})
+                  </span>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {(extractedRecipe.instructions || []).map((inst, idx) => (
+                      <div key={idx} className="text-xs font-cabinet flex items-start gap-1.5">
+                        <span className="font-mono font-bold text-[10px] text-[#10B981] mt-0.5">{idx + 1}.</span>
+                        <span className="text-[#2C4A3B] leading-snug">{inst}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
                   onClick={() => setStep('upload')}
-                  className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF6EE] cursor-pointer"
+                  className="px-4 py-2 rounded-xl border-2 border-[#1A3629]/25 hover:border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs cursor-pointer"
                 >
-                  ← Rescan Photo
+                  ← Rescan Plate
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleFinalSave}
-                  className="flex-1 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  onClick={handleSaveAndClose}
+                  className="px-6 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-2"
                 >
-                  <span>✓ Save to My Recipe Library</span>
+                  <span>Save to Whole-Food Catalog →</span>
                 </button>
               </div>
             </div>

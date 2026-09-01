@@ -46,7 +46,7 @@ export default function TermsPage() {
               Important Health &amp; Nutritional Disclaimer
             </h3>
             <p className="text-xs sm:text-sm font-cabinet font-medium text-[#78350F] leading-relaxed">
-              Cyath provides habit tracking, culinary ideas, and behavioral statistics for general educational and informational wellness purposes only. Cyath and the StoveSage AI assistant do not provide medical advice, diagnosis, or clinical treatment. Always consult a qualified healthcare provider before undertaking new dietary or strenuous physical regimens.
+              Cyath provides habit tracking, culinary ideas, and behavioral statistics for general educational and informational wellness purposes only. Cyath and its AI vision scanner do not provide medical advice, diagnosis, or clinical treatment. Always consult a qualified healthcare provider before undertaking new dietary or strenuous physical regimens.
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="font-fraunces font-bold text-2xl text-[#1A3629]">3. Intellectual Property</h2>
             <p className="text-[#2C4A3B]">
-              All custom illustrations, 16-bit pixel art assets, audio synthesis designs, software code, and brand marks associated with Cyath and StoveSage are the exclusive intellectual property of Cyath. You may not reproduce, distribute, or reverse-engineer these assets without prior written consent.
+              All custom illustrations, 16-bit pixel art assets, audio synthesis designs, software code, and brand marks associated with Cyath are the exclusive intellectual property of Cyath. You may not reproduce, distribute, or reverse-engineer these assets without prior written consent.
             </p>
           </section>
 

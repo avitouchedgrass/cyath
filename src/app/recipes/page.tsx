@@ -30,6 +30,36 @@ const SORT_OPTIONS: { id: 'protein' | 'calories' | 'time'; label: string }[] = [
   { id: 'time', label: 'Quickest Prep' },
 ];
 
+function getDietBadgeDetails(dietType?: string) {
+  switch (dietType?.toLowerCase()) {
+    case 'vegan':
+      return {
+        label: 'Vegan',
+        dotColor: 'bg-[#10B981]',
+        pillStyle: 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/60',
+      };
+    case 'vegetarian':
+      return {
+        label: 'Vegetarian',
+        dotColor: 'bg-[#059669]',
+        pillStyle: 'bg-[#F0FDF4] text-[#166534] border-[#22C55E]/60',
+      };
+    case 'pescatarian':
+      return {
+        label: 'Pescatarian',
+        dotColor: 'bg-[#2563EB]',
+        pillStyle: 'bg-[#EFF6FF] text-[#1E40AF] border-[#3B82F6]/60',
+      };
+    case 'omnivore':
+    default:
+      return {
+        label: 'Omnivore',
+        dotColor: 'bg-[#D97706]',
+        pillStyle: 'bg-[#FFFBEB] text-[#92400E] border-[#F59E0B]/60',
+      };
+  }
+}
+
 function RecipesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -164,7 +194,7 @@ function RecipesContent() {
         (selectedDietFilter === 'Vegetarian' && (r.dietType === 'vegetarian' || r.dietType === 'vegan')) ||
         (selectedDietFilter === 'Vegan' && r.dietType === 'vegan') ||
         (selectedDietFilter === 'Pescatarian' && (r.dietType === 'pescatarian' || r.dietType === 'vegetarian' || r.dietType === 'vegan')) ||
-        (selectedDietFilter === 'Omnivore' && true);
+        (selectedDietFilter === 'Omnivore' && (r.dietType === 'omnivore' || !r.dietType));
 
       const query = searchQuery.trim().toLowerCase();
       const matchesSearch =
@@ -287,9 +317,9 @@ function RecipesContent() {
         </div>
 
         {/* Distilled Discovery & Filtering Console */}
-        <div className="flex flex-col gap-3 mb-8 p-3.5 sm:p-4 rounded-2xl border-2 border-[#1A3629] bg-[#FAF6EE] shadow-[3px_3px_0px_#1A3629]">
+        <div className="flex flex-col gap-3.5 mb-8 p-4 sm:p-5 rounded-2xl border-3 border-[#1A3629] bg-[#FAF6EE] shadow-[4px_4px_0px_#1A3629]">
           {/* Row 1: Search Bar + Dish Counter + Sort Dropdown */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1">
               <input
@@ -298,7 +328,7 @@ function RecipesContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search recipes, ingredients, macros..."
-                className="w-full pl-3.5 pr-10 py-2 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
+                className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border-2 text-xs font-cabinet font-bold focus:outline-none transition-all bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] placeholder-[#2C4A3B]/60 shadow-[2px_2px_0px_#1A3629]"
               />
               {!searchQuery ? (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold border border-[#1A3629]/40 text-[#1A3629] px-1.5 py-0.5 rounded pointer-events-none">
@@ -317,7 +347,7 @@ function RecipesContent() {
 
             {/* Counter Pill + Custom Sort Dropdown */}
             <div className="flex items-center gap-2 shrink-0 justify-between sm:justify-end">
-              <div className="px-3 py-1.5 rounded-xl border-2 border-[#1A3629]/25 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629] whitespace-nowrap">
+              <div className="px-3 py-2 rounded-xl border-2 border-[#1A3629]/25 bg-[#FFFDF9] text-xs font-mono font-bold text-[#1A3629] whitespace-nowrap shadow-xs">
                 {filteredRecipes.length} {filteredRecipes.length === 1 ? 'Dish' : 'Dishes'}
               </div>
 
@@ -328,7 +358,7 @@ function RecipesContent() {
                   aria-expanded={isSortOpen}
                   aria-label={`Sort recipes by ${SORT_OPTIONS.find((o) => o.id === sortBy)?.label}`}
                   onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="px-3 py-1.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-1.5 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA]"
+                  className="px-3.5 py-2 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center gap-1.5 cursor-pointer bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4EDE0]"
                 >
                   <span className="text-[#4A5D4E] text-[11px]">Sort:</span>
                   <span>{SORT_OPTIONS.find((o) => o.id === sortBy)?.label}</span>
@@ -366,51 +396,69 @@ function RecipesContent() {
             </div>
           </div>
 
-          {/* Row 2: Unified Filter Chips */}
-          <div className="pt-2 border-t border-[#1A3629]/15 flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            {visibleCategories.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => {
-                    retroAudio.playBlip();
-                    setSelectedCategory(cat);
-                  }}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border ${
-                    isSelected
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[1px_1px_0px_#3A6B52]'
-                      : 'bg-[#FFFDF9] text-[#2C4A3B] border-[#1A3629]/20 hover:border-[#1A3629]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+          {/* Row 2: Two Distinct, Dedicated Filter Rows (Diet on top, Category below) */}
+          <div className="pt-3 border-t-2 border-[#1A3629]/15 flex flex-col gap-2.5">
+            {/* 1. Diet Filter (Prominent & Color-coded) */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1A3629] shrink-0 w-16">
+                Diet:
+              </span>
+              <div className="flex items-center gap-1.5">
+                {DIET_FILTERS.map((d) => {
+                  const isSelected = selectedDietFilter === d.id;
+                  const badge = getDietBadgeDetails(d.id.toLowerCase());
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playBlip();
+                        setSelectedDietFilter(d.id);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border-2 flex items-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] -translate-y-0.5'
+                          : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/30 hover:border-[#1A3629]'
+                      }`}
+                    >
+                      {d.id !== 'All' && (
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-[#10B981]' : badge.dotColor}`} />
+                      )}
+                      <span>{d.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-            <span className="text-[#1A3629]/30 font-mono text-xs px-1 select-none">|</span>
-
-            {DIET_FILTERS.filter(d => d.id !== 'All').map((d) => {
-              const isSelected = selectedDietFilter === d.id;
-              return (
-                <button
-                  key={d.id}
-                  type="button"
-                  onClick={() => {
-                    retroAudio.playBlip();
-                    setSelectedDietFilter(isSelected ? 'All' : d.id);
-                  }}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border ${
-                    isSelected
-                      ? 'bg-[#10B981] text-[#FFFDF9] border-[#1A3629] shadow-[1px_1px_0px_#1A3629]'
-                      : 'bg-[#FFFDF9] text-[#4A5D4E] border-[#1A3629]/20 hover:border-[#1A3629]'
-                  }`}
-                >
-                  {d.label}
-                </button>
-              );
-            })}
+            {/* 2. Fuel / Macro Category (Secondary Filter) */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none pt-1.5 border-t border-[#1A3629]/10">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E] shrink-0 w-16">
+                Type:
+              </span>
+              <div className="flex items-center gap-1.5">
+                {visibleCategories.map((cat) => {
+                  const isSelected = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playBlip();
+                        setSelectedCategory(cat);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[1px_1px_0px_#3A6B52]'
+                          : 'bg-[#FFFDF9] text-[#2C4A3B] border-[#1A3629]/20 hover:border-[#1A3629]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -437,6 +485,7 @@ function RecipesContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRecipes.map((recipe) => {
               const isLogged = mounted && todayLog.loggedRecipeIds.includes(recipe.id);
+              const dietBadge = getDietBadgeDetails(recipe.dietType);
 
               return (
                 <div
@@ -448,15 +497,26 @@ function RecipesContent() {
                   <div className="flex flex-col flex-1">
                     {/* Header Badges & Focus Score */}
                     <div className="flex items-center justify-between mb-3 gap-2 min-h-[28px]">
-                      <span
-                        className={`text-[10px] font-mono font-bold tracking-wider border-2 px-2.5 py-0.5 rounded-full uppercase whitespace-nowrap ${
-                          recipe.isCustom
-                            ? 'border-[#10B981] bg-[#ECFDF5] text-[#065F46]'
-                            : 'border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]'
-                        }`}
-                      >
-                        {recipe.isCustom ? `Custom · ${recipe.category}` : recipe.category}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* Prominent Diet Badge */}
+                        <span
+                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border-2 uppercase tracking-wider flex items-center gap-1 shrink-0 ${dietBadge.pillStyle}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dietBadge.dotColor}`} />
+                          <span>{dietBadge.label}</span>
+                        </span>
+
+                        {/* Category Badge */}
+                        <span
+                          className={`text-[10px] font-mono font-bold tracking-wider border-2 px-2 py-0.5 rounded-md uppercase whitespace-nowrap ${
+                            recipe.isCustom
+                              ? 'border-[#10B981] bg-[#ECFDF5] text-[#065F46]'
+                              : 'border-[#1A3629]/30 bg-[#F4F0EA] text-[#1A3629]'
+                          }`}
+                        >
+                          {recipe.isCustom ? `Custom · ${recipe.category}` : recipe.category}
+                        </span>
+                      </div>
 
                       <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629] shrink-0 whitespace-nowrap">
                         <span>Focus {recipe.focusScore}</span>
@@ -656,7 +716,16 @@ function RecipesContent() {
 
             {/* Modal Title & Meta in Fraunces / Cabinet Grotesk */}
             <div className="text-center sm:text-left">
-              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase font-bold mb-2">
+              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase font-bold mb-2 flex-wrap">
+                {(() => {
+                  const dietBadge = getDietBadgeDetails(selectedRecipe.dietType);
+                  return (
+                    <span className={`text-[10px] px-2.5 py-0.5 rounded-md border-2 uppercase font-bold flex items-center gap-1 ${dietBadge.pillStyle}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${dietBadge.dotColor}`} />
+                      <span>{dietBadge.label}</span>
+                    </span>
+                  );
+                })()}
                 <span className="border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] px-2.5 py-0.5 rounded-md text-[10px] tracking-widest">
                   {selectedRecipe.category}
                 </span>

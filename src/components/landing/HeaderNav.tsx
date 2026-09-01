@@ -226,7 +226,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               >
                 <span className="flex items-center gap-2">
                   <span className="text-[#10B981] font-bold">✦</span>
-                  <span>AI Metabolic Coach</span>
+                  <span>AI Health Coach</span>
                 </span>
                 <span className="font-mono text-xs text-[#A7F3D0] bg-[#2C4A3B] px-2 py-0.5 rounded border border-[#FFFDF9]/20 font-bold">
                   Open ⌘J

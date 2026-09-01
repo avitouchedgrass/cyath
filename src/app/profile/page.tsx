@@ -128,7 +128,7 @@ export default function ProfilePage() {
               Explorer Dossier
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
-              Your personal wellness telemetry sheet, calibrated baseline targets, and cloud synchronization.
+              Your account settings, baseline targets, and daily progress summary.
             </p>
           </div>
 
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                 setIsInviteModalOpen(true);
               }}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#10B981] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              title="Adventurer's Guild Pact: Invite Friends for +250 XP"
+              title="Invite Friends for +250 XP"
             >
               <Gift className="w-3.5 h-3.5 text-[#059669]" />
               <span>Invite (+250 XP)</span>
@@ -214,7 +214,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Days Calibrated
+              Days Logged
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
               {totalDaysLogged}
@@ -226,25 +226,25 @@ export default function ProfilePage() {
 
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Habits Executed
+              Habits Completed
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
               {totalHabitsCompleted}
             </div>
             <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Micro-routines executed
+              Total habits completed
             </span>
           </div>
 
           <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Total Protein Fuel
+              Total Protein Logged
             </span>
             <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
               {totalProteinLogged}g
             </div>
             <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Cumulative whole-food fuel
+              Total grams logged
             </span>
           </div>
         </div>

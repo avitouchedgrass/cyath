@@ -40,7 +40,7 @@ export function StoveSageChatbot() {
       id: 'welcome',
       role: 'assistant',
       content:
-        "Greetings! I am **Cyath AI Coach (StoveSage)**, your metabolic and culinary intelligence assistant.\n\nAsk me for high-protein recipe recommendations, custom daily habits, workout protocols, or have me update your daily planner directly.",
+        "Hi! I am **Cyath AI Coach**, your meal and daily habit assistant.\n\nAsk me for high-protein recipe ideas, workout suggestions, or to update your daily planner directly.",
       actions: [],
     },
   ]);
@@ -325,7 +325,7 @@ export function StoveSageChatbot() {
         id: 'welcome',
         role: 'assistant',
         content:
-          "Chat reset. How may I assist your metabolic health, workout calibration, or recipe planning today?",
+          "Chat reset. How can I help with your meals, workouts, or daily habits today?",
         actions: [],
       },
     ]);
@@ -365,7 +365,7 @@ export function StoveSageChatbot() {
                   </span>
                 </h3>
                 <span className="text-[11px] font-cabinet font-medium text-[#4A5D4E] mt-0.5 block">
-                  Metabolic &amp; Culinary Intelligence
+                  Meals &amp; Habit Assistant
                 </span>
               </div>
             </div>

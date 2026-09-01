@@ -40,7 +40,7 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'morning-activation',
     name: 'Morning Sunlight & Energy',
-    shortSummary: 'Clears morning grogginess and naturally resets your internal circadian timer in 15 minutes.',
+    shortSummary: 'Clears morning grogginess and resets your body clock in 15 minutes.',
     category: 'Morning',
     icon: 'sun',
     timeframe: 'First 30m of day',
@@ -51,9 +51,9 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
       accent: '#D97706',
     },
     habits: [
-      { title: '15m outdoor morning sunlight', hint: 'Circadian anchor' },
-      { title: '500ml water + pinch of sea salt', hint: 'Electrolyte rehydration' },
-      { title: 'Cold splash or quick rinse', hint: 'Natural alertness reflex' },
+      { title: '15m outdoor morning sunlight', hint: 'Body clock reset' },
+      { title: '500ml water + pinch of sea salt', hint: 'Morning hydration' },
+      { title: 'Cold splash or quick rinse', hint: 'Quick alertness boost' },
     ],
     standardHabits: [
       { id: 'sunlight', title: 'Morning Sunlight Exposure (15m)', category: 'morning', targetDaysPerWeek: 7 },
@@ -81,9 +81,9 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
       accent: '#2563EB',
     },
     habits: [
-      { title: 'Zero phone input first 30 mins', hint: 'Protect cognitive focus' },
-      { title: 'High-protein breakfast (35g+)', hint: 'Stabilize blood glucose' },
-      { title: '90-min single-task work block', hint: 'Ultradian deep sprint' },
+      { title: 'Zero phone input first 30 mins', hint: 'Protect morning focus' },
+      { title: 'High-protein breakfast (35g+)', hint: 'Steady morning energy' },
+      { title: '90-min single-task work block', hint: 'Focused work block' },
     ],
     standardHabits: [
       { id: 'zero_phone', title: 'Zero Phone First 30 Mins', category: 'mindset', targetDaysPerWeek: 7 },
@@ -100,7 +100,7 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'deep-rem-sleep',
     name: 'Restful Sleep Wind-Down',
-    shortSummary: 'Calms your sympathetic nervous system for deeper, uninterrupted restorative sleep.',
+    shortSummary: 'Calms your body and mind for deeper, uninterrupted sleep.',
     category: 'Sleep',
     icon: 'moon',
     timeframe: '60 mins prior to bed',
@@ -111,9 +111,9 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
       accent: '#4F46E5',
     },
     habits: [
-      { title: 'Screens off 60 mins before bed', hint: 'Digital sunset' },
+      { title: 'Screens off 60 mins before bed', hint: 'Better melatonin' },
       { title: 'Cool bedroom temperature (~67°F)', hint: 'Deep sleep trigger' },
-      { title: 'Magnesium or herbal chamomile tea', hint: 'GABA activation' },
+      { title: 'Magnesium or herbal chamomile tea', hint: 'Evening relaxation' },
     ],
     standardHabits: [
       { id: 'digital_sunset', title: 'Digital Sunset (Screens Off 60m Prior)', category: 'recovery', targetDaysPerWeek: 7 },
@@ -130,7 +130,7 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'cellular-mobility',
     name: 'Daily Movement & Posture',
-    shortSummary: 'Keeps spinal joints supple and reverses the compression of long seated sessions.',
+    shortSummary: 'Keeps spinal joints supple and reverses the stiffness of long seated sessions.',
     category: 'Movement',
     icon: 'zap',
     timeframe: 'Throughout the day',
@@ -141,9 +141,9 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
       accent: '#059669',
     },
     habits: [
-      { title: '10-min post-meal walk', hint: 'Glucose clearance' },
-      { title: '30-sec spine decompression hang', hint: 'Spinal disc relief' },
-      { title: '5-min deep hip opener stretch', hint: 'Pelvic mobility' },
+      { title: '10-min post-meal walk', hint: 'Digestive energy' },
+      { title: '30-sec spine decompression hang', hint: 'Spine relief' },
+      { title: '5-min deep hip opener stretch', hint: 'Hip mobility' },
     ],
     standardHabits: [
       { id: 'post_meal_walk', title: '10-Min Post-Meal Walk', category: 'nutrition', targetDaysPerWeek: 7 },
@@ -195,7 +195,7 @@ export default function ProtocolsPage() {
     setToastMessage(
       isAlreadyActive
         ? `Removed ${protocol.name} from your planner.`
-        : `Equipped ${protocol.name} to your Daily Planner!`
+        : `Added ${protocol.name} to your Daily Planner!`
     );
 
     setTimeout(() => setToastMessage(null), 3500);
@@ -213,16 +213,16 @@ export default function ProtocolsPage() {
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
-              Protocol Cartridges
+              Guided Routines
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
-              Engineered daily habit blueprints calibrated for circadian alignment, deep focus, and restorative sleep.
+              Science-backed daily habit routines for morning energy, deep focus, and better sleep.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <span className="px-3 py-1 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9] text-[11px] font-mono font-bold text-[#1A3629]">
-              {activeProtocolIds.length} of {CURATED_PROTOCOLS.length} Equipped
+              {activeProtocolIds.length} of {CURATED_PROTOCOLS.length} Active
             </span>
           </div>
         </div>
@@ -280,14 +280,14 @@ export default function ProtocolsPage() {
                         {getIcon()}
                       </div>
                       <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider ${protocol.themeColor.badgeBg} ${protocol.themeColor.badgeText} ${protocol.themeColor.border}`}>
-                        {protocol.category} Blueprint
+                        {protocol.category} Routine
                       </span>
                     </div>
 
                     {isActivated ? (
                       <span className="px-2.5 py-1 rounded-full border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] text-[10px] font-mono font-bold uppercase flex items-center gap-1 shadow-xs">
                         <Check className="w-3 h-3" />
-                        <span>Equipped</span>
+                        <span>Active</span>
                       </span>
                     ) : (
                       <span className="text-[10px] font-mono font-bold text-[#4A5D4E]">
@@ -307,7 +307,7 @@ export default function ProtocolsPage() {
                   {/* Daily Habits Checklist Preview */}
                   <div className="space-y-2 mb-6">
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E] block mb-1">
-                      Included Routine Actions:
+                      Daily Habits:
                     </span>
                     {protocol.habits.map((habit, i) => (
                       <div
@@ -336,7 +336,7 @@ export default function ProtocolsPage() {
                     }}
                     className="text-xs font-mono font-bold hover:underline flex items-center gap-1 cursor-pointer text-[#1A3629]"
                   >
-                    <span>Read Field Guide</span>
+                    <span>Why it Works</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
@@ -352,12 +352,12 @@ export default function ProtocolsPage() {
                     {isActivated ? (
                       <>
                         <Check className="w-3.5 h-3.5" />
-                        <span>Unequip Cartridge</span>
+                        <span>Remove Routine</span>
                       </>
                     ) : (
                       <>
                         <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>Equip to Planner</span>
+                        <span>Add to Planner</span>
                       </>
                     )}
                   </button>
@@ -371,11 +371,9 @@ export default function ProtocolsPage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="px-5 py-3.5 rounded-xl border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xl flex items-center gap-3">
-            <Sparkles className="w-4 h-4 text-[#10B981]" />
-            <span>{toastMessage}</span>
-          </div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex items-center gap-2 font-cabinet font-bold text-xs">
+          <Sparkles className="w-4 h-4 text-[#10B981]" />
+          <span>{toastMessage}</span>
         </div>
       )}
 
@@ -400,7 +398,7 @@ export default function ProtocolsPage() {
 
             <div>
               <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider inline-block mb-2 ${selectedProtocolForModal.themeColor.badgeBg} ${selectedProtocolForModal.themeColor.badgeText} ${selectedProtocolForModal.themeColor.border}`}>
-                {selectedProtocolForModal.category} Field Guide
+                {selectedProtocolForModal.category} Routine
               </span>
               <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 {selectedProtocolForModal.name}
@@ -447,12 +445,12 @@ export default function ProtocolsPage() {
                 {activeProtocolIds.includes(selectedProtocolForModal.id) ? (
                   <>
                     <Check className="w-4 h-4" />
-                    <span>Unequip from Planner</span>
+                    <span>Remove from Daily Planner</span>
                   </>
                 ) : (
                   <>
                     <Plus className="w-4 h-4 stroke-[2.5]" />
-                    <span>Equip All Habits to Daily Planner</span>
+                    <span>Add Habits to Daily Planner</span>
                   </>
                 )}
               </button>

@@ -59,16 +59,16 @@ export default function CorrelationsPage() {
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
-              Correlation Engine
+              Habit Insights
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
-              Automated telemetry regression discovering the daily nutritional and habit drivers behind your peak focus days.
+              See how your meals, sleep, and daily habits directly affect your energy and focus.
             </p>
           </div>
 
           {/* Time Horizon Pills */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] font-mono font-bold text-[#4A5D4E]">Sample Window:</span>
+            <span className="text-[11px] font-mono font-bold text-[#4A5D4E]">Time Period:</span>
             <div className="inline-flex items-center gap-1 p-1 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629]/25 shadow-[2px_2px_0px_#1A3629]">
               {([7, 14, 30] as const).map((days) => (
                 <button
@@ -98,7 +98,7 @@ export default function CorrelationsPage() {
           <div className="lg:col-span-4 space-y-3">
             <div className="flex items-center justify-between px-1">
               <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
-                Active Hypotheses ({correlations.length})
+                Trends ({correlations.length})
               </span>
               <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#10B981]/30">
                 Live Data
@@ -142,7 +142,7 @@ export default function CorrelationsPage() {
 
                     <div className="flex items-center justify-between text-[11px] font-mono font-bold pt-2 border-t border-[#1A3629]/15 text-[#4A5D4E]">
                       <span>r = {corr.coefficient.toFixed(2)}</span>
-                      <span className="text-[#1A3629] font-bold">{corr.impactScore} LINK →</span>
+                      <span className="text-[#1A3629] font-bold">{corr.impactScore} Trend →</span>
                     </div>
                   </button>
                 );
@@ -160,7 +160,7 @@ export default function CorrelationsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-[#1A3629]/15">
                 <div>
                   <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#4A5D4E] block">
-                    Telemetry Stream · {timeHorizon}-Day Sample
+                    {timeHorizon}-Day Overview
                   </span>
                   <h2 className="font-fraunces font-black text-2xl tracking-tight mt-0.5 text-[#1A3629]">
                     {activeCorrelation.title}
@@ -170,7 +170,7 @@ export default function CorrelationsPage() {
                 {/* Segmented Phosphor Signal Meter */}
                 <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 bg-[#FAF6EE] border-[#1A3629] text-xs font-mono font-bold">
-                    <span className="text-[#4A5D4E]">Signal:</span>
+                    <span className="text-[#4A5D4E]">Strength:</span>
                     <span className="tabular-nums font-black text-[#10B981]">
                       {activeCorrelation.confidence}% ({activeCorrelation.impactScore})
                     </span>

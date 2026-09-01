@@ -75,7 +75,7 @@ export default function DashboardPage() {
       return {
         badge: 'MORNING',
         title: 'Morning Jumpstart',
-        description: 'Drink 500ml water, natural sunlight, and bioavailable protein.',
+        description: 'Drink a tall glass of water, get morning sunlight, and eat a high-protein meal.',
       };
     } else if (hour < 17) {
       return {

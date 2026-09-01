@@ -153,10 +153,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 22,
     category: 'High Protein',
     dietType: 'omnivore',
-    tags: ['High Protein', 'Electrolyte Rich', 'Balanced Macros', 'Omnivore'],
-    focusScore: '8.9/10',
+    tags: ['High Protein', 'Whole Food', 'Comfort Classic', 'Clean Energy'],
+    focusScore: '9.5/10',
     description:
-      'Complete amino acid profile combined with natural potassium, magnesium, and bioavailable iron from grass-fed beef to restore muscle and neural vigor.',
+      'Rich protein and essential minerals from steak and eggs to restore energy and support muscle recovery.',
     ingredients: [
       { item: '90/10 Grass-Fed Minced Beef', amount: '180g' },
       { item: 'Simmered Black Beans', amount: '80g' },
@@ -229,10 +229,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 10,
     category: 'Quick Fuel',
     dietType: 'vegetarian',
-    tags: ['Fast Prep', 'Brain Fats', 'Vegetarian', 'Breakfast'],
+    tags: ['Fast Prep', 'Healthy Fats', 'Vegetarian', 'Breakfast'],
     focusScore: '9.0/10',
     description:
-      'Natural whole-grain carbohydrates paired with bioavailable fatty acids. Excellent for fast cognitive activation without glycemic rollercoasters.',
+      'Whole-grain sourdough toast paired with rich avocado and eggs for steady morning energy.',
     ingredients: [
       { item: 'Cold-Fermented Sourdough Bread', amount: '2 thick slices' },
       { item: 'Haas Avocado', amount: '1 whole ripe' },
@@ -333,10 +333,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 35,
     category: 'Steady Carbs',
     dietType: 'vegan',
-    tags: ['Prebiotic Fiber', 'Legume Complex', 'Vegan', 'Slow Glycemic'],
+    tags: ['High Fiber', 'Plant Protein', 'Vegan', 'Steady Energy'],
     focusScore: '9.0/10',
     description:
-      'Classic North Indian longevity staple. Slow-simmered kidney beans deliver high prebiotic oligosaccharides to nourish gut flora, while the amino acid pairing of legumes and aged basmati yields a complete protein profile for sustained stamina without glycemic spikes.',
+      'Classic North Indian comfort food. Slow-simmered kidney beans and fragrant basmati rice deliver hearty plant protein and sustained, steady energy.',
     ingredients: [
       { item: 'Kashmiri Red Kidney Beans (Rajma)', amount: '180g cooked' },
       { item: 'Aged Basmati Rice with Roasted Jeera', amount: '160g steamed' },
@@ -597,10 +597,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 12,
     category: 'Steady Carbs',
     dietType: 'vegetarian',
-    tags: ['Quick Fuel', 'Fast Prep', 'Vegetarian', 'Comfort Staple'],
+    tags: ['Quick Fuel', 'Fast Prep', 'Vegetarian', 'Comfort Food'],
     focusScore: '8.9/10',
     description:
-      'The ultimate quick pantry dish using leftover steamed rice. Fast-absorbing starches pair with complete egg protein, while allicin from browned garlic stimulates circulation and metabolic alertness.',
+      'The ultimate quick pantry dish using leftover rice and eggs. Fast-absorbing carbs combine with protein and toasted garlic for a quick, energizing meal.',
     ingredients: [
       { item: 'Chilled Steamed Rice (Basmati or Jasmine)', amount: '180g cooked' },
       { item: 'Farm-Fresh Large Eggs', amount: '3 whisked' },
@@ -630,10 +630,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 10,
     category: 'Steady Carbs',
     dietType: 'vegetarian',
-    tags: ['Gut Soothing', 'Probiotic Cleanse', 'Vegetarian', 'Cooling Fuel'],
+    tags: ['Gut Friendly', 'Comfort Food', 'Vegetarian', 'Cooling Fuel'],
     focusScore: '9.0/10',
     description:
-      'Millennia-old Ayurvedic thermal regulator. Live active Lactobacillus cultures replenish the intestinal microbiome, while mustard seeds, curry leaves, and ginger stimulate gentle bile secretion for zero-bloat recovery.',
+      'A classic soothing South Indian comfort meal. Fresh yogurt and fragrant spices aid gentle digestion, keeping your stomach calm and energized.',
     ingredients: [
       { item: 'Soft Over-Cooked Rice (Sona Masoori / Basmati)', amount: '160g cooked warm' },
       { item: 'Fresh Whole Milk Set Curd (Dahi)', amount: '150g whisked smooth' },
@@ -663,10 +663,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 12,
     category: 'Quick Fuel',
     dietType: 'vegetarian',
-    tags: ['Beta-Glucan Fiber', 'Fast Prep', 'Vegetarian', 'Morning Alert', 'Low Glycemic'],
+    tags: ['High Fiber', 'Fast Prep', 'Vegetarian', 'Morning Fuel', 'Steady Energy'],
     focusScore: '9.1/10',
     description:
-      'Soluble oat beta-glucan blunts postprandial glucose surges and feeds short-chain fatty acid gut bacteria, while the pasture-raised soft egg supplies essential choline, lutein, and complete amino acids.',
+      'Rolled oats simmered with golden turmeric, cumin, and vegetables, topped with a soft-boiled egg for clean, satisfying morning fuel.',
     ingredients: [
       { item: 'Whole Rolled Oats', amount: '55g' },
       { item: 'Pasture-Raised Egg', amount: '1 soft-boiled (6.5 min)' },
@@ -732,7 +732,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Plant & Dairy Protein', 'Gluten-Free', 'Vegetarian', 'Quick Fuel'],
     focusScore: '9.1/10',
     description:
-      'Naturally gluten-free chickpea flour crepe layered with fresh dairy paneer. High in plant fiber, folate, and calcium with a low glycemic index, keeping insulin steady for hours of sustained focus.',
+      'Crispy chickpea flour crepe stuffed with seasoned paneer. High in plant protein and calcium, keeping you full and focused for hours.',
     ingredients: [
       { item: 'Gram Flour (Besan / Chickpea Flour)', amount: '70g' },
       { item: 'Fresh Grated Paneer', amount: '90g' },
@@ -762,10 +762,10 @@ export const RECIPES: Recipe[] = [
     prepTimeMinutes: 12,
     category: 'Steady Carbs',
     dietType: 'vegan',
-    tags: ['Prebiotic Fiber', 'High Iron', 'Vegan', 'Slow Glycemic', 'Ayurvedic'],
+    tags: ['High Fiber', 'High Iron', 'Vegan', 'Steady Energy'],
     focusScore: '9.0/10',
     description:
-      'Dense brown chickpeas provide resilient resistant starch, bioavailable non-heme iron, and minerals. Paired with medium-chain triglycerides (MCTs) from grated fresh coconut for clean cognitive fuel without insulin spikes.',
+      'Tender black chickpeas tossed with crackling mustard seeds, curry leaves, and fresh coconut for hearty fiber and clean energy.',
     ingredients: [
       { item: 'Boiled Black Chickpeas (Kala Chana)', amount: '200g cooked tender' },
       { item: 'Fresh Grated Coconut', amount: '2 tbsp' },
@@ -1025,7 +1025,7 @@ export const RECIPES: Recipe[] = [
     tags: ['High Iron', 'Gut Health', 'Vegan', 'North African', 'Comfort Food'],
     focusScore: '9.3/10',
     description:
-      'North African tagine stew made effortlessly using whole masoor dal and kabuli chana. Warm spices like roasted cumin, cinnamon, and ginger stoke digestive enzymes while delivering clean slow-burning fuel and bioavailable iron.',
+      'Hearty spiced lentil and chickpea stew with cumin, cinnamon, and ginger for warming, slow-burning fuel.',
     ingredients: [
       { item: 'Whole Red Lentils (Sabut Masoor Dal)', amount: '80g dry' },
       { item: 'Boiled Kabuli Chana', amount: '100g' },

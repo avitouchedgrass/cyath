@@ -11,10 +11,10 @@ import { useHabitStore } from '@/store/useHabitStore';
 const STEP_LOOP = [
   {
     step: '01',
-    badge: 'Step 01 · Blueprints',
-    title: 'Choose Proven Daily Blueprints',
+    badge: 'Step 01 · Routines',
+    title: 'Choose a Daily Routine',
     description:
-      'Start with science-backed daily routines you can actually stick to—like Morning Sunlight, Clean Protein Fueling, and Restful Sleep Wind-Downs.',
+      'Start with science-backed daily routines you can actually stick to—like Morning Sunlight, High-Protein Meals, and Restful Sleep Wind-Downs.',
     highlights: ['Simple daily habits', 'Personalized protein targets', 'Zero overwhelming clutter'],
   },
   {
@@ -329,7 +329,7 @@ export default function Home() {
                 <div className="flex items-center justify-between pt-4 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold text-[#2C4A3B]">
                   <span>Daily habit &amp; meal insights</span>
                   <Link href="/correlations" className="hover:underline flex items-center gap-1 text-[#1A3629]">
-                    <span>View All Discoveries →</span>
+                    <span>View All Insights →</span>
                   </Link>
                 </div>
               </div>
@@ -401,7 +401,7 @@ export default function Home() {
                 </div>
 
                 <div className="pt-4 border-t-2 border-[#1A3629]/15 text-[11px] font-mono font-bold text-[#2C4A3B]">
-                  28-Day Habit Activity Matrix
+                  28-Day Habit Activity
                 </div>
               </div>
 

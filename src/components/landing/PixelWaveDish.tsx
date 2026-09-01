@@ -41,6 +41,21 @@ export function PixelWaveDish({
         }
       };
       img.onerror = () => {
+        if (src.includes('.webp')) {
+          const fallbackPng = src.replace('.webp', '.png');
+          const pngImg = new Image();
+          pngImg.src = fallbackPng;
+          pngImg.onload = () => {
+            imagesRef.current[src] = pngImg;
+            loadedCount++;
+            if (loadedCount === dishImages.length) setImagesLoaded(true);
+          };
+          pngImg.onerror = () => {
+            loadedCount++;
+            if (loadedCount === dishImages.length) setImagesLoaded(true);
+          };
+          return;
+        }
         loadedCount++;
         if (loadedCount === dishImages.length) {
           setImagesLoaded(true);

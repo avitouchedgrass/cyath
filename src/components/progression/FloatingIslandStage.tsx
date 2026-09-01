@@ -102,6 +102,12 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
                   decoding="async"
                   // @ts-ignore
                   fetchPriority={isSelected ? 'high' : 'low'}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src.includes('.webp')) {
+                      target.src = target.src.replace('.webp', '.png');
+                    }
+                  }}
                   onContextMenu={(e) => e.preventDefault()}
                   onDragStart={(e) => e.preventDefault()}
                   className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_12px_16px_rgba(26,54,41,0.12)] select-none pointer-events-none transition-all duration-300 ${

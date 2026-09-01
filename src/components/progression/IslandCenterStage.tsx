@@ -88,6 +88,12 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
                     decoding="async"
                     // @ts-ignore
                     fetchPriority={isSelected ? 'high' : 'low'}
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src.includes('.webp')) {
+                        target.src = target.src.replace('.webp', '.png');
+                      }
+                    }}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
                     className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_24px_30px_rgba(26,54,41,0.22)] select-none pointer-events-none transition-all duration-300 ${

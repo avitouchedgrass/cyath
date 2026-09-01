@@ -470,6 +470,12 @@ function RecipesContent() {
                           alt={recipe.name}
                           loading="lazy"
                           decoding="async"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.src.includes('.webp')) {
+                              target.src = target.src.replace('.webp', '.png');
+                            }
+                          }}
                           className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.14)] group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -608,6 +614,12 @@ function RecipesContent() {
                         ? 'scale(1.22)'
                         : 'scale(1)'
                       : 'scale(1)',
+                  }}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src.includes('.webp')) {
+                      target.src = target.src.replace('.webp', '.png');
+                    }
                   }}
                   className={`w-full h-full object-contain drop-shadow-[15px_15px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 ease-out z-10 ${
                     showingRawPhoto ? 'rounded-2xl' : '[image-rendering:pixelated]'

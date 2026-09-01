@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
@@ -14,22 +14,44 @@ interface HeaderNavProps {
 
 export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const pathname = usePathname();
   const { userSession } = useHabitStore();
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     setMounted(true);
     if (typeof document !== 'undefined') {
       document.documentElement.classList.remove('dark');
     }
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      const prevScrollY = lastScrollYRef.current;
+      const diff = currentScrollY - prevScrollY;
+
+      setIsScrolled(currentScrollY > 20);
+
+      // Always show at top of page
+      if (currentScrollY <= 20) {
+        setIsVisible(true);
+      } 
+      // Scrolling down: hide header
+      else if (diff > 5 && currentScrollY > 60) {
+        setIsVisible(false);
+      } 
+      // Scrolling up even a bit: reveal header immediately
+      else if (diff < -3) {
+        setIsVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -62,7 +84,11 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-4 sm:px-6 lg:px-12 pointer-events-none transition-all duration-300">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-4 sm:px-6 lg:px-12 transition-transform duration-300 ease-out pointer-events-none ${
+        isVisible || isMobileMenuOpen ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
         {/* Left: Authentic Lowercase Pixel Brand Text */}

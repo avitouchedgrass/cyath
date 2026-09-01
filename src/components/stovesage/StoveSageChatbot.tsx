@@ -410,8 +410,8 @@ export function StoveSageChatbot() {
 
           {/* User Telemetry Context Ribbon */}
           <div className="px-4 py-1.5 bg-[#FAF6EE]/80 border-b border-[#1A3629]/10 flex items-center justify-between text-[10px] font-mono text-[#4A5D4E]">
-            <span>🎯 Goal: {userProfile?.primaryGoal || 'Focus'}</span>
-            <span>🥩 {todayLog.totalProteinLogged || 0}g Logged Today</span>
+            <span>Goal: {userProfile?.primaryGoal || 'Focus'}</span>
+            <span>Protein: {todayLog.totalProteinLogged || 0}g Logged</span>
           </div>
 
           {/* Optional Custom API Key Drawer */}
@@ -559,7 +559,7 @@ export function StoveSageChatbot() {
         </div>
       )}
 
-      {/* Sleek, Professional Floating Action Trigger Pill */}
+      {/* Sleek, Professional Floating Action Trigger Pill (Negative Style: Forest Green with White Text) */}
       {!isOpen && (
         <button
           type="button"
@@ -567,13 +567,13 @@ export function StoveSageChatbot() {
             retroAudio.playBlip();
             setIsOpen(true);
           }}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border-2 sm:border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:shadow-[5px_5px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer group select-none"
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer group select-none"
           aria-label="Open Cyath AI Coach (Cmd+J)"
           title="Open Cyath AI Coach (⌘J / Ctrl+J)"
         >
           <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
-          <span className="font-cabinet font-bold text-xs text-[#1A3629]">✦ AI Coach</span>
-          <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FAF6EE] border border-[#1A3629]/20 text-[#4A5D4E]">
+          <span className="font-cabinet font-bold text-xs text-[#FFFDF9]">✦ AI Coach</span>
+          <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#2C4A3B] border border-[#FFFDF9]/20 text-[#A7F3D0]">
             ⌘J
           </span>
         </button>

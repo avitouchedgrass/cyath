@@ -267,8 +267,8 @@ export function InteractiveCorrelationMatrix({
       {/* Interactive Helper Banner / Drag Reminder */}
       <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629]/25 text-[#1A3629] text-[11px] font-mono font-bold shadow-sm">
         <span className="flex items-center gap-2">
-          <span className="text-sm leading-none">💡</span>
-          <span>Tip: Click &amp; drag any data circle to test live biometric responses!</span>
+          <span className="font-bold text-[#10B981]">[TIP]</span>
+          <span>Click and drag any data circle to test live biometric responses</span>
         </span>
         <span className="hidden sm:inline-block text-[10px] text-[#4A5D4E] uppercase tracking-wider font-bold">
           Interactive Scatter

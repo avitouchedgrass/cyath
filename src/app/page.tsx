@@ -106,7 +106,7 @@ export default function Home() {
                 <Link href="/recipes" className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1A3629] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-2 bg-transparent text-[#1A3629] border-[#1A3629]/70 hover:border-[#1A3629] hover:bg-[#1A3629]/5 shadow-none hover:shadow-[2px_2px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     Browse Recipes
                   </button>
@@ -114,57 +114,57 @@ export default function Home() {
               </div>
 
               {/* Bottom Metric Inset Micro-Cards */}
-              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-6 border-t-2 border-[#1A3629]/15 w-full">
+              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 pt-6 border-t-2 border-[#1A3629]/15 w-full">
                 
                 {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div className="flex items-center gap-1.5 mb-2">
                     {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
                       <span 
                         key={i} 
-                        className="h-3 w-3 rounded-xs bg-[#1A3629]" 
+                        className="h-3.5 w-3.5 rounded-xs bg-[#1A3629]" 
                         style={{ opacity }} 
                       />
                     ))}
                   </div>
                   <div>
-                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
+                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Streak Heatmaps
                     </div>
-                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
+                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
                       Gentle consistency
                     </div>
                   </div>
                 </div>
 
                 {/* Micro-Card 2: Macro Fueling Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
                   <div 
                     key={currentDish.id}
-                    className="font-mono font-bold text-sm tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
+                    className="font-mono font-black text-base tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
                   >
                     {currentDish.protein} PRO · {currentDish.calories} KCAL
                   </div>
                   <div>
-                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
+                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Whole-Food Fuel
                     </div>
-                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
+                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
                       16-bit hearty dishes
                     </div>
                   </div>
                 </div>
 
                 {/* Micro-Card 3: Discovery Rating */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 flex flex-col justify-between h-[116px] shadow-[3px_3px_0px_#1A3629] transition-all">
-                  <div className="font-mono font-bold text-xs tracking-tight text-[#1A3629] whitespace-nowrap">
-                    <span className="text-sm font-black tabular-nums">{currentDish.focus}</span> FOCUS LINK
+                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                  <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
+                    <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS LINK
                   </div>
                   <div>
-                    <div className="font-cabinet font-bold text-xs uppercase tracking-wide text-[#1A3629]">
+                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Energy Links
                     </div>
-                    <div className="font-mono text-[11px] mt-0.5 text-[#2C4A3B]">
+                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
                       Routine × mood insights
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default function Home() {
             </div>
 
             {/* Hero Right Column: Massive Unboxed Pixel Art Showcase */}
-            <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
+            <div className="lg:col-span-6 w-full flex items-center justify-center">
               <PixelShowcase 
                 onDishChange={(dish) => setCurrentDish(dish)} 
               />

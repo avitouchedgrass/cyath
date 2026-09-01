@@ -28,14 +28,9 @@ export function HabitCalendarMini() {
   return (
     <div className="bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3">
       <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
-        <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/70 block">
-            Calendar Heatmap
-          </span>
-          <h3 className="font-fraunces font-bold text-base text-[#1A3629] leading-tight">
-            Habit Activity
-          </h3>
-        </div>
+        <h3 className="font-fraunces font-bold text-base text-[#1A3629] leading-tight">
+          Monthly Activity
+        </h3>
         <span className="font-mono text-xs text-[#1A3629] font-bold bg-[#FAF6EE] px-2 py-0.5 rounded-md border border-[#1A3629]/20">
           {monthName} {year}
         </span>

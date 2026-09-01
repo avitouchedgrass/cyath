@@ -11,6 +11,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { formatLocalDate } from '@/lib/dateUtils';
 
 const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -69,7 +70,7 @@ function RecipesContent() {
   }, []);
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
-  const todayKey = new Date().toISOString().split('T')[0];
+  const todayKey = formatLocalDate();
   const todayLog = getDailyLog(currentDate || todayKey);
 
   const allRecipes = useMemo(() => {

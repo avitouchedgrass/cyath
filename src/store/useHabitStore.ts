@@ -15,6 +15,7 @@ import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe } from '@/lib/recipes';
 import { validateReferralCodeInput, KNOWN_SEED_CODES } from '@/lib/referralUtils';
+import { formatLocalDate } from '@/lib/dateUtils';
 
 export interface HabitItem {
   id: string;
@@ -134,7 +135,7 @@ export interface HabitStoreState {
   completeWalkthrough: () => void;
 }
 
-const getTodayString = () => new Date().toISOString().split('T')[0];
+const getTodayString = () => formatLocalDate();
 
 const createEmptyDailyLog = (): DailyLogData => ({
   habitsCompleted: {},

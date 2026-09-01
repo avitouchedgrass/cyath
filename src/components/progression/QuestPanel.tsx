@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { getDailyQuests, DailyQuest } from '@/lib/progression/engine';
 import { WEEKLY_CHALLENGE_XP } from '@/lib/progression/config';
+import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
 
 export function QuestPanel() {
   const {
@@ -29,25 +30,23 @@ export function QuestPanel() {
     };
 
     updateCountdown();
-    const timer = setInterval(updateCountdown, 60000);
-    return () => clearInterval(timer);
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
   }, []);
 
-  const todayLog = getDailyLog(currentDate);
   const quests: DailyQuest[] = useMemo(() => {
-    return getDailyQuests(currentDate, todayLog, habits);
-  }, [currentDate, todayLog, habits]);
+    const log = getDailyLog(currentDate);
+    return getDailyQuests(currentDate, log, habits);
+  }, [currentDate, getDailyLog, habits]);
 
   const claimedQuestIds = completedQuestIdsByDate[currentDate] || [];
 
-  // Weekly Challenge Progress: Habits completed in the last 7 days
+  // Calculate 7-day habit count for weekly challenge
   const weeklyHabitCount = useMemo(() => {
-    const today = new Date(currentDate);
+    const baseDate = parseLocalDate(currentDate);
     let count = 0;
     for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().split('T')[0];
+      const key = getRelativeLocalDate(-i, baseDate);
       const log = logsByDate[key];
       if (log?.habitsCompleted) {
         count += Object.values(log.habitsCompleted).filter(Boolean).length;

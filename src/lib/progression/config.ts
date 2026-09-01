@@ -30,17 +30,17 @@ export interface TitleRank {
 }
 
 export const TITLE_RANKS: TitleRank[] = [
-  { minLevel: 50, name: 'Mythic of the Wild' },
-  { minLevel: 42, name: 'Starwarden' },
-  { minLevel: 35, name: 'Mythweaver' },
-  { minLevel: 28, name: 'Eldergrove Guardian' },
-  { minLevel: 21, name: 'Beastwarden' },
-  { minLevel: 15, name: 'Froststrider' },
-  { minLevel: 10, name: 'Grovecaller' },
-  { minLevel: 6, name: 'Emberwarden' },
-  { minLevel: 3, name: 'Trailkeeper' },
-  { minLevel: 2, name: 'Forager' },
-  { minLevel: 1, name: 'Wanderer' },
+  { minLevel: 50, name: 'Level 50' },
+  { minLevel: 42, name: 'Level 42' },
+  { minLevel: 35, name: 'Level 35' },
+  { minLevel: 28, name: 'Level 28' },
+  { minLevel: 21, name: 'Level 21' },
+  { minLevel: 15, name: 'Level 15' },
+  { minLevel: 10, name: 'Level 10' },
+  { minLevel: 6, name: 'Level 6' },
+  { minLevel: 3, name: 'Level 3' },
+  { minLevel: 2, name: 'Level 2' },
+  { minLevel: 1, name: 'Level 1' },
 ];
 
 export interface IslandTier {

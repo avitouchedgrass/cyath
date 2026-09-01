@@ -3,20 +3,20 @@
 import React from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { STREAK_FREEZE } from '@/lib/progression/config';
+import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
 
 export function StreakCardMini() {
   const { streakCount, streakFreezeStock, logsByDate, currentDate } = useHabitStore();
 
-  const today = new Date(currentDate || new Date());
-  const todayDayOfWeek = today.getDay(); // 0 = Sunday
+  const baseDate = parseLocalDate(currentDate || '');
+  const todayDayOfWeek = baseDate.getDay(); // 0 = Sunday
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Check last 7 days activity
   const weekDays = daysOfWeek.map((label, dayIndex) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (todayDayOfWeek - dayIndex));
-    const dateStr = d.toISOString().split('T')[0];
+    const offset = dayIndex - todayDayOfWeek;
+    const dateStr = getRelativeLocalDate(offset, baseDate);
     const log = logsByDate[dateStr];
     const completedCount = log?.habitsCompleted
       ? Object.values(log.habitsCompleted).filter(Boolean).length
@@ -39,14 +39,9 @@ export function StreakCardMini() {
   return (
     <div className="bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
       <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
-        <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/70 block">
-            Cadence Rhythm
-          </span>
-          <h3 className="font-fraunces font-bold text-base text-[#1A3629] tracking-tight">
-            Habit Streak
-          </h3>
-        </div>
+        <h3 className="font-fraunces font-bold text-base text-[#1A3629] tracking-tight">
+          Habit Streak
+        </h3>
         <div className="flex items-center text-xs font-mono font-bold text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full border border-[#D97706]/30">
           <span className="tabular-nums">{streakCount} Days Active</span>
         </div>

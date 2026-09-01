@@ -17,7 +17,7 @@ describe('Progression Math & Levels', () => {
   it('starts at level 1 with 0 XP', () => {
     const p = calculateLevel(0);
     expect(p.level).toBe(1);
-    expect(p.title).toBe('Wanderer');
+    expect(p.title).toBe('Level 1');
     expect(p.currentLevelXp).toBe(0);
     expect(p.progressPercent).toBe(0);
     expect(p.isMaxLevel).toBe(false);
@@ -34,12 +34,12 @@ describe('Progression Math & Levels', () => {
     expect(progress.progressPercent).toBeLessThanOrEqual(52);
   });
 
-  it('caps at MAX_LEVEL 50 with Mythic of the Wild title', () => {
+  it('caps at MAX_LEVEL 50 with Level 50 title', () => {
     const lvl50Xp = xpToReachLevel(MAX_LEVEL);
     const maxProgress = calculateLevel(lvl50Xp + 5000);
 
     expect(maxProgress.level).toBe(MAX_LEVEL);
-    expect(maxProgress.title).toBe('Mythic of the Wild');
+    expect(maxProgress.title).toBe('Level 50');
     expect(maxProgress.progressPercent).toBe(100);
     expect(maxProgress.isMaxLevel).toBe(true);
   });

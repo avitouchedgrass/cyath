@@ -5,6 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { getDailyQuests, DailyQuest } from '@/lib/progression/engine';
 import { WEEKLY_CHALLENGE_XP } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
+import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
 
 export function DailyQuestsMini() {
   const {
@@ -43,12 +44,10 @@ export function DailyQuestsMini() {
 
   // Weekly Challenge Progress: Habits completed in the last 7 days
   const weeklyHabitCount = useMemo(() => {
-    const today = new Date(currentDate);
+    const baseDate = parseLocalDate(currentDate);
     let count = 0;
     for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().split('T')[0];
+      const key = getRelativeLocalDate(-i, baseDate);
       const log = logsByDate[key];
       if (log?.habitsCompleted) {
         count += Object.values(log.habitsCompleted).filter(Boolean).length;

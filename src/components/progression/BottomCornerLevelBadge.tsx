@@ -35,8 +35,8 @@ export function BottomCornerLevelBadge() {
         id="xp-hud-badge-target"
         href="/sanctuary"
         className="flex items-center gap-3 px-3.5 py-2 rounded-2xl border-2 sm:border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] hover:shadow-[5px_5px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer group"
-        title={`Level ${progress.level} · ${progress.title} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) — Open Sanctuary`}
-        aria-label={`Current Level: Level ${progress.level} ${progress.title}`}
+        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) — Open Sanctuary`}
+        aria-label={`Current Level: Level ${progress.level}`}
       >
         {/* Floating Level Badge Circle */}
         <div className="flex items-center gap-1.5 bg-[#FAF6EE] px-2 py-1 rounded-xl border border-[#1A3629]/30 group-hover:border-[#1A3629] transition-colors">
@@ -49,8 +49,8 @@ export function BottomCornerLevelBadge() {
         {/* Title & XP Progress Bar */}
         <div className="flex flex-col gap-0.5 min-w-[70px]">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] truncate max-w-[90px] sm:max-w-[120px]">
-              {progress.title}
+            <span className="text-[10px] font-cabinet font-bold text-[#1A3629] truncate max-w-[90px] sm:max-w-[120px]">
+              Level {progress.level}
             </span>
             <span className="text-[10px] font-mono font-bold text-[#4A5D4E] tabular-nums">
               {progress.progressPercent}%

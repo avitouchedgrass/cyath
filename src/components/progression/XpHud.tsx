@@ -28,33 +28,18 @@ export function XpHud() {
           </span>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
-              Progression · Level {progress.level}
-            </span>
-            <span className="px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase tracking-wider bg-[#ECFDF5] border-[#10B981]/40 text-[#065F46]">
-              {progress.title}
-            </span>
-            {progress.isMaxLevel && (
-              <span className="px-2 py-0.5 rounded-full bg-[#D97706] text-[#FFFDF9] font-mono text-[9px] font-bold">
-                MAX
-              </span>
-            )}
-          </div>
+        <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h2 className="font-fraunces font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
-              {progress.title}
+            <h2 className="font-fraunces font-black text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+              Level {progress.level}
             </h2>
-            <span className="font-mono text-xs text-[#4A5D4E]">
+            <span className="font-cabinet font-bold text-xs sm:text-sm text-[#4A5D4E]">
               · Phase {islandTier.tier}: {islandTier.name}
             </span>
           </div>
-          {progress.nextTitle && (
-            <p className="font-mono text-[11px] text-[#4A5D4E]">
-              Next rank: {progress.nextTitle}
-            </p>
-          )}
+          <p className="font-mono text-[11px] text-[#4A5D4E] mt-0.5">
+            {progress.isMaxLevel ? 'Pinnacle Level Reached' : `${progress.xpForNextLevel - progress.currentLevelXp} XP needed for Level ${progress.level + 1}`}
+          </p>
         </div>
       </div>
 

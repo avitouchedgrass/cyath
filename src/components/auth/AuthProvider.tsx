@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
+import { formatLocalDate } from '@/lib/dateUtils';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUserSession } = useHabitStore();
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               userSession: null,
               userProfile: null,
               customRecipes: [],
-              logsByDate: { [new Date().toISOString().split('T')[0]]: {
+              logsByDate: { [formatLocalDate()]: {
                 habitsCompleted: {},
                 totalProteinLogged: 0,
                 totalCaloriesLogged: 0,

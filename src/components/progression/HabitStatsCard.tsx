@@ -32,17 +32,9 @@ export function HabitStatsCard() {
   return (
     <div className="bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
       <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
-        <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/70 block">
-            Habit Telemetry
-          </span>
-          <h3 className="font-fraunces font-bold text-base text-[#1A3629] tracking-tight">
-            Lifetime Discipline
-          </h3>
-        </div>
-        <span className="font-mono text-[10px] font-bold text-[#1A3629] bg-[#FAF6EE] px-2 py-0.5 rounded-md border border-[#1A3629]/20 uppercase tracking-wider">
-          Verified
-        </span>
+        <h3 className="font-fraunces font-bold text-base text-[#1A3629] tracking-tight">
+          Lifetime Stats
+        </h3>
       </div>
 
       <div className="grid grid-cols-2 gap-3.5">

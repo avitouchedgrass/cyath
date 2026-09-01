@@ -9,6 +9,7 @@ import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { formatLocalDate, getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, userProfile, router]);
 
-  const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const todayDateStr = useMemo(() => formatLocalDate(), []);
   const isViewingToday = currentDate === todayDateStr;
   const todayLog = getDailyLog(currentDate);
 
@@ -93,14 +94,11 @@ export default function DashboardPage() {
 
   // Heatmap Days: Toggle-able between 7 and 28 days (default 7 days)
   const heatmapDays = useMemo(() => {
-    const today = new Date();
     const days = [];
     const count = historyRange;
 
     for (let i = count - 1; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateKey = d.toISOString().split('T')[0];
+      const dateKey = getRelativeLocalDate(-i);
       const log = logsByDate[dateKey];
 
       let habitsDone = 0;
@@ -139,6 +137,8 @@ export default function DashboardPage() {
       else if (totalActions >= 5) level = 3;
       else if (totalActions >= 3) level = 2;
       else if (totalActions >= 1) level = 1;
+
+      const d = parseLocalDate(dateKey);
 
       days.push({
         dateStr: dateKey,
@@ -317,14 +317,9 @@ export default function DashboardPage() {
         {/* 1. Habit Check-in History (Toggle-able between 7 and 28 days) */}
         <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
-                {historyRange}-Day Consistency Matrix
-              </span>
-              <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                Habit Check-in History
-              </h2>
-            </div>
+            <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+              Habit Check-in History
+            </h2>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* 7 Days vs 28 Days Toggle */}
@@ -436,14 +431,9 @@ export default function DashboardPage() {
           {/* COLUMN 1: Today's Habits (Distilled with Integrated Progress) */}
           <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-3">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
-                  Core Routine
-                </span>
-                <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                  Today&apos;s Habits
-                </h2>
-              </div>
+              <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                Today&apos;s Habits
+              </h2>
 
               <button
                 type="button"
@@ -498,7 +488,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-cabinet font-bold">All habits checked! Daily routine calibrated.</span>
                 </div>
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#10B981] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#10B981]/30 shrink-0">
-                  100% Mastery
+                  100% Complete
                 </span>
               </div>
             )}
@@ -558,14 +548,9 @@ export default function DashboardPage() {
             {/* Daily Phase & Quick Notes */}
             <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3">
               <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                    Phase Focus
-                  </span>
-                  <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
-                    {routineWindow.title}
-                  </h2>
-                </div>
+                <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
+                  {routineWindow.title}
+                </h2>
                 <span className="px-2 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#FAF6EE] text-[9px] font-mono font-bold uppercase text-[#1A3629]">
                   {routineWindow.badge}
                 </span>
@@ -599,14 +584,9 @@ export default function DashboardPage() {
             {/* Logged Whole-Food Meals */}
             <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3">
               <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block">
-                    Nutrition
-                  </span>
-                  <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
-                    Logged Whole Foods
-                  </h2>
-                </div>
+                <h2 className="font-fraunces font-bold text-base text-[#1A3629]">
+                  Logged Whole Foods
+                </h2>
                 {isViewingToday && (
                   <Link 
                     href="/recipes" 
@@ -676,9 +656,6 @@ export default function DashboardPage() {
           {/* COLUMN 3: Distilled Biometrics & Telemetry (Consolidated into 1 Card) */}
           <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4">
             <div className="border-b border-[#1A3629]/15 pb-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60 block mb-0.5">
-                Daily Check-in
-              </span>
               <h2 className="font-fraunces font-bold text-lg text-[#1A3629]">
                 Biometrics &amp; Energy
               </h2>

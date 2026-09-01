@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { STREAK_MILESTONES, STREAK_FREEZE } from '@/lib/progression/config';
 
+import { Flame, ShieldCheck } from 'lucide-react';
+
 interface StreakBadgeProps {
   showDetails?: boolean;
 }
@@ -20,32 +22,24 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none group"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none group"
         aria-label="View streak details"
       >
-        <div className="w-5 h-5 rounded-md overflow-hidden shrink-0 border border-[#1A3629]/20 shadow-[1px_1px_0px_#1A3629]">
-          <img
-            src="/assets/progression/relic_flame_brazier.webp"
-            alt="Cadence Flame"
-            className="w-full h-full object-cover [image-rendering:pixelated]"
-          />
+        <div className="flex items-center gap-1.5">
+          <Flame className="w-4 h-4 text-[#D97706] fill-[#F59E0B] shrink-0" />
+          <span className="font-cabinet text-xs font-bold text-[#1A3629] tabular-nums">
+            {streakCount} {streakCount === 1 ? 'Day' : 'Days'}
+          </span>
         </div>
-        <span className="font-cabinet text-xs font-bold text-[#1A3629]">
-          {streakCount} {streakCount === 1 ? 'Day' : 'Days'}
-        </span>
 
         {streakFreezeStock > 0 && (
-          <span
+          <div
             className="flex items-center gap-1 pl-2 border-l border-[#1A3629]/20 text-[11px] font-mono font-bold text-[#2563EB]"
             title={`${streakFreezeStock} Streak Freeze available`}
           >
-            <img
-              src="/assets/progression/relic_freeze_rune.webp"
-              alt="Freeze Shield"
-              className="w-3.5 h-3.5 rounded-sm object-cover [image-rendering:pixelated]"
-            />
-            <span>{streakFreezeStock}</span>
-          </span>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+            <span className="tabular-nums">{streakFreezeStock}</span>
+          </div>
         )}
       </button>
 

@@ -8,6 +8,7 @@ import {
   StreakMilestone,
 } from './config';
 import type { DailyLogData, HabitItem } from '@/store/useHabitStore';
+import { formatLocalDate, parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
 
 export interface LevelProgress {
   level: number;
@@ -32,9 +33,8 @@ export function calculateLevel(totalXp: number): LevelProgress {
     }
   }
 
-  const currentRank = TITLE_RANKS.find((r) => currentLevel >= r.minLevel) ?? TITLE_RANKS[TITLE_RANKS.length - 1];
-  const higherRanks = TITLE_RANKS.filter((r) => r.minLevel > currentLevel).sort((a, b) => a.minLevel - b.minLevel);
-  const nextRank = higherRanks[0];
+  const levelTitle = `Level ${currentLevel}`;
+  const nextLevelTitle = currentLevel < MAX_LEVEL ? `Level ${currentLevel + 1}` : undefined;
 
   if (currentLevel >= MAX_LEVEL) {
     const levelFloor = xpToReachLevel(MAX_LEVEL);
@@ -44,7 +44,7 @@ export function calculateLevel(totalXp: number): LevelProgress {
       xpForNextLevel: 0,
       totalXp: safeXp,
       progressPercent: 100,
-      title: currentRank.name,
+      title: levelTitle,
       nextTitle: undefined,
       isMaxLevel: true,
     };
@@ -62,8 +62,8 @@ export function calculateLevel(totalXp: number): LevelProgress {
     xpForNextLevel: xpNeeded,
     totalXp: safeXp,
     progressPercent,
-    title: currentRank.name,
-    nextTitle: nextRank?.name,
+    title: levelTitle,
+    nextTitle: nextLevelTitle,
     isMaxLevel: false,
   };
 }
@@ -154,7 +154,7 @@ export function calculateStreakStatus(
   let freezeStock = Math.min(STREAK_FREEZE.maxStock, Math.max(0, currentFreezeStock));
   let freezeUsedYesterday = false;
 
-  const today = new Date(todayStr);
+  const baseDate = parseLocalDate(todayStr);
   const isActionTaken = (log?: DailyLogData): boolean => {
     if (!log) return false;
     const habitsCount = Object.values(log.habitsCompleted ?? {}).filter(Boolean).length;
@@ -164,26 +164,18 @@ export function calculateStreakStatus(
   const todayLog = logsByDate[todayStr];
   const activeToday = isActionTaken(todayLog);
 
-  let checkDate = new Date(today);
-  if (!activeToday) {
-    checkDate.setDate(checkDate.getDate() - 1);
-  }
-
+  let startOffset = activeToday ? 0 : 1;
   let streakAlive = true;
-  let dayOffset = 0;
+  let dayOffset = startOffset;
 
   while (streakAlive && dayOffset < 365) {
-    const d = new Date(checkDate);
-    d.setDate(d.getDate() - dayOffset);
-    const dateKey = d.toISOString().split('T')[0];
+    const dateKey = getRelativeLocalDate(-dayOffset, baseDate);
     const log = logsByDate[dateKey];
 
     if (isActionTaken(log)) {
       streak++;
     } else {
-      const dayBefore = new Date(d);
-      dayBefore.setDate(dayBefore.getDate() - 1);
-      const dayBeforeKey = dayBefore.toISOString().split('T')[0];
+      const dayBeforeKey = getRelativeLocalDate(-dayOffset - 1, baseDate);
       const hadActivityBefore = isActionTaken(logsByDate[dayBeforeKey]);
 
       if (hadActivityBefore && freezeStock > 0 && !freezeUsedYesterday) {

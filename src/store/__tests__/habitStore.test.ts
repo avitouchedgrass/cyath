@@ -233,9 +233,19 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(profile?.referralCode).toBeDefined();
     expect(profile?.referralCode).toMatch(/^RANGE-[A-Z0-9]{4}$/);
 
+    // Claiming a link should fail with explicit error
+    const linkClaim = await useHabitStore.getState().claimReferralCode('https://cyath.space/auth?ref=ALEX-8K9L');
+    expect(linkClaim.success).toBe(false);
+    expect(linkClaim.message).toContain('not a website link');
+
+    // Claiming random garbage with special characters should fail
+    const invalidCharClaim = await useHabitStore.getState().claimReferralCode('bad code@123!');
+    expect(invalidCharClaim.success).toBe(false);
+
     // Claiming own code should fail
     const ownClaim = await useHabitStore.getState().claimReferralCode(profile!.referralCode!);
     expect(ownClaim.success).toBe(false);
+    expect(ownClaim.message).toMatch(/cannot claim your own/i);
 
     // Claiming friend's valid code should succeed and grant +250 XP
     const friendCode = 'CYATH-7K9P';
@@ -249,6 +259,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     // Claiming second time should fail
     const duplicateClaim = await useHabitStore.getState().claimReferralCode('CYATH-DIFF');
     expect(duplicateClaim.success).toBe(false);
+    expect(duplicateClaim.message).toContain('already claimed');
   });
 
   it('completes pioneer walkthrough and awards +50 XP calibration quest bonus', () => {

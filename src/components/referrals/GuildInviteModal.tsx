@@ -163,9 +163,12 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
 
         {/* Claim A Friend's Code Section */}
         <div className="p-4 rounded-2xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-0.5">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
               Have a Friend&apos;s Invite Code?
+            </span>
+            <span className="text-[11px] font-cabinet font-medium text-[#2C4A3B]">
+              Enter their unique code (e.g. ALEX-7K9P). Web links are not accepted.
             </span>
           </div>
 
@@ -175,7 +178,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
                 type="text"
                 value={referralInput}
                 onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
-                placeholder="e.g. CYATH-XXXX"
+                placeholder="e.g. ALEX-7K9P"
                 className="flex-1 px-3 py-2 rounded-xl border-2 border-[#1A3629]/30 focus:border-[#1A3629] bg-[#FFFDF9] font-mono text-xs text-[#1A3629] outline-none uppercase placeholder:normal-case"
               />
               <button
@@ -183,7 +186,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
                 disabled={isClaimingRef || !referralInput.trim()}
                 className="px-4 py-2 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 shrink-0"
               >
-                {isClaimingRef ? 'Claiming...' : 'Claim +250 XP'}
+                {isClaimingRef ? 'Verifying...' : 'Claim +250 XP'}
               </button>
             </form>
           ) : (

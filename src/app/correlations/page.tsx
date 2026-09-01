@@ -191,7 +191,17 @@ export default function CorrelationsPage() {
                 initialPoints={matrixPoints}
                 xLabel={activeCorrelation.xLabel}
                 yLabel={activeCorrelation.yLabel}
-                xUnit={activeCorrelation.id.includes('protein') ? 'g' : activeCorrelation.id.includes('sleep') ? 'h' : 'min'}
+                xUnit={
+                  activeCorrelation.id.includes('protein')
+                    ? 'g'
+                    : activeCorrelation.id.includes('sleep')
+                    ? 'h'
+                    : activeCorrelation.id.includes('hydration')
+                    ? 'L'
+                    : activeCorrelation.id.includes('momentum') || activeCorrelation.id.includes('adherence')
+                    ? '%'
+                    : 'pts'
+                }
               />
 
               {/* Executive Actionable Takeaway Box */}

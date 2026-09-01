@@ -409,6 +409,7 @@ export const useHabitStore = create<HabitStoreState>()(
               allergies: profile.allergies?.length ? profile.allergies : (currentLocalProfile?.allergies || []),
               dietaryRestrictions: profile.dietary_restrictions?.length ? profile.dietary_restrictions : (currentLocalProfile?.dietaryRestrictions || []),
               onboardingCompleted: isOnboardingDone,
+              walkthroughCompleted: !!((profile as any)?.walkthrough_completed || currentLocalProfile?.walkthroughCompleted),
               referralCode: finalReferralCode,
               referredBy: (profile as any)?.referred_by || currentLocalProfile?.referredBy,
               claimedReferral: !!((profile as any)?.referred_by || currentLocalProfile?.claimedReferral),
@@ -447,7 +448,15 @@ export const useHabitStore = create<HabitStoreState>()(
                     streak_count: finalStreak,
                     streak_freeze_stock: finalFreeze,
                     onboarding_completed: isOnboardingDone,
+                    walkthrough_completed: finalProfile.walkthroughCompleted,
                     full_name: finalProfile.fullName,
+                    age: finalProfile.age,
+                    sex: finalProfile.sex,
+                    height_cm: finalProfile.heightCm,
+                    weight_kg: finalProfile.weightKg,
+                    primary_goal: finalProfile.primaryGoal,
+                    allergies: finalProfile.allergies,
+                    dietary_restrictions: finalProfile.dietaryRestrictions,
                     updated_at: new Date().toISOString(),
                   }, { onConflict: 'user_id' });
               } catch {}
@@ -548,6 +557,7 @@ export const useHabitStore = create<HabitStoreState>()(
                 allergies: updated.allergies,
                 dietary_restrictions: updated.dietaryRestrictions,
                 onboarding_completed: updated.onboardingCompleted,
+                walkthrough_completed: updated.walkthroughCompleted ?? false,
                 referral_code: updated.referralCode,
                 referred_by: updated.referredBy || null,
                 total_xp: get().totalXp,
@@ -1415,12 +1425,25 @@ export const useHabitStore = create<HabitStoreState>()(
 
       completeWalkthrough: () => {
         const profile = get().userProfile;
-        if (profile) {
-          get().updateUserProfile({
-            ...profile,
-            walkthroughCompleted: true,
-          });
+        // Strictly prevent multiple XP exploits: only award calibration quest bonus once
+        if (profile?.walkthroughCompleted) {
+          return;
         }
+        const updated: UserProfile = {
+          ...(profile || {
+            fullName: '',
+            age: 25,
+            sex: 'other',
+            heightCm: 175,
+            weightKg: 70,
+            primaryGoal: 'focus',
+            allergies: [],
+            dietaryRestrictions: [],
+            onboardingCompleted: false,
+          }),
+          walkthroughCompleted: true,
+        };
+        get().updateUserProfile(updated);
         get().gainXp(50, 'Pioneer Calibration Complete');
       },
 

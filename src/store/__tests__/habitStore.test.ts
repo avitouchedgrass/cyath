@@ -276,6 +276,11 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(useHabitStore.getState().userProfile?.walkthroughCompleted).toBe(true);
     expect(useHabitStore.getState().totalXp).toBe(50);
     expect(useHabitStore.getState().xpHistory[0].reason).toBe('Pioneer Calibration Complete');
+
+    // Recompleting walkthrough should NOT award additional XP
+    useHabitStore.getState().completeWalkthrough();
+    expect(useHabitStore.getState().totalXp).toBe(50);
+    expect(useHabitStore.getState().xpHistory.length).toBe(1);
   });
 });
 

@@ -5,8 +5,8 @@ import { retroAudio } from '@/lib/retroAudio';
 
 export interface MatrixDataPoint {
   id: string;
-  x: number; // e.g. Protein (g) or Sleep (h)
-  y: number; // Focus / Energy (1-10)
+  x: number; // e.g. Protein (g), Sleep (h), Hydration (L), or Adherence (%)
+  y: number; // Focus / Energy / Mood (1-10)
   label: string;
 }
 
@@ -39,31 +39,70 @@ export function InteractiveCorrelationMatrix({
 }: InteractiveCorrelationMatrixProps) {
   const [points, setPoints] = useState<MatrixDataPoint[]>(initialPoints);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [simulatedX, setSimulatedX] = useState<number>(165);
   const [hoveredPointId, setHoveredPointId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
 
+  const isSleep = xUnit === 'h' || xLabel.toLowerCase().includes('sleep');
+  const isHydration = xUnit === 'L' || xLabel.toLowerCase().includes('hydration');
+  const isPercent = xUnit === '%' || xLabel.toLowerCase().includes('adherence') || xLabel.toLowerCase().includes('rate');
+
+  const getDefaultSimulatedX = useCallback(() => {
+    if (isSleep) return 8.0;
+    if (isHydration) return 2.8;
+    if (isPercent) return 85;
+    return 150;
+  }, [isSleep, isHydration, isPercent]);
+
+  const [simulatedX, setSimulatedX] = useState<number>(getDefaultSimulatedX);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Compute live statistical regression & correlation coefficient
+  // Sync state whenever initial points or metric units switch
+  useEffect(() => {
+    setPoints(initialPoints);
+    setSimulatedX(getDefaultSimulatedX());
+  }, [initialPoints, getDefaultSimulatedX]);
+
+  // Compute metric-aware statistical regression & dynamic domain bounds
   const stats = useMemo(() => {
     const n = points.length;
-    if (n < 2) {
-      return { m: 0.03, b: 2.5, r: 0.85, rSquared: 0.72, minX: 70, maxX: 220, minY: 1, maxY: 10 };
-    }
-
     const xs = points.map((p) => p.x);
     const ys = points.map((p) => p.y);
 
-    const minX = Math.min(70, Math.min(...xs) - 10);
-    const maxX = Math.max(220, Math.max(...xs) + 15);
+    let minX: number;
+    let maxX: number;
+    let stepVal: number;
+
+    if (isSleep) {
+      minX = Math.max(3.0, Math.min(4.5, Math.min(...xs) - 0.5));
+      maxX = Math.max(10.5, Math.max(...xs) + 0.5);
+      stepVal = 0.25;
+    } else if (isHydration) {
+      minX = Math.max(0.5, Math.min(1.2, Math.min(...xs) - 0.3));
+      maxX = Math.max(4.5, Math.max(...xs) + 0.3);
+      stepVal = 0.1;
+    } else if (isPercent) {
+      minX = 0;
+      maxX = 100;
+      stepVal = 1;
+    } else {
+      // Default: Protein in grams
+      minX = Math.min(50, Math.min(...xs) - 10);
+      maxX = Math.max(220, Math.max(...xs) + 15);
+      stepVal = 5;
+    }
+
     const minY = 1;
     const maxY = 10;
+
+    if (n < 2) {
+      return { m: 0.03, b: 2.5, r: 0.85, rSquared: 0.72, minX, maxX, minY, maxY, stepVal };
+    }
 
     const meanX = xs.reduce((a, b) => a + b, 0) / n;
     const meanY = ys.reduce((a, b) => a + b, 0) / n;
@@ -85,8 +124,8 @@ export function InteractiveCorrelationMatrix({
     const r = denX > 0 && denY > 0 ? num / Math.sqrt(denX * denY) : 0.8;
     const rSquared = Math.max(0, Math.min(1, r * r));
 
-    return { m, b, r, rSquared, minX, maxX, minY, maxY };
-  }, [points]);
+    return { m, b, r, rSquared, minX, maxX, minY, maxY, stepVal };
+  }, [points, isSleep, isHydration, isPercent]);
 
   // Live forecast based on simulated slider
   const predictedFocus = useMemo(() => {
@@ -106,11 +145,14 @@ export function InteractiveCorrelationMatrix({
     }
   }, [predictedFocus, simulatedX, mounted]);
 
-  // Normalized percent position utilities (100% deterministic, zero SSR ref access)
+  // Normalized percent position utilities (100% deterministic)
   const getPercentCoords = useCallback(
     (xVal: number, yVal: number) => {
-      const normX = Math.max(0, Math.min(1, (xVal - stats.minX) / (stats.maxX - stats.minX || 1)));
-      const normY = Math.max(0, Math.min(1, (yVal - stats.minY) / (stats.maxY - stats.minY || 1)));
+      const rangeX = stats.maxX - stats.minX || 1;
+      const rangeY = stats.maxY - stats.minY || 1;
+
+      const normX = Math.max(0, Math.min(1, (xVal - stats.minX) / rangeX));
+      const normY = Math.max(0, Math.min(1, (yVal - stats.minY) / rangeY));
 
       const leftPct = normX * 80 + 10; // 10% to 90%
       const topPct = 100 - (normY * 74 + 13); // 13% to 87%
@@ -151,7 +193,8 @@ export function InteractiveCorrelationMatrix({
     const normX = Math.max(0, Math.min(1, clickX / plotW));
     const normY = Math.max(0, Math.min(1, clickY / plotH));
 
-    const newX = Math.round(stats.minX + normX * (stats.maxX - stats.minX));
+    const rawX = stats.minX + normX * (stats.maxX - stats.minX);
+    const newX = isSleep || isHydration ? Number(rawX.toFixed(1)) : Math.round(rawX);
     const newY = Number((stats.minY + normY * (stats.maxY - stats.minY)).toFixed(1));
 
     setPoints((prev) =>
@@ -177,12 +220,13 @@ export function InteractiveCorrelationMatrix({
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = Number(e.target.value);
     setSimulatedX(val);
-    retroAudio.playPitch(320 + (val / 220) * 450, 0.03);
+    const pitchRatio = (val - stats.minX) / (stats.maxX - stats.minX || 1);
+    retroAudio.playPitch(320 + pitchRatio * 450, 0.03);
   };
 
   const resetPoints = () => {
     setPoints(initialPoints);
-    setSimulatedX(165);
+    setSimulatedX(getDefaultSimulatedX());
     retroAudio.playBlip();
   };
 
@@ -218,6 +262,17 @@ export function InteractiveCorrelationMatrix({
             Reset Points
           </button>
         </div>
+      </div>
+
+      {/* Interactive Helper Banner / Drag Reminder */}
+      <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629]/25 text-[#1A3629] text-[11px] font-mono font-bold shadow-sm">
+        <span className="flex items-center gap-2">
+          <span className="text-sm leading-none">💡</span>
+          <span>Tip: Click &amp; drag any data circle to test live biometric responses!</span>
+        </span>
+        <span className="hidden sm:inline-block text-[10px] text-[#4A5D4E] uppercase tracking-wider font-bold">
+          Interactive Scatter
+        </span>
       </div>
 
       {/* 2D Interactive Physics Canvas Arena */}
@@ -330,9 +385,9 @@ export function InteractiveCorrelationMatrix({
           </div>
           <input
             type="range"
-            min={stats.minX + 5}
-            max={stats.maxX - 5}
-            step={5}
+            min={stats.minX}
+            max={stats.maxX}
+            step={stats.stepVal}
             value={simulatedX}
             onChange={handleSliderChange}
             className="w-full accent-[#1A3629] cursor-pointer h-2 bg-[#F4F0EA] rounded-lg appearance-none"

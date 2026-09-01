@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
+import { supabase } from '@/lib/supabase';
 import { Logo } from '@/components/ui/Logo';
 import { retroAudio } from '@/lib/retroAudio';
 import {
@@ -183,8 +184,8 @@ function OnboardingContent() {
     }
   };
 
-  const handleComplete = () => {
-    updateUserProfile({
+  const handleComplete = async () => {
+    const profileData = {
       fullName: fullName.trim() || 'Cyath Explorer',
       age: typeof age === 'number' ? age : 26,
       sex,
@@ -194,7 +195,31 @@ function OnboardingContent() {
       allergies: selectedAllergies,
       dietaryRestrictions: [selectedDiet],
       onboardingCompleted: true,
-    });
+    };
+
+    updateUserProfile(profileData);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const activeUserId = session?.user?.id || userSession?.id;
+      if (activeUserId && !activeUserId.startsWith('guest_')) {
+        await supabase.from('user_profiles').upsert({
+          user_id: activeUserId,
+          full_name: profileData.fullName,
+          age: profileData.age,
+          sex: profileData.sex,
+          height_cm: profileData.heightCm,
+          weight_kg: profileData.weightKg,
+          primary_goal: profileData.primaryGoal,
+          allergies: profileData.allergies,
+          dietary_restrictions: profileData.dietaryRestrictions,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+      }
+    } catch (err) {
+      console.warn('Direct onboarding Supabase sync fallback:', err);
+    }
 
     router.push('/dashboard');
   };

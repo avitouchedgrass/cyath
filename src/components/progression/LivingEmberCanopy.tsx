@@ -36,14 +36,9 @@ export function LivingEmberCanopy({ className = '', intensity = 'ambient' }: Liv
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    let animId: number;
-    let isVisible = true;
     let width = 0;
     let height = 0;
     let dpr = 1;
-
-    // Check reduced motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const particles: Particle[] = [];
     const maxParticles = intensity === 'high' ? 85 : 48;
@@ -125,11 +120,35 @@ export function LivingEmberCanopy({ className = '', intensity = 'ambient' }: Liv
       }
     });
 
-    // Intersection observer to pause offscreen
+    let animId: number = 0;
+    let isVisible = true;
+
+    // Check reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const startLoop = () => {
+      if (animId || !isVisible || prefersReducedMotion) return;
+      lastTime = performance.now();
+      animId = requestAnimationFrame(loop);
+    };
+
+    const stopLoop = () => {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = 0;
+      }
+    };
+
+    // Viewport visibility observer to avoid burning background cycles
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startLoop();
+          } else {
+            stopLoop();
+          }
         });
       },
       { threshold: 0.05 }
@@ -139,18 +158,22 @@ export function LivingEmberCanopy({ className = '', intensity = 'ambient' }: Liv
     // Tab visibility listener
     const onVisibilityChange = () => {
       isVisible = document.visibilityState === 'visible';
+      if (isVisible) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     let lastTime = performance.now();
 
     const loop = (time: number) => {
-      animId = requestAnimationFrame(loop);
-
       if (!isVisible || prefersReducedMotion) {
-        lastTime = time;
+        stopLoop();
         return;
       }
+      animId = requestAnimationFrame(loop);
 
       const dt = Math.min((time - lastTime) / 16.67, 2);
       lastTime = time;

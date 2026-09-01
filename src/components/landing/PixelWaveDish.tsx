@@ -158,16 +158,22 @@ export function PixelWaveDish({
             ctx.restore();
           }
         }
-      } else if (currentImg) {
-        // Idle state: Draw active dish
-        drawDish(currentImg);
-      }
 
-      ctx.restore();
-      animRef.current = requestAnimationFrame(render);
+        ctx.restore();
+        // Continue animation loop while scanning transition is active
+        animRef.current = requestAnimationFrame(render);
+      } else if (currentImg) {
+        // Idle state: Draw active dish once without continuous RAF loops
+        drawDish(currentImg);
+        ctx.restore();
+        animRef.current = null;
+      } else {
+        ctx.restore();
+        animRef.current = null;
+      }
     };
 
-    animRef.current = requestAnimationFrame(render);
+    render(performance.now());
 
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);

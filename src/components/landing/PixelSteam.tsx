@@ -25,22 +25,41 @@ export function PixelSteam({ active = true, className = "", intensity = 1.0 }: P
   const animRef = useRef<number | null>(null);
   const particlesRef = useRef<SteamParticle[]>([]);
   const lastSpawnRef = useRef<number>(0);
+  const isVisibleRef = useRef<boolean>(true);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Observe visibility in viewport to completely freeze execution when offscreen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting && animRef.current) {
+          cancelAnimationFrame(animRef.current);
+          animRef.current = null;
+        } else if (entry.isIntersecting && active && !animRef.current) {
+          animRef.current = requestAnimationFrame(render);
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+
     if (!active) {
       if (animRef.current) cancelAnimationFrame(animRef.current);
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      observer.disconnect();
       return;
     }
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      observer.disconnect();
+      return;
+    }
 
     let lastTime = performance.now();
 
@@ -136,6 +155,7 @@ export function PixelSteam({ active = true, className = "", intensity = 1.0 }: P
     animRef.current = requestAnimationFrame(render);
 
     return () => {
+      observer.disconnect();
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
   }, [active, intensity]);

@@ -50,6 +50,19 @@ export interface UserProfile {
   allergies: string[];
   dietaryRestrictions: string[];
   onboardingCompleted: boolean;
+  referralCode?: string;
+  referredBy?: string;
+  referralCount?: number;
+  claimedReferral?: boolean;
+}
+
+export function generateReferralCode(identifier?: string): string {
+  const clean = (identifier || 'CYATH')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 5) || 'CYATH';
+  const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${clean}-${randomSuffix}`;
 }
 
 export interface XpHistoryItem {
@@ -110,6 +123,7 @@ export interface HabitStoreState {
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   gainXp: (amount: number, reason: string, source?: string) => { oldLevel: number; newLevel: number; leveledUp: boolean };
   claimQuest: (questId: string, date?: string) => void;
+  claimReferralCode: (code: string) => Promise<{ success: boolean; message: string; xpAwarded: number }>;
   getDailyLog: (date?: string) => DailyLogData;
   syncWithSupabase: (date?: string) => Promise<void>;
   initDemoSession: () => void;
@@ -380,6 +394,8 @@ export const useHabitStore = create<HabitStoreState>()(
             const finalFreeze = Math.min(STREAK_FREEZE.maxStock, Math.max(profile.streak_freeze_stock ?? 0, currentLocalFreeze));
             const isOnboardingDone = profile.onboarding_completed || currentLocalProfile?.onboardingCompleted || false;
 
+            const finalReferralCode = (profile as any)?.referral_code || currentLocalProfile?.referralCode || generateReferralCode(profile.full_name || currentLocalProfile?.fullName || session.email);
+
             const finalProfile: UserProfile = {
               fullName: profile.full_name || currentLocalProfile?.fullName || '',
               age: profile.age || currentLocalProfile?.age || 25,
@@ -390,6 +406,9 @@ export const useHabitStore = create<HabitStoreState>()(
               allergies: profile.allergies?.length ? profile.allergies : (currentLocalProfile?.allergies || []),
               dietaryRestrictions: profile.dietary_restrictions?.length ? profile.dietary_restrictions : (currentLocalProfile?.dietaryRestrictions || []),
               onboardingCompleted: isOnboardingDone,
+              referralCode: finalReferralCode,
+              referredBy: (profile as any)?.referred_by || currentLocalProfile?.referredBy,
+              claimedReferral: !!((profile as any)?.referred_by || currentLocalProfile?.claimedReferral),
             };
 
             set({
@@ -502,7 +521,12 @@ export const useHabitStore = create<HabitStoreState>()(
           onboardingCompleted: false,
         };
 
-        const updated = { ...current, ...profile };
+        const finalReferralCode = profile.referralCode || current.referralCode || generateReferralCode(profile.fullName || current.fullName || get().userSession?.email);
+        const updated: UserProfile = {
+          ...current,
+          ...profile,
+          referralCode: finalReferralCode,
+        };
         set({ userProfile: updated });
 
         const userId = get().userSession?.id;
@@ -521,6 +545,8 @@ export const useHabitStore = create<HabitStoreState>()(
                 allergies: updated.allergies,
                 dietary_restrictions: updated.dietaryRestrictions,
                 onboarding_completed: updated.onboardingCompleted,
+                referral_code: updated.referralCode,
+                referred_by: updated.referredBy || null,
                 total_xp: get().totalXp,
                 streak_count: get().streakCount,
                 streak_freeze_stock: get().streakFreezeStock,
@@ -691,6 +717,64 @@ export const useHabitStore = create<HabitStoreState>()(
             xpAwarded: quest.xpAward,
           });
         }
+      },
+
+      claimReferralCode: async (code: string) => {
+        const cleanCode = code.trim().toUpperCase();
+        if (!cleanCode) {
+          return { success: false, message: 'Please enter a valid referral code.', xpAwarded: 0 };
+        }
+
+        const currentProfile = get().userProfile;
+        if (currentProfile?.claimedReferral) {
+          return { success: false, message: 'You have already claimed a starter referral bonus.', xpAwarded: 0 };
+        }
+
+        if (currentProfile?.referralCode === cleanCode) {
+          return { success: false, message: 'Cannot claim your own referral code.', xpAwarded: 0 };
+        }
+
+        // Award +250 XP to the new recruit
+        get().gainXp(250, `Guild Recruit Bonus (${cleanCode})`, 'referral');
+        retroAudio.playTierUpgrade();
+
+        const updatedProfile: UserProfile = {
+          ...(currentProfile || {
+            fullName: '',
+            age: 25,
+            sex: 'other',
+            heightCm: 175,
+            weightKg: 70,
+            primaryGoal: 'focus',
+            allergies: [],
+            dietaryRestrictions: [],
+            onboardingCompleted: false,
+          }),
+          claimedReferral: true,
+          referredBy: cleanCode,
+          referralCode: currentProfile?.referralCode || generateReferralCode(currentProfile?.fullName || get().userSession?.email),
+        };
+
+        get().updateUserProfile(updatedProfile);
+
+        // Send server attribution request in the background
+        try {
+          fetch('/api/referrals/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referralCode: cleanCode,
+              recruitUserId: get().userSession?.id,
+              recruitEmail: get().userSession?.email,
+            }),
+          }).catch(() => {});
+        } catch {}
+
+        return {
+          success: true,
+          message: `Guild Pact activated! +250 Starter XP awarded for joining via ${cleanCode}.`,
+          xpAwarded: 250,
+        };
       },
 
       toggleHabit: (habitId, date) => {

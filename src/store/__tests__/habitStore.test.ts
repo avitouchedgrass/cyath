@@ -223,4 +223,32 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(useHabitStore.getState().totalXp).toBe(1400);
     expect(useHabitStore.getState().habits.some((h) => h.title === 'Advanced Kettlebell Swing')).toBe(true);
   });
+
+  it('generates unique referral code and awards +250 XP on claiming invite code', async () => {
+    const userId = 'user_recruit_1';
+    useHabitStore.getState().setUserSession({ id: userId, email: 'recruit@gmail.com' });
+    useHabitStore.getState().updateUserProfile({ fullName: 'Ranger Recruit' });
+
+    const profile = useHabitStore.getState().userProfile;
+    expect(profile?.referralCode).toBeDefined();
+    expect(profile?.referralCode).toMatch(/^RANGE-[A-Z0-9]{4}$/);
+
+    // Claiming own code should fail
+    const ownClaim = await useHabitStore.getState().claimReferralCode(profile!.referralCode!);
+    expect(ownClaim.success).toBe(false);
+
+    // Claiming friend's valid code should succeed and grant +250 XP
+    const friendCode = 'CYATH-7K9P';
+    const validClaim = await useHabitStore.getState().claimReferralCode(friendCode);
+    expect(validClaim.success).toBe(true);
+    expect(validClaim.xpAwarded).toBe(250);
+    expect(useHabitStore.getState().totalXp).toBe(250);
+    expect(useHabitStore.getState().userProfile?.claimedReferral).toBe(true);
+    expect(useHabitStore.getState().userProfile?.referredBy).toBe(friendCode);
+
+    // Claiming second time should fail
+    const duplicateClaim = await useHabitStore.getState().claimReferralCode('CYATH-DIFF');
+    expect(duplicateClaim.success).toBe(false);
+  });
 });
+

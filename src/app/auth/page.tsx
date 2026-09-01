@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
 import { retroAudio } from '@/lib/retroAudio';
-import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock, Gift } from 'lucide-react';
 
 function AuthContent() {
   const router = useRouter();
@@ -27,6 +27,26 @@ function AuthContent() {
   const [isVerificationSent, setIsVerificationSent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resending, setResending] = useState(false);
+  const [pendingRefCode, setPendingRefCode] = useState<string | null>(null);
+
+  // Capture referral code from URL query param or localStorage
+  useEffect(() => {
+    const urlRef = searchParams.get('ref');
+    if (urlRef) {
+      const clean = urlRef.trim().toUpperCase();
+      try {
+        localStorage.setItem('cyath_pending_referral', clean);
+      } catch {}
+      setPendingRefCode(clean);
+    } else if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('cyath_pending_referral');
+        if (saved) {
+          setPendingRefCode(saved);
+        }
+      } catch {}
+    }
+  }, [searchParams]);
 
   // Password Complexity Standards
   const passwordCriteria = {
@@ -91,6 +111,15 @@ function AuthContent() {
     if (user) {
       setUserSession(user);
       await useHabitStore.getState().reconcileUserSession(user);
+
+      // Claim pending referral code if available
+      try {
+        const pendingRef = typeof window !== 'undefined' ? localStorage.getItem('cyath_pending_referral') : null;
+        if (pendingRef) {
+          await useHabitStore.getState().claimReferralCode(pendingRef);
+          localStorage.removeItem('cyath_pending_referral');
+        }
+      } catch {}
     } else {
       useHabitStore.getState().initDemoSession();
       router.push('/dashboard');
@@ -577,6 +606,15 @@ function AuthContent() {
                 Log In
               </button>
             </div>
+
+            {pendingRefCode && (
+              <div className="p-3 rounded-2xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] flex items-center gap-2 shadow-xs">
+                <Gift className="w-4 h-4 text-[#10B981] shrink-0" />
+                <span className="font-mono text-xs font-bold">
+                  Guild Invite [{pendingRefCode}] Applied · +250 Starter XP
+                </span>
+              </div>
+            )}
 
             <div>
               <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">

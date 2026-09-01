@@ -50,6 +50,7 @@ export interface UserProfile {
   allergies: string[];
   dietaryRestrictions: string[];
   onboardingCompleted: boolean;
+  walkthroughCompleted?: boolean;
   referralCode?: string;
   referredBy?: string;
   referralCount?: number;
@@ -129,6 +130,7 @@ export interface HabitStoreState {
   initDemoSession: () => void;
   deleteAccountData: () => Promise<void>;
   resetUserProgress: () => Promise<void>;
+  completeWalkthrough: () => void;
 }
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -1345,6 +1347,17 @@ export const useHabitStore = create<HabitStoreState>()(
           pendingAction: null,
           customRecipes: [],
         });
+      },
+
+      completeWalkthrough: () => {
+        const profile = get().userProfile;
+        if (profile) {
+          get().updateUserProfile({
+            ...profile,
+            walkthroughCompleted: true,
+          });
+        }
+        get().gainXp(50, 'Pioneer Calibration Complete');
       },
 
       resetUserProgress: async () => {

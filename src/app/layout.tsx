@@ -4,6 +4,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLevelBadge";
+import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import "./globals.css";
 
@@ -92,6 +93,7 @@ export default function RootLayout({
           <XpToastLayer />
           <LevelUpModal />
           <BottomCornerLevelBadge />
+          <PioneerWalkthrough />
         </AuthProvider>
       </body>
     </html>

@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
-import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -328,6 +328,35 @@ export default function ProfilePage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Pioneer Onboarding Tour Launcher Card */}
+        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629] flex items-center justify-center shadow-[2px_2px_0px_#1A3629] shrink-0">
+              <Compass className="w-5 h-5 text-[#1A3629]" />
+            </div>
+            <div>
+              <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
+                Pioneer Onboarding Tour
+              </h3>
+              <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
+                Replay the interactive walkthrough of Cyath’s habits engine, food scanner, and sanctuary.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playInspectConfirm();
+              window.dispatchEvent(new CustomEvent('open-cyath-walkthrough'));
+            }}
+            className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] hover:bg-[#E8DECF] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Launch Walkthrough Tour</span>
+          </button>
         </div>
 
         {/* Danger Zone: Account & Data Reset */}

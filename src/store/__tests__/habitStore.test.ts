@@ -250,5 +250,21 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     const duplicateClaim = await useHabitStore.getState().claimReferralCode('CYATH-DIFF');
     expect(duplicateClaim.success).toBe(false);
   });
+
+  it('completes pioneer walkthrough and awards +50 XP calibration quest bonus', () => {
+    const userId = 'user_pioneer_1';
+    useHabitStore.getState().setUserSession({ id: userId, email: 'pioneer@gmail.com' });
+    useHabitStore.getState().updateUserProfile({ fullName: 'Pioneer Scout' });
+
+    expect(useHabitStore.getState().userProfile?.walkthroughCompleted).toBeUndefined();
+    expect(useHabitStore.getState().totalXp).toBe(0);
+
+    // Complete walkthrough
+    useHabitStore.getState().completeWalkthrough();
+
+    expect(useHabitStore.getState().userProfile?.walkthroughCompleted).toBe(true);
+    expect(useHabitStore.getState().totalXp).toBe(50);
+    expect(useHabitStore.getState().xpHistory[0].reason).toBe('Pioneer Calibration Complete');
+  });
 });
 

@@ -3,6 +3,7 @@ import { Inter, Playfair_Display, JetBrains_Mono, Fraunces, Pixelify_Sans } from
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
+import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLevelBadge";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import "./globals.css";
 
@@ -90,6 +91,7 @@ export default function RootLayout({
           <XpParticleCanvas />
           <XpToastLayer />
           <LevelUpModal />
+          <BottomCornerLevelBadge />
         </AuthProvider>
       </body>
     </html>

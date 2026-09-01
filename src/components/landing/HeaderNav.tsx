@@ -100,10 +100,10 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
           cyath
         </Link>
 
-        {/* Center: Tactile Pill Nav (Desktop) */}
+        {/* Center: High-Contrast Tactile Pill Nav (Desktop) */}
         <nav 
           aria-label="Main Navigation"
-          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 transition-all duration-300 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full px-6 h-10 ${
+          className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1.5 transition-all duration-300 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-full p-1 h-11 ${
             isScrolled 
               ? "shadow-[4px_4px_0px_#1A3629]" 
               : "shadow-[3px_3px_0px_#1A3629]"
@@ -116,10 +116,10 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               <Link 
                 key={item.name} 
                 href={item.href}
-                className={`font-cabinet font-bold text-xs transition-colors px-2.5 py-1 rounded-full ${
+                className={`font-cabinet font-bold text-xs transition-all px-3.5 py-1.5 rounded-full ${
                   isActive
-                    ? "text-[#1A3629] bg-[#E8DECF]/70"
-                    : "text-[#1A3629] hover:text-[#3A6B52]"
+                    ? "text-[#FFFDF9] bg-[#1A3629] shadow-[2px_2px_0px_#3A6B52]"
+                    : "text-[#1A3629] hover:text-[#1A3629] hover:bg-[#F4EDE0]"
                 }`}
               >
                 {item.name}
@@ -134,7 +134,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
             <button
               type="button"
               onClick={() => setIsInviteModalOpen(true)}
-              className="border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] px-3 sm:px-4 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#10B981] hover:shadow-[4px_4px_0px_#10B981] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer h-10 select-none shrink-0"
+              className="border-2 border-[#065F46] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] px-3.5 sm:px-4 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#10B981] hover:shadow-[4px_4px_0px_#10B981] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer h-10 select-none shrink-0"
               title="Adventurer's Guild Pact: Invite Friends for +250 XP"
               aria-label="Invite friends to Cyath for +250 XP"
             >
@@ -146,17 +146,17 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center cursor-pointer h-10"
+              className="border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center cursor-pointer h-10"
             >
               <span>Profile</span>
             </Link>
           ) : (
             <Link
               href={mounted && userSession ? "/dashboard" : "/login"}
-              className="border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:shadow-[4px_4px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer h-10"
+              className="border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer h-10"
             >
-              <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
-              <span className="hidden xs:inline">Dashboard</span>
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+              <span className="hidden xs:inline">{mounted && userSession ? "Dashboard" : "Log In"}</span>
               <span className="xs:hidden">App</span>
             </Link>
           )}
@@ -167,7 +167,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle navigation menu"
             aria-expanded={isMobileMenuOpen}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer font-cabinet font-bold text-xs"
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer font-cabinet font-bold text-xs"
           >
             {isMobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -183,7 +183,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-x-4 top-24 bg-[#FFFDF9] border-3 border-[#1A3629] rounded-2xl p-5 shadow-[6px_6px_0px_#1A3629] flex flex-col gap-2 z-50 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b-2 border-[#1A3629]/15">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#4A5D4E]">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#1A3629]">
                 Navigation Menu
               </span>
               <button
@@ -206,12 +206,12 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`px-4 py-3 rounded-xl font-cabinet font-bold text-sm transition-all flex items-center justify-between border-2 min-h-[44px] ${
                       isActive
-                        ? "bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[2px_2px_0px_#3A6B52]"
-                        : "bg-[#F4F0EA] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]"
+                        ? "bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52]"
+                        : "bg-[#FAF6EE] text-[#1A3629] border-[#1A3629]/30 hover:border-[#1A3629]"
                     }`}
                   >
                     <span>{item.name}</span>
-                    {isActive && <span className="font-mono text-xs">● Active</span>}
+                    {isActive && <span className="font-mono text-xs text-[#A7F3D0]">● Active</span>}
                   </Link>
                 );
               })}
@@ -222,13 +222,13 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
                   setIsMobileMenuOpen(false);
                   window.dispatchEvent(new CustomEvent('open-ai-coach'));
                 }}
-                className="mt-1 px-4 py-3 rounded-xl font-cabinet font-bold text-sm transition-all flex items-center justify-between border-2 min-h-[44px] bg-[#FAF6EE] text-[#1A3629] border-[#1A3629]/30 hover:border-[#1A3629] cursor-pointer"
+                className="mt-1 px-4 py-3 rounded-xl font-cabinet font-bold text-sm transition-all flex items-center justify-between border-2 min-h-[44px] bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <span className="text-[#10B981] font-bold">✦</span>
                   <span>AI Metabolic Coach</span>
                 </span>
-                <span className="font-mono text-xs text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#10B981]/30 font-bold">
+                <span className="font-mono text-xs text-[#A7F3D0] bg-[#2C4A3B] px-2 py-0.5 rounded border border-[#FFFDF9]/20 font-bold">
                   Open ⌘J
                 </span>
               </button>

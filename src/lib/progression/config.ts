@@ -52,16 +52,16 @@ export interface IslandTier {
 }
 
 export const ISLAND_TIERS: IslandTier[] = [
-  { tier: 1, minLevel: 1, name: 'The Awakening Rock', image: '/islands/r1.png', description: 'A nascent floating bedrock in the quiet morning sky.' },
-  { tier: 2, minLevel: 3, name: 'The Timber Shanty', image: '/islands/r2.png', description: 'Early roots take hold with a humble wooden shelter.' },
-  { tier: 3, minLevel: 6, name: 'The Woodcutter Cabin', image: '/islands/r3.png', description: 'A sturdy stone and timber hearth amidst growing greenery.' },
-  { tier: 4, minLevel: 10, name: 'The Hearthside Cottage', image: '/islands/r4.png', description: 'A blossoming dwelling with stone chimney and blooming flora.' },
-  { tier: 5, minLevel: 15, name: 'The Watermill Homestead', image: '/islands/r5.png', description: 'Fresh mountain water flows as habits settle into steady rhythm.' },
-  { tier: 6, minLevel: 21, name: 'The Windmill Grove', image: '/islands/r6.png', description: 'Catching sky currents with thriving crops and stone paved paths.' },
-  { tier: 7, minLevel: 28, name: 'The Forest Haven', image: '/islands/r7.png', description: 'An expansive woodland sanctuary of verified daily discipline.' },
-  { tier: 8, minLevel: 35, name: 'The Celestial Observatory', image: '/islands/r8.png', description: 'Reaching into the stars with brass spires and hanging lanterns.' },
-  { tier: 9, minLevel: 42, name: 'The Skylands Estate', image: '/islands/r9.png', description: 'A grand multi-tier sky estate overlooking the morning clouds.' },
-  { tier: 10, minLevel: 50, name: 'The Mythic Eden Canopy', image: '/islands/r10.png', description: 'The pinnacle sky haven, timeless, vibrant, and blooming.' },
+  { tier: 1, minLevel: 1, name: 'The Awakening Rock', image: '/islands/r1.webp', description: 'A nascent floating bedrock in the quiet morning sky.' },
+  { tier: 2, minLevel: 3, name: 'The Timber Shanty', image: '/islands/r2.webp', description: 'Early roots take hold with a humble wooden shelter.' },
+  { tier: 3, minLevel: 6, name: 'The Woodcutter Cabin', image: '/islands/r3.webp', description: 'A sturdy stone and timber hearth amidst growing greenery.' },
+  { tier: 4, minLevel: 10, name: 'The Hearthside Cottage', image: '/islands/r4.webp', description: 'A blossoming dwelling with stone chimney and blooming flora.' },
+  { tier: 5, minLevel: 15, name: 'The Watermill Homestead', image: '/islands/r5.webp', description: 'Fresh mountain water flows as habits settle into steady rhythm.' },
+  { tier: 6, minLevel: 21, name: 'The Windmill Grove', image: '/islands/r6.webp', description: 'Catching sky currents with thriving crops and stone paved paths.' },
+  { tier: 7, minLevel: 28, name: 'The Forest Haven', image: '/islands/r7.webp', description: 'An expansive woodland sanctuary of verified daily discipline.' },
+  { tier: 8, minLevel: 35, name: 'The Celestial Observatory', image: '/islands/r8.webp', description: 'Reaching into the stars with brass spires and hanging lanterns.' },
+  { tier: 9, minLevel: 42, name: 'The Skylands Estate', image: '/islands/r9.webp', description: 'A grand multi-tier sky estate overlooking the morning clouds.' },
+  { tier: 10, minLevel: 50, name: 'The Mythic Eden Canopy', image: '/islands/r10.webp', description: 'The pinnacle sky haven, timeless, vibrant, and blooming.' },
 ];
 
 export function getIslandTier(level: number): IslandTier {

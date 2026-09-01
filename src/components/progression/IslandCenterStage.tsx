@@ -15,12 +15,24 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
   const nextIsland = getNextIslandTier(currentLevel);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(currentIsland.tier - 1);
 
-  // Preload all island tier assets immediately so rapid phase scrubbing never experiences image pop-in
+  // Preload remaining island tier assets progressively during idle time
   useEffect(() => {
-    ISLAND_TIERS.forEach((tier) => {
-      const img = new Image();
-      img.src = tier.image;
-    });
+    const preloader = () => {
+      ISLAND_TIERS.forEach((tier) => {
+        const img = new Image();
+        img.src = tier.image;
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        const id = (window as any).requestIdleCallback(preloader, { timeout: 2000 });
+        return () => (window as any).cancelIdleCallback(id);
+      } else {
+        const timer = setTimeout(preloader, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
   }, []);
 
   const displayedIsland = ISLAND_TIERS[selectedPhaseIndex] || currentIsland;
@@ -65,15 +77,17 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
                   className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-300 ease-out select-none pointer-events-none ${
                     isSelected
                       ? 'opacity-100 scale-100 z-10'
-                      : 'opacity-0 scale-95 z-0'
+                      : 'opacity-0 scale-95 z-0 pointer-events-none'
                   }`}
                 >
                   <img
                     src={tier.image}
                     alt={tier.name}
                     draggable={false}
-                    loading="eager"
+                    loading={isSelected ? 'eager' : 'lazy'}
                     decoding="async"
+                    // @ts-ignore
+                    fetchPriority={isSelected ? 'high' : 'low'}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
                     className={`w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[0_24px_30px_rgba(26,54,41,0.22)] select-none pointer-events-none transition-all duration-300 ${

@@ -157,7 +157,7 @@ export function QuestPanel() {
         <div className="max-w-xl">
           <div className="flex items-center gap-2 mb-1">
             <img
-              src="/assets/progression/relic_freeze_rune.jpg"
+              src="/assets/progression/relic_freeze_rune.webp"
               alt="Endurance Relic"
               className="w-5 h-5 rounded-sm object-cover [image-rendering:pixelated] border border-[#1A3629]/20"
             />

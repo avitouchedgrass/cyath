@@ -25,7 +25,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
       >
         <div className="w-5 h-5 rounded-md overflow-hidden shrink-0 border border-[#1A3629]/20 shadow-[1px_1px_0px_#1A3629]">
           <img
-            src="/assets/progression/relic_flame_brazier.jpg"
+            src="/assets/progression/relic_flame_brazier.webp"
             alt="Cadence Flame"
             className="w-full h-full object-cover [image-rendering:pixelated]"
           />
@@ -40,7 +40,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
             title={`${streakFreezeStock} Streak Freeze available`}
           >
             <img
-              src="/assets/progression/relic_freeze_rune.jpg"
+              src="/assets/progression/relic_freeze_rune.webp"
               alt="Freeze Shield"
               className="w-3.5 h-3.5 rounded-sm object-cover [image-rendering:pixelated]"
             />

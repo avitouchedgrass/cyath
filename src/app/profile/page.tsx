@@ -234,127 +234,7 @@ export default function ProfilePage() {
           <XpHud />
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Days Calibrated
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalDaysLogged}
-            </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Active journal entries
-            </span>
-          </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Habits Executed
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalHabitsCompleted}
-            </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Micro-routines executed
-            </span>
-          </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Total Protein Fuel
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalProteinLogged}g
-            </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Cumulative whole-food fuel
-            </span>
-          </div>
-        </div>
-
-        {/* Account Details & Blueprints Configuration */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
-                Calibrated Blueprint Targets
-              </h2>
-              <div className="space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span className="text-[#4A5D4E]">Target Daily Protein:</span>
-                  <span className="font-bold text-[#1A3629]">
-                    {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
-                  </span>
-                </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span className="text-[#4A5D4E]">Target Hydration:</span>
-                  <span className="font-bold text-[#1A3629]">
-                    {userProfile?.weightKg ? (userProfile.weightKg * 0.04).toFixed(1) : '2.5'}L / day
-                  </span>
-                </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
-                  <span className="text-[#4A5D4E]">Target Sleep:</span>
-                  <span className="font-bold text-[#1A3629]">8.0 hours</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#4A5D4E]">Equipped Cartridges:</span>
-                  <span className="font-bold text-[#10B981]">{activeProtocolIds?.length || 1} Active</span>
-                </div>
-              </div>
-            </div>
-
-            <Link
-              href="/onboarding"
-              className="mt-6 w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-cabinet font-bold text-xs text-center shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block"
-            >
-              Re-Calibrate Daily Targets →
-            </Link>
-          </div>
-
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
-                Core Pillars Navigation
-              </h2>
-              <ul className="space-y-2.5 font-cabinet font-bold text-xs">
-                <li>
-                  <Link href="/protocols" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Protocol Cartridges</span>
-                    <span className="font-mono text-xs">→</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/recipes" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Whole-Food Fuel Recipes</span>
-                    <span className="font-mono text-xs">→</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/correlations" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Correlation Engine</span>
-                    <span className="font-mono text-xs">→</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sanctuary" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Sanctuary Floating Island</span>
-                    <span className="font-mono text-xs">→</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
-              <span>Cyath Engine v2.0</span>
-              <span>Local-First · Encrypted</span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Guild Recruitment Pact (Referral System) */}
+        {/* Guild Recruitment Pact (Referral System) - Strategic Hero Position */}
         <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b-2 border-[#1A3629]/15">
             <div>
@@ -482,6 +362,126 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
+              Days Calibrated
+            </span>
+            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+              {totalDaysLogged}
+            </div>
+            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
+              Active journal entries
+            </span>
+          </div>
+
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
+              Habits Executed
+            </span>
+            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+              {totalHabitsCompleted}
+            </div>
+            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
+              Micro-routines executed
+            </span>
+          </div>
+
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
+              Total Protein Fuel
+            </span>
+            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+              {totalProteinLogged}g
+            </div>
+            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
+              Cumulative whole-food fuel
+            </span>
+          </div>
+        </div>
+
+        {/* Account Details & Blueprints Configuration */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
+                Calibrated Blueprint Targets
+              </h2>
+              <div className="space-y-3 font-mono text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                  <span className="text-[#4A5D4E]">Target Daily Protein:</span>
+                  <span className="font-bold text-[#1A3629]">
+                    {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
+                  </span>
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                  <span className="text-[#4A5D4E]">Target Hydration:</span>
+                  <span className="font-bold text-[#1A3629]">
+                    {userProfile?.weightKg ? (userProfile.weightKg * 0.04).toFixed(1) : '2.5'}L / day
+                  </span>
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                  <span className="text-[#4A5D4E]">Target Sleep:</span>
+                  <span className="font-bold text-[#1A3629]">8.0 hours</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#4A5D4E]">Equipped Cartridges:</span>
+                  <span className="font-bold text-[#10B981]">{activeProtocolIds?.length || 1} Active</span>
+                </div>
+              </div>
+            </div>
+
+            <Link
+              href="/onboarding"
+              className="mt-6 w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-cabinet font-bold text-xs text-center shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block"
+            >
+              Re-Calibrate Daily Targets →
+            </Link>
+          </div>
+
+          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
+                Core Pillars Navigation
+              </h2>
+              <ul className="space-y-2.5 font-cabinet font-bold text-xs">
+                <li>
+                  <Link href="/protocols" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Protocol Cartridges</span>
+                    <span className="font-mono text-xs">→</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/recipes" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Whole-Food Fuel Recipes</span>
+                    <span className="font-mono text-xs">→</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/correlations" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Correlation Engine</span>
+                    <span className="font-mono text-xs">→</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/sanctuary" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Sanctuary Floating Island</span>
+                    <span className="font-mono text-xs">→</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
+              <span>Cyath Engine v2.0</span>
+              <span>Local-First · Encrypted</span>
+            </div>
+          </div>
+
         </div>
 
         {/* Danger Zone: Account & Data Reset */}

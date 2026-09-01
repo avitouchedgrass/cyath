@@ -9,6 +9,7 @@ import { RECIPES } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { Gift, Copy, Check, Share2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function DashboardPage() {
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState('');
   const [historyRange, setHistoryRange] = useState<7 | 28>(7);
+  const [copiedInvite, setCopiedInvite] = useState(false);
 
   const {
     habits,
@@ -56,6 +58,22 @@ export default function DashboardPage() {
   const todayDateStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const isViewingToday = currentDate === todayDateStr;
   const todayLog = getDailyLog(currentDate);
+
+  const userReferralCode = userProfile?.referralCode || 'CYATH-JOIN';
+  const inviteUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/auth?ref=${userReferralCode}`
+    : `https://cyath.space/auth?ref=${userReferralCode}`;
+
+  const handleCopyInviteLink = async () => {
+    retroAudio.playInspectConfirm();
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setCopiedInvite(true);
+      setTimeout(() => setCopiedInvite(false), 2500);
+    } catch {
+      // Fallback
+    }
+  };
 
   // Calculate stats
   const completedCount = useMemo(() => {
@@ -788,6 +806,57 @@ export default function DashboardPage() {
                 >
                   +0.5h
                 </button>
+              </div>
+            </div>
+
+            {/* Strategic Referral Guild Card in Column 3 */}
+            <div className="p-3.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] flex flex-col gap-2.5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#10B981]/25 pb-1.5">
+                <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase text-[#065F46]">
+                  <Gift className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Guild Pact (+250 XP)</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded bg-white text-[9px] font-mono font-bold text-[#065F46] border border-[#10B981]/30">
+                  Dual Reward
+                </span>
+              </div>
+
+              <p className="text-[11px] font-cabinet font-medium text-[#1A3629] leading-snug">
+                Recruit a companion. You both earn <strong>+250 XP</strong> on activation!
+              </p>
+
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 px-2.5 py-1.5 rounded-lg border border-[#10B981]/40 bg-white font-mono font-black text-xs text-[#1A3629] select-all truncate">
+                  {userReferralCode}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyInviteLink}
+                  className="px-3 py-1.5 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[11px] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-xs"
+                >
+                  {copiedInvite ? (
+                    <>
+                      <Check className="w-3 h-3 text-[#34D399]" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`I'm leveling up my metabolic habits on Cyath! Join my guild with code ${userReferralCode} for +250 Starter XP: ${inviteUrl}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => retroAudio.playInspectConfirm()}
+                  className="p-1.5 rounded-lg border border-[#1A3629] bg-white hover:bg-[#FAF6EE] text-[#1A3629] cursor-pointer flex items-center justify-center shrink-0 shadow-xs"
+                  title="Share to WhatsApp"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-[#1A3629]" />
+                </a>
               </div>
             </div>
           </div>

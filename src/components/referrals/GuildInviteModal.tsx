@@ -78,14 +78,14 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629] bg-[#FAF6EE] text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629] flex items-center gap-1">
                 <Gift className="w-3 h-3 text-[#D97706]" />
-                Adventurer&apos;s Guild Pact
+                Friend Referral Program
               </span>
               <span className="px-2 py-0.5 rounded-md border border-[#10B981] bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
                 +250 XP Dual Reward
               </span>
             </div>
             <h2 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
-              Invite Companions to Cyath
+              Invite Friends to Cyath
             </h2>
           </div>
 
@@ -100,7 +100,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
         </div>
 
         <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
-          Share your unique invite link. When your friend joins, they receive <strong>+250 Starter XP</strong> (instant Level 2) and you earn <strong>+250 Guild Bonus XP</strong>!
+          Share your unique invite link. When your friend joins, they receive <strong>+250 Starter XP</strong> (instant Level 2) and you earn <strong>+250 Bonus XP</strong>!
         </p>
 
         {/* Your Referral Code Ribbon */}
@@ -140,7 +140,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
           </span>
           <div className="grid grid-cols-2 gap-3">
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`I'm leveling up my metabolic health on Cyath! Join my guild with code ${userReferralCode} for +250 Starter XP: ${inviteUrl}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`I'm improving my daily habits on Cyath! Join with my invite code ${userReferralCode} for +250 Starter XP: ${inviteUrl}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => retroAudio.playInspectConfirm()}
@@ -150,7 +150,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
             </a>
 
             <a
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Tracking my daily metabolic habits and building my 16-bit sanctuary on @Cyath. Join with my code ${userReferralCode} to get +250 Starter XP:`)}&url=${encodeURIComponent(inviteUrl)}`}
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Tracking my daily health habits and building my island on @Cyath. Join with my code ${userReferralCode} to get +250 Starter XP:`)}&url=${encodeURIComponent(inviteUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => retroAudio.playInspectConfirm()}
@@ -192,7 +192,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
           ) : (
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#065F46]">
               <Check className="w-4 h-4 text-[#10B981]" />
-              <span>Starter Guild XP Claimed ({userProfile.referredBy || 'GUILD'})</span>
+              <span>Referral Bonus Claimed ({userProfile.referredBy || 'INVITE'})</span>
             </div>
           )}
 

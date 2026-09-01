@@ -143,7 +143,7 @@ describe('Streak Calculation & Freeze Protection', () => {
 
     const status = calculateStreakStatus(logs, '2026-08-27', 1);
     expect(status.currentStreak).toBe(3);
-    expect(status.milestoneAchievedToday?.name).toBe('Kindling');
+    expect(status.milestoneAchievedToday?.name).toBe('3 Day Streak');
   });
 
   it('uses streak freeze when a day is missed', () => {

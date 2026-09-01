@@ -55,13 +55,13 @@ export const ISLAND_TIERS: IslandTier[] = [
   { tier: 1, minLevel: 1, name: 'The Awakening Rock', image: '/islands/r1.webp', description: 'A nascent floating bedrock in the quiet morning sky.' },
   { tier: 2, minLevel: 3, name: 'The Timber Shanty', image: '/islands/r2.webp', description: 'Early roots take hold with a humble wooden shelter.' },
   { tier: 3, minLevel: 6, name: 'The Woodcutter Cabin', image: '/islands/r3.webp', description: 'A sturdy stone and timber hearth amidst growing greenery.' },
-  { tier: 4, minLevel: 10, name: 'The Hearthside Cottage', image: '/islands/r4.webp', description: 'A blossoming dwelling with stone chimney and blooming flora.' },
+  { tier: 4, minLevel: 10, name: 'The Hearthside Cottage', image: '/islands/r4.webp', description: 'A blossoming cottage with stone chimney and garden.' },
   { tier: 5, minLevel: 15, name: 'The Watermill Homestead', image: '/islands/r5.webp', description: 'Fresh mountain water flows as habits settle into steady rhythm.' },
   { tier: 6, minLevel: 21, name: 'The Windmill Grove', image: '/islands/r6.webp', description: 'Catching sky currents with thriving crops and stone paved paths.' },
-  { tier: 7, minLevel: 28, name: 'The Forest Haven', image: '/islands/r7.webp', description: 'An expansive woodland sanctuary of verified daily discipline.' },
+  { tier: 7, minLevel: 28, name: 'The Forest Haven', image: '/islands/r7.webp', description: 'An expansive woodland island of verified daily discipline.' },
   { tier: 8, minLevel: 35, name: 'The Celestial Observatory', image: '/islands/r8.webp', description: 'Reaching into the stars with brass spires and hanging lanterns.' },
   { tier: 9, minLevel: 42, name: 'The Skylands Estate', image: '/islands/r9.webp', description: 'A grand multi-tier sky estate overlooking the morning clouds.' },
-  { tier: 10, minLevel: 50, name: 'The Mythic Eden Canopy', image: '/islands/r10.webp', description: 'The pinnacle sky haven, timeless, vibrant, and blooming.' },
+  { tier: 10, minLevel: 50, name: 'The Eden Canopy', image: '/islands/r10.webp', description: 'The pinnacle sky haven, vibrant and blooming.' },
 ];
 
 export function getIslandTier(level: number): IslandTier {
@@ -89,12 +89,12 @@ export interface StreakMilestone {
 }
 
 export const STREAK_MILESTONES: StreakMilestone[] = [
-  { days: 3, xp: 50, name: 'Kindling' },
-  { days: 7, xp: 100, name: 'Steady Burn' },
-  { days: 14, xp: 200, name: 'Hearthkeeper' },
-  { days: 30, xp: 400, name: 'Moonwatch' },
-  { days: 60, xp: 600, name: 'Old Growth' },
-  { days: 100, xp: 1000, name: 'Eternal Flame' },
+  { days: 3, xp: 50, name: '3 Day Streak' },
+  { days: 7, xp: 100, name: '1 Week Streak' },
+  { days: 14, xp: 200, name: '2 Week Streak' },
+  { days: 30, xp: 400, name: '1 Month Streak' },
+  { days: 60, xp: 600, name: '2 Month Streak' },
+  { days: 100, xp: 1000, name: '100 Day Streak' },
 ];
 
 export const STREAK_FREEZE = {
@@ -109,16 +109,18 @@ export interface QuestTemplate {
   title: string;
   description: string;
   xpAward: number;
-  category: 'nutrition' | 'habits' | 'recovery' | 'activity';
+  category: 'nutrition' | 'hydration' | 'habits' | 'recovery' | 'activity';
   target: number;
   unit: string;
 }
 
+export type Quest = QuestTemplate;
+
 export const DAILY_QUEST_POOL: QuestTemplate[] = [
   {
     id: 'morning_activation',
-    title: 'Dawn Ignition',
-    description: 'Catch early sunlight & hydrate within 30 minutes of waking.',
+    title: 'Morning Sun & Water',
+    description: 'Get morning sunlight and hydrate within 30 minutes of waking.',
     xpAward: 25,
     category: 'habits',
     target: 1,
@@ -126,8 +128,8 @@ export const DAILY_QUEST_POOL: QuestTemplate[] = [
   },
   {
     id: 'protein_target',
-    title: 'Structural Synthesis',
-    description: 'Hit 120g+ of bioavailable daily protein.',
+    title: 'Protein Target',
+    description: 'Hit 120g+ of dietary protein today.',
     xpAward: 30,
     category: 'nutrition',
     target: 120,
@@ -135,17 +137,17 @@ export const DAILY_QUEST_POOL: QuestTemplate[] = [
   },
   {
     id: 'hydration_flow',
-    title: 'Artesian Flow',
-    description: 'Consume at least 2.0L of pure water & minerals.',
+    title: 'Hydration Target',
+    description: 'Drink at least 2.0L of water today.',
     xpAward: 25,
-    category: 'nutrition',
+    category: 'hydration',
     target: 2.0,
     unit: 'L',
   },
   {
     id: 'sleep_restoration',
-    title: 'Deep Reconstitution',
-    description: 'Log 7+ hours of uninterrupted sleep.',
+    title: 'Quality Sleep',
+    description: 'Log 7+ hours of quality sleep.',
     xpAward: 25,
     category: 'recovery',
     target: 7,
@@ -153,7 +155,7 @@ export const DAILY_QUEST_POOL: QuestTemplate[] = [
   },
   {
     id: 'habit_trio',
-    title: 'The Triumvirate',
+    title: 'Habit Trio',
     description: 'Complete at least 3 distinct habits today.',
     xpAward: 35,
     category: 'habits',
@@ -162,7 +164,7 @@ export const DAILY_QUEST_POOL: QuestTemplate[] = [
   },
   {
     id: 'recipe_craft',
-    title: 'Alchemical Fuel',
+    title: 'Daily Meal Log',
     description: 'Cook or log a nutrient-dense whole-food recipe.',
     xpAward: 30,
     category: 'nutrition',
@@ -171,11 +173,13 @@ export const DAILY_QUEST_POOL: QuestTemplate[] = [
   },
   {
     id: 'flawless_habits',
-    title: 'Absolute Alignment',
-    description: 'Complete every single scheduled habit on your list.',
+    title: 'Perfect Day',
+    description: 'Complete every scheduled habit on your list.',
     xpAward: 50,
     category: 'habits',
     target: 1,
     unit: 'day',
   },
 ];
+
+export const DAILY_QUESTS = DAILY_QUEST_POOL;

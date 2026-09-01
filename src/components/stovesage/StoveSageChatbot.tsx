@@ -247,7 +247,7 @@ export function StoveSageChatbot() {
         .join(', ');
 
       const userContext = {
-        userName: userProfile?.fullName || 'Pilgrim',
+        userName: userProfile?.fullName || 'Friend',
         primaryGoal: userProfile?.primaryGoal || 'Daily Well-Being',
         todayProteinLogged: todayLog.totalProteinLogged || 0,
         dailyProteinTarget: userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140,

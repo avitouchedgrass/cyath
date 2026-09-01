@@ -70,7 +70,7 @@ const CURATED_PROTOCOLS: ProtocolBlueprint[] = [
   {
     id: 'cognitive-flow',
     name: 'Deep Focus Sprint',
-    shortSummary: 'Protects your cognitive bandwidth for high-leverage creative and analytical work.',
+    shortSummary: 'Protects focus and energy for deep creative and analytical work.',
     category: 'Focus',
     icon: 'brain',
     timeframe: 'Morning to Midday',

@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
         </div>
 
-        {/* Pioneer Onboarding Tour Launcher Card */}
+        {/* Getting Started Walkthrough Launcher Card */}
         <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629] flex items-center justify-center shadow-[2px_2px_0px_#1A3629] shrink-0">
@@ -338,10 +338,10 @@ export default function ProfilePage() {
             </div>
             <div>
               <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
-                Pioneer Onboarding Tour
+                Getting Started Walkthrough
               </h3>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
-                Replay the interactive walkthrough of Cyath’s habits engine, food scanner, and sanctuary.
+                Replay the interactive guide to habit tracking, recipes, and island progression.
               </p>
             </div>
           </div>

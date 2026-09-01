@@ -209,7 +209,7 @@ export default function CorrelationsPage() {
                 <div className="flex items-center gap-2 text-[#1A3629]">
                   <Sparkles className="w-4 h-4 text-[#10B981]" />
                   <h4 className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629]">
-                    Actionable Habit Leverage
+                    Key Takeaway &amp; Recommendation
                   </h4>
                 </div>
                 <p className="text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">

@@ -80,11 +80,11 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     stepNumber: 4,
     totalSteps: 4,
     route: '/profile',
-    badge: 'Stage 4 of 4 · Guild Network',
-    title: 'Adventurer’s Guild & Referral Bonus',
-    subtitle: 'Recruit friends and earn mutual +250 XP bonuses',
+    badge: 'Stage 4 of 4 · Invite Friends',
+    title: 'Friend Referrals & XP Bonus',
+    subtitle: 'Invite friends and earn mutual +250 XP bonuses',
     description:
-      'Leveling up is better together. Use the "Invite (+250 XP)" button in the top navbar or in your profile dossier to share your invite link. When a companion joins, you both unlock +250 Bonus XP!',
+      'Building habits is better together. Use the "Invite (+250 XP)" button in the top navbar or in your profile to share your invite link. When a friend joins, you both unlock +250 Bonus XP!',
     icon: Gift,
     accentColor: '#10B981',
     bgTint: '#ECFDF5',
@@ -223,7 +223,7 @@ export function PioneerWalkthrough() {
             </div>
             <div>
               <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] block">
-                Pioneer Calibration Tour
+                Getting Started Guide
               </span>
               <span className="font-cabinet font-bold text-xs text-[#1A3629]">
                 {currentStep.badge}

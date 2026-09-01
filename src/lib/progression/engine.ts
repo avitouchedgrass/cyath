@@ -73,7 +73,7 @@ export interface DailyQuest {
   title: string;
   description: string;
   xpAward: number;
-  category: 'nutrition' | 'habits' | 'recovery' | 'activity';
+  category: 'nutrition' | 'hydration' | 'habits' | 'recovery' | 'activity';
   progress: number;
   target: number;
   unit: string;

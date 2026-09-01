@@ -166,7 +166,7 @@ export function QuestPanel() {
             </span>
           </div>
           <h4 className="font-fraunces font-bold text-xl text-[#1A3629] mb-1">
-            The 7-Day Habit Crucible
+            7-Day Consistency Challenge
           </h4>
           <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed">
             Complete at least 20 total habit executions across the rolling week to earn the weekly endurance bonus.

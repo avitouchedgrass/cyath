@@ -103,7 +103,7 @@ export function LevelUpModal() {
             <div>
               <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-[#065F46]">
                 <Gift className="w-3 h-3 text-[#10B981]" />
-                <span>Guild Recruitment Pact</span>
+                <span>Friend Referral</span>
               </div>
               <span className="text-xs font-cabinet font-bold text-[#1A3629] block">
                 Share Level {data.newLevel} &amp; Earn +250 XP

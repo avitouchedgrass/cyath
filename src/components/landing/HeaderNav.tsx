@@ -5,8 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { XpHudBadge } from "@/components/progression/XpHudBadge";
-import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
-import { Gift } from "lucide-react";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -17,7 +15,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const pathname = usePathname();
   const { userSession } = useHabitStore();
 
@@ -107,18 +104,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
         <div className="flex items-center gap-2 sm:gap-3 z-10">
           {mounted && <XpHudBadge />}
 
-          {mounted && (
-            <button
-              type="button"
-              onClick={() => setIsInviteModalOpen(true)}
-              className="border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] px-3 sm:px-3.5 rounded-full font-mono font-bold text-xs shadow-[2px_2px_0px_#10B981] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer h-10"
-              title="Adventurer's Guild Pact: Invite Friends for +250 XP"
-            >
-              <Gift className="w-3.5 h-3.5 text-[#059669]" />
-              <span className="hidden sm:inline">+250 XP</span>
-            </button>
-          )}
-
           {pathname.startsWith('/dashboard') ? (
             <Link
               href="/profile"
@@ -148,12 +133,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
             {isMobileMenuOpen ? '✕' : '☰'}
           </button>
         </div>
-
-        {/* Guild Invite Modal */}
-        <GuildInviteModal
-          isOpen={isInviteModalOpen}
-          onClose={() => setIsInviteModalOpen(false)}
-        />
 
         {/* Mobile Navigation Drawer Sheet (<768px) */}
         {isMobileMenuOpen && (

@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe } from '@/lib/recipes';
+import { Sparkles, X, RotateCcw, KeyRound, ArrowRight, Check, Send, Bot } from 'lucide-react';
 
 interface ChatAction {
   type: 'ADD_HABIT' | 'ADD_RECIPE' | 'SET_METRIC' | 'LOG_RECIPE';
@@ -24,42 +26,30 @@ export function StoveSageChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [customKey, setCustomKey] = useState<string>('');
+  const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
+  const [isTourActive, setIsTourActive] = useState(false);
+
+  const pathname = usePathname();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
       content:
-        "Greetings! I am **StoveSage**, your culinary and metabolic wizard. Ask me for recipes, custom exercises, daily habit recommendations, or let me tweak your dashboard directly!",
+        "Greetings! I am **Cyath AI Coach (StoveSage)**, your metabolic and culinary intelligence assistant.\n\nAsk me for high-protein recipe recommendations, custom daily habits, workout protocols, or have me update your daily planner directly.",
       actions: [],
     },
   ]);
+
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([
-    'Add a 15-min stretch habit',
-    'Suggest a 40g protein meal',
+    'Suggest a 45g protein dinner',
+    'Add a 15-min morning stretch habit',
     'Log 2.5L water for today',
   ]);
-  const [customKey, setCustomKey] = useState<string>('');
-  const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
-
-  const [isTourActive, setIsTourActive] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleWalkthroughStart = () => {
-      setIsOpen(false);
-      setIsTourActive(true);
-    };
-    const handleWalkthroughEnd = () => {
-      setIsTourActive(false);
-    };
-    window.addEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
-    window.addEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
-    return () => {
-      window.removeEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
-      window.removeEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
-    };
-  }, []);
 
   const {
     habits,
@@ -80,15 +70,63 @@ export function StoveSageChatbot() {
   } = useHabitStore();
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
       const savedKey = localStorage.getItem('cyath_gemini_api_key') || '';
       setCustomKey(savedKey);
     }
   }, []);
 
+  // Global event listeners for opening coach & keyboard shortcuts (⌘J / Ctrl+J, ESC)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    const handleOpenEvent = () => {
+      setIsOpen(true);
+      retroAudio.playBlip();
+    };
+
+    const handleWalkthroughStart = () => {
+      setIsOpen(false);
+      setIsTourActive(true);
+    };
+
+    const handleWalkthroughEnd = () => {
+      setIsTourActive(false);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle with Cmd+J or Ctrl+J
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'j' || e.key === 'J')) {
+        e.preventDefault();
+        setIsOpen((prev) => {
+          if (!prev) retroAudio.playBlip();
+          return !prev;
+        });
+      }
+      // Close on ESC
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('open-ai-coach', handleOpenEvent);
+    window.addEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
+    window.addEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('open-ai-coach', handleOpenEvent);
+      window.removeEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
+      window.removeEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 150);
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isOpen, messages, isLoading]);
 
   const executeAction = (action: {
     type: 'ADD_HABIT' | 'ADD_RECIPE' | 'SET_METRIC' | 'LOG_RECIPE';
@@ -105,9 +143,9 @@ export function StoveSageChatbot() {
         const fallbackId = `ai-recipe-${Date.now()}`;
         const newRecipe: Recipe = {
           id: action.payload.id || fallbackId,
-          name: action.payload.name || 'Enchanted Chef Creation',
-          subtitle: action.payload.subtitle || 'Formulated by StoveSage',
-          image: action.payload.image || '/assets/food/grilled-chicken-1.0.png',
+          name: action.payload.name || 'Custom Chef Creation',
+          subtitle: action.payload.subtitle || 'Formulated by Cyath AI',
+          image: action.payload.image || '/assets/food/grilled-chicken-1.0.webp',
           calories: Number(action.payload.calories) || 450,
           protein: Number(action.payload.protein) || 35,
           carbs: Number(action.payload.carbs) || 30,
@@ -115,11 +153,11 @@ export function StoveSageChatbot() {
           prepTimeMinutes: Number(action.payload.prepTimeMinutes) || 15,
           category: action.payload.category || 'High Protein',
           dietType: action.payload.dietType || 'omnivore',
-          tags: action.payload.tags || ['High Protein', 'StoveSage Spec'],
+          tags: action.payload.tags || ['High Protein', 'AI Spec'],
           focusScore: action.payload.focusScore || '9.5/10',
-          description: action.payload.description || 'Nutrient-dense recipe formulated by StoveSage.',
+          description: action.payload.description || 'Nutrient-dense recipe formulated by AI.',
           ingredients: action.payload.ingredients || [{ item: 'Lean Protein Source', amount: '200g' }],
-          instructions: action.payload.instructions || ['Prepare ingredients and cook with care.'],
+          instructions: action.payload.instructions || ['Prepare ingredients and cook thoroughly.'],
           isCustom: true,
         };
         addCustomRecipe(newRecipe);
@@ -235,10 +273,9 @@ export function StoveSageChatbot() {
         if (data.requiresKey) {
           setShowKeyInput(true);
         }
-        throw new Error(data.error || 'Failed to reach StoveSage');
+        throw new Error(data.error || 'Failed to reach AI Coach');
       }
 
-      // Do not automatically execute actions - present them to the user with a choice to Add or Dismiss
       const pendingActions = (data.actions || []).map((action: any) => ({
         ...action,
         status: 'pending' as 'pending' | 'applied' | 'dismissed',
@@ -247,7 +284,7 @@ export function StoveSageChatbot() {
       const botMessage: ChatMessage = {
         id: `bot-${Date.now()}`,
         role: 'assistant',
-        content: data.reply || "A wave of magic surges! Your request has been forged.",
+        content: data.reply || 'Your request has been processed.',
         actions: pendingActions,
       };
 
@@ -262,7 +299,7 @@ export function StoveSageChatbot() {
         {
           id: `bot-err-${Date.now()}`,
           role: 'assistant',
-          content: `**Disturbance in the Ether:** ${err.message || 'Something went wrong.'}\n\n*Tip: If you entered a custom key with quota limits, you can clear it in the "API Key" menu to automatically use Cyath's default key.*`,
+          content: `**Notice:** ${err.message || 'Unable to connect to AI Coach.'}`,
         },
       ]);
     } finally {
@@ -281,58 +318,80 @@ export function StoveSageChatbot() {
     }
   };
 
-  if (isTourActive) return null;
+  const resetChat = () => {
+    retroAudio.playBlip();
+    setMessages([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content:
+          "Chat reset. How may I assist your metabolic health, workout calibration, or recipe planning today?",
+        actions: [],
+      },
+    ]);
+  };
+
+  if (!mounted || isTourActive) return null;
+  if (
+    pathname === '/auth' ||
+    pathname === '/login' ||
+    pathname === '/onboarding' ||
+    pathname.startsWith('/auth/')
+  ) {
+    return null;
+  }
+
+  const todayLog = getDailyLog(currentDate);
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
-      {/* Expanded Chat Terminal */}
+    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end pointer-events-auto select-none">
+      
+      {/* Expanded Professional Coach Modal / Drawer */}
       {isOpen && (
-        <div className="relative mb-3 w-[92vw] sm:w-[420px] max-h-[82vh] h-[560px] bg-[#FFFDF9] border-4 border-[#1A3629] rounded-3xl shadow-[8px_8px_0px_#1A3629] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="relative mb-3 w-[92vw] sm:w-[440px] max-h-[82vh] h-[580px] bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl shadow-[6px_6px_0px_#1A3629] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
           
           {/* Header */}
           <div className="p-4 bg-[#FAF6EE] border-b-2 border-[#1A3629]/15 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative w-9 h-12 shrink-0">
-                <Image
-                  src="/assets/stovesage.png"
-                  alt="StoveSage"
-                  fill
-                  className="object-contain [image-rendering:pixelated]"
-                />
+              <div className="w-8 h-8 rounded-xl bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center font-bold text-sm shadow-[2px_2px_0px_#3A6B52] shrink-0">
+                ✦
               </div>
               <div>
-                <h3 className="font-fraunces font-bold text-base text-[#1A3629] flex items-center gap-1.5 leading-none">
-                  <span>StoveSage</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-[#1A3629]/20 bg-[#E8DECF]/80 text-[#3A6B52]">
-                    AI Wizard
+                <h3 className="font-cabinet font-bold text-sm text-[#1A3629] flex items-center gap-2 leading-none">
+                  <span>Cyath AI Coach</span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full border border-[#10B981]/40 bg-[#ECFDF5] text-[#065F46] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                    Online
                   </span>
                 </h3>
-                <span className="text-[11px] font-cabinet font-medium text-[#2C4A3B] mt-0.5 block">
-                  Metabolic & Culinary Companion
+                <span className="text-[11px] font-cabinet font-medium text-[#4A5D4E] mt-0.5 block">
+                  Metabolic &amp; Culinary Intelligence
                 </span>
               </div>
             </div>
 
+            {/* Action Buttons */}
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-stovesage-walkthrough'));
-                  setIsOpen(false);
-                }}
-                className="text-[10px] font-mono font-bold px-2 py-1 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629] transition-colors cursor-pointer"
-                title="Re-open site walkthrough"
+                onClick={resetChat}
+                className="w-7 h-7 rounded-lg border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629] transition-colors flex items-center justify-center cursor-pointer"
+                title="Reset conversation"
+                aria-label="Reset conversation"
               >
-                Guide
+                <RotateCcw className="w-3.5 h-3.5" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className="text-[10px] font-mono font-bold px-2 py-1 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629] transition-colors cursor-pointer"
-                title="Configure Gemini API Key"
+                className={`w-7 h-7 rounded-lg border border-[#1A3629]/20 transition-colors flex items-center justify-center cursor-pointer ${
+                  showKeyInput ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629]'
+                }`}
+                title="Configure custom API key (optional)"
+                aria-label="API Key settings"
               >
-                API Key
+                <KeyRound className="w-3.5 h-3.5" />
               </button>
 
               <button
@@ -341,32 +400,38 @@ export function StoveSageChatbot() {
                   retroAudio.playBlip();
                   setIsOpen(false);
                 }}
-                className="w-7 h-7 rounded-full border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Close StoveSage Chat"
+                className="w-7 h-7 rounded-full border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors flex items-center justify-center cursor-pointer ml-1"
+                aria-label="Close AI Coach"
               >
                 ✕
               </button>
             </div>
           </div>
 
-          {/* Optional Gemini API Key Drawer */}
+          {/* User Telemetry Context Ribbon */}
+          <div className="px-4 py-1.5 bg-[#FAF6EE]/80 border-b border-[#1A3629]/10 flex items-center justify-between text-[10px] font-mono text-[#4A5D4E]">
+            <span>🎯 Goal: {userProfile?.primaryGoal || 'Focus'}</span>
+            <span>🥩 {todayLog.totalProteinLogged || 0}g Logged Today</span>
+          </div>
+
+          {/* Optional Custom API Key Drawer */}
           {showKeyInput && (
-            <div className="p-3 bg-[#F4EDE0] border-b-2 border-[#1A3629]/20 text-xs font-cabinet flex flex-col gap-2">
+            <div className="p-3.5 bg-[#FAF6EE] border-b-2 border-[#1A3629]/20 text-xs font-cabinet flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#1A3629]">Google Gemini API Key (Free)</span>
-                <span className="text-[10px] font-mono text-[#3A6B52]">Stored in local browser</span>
+                <span className="font-bold text-[#1A3629]">Custom Gemini API Key (Optional)</span>
+                <span className="text-[10px] font-mono text-[#4A5D4E]">Overrides system key</span>
               </div>
               <input
                 type="password"
                 value={customKey}
                 onChange={(e) => handleSaveApiKey(e.target.value)}
-                placeholder="AIzaSy... (free at aistudio.google.com)"
-                className="w-full px-3 py-1.5 rounded-lg border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none"
+                placeholder="Leave blank to use Cyath's default key"
+                className="w-full px-3 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none"
               />
             </div>
           )}
 
-          {/* Messages Scroll Area */}
+          {/* Messages Feed */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3.5 scrollbar-thin">
             {messages.map((msg) => {
               const isBot = msg.role === 'assistant';
@@ -378,11 +443,10 @@ export function StoveSageChatbot() {
                   <div
                     className={`max-w-[88%] p-3.5 rounded-2xl text-xs sm:text-sm font-cabinet leading-relaxed ${
                       isBot
-                        ? 'bg-[#FAF6EE] border-2 border-[#1A3629]/30 text-[#1A3629] rounded-tl-sm shadow-sm'
-                        : 'bg-[#1A3629] text-[#FFFDF9] rounded-tr-sm shadow-md'
+                        ? 'bg-[#FAF6EE] border-2 border-[#1A3629]/25 text-[#1A3629] rounded-tl-xs shadow-xs'
+                        : 'bg-[#1A3629] text-[#FFFDF9] rounded-tr-xs shadow-md'
                     }`}
                   >
-                    {/* Render plain text or simple markdown formatting */}
                     <div className="space-y-1.5 whitespace-pre-wrap">
                       {msg.content}
                     </div>
@@ -401,12 +465,12 @@ export function StoveSageChatbot() {
                               </span>
                               {act.status === 'applied' && (
                                 <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0">
-                                  Added
+                                  ✓ Added
                                 </span>
                               )}
                               {act.status === 'dismissed' && (
                                 <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
-                                  Skipped
+                                  Dismissed
                                 </span>
                               )}
                             </div>
@@ -416,9 +480,9 @@ export function StoveSageChatbot() {
                                 <button
                                   type="button"
                                   onClick={() => handleApplyAction(msg.id, i)}
-                                  className="flex-1 py-1 px-2.5 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                  className="flex-1 py-1 px-3 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
                                 >
-                                  {act.type === 'ADD_HABIT' ? 'Add Habit' : act.type === 'ADD_RECIPE' ? 'Add Recipe' : 'Apply'}
+                                  {act.type === 'ADD_HABIT' ? '+ Add to Habits' : act.type === 'LOG_RECIPE' ? '✓ Quick Log' : 'Apply'}
                                 </button>
                                 <button
                                   type="button"
@@ -440,8 +504,8 @@ export function StoveSageChatbot() {
 
             {isLoading && (
               <div className="flex items-center gap-2 p-3 bg-[#FAF6EE] border-2 border-[#1A3629]/20 rounded-2xl w-fit text-xs font-mono text-[#3A6B52]">
-                <span className="animate-spin text-base">✦</span>
-                <span>StoveSage is consulting the culinary grimoire...</span>
+                <span className="animate-spin text-sm">✦</span>
+                <span>Formulating personalized recommendation...</span>
               </div>
             )}
 
@@ -450,7 +514,7 @@ export function StoveSageChatbot() {
 
           {/* Quick Prompt Suggestions */}
           {suggestedPrompts.length > 0 && !isLoading && (
-            <div className="px-3 py-1.5 bg-[#FAF6EE]/50 border-t border-[#1A3629]/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            <div className="px-3 py-2 bg-[#FAF6EE]/60 border-t border-[#1A3629]/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
               {suggestedPrompts.map((prompt, i) => (
                 <button
                   key={i}
@@ -467,6 +531,7 @@ export function StoveSageChatbot() {
           {/* Input Footer */}
           <div className="p-3 bg-[#FFFDF9] border-t-2 border-[#1A3629]/15 flex items-center gap-2">
             <input
+              ref={inputRef}
               type="text"
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
@@ -476,23 +541,25 @@ export function StoveSageChatbot() {
                   handleSendMessage();
                 }
               }}
-              placeholder="Ask StoveSage to add habits or recipes..."
+              placeholder="Ask for meals, habit ideas, or metric logging..."
               className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-xs sm:text-sm font-cabinet text-[#1A3629] placeholder-[#1A3629]/50 focus:outline-none focus:bg-[#FFFDF9]"
             />
             <button
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1"
+              aria-label="Send message"
             >
-              Send
+              <span>Send</span>
+              <Send className="w-3 h-3" />
             </button>
           </div>
 
         </div>
       )}
 
-      {/* Floating Corner Mascot Button */}
+      {/* Sleek, Professional Floating Action Trigger Pill */}
       {!isOpen && (
         <button
           type="button"
@@ -500,25 +567,15 @@ export function StoveSageChatbot() {
             retroAudio.playBlip();
             setIsOpen(true);
           }}
-          className="stovesage-launcher group relative flex items-center justify-center p-2 rounded-2xl border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] hover:shadow-[6px_6px_0px_#1A3629] hover:-translate-y-1 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer"
-          aria-label="Open StoveSage AI Assistant"
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border-2 sm:border-3 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] shadow-[4px_4px_0px_#1A3629] hover:shadow-[5px_5px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer group select-none"
+          aria-label="Open Cyath AI Coach (Cmd+J)"
+          title="Open Cyath AI Coach (⌘J / Ctrl+J)"
         >
-          <div className="relative w-12 h-16 sm:w-14 sm:h-18 transition-transform group-hover:scale-105">
-            <Image
-              src="/assets/stovesage.png"
-              alt="StoveSage Floating Mascot"
-              fill
-              className="object-contain [image-rendering:pixelated] drop-shadow-[2px_2px_0px_rgba(26,54,41,0.2)]"
-            />
-          </div>
-
-          {/* Dynamic Bubble Pill */}
-          <span className="absolute -top-2.5 -left-2 sm:-left-3 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#E8DECF] text-[#1A3629] px-2 py-0.5 rounded-full border border-[#1A3629] shadow-xs">
-            AI Sage
+          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+          <span className="font-cabinet font-bold text-xs text-[#1A3629]">✦ AI Coach</span>
+          <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FAF6EE] border border-[#1A3629]/20 text-[#4A5D4E]">
+            ⌘J
           </span>
-
-          {/* Pulse Indicator */}
-          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#10B981] border-2 border-[#FFFDF9] rounded-full animate-pulse" />
         </button>
       )}
     </div>

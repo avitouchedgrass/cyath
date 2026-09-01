@@ -81,11 +81,12 @@ If no actions are requested or needed, return "actions": [].
 Never wrap the output in markdown codeblocks like \`\`\`json. Return pure raw JSON.`;
 
 const CANDIDATE_MODELS = [
-  'gemini-3.5-flash-lite',
   'gemini-3.5-flash',
-  'gemini-3-flash-preview',
-  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite',
+  'gemini-flash-latest',
   'gemini-flash-lite-latest',
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
 ];
 
 async function callGeminiChat(apiKey: string, model: string, contents: any[]) {

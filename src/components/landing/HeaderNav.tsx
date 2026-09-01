@@ -189,6 +189,23 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
                   </Link>
                 );
               })}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  window.dispatchEvent(new CustomEvent('open-ai-coach'));
+                }}
+                className="mt-1 px-4 py-3 rounded-xl font-cabinet font-bold text-sm transition-all flex items-center justify-between border-2 min-h-[44px] bg-[#FAF6EE] text-[#1A3629] border-[#1A3629]/30 hover:border-[#1A3629] cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-[#10B981] font-bold">✦</span>
+                  <span>AI Metabolic Coach</span>
+                </span>
+                <span className="font-mono text-xs text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#10B981]/30 font-bold">
+                  Open ⌘J
+                </span>
+              </button>
             </nav>
           </div>
         )}

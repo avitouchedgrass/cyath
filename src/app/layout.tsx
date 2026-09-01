@@ -5,6 +5,7 @@ import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLevelBadge";
 import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough";
+import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import "./globals.css";
 
@@ -98,6 +99,7 @@ export default function RootLayout({
           <LevelUpModal />
           <BottomCornerLevelBadge />
           <PioneerWalkthrough />
+          <StoveSageChatbot />
         </AuthProvider>
       </body>
     </html>

@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { Recipe } from '@/lib/recipes';
+import { Recipe, findClosestRecipe } from '@/lib/recipes';
+import { generateRetroFramedBadge } from '@/lib/imageStylizer';
 import { Sparkles, X, RotateCcw, KeyRound, ArrowRight, Check, Send, Bot } from 'lucide-react';
 
 interface ChatAction {
@@ -141,23 +142,35 @@ export function StoveSageChatbot() {
         retroAudio.playInspectConfirm();
       } else if (action.type === 'ADD_RECIPE') {
         const fallbackId = `ai-recipe-${Date.now()}`;
+        const match = findClosestRecipe(action.payload);
+        const spriteUrl = action.payload.sprite || match.spriteUrl;
+        const framedImage = action.payload.image || spriteUrl;
+
         const newRecipe: Recipe = {
           id: action.payload.id || fallbackId,
           name: action.payload.name || 'Custom Chef Creation',
           subtitle: action.payload.subtitle || 'Formulated by Cyath AI',
-          image: action.payload.image || '/assets/food/grilled-chicken-1.0.webp',
-          calories: Number(action.payload.calories) || 450,
-          protein: Number(action.payload.protein) || 35,
-          carbs: Number(action.payload.carbs) || 30,
-          fats: Number(action.payload.fats) || 12,
+          image: framedImage,
+          calories: Number(action.payload.calories) || match.recipe.calories || 450,
+          protein: Number(action.payload.protein) || match.recipe.protein || 35,
+          carbs: Number(action.payload.carbs) || match.recipe.carbs || 30,
+          fats: Number(action.payload.fats) || match.recipe.fats || 12,
           prepTimeMinutes: Number(action.payload.prepTimeMinutes) || 15,
-          category: action.payload.category || 'High Protein',
-          dietType: action.payload.dietType || 'omnivore',
+          category: action.payload.category || match.recipe.category || 'High Protein',
+          dietType: action.payload.dietType || match.recipe.dietType || 'omnivore',
           tags: action.payload.tags || ['High Protein', 'AI Spec'],
           focusScore: action.payload.focusScore || '9.5/10',
-          description: action.payload.description || 'Nutrient-dense recipe formulated by AI.',
-          ingredients: action.payload.ingredients || [{ item: 'Lean Protein Source', amount: '200g' }],
-          instructions: action.payload.instructions || ['Prepare ingredients and cook thoroughly.'],
+          description:
+            action.payload.description ||
+            `Nutrient-dense custom recipe formulated by Cyath AI Coach, calibrated to ${match.recipe.name}.`,
+          ingredients:
+            action.payload.ingredients && action.payload.ingredients.length > 0
+              ? action.payload.ingredients
+              : match.recipe.ingredients,
+          instructions:
+            action.payload.instructions && action.payload.instructions.length > 0
+              ? action.payload.instructions
+              : match.recipe.instructions,
           isCustom: true,
         };
         addCustomRecipe(newRecipe);
@@ -276,10 +289,36 @@ export function StoveSageChatbot() {
         throw new Error(data.error || 'Failed to reach AI Coach');
       }
 
-      const pendingActions = (data.actions || []).map((action: any) => ({
-        ...action,
-        status: 'pending' as 'pending' | 'applied' | 'dismissed',
-      }));
+      const pendingActions = await Promise.all(
+        (data.actions || []).map(async (action: any) => {
+          if (action.type === 'ADD_RECIPE' && action.payload) {
+            const match = findClosestRecipe(action.payload);
+            const spriteUrl = action.payload.sprite || match.spriteUrl;
+            let framed = action.payload.image;
+            if (!framed || framed.startsWith('/assets/')) {
+              try {
+                framed = await generateRetroFramedBadge(spriteUrl, 'CYATH · AI RECIPE');
+              } catch {
+                framed = spriteUrl;
+              }
+            }
+            return {
+              ...action,
+              payload: {
+                ...action.payload,
+                sprite: spriteUrl,
+                image: framed,
+                closestRecipeName: action.payload.closestRecipeName || match.recipe.name,
+              },
+              status: 'pending' as 'pending' | 'applied' | 'dismissed',
+            };
+          }
+          return {
+            ...action,
+            status: 'pending' as 'pending' | 'applied' | 'dismissed',
+          };
+        })
+      );
 
       const botMessage: ChatMessage = {
         id: `bot-${Date.now()}`,
@@ -452,48 +491,147 @@ export function StoveSageChatbot() {
 
                     {/* Interactive Action Confirmation Cards */}
                     {msg.actions && msg.actions.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-[#1A3629]/15 flex flex-col gap-2">
-                        {msg.actions.map((act, i) => (
-                          <div
-                            key={i}
-                            className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-xs"
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] font-cabinet font-bold text-[#1A3629] leading-snug">
-                                {act.summary || `Proposed ${act.type}`}
-                              </span>
-                              {act.status === 'applied' && (
-                                <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0">
-                                  ✓ Added
+                      <div className="mt-3 pt-2.5 border-t border-[#1A3629]/15 flex flex-col gap-2.5">
+                        {msg.actions.map((act, i) => {
+                          if (act.type === 'ADD_RECIPE' && act.payload) {
+                            return (
+                              <div
+                                key={i}
+                                className="flex flex-col gap-2.5 p-3 rounded-2xl border-2 border-[#1A3629] bg-[#FAF6EE] shadow-[3px_3px_0px_#1A3629]"
+                              >
+                                <div className="flex items-start gap-3">
+                                  {/* Retro Card Format Sprite Enclosure (AI Scanner format) */}
+                                  <div className="relative w-24 h-24 shrink-0 rounded-2xl border-2 border-[#1A3629] overflow-hidden bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] flex flex-col items-center justify-between p-1.5">
+                                    <div className="w-full flex-1 flex items-center justify-center bg-[#FAF6EE]/80 rounded-xl overflow-hidden relative">
+                                      <img
+                                        src={act.payload.sprite || act.payload.image || '/assets/food/grain-bowl-1.0.png'}
+                                        alt={act.payload.name || 'AI Recipe'}
+                                        className="w-full h-full object-contain [image-rendering:pixelated]"
+                                      />
+                                      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(26,54,41,0.06)_1px,transparent_1px)] bg-[size:100%_4px]" />
+                                    </div>
+                                    <div className="w-full flex items-center justify-between px-1 pt-1 border-t border-[#1A3629]/15 text-[8px] font-mono font-bold text-[#1A3629]">
+                                      <span className="flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] border border-[#1A3629]" />
+                                        <span>AI SPEC</span>
+                                      </span>
+                                      <span className="tracking-widest opacity-60">||||</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Recipe Manifest Info */}
+                                  <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#10B981] text-[#FFFDF9] border border-[#1A3629]">
+                                        AI Custom
+                                      </span>
+                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#FFFDF9] border border-[#1A3629] text-[#1A3629]">
+                                        {act.payload.category || 'High Protein'}
+                                      </span>
+                                    </div>
+                                    <h4 className="font-cabinet font-bold text-xs sm:text-sm text-[#1A3629] leading-tight truncate">
+                                      {act.payload.name || 'Custom Plate'}
+                                    </h4>
+                                    <p className="text-[11px] font-cabinet font-medium text-[#4A5D4E] line-clamp-1">
+                                      {act.payload.subtitle || 'Formulated by Cyath AI Coach'}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-0.5 text-[10px] font-mono font-bold text-[#1A3629]">
+                                      <span className="bg-[#FFFDF9] px-1.5 py-0.5 rounded border border-[#1A3629]/20">
+                                        {act.payload.protein || 35}g Protein
+                                      </span>
+                                      <span className="text-[#4A5D4E]">
+                                        {act.payload.calories || 450} kcal
+                                      </span>
+                                    </div>
+                                    {act.payload.closestRecipeName && (
+                                      <span className="text-[9px] font-mono text-[#3A6B52] mt-0.5 truncate">
+                                        Matched: {act.payload.closestRecipeName}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {act.status === 'pending' && (
+                                  <div className="flex items-center gap-2 pt-1 border-t border-[#1A3629]/15">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleApplyAction(msg.id, i)}
+                                      className="flex-1 py-1.5 px-3 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                    >
+                                      + Add to My Recipes
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDismissAction(msg.id, i)}
+                                      className="py-1.5 px-3 rounded-xl border border-[#1A3629]/30 hover:bg-[#FFFDF9] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
+                                    >
+                                      Dismiss
+                                    </button>
+                                  </div>
+                                )}
+                                {act.status === 'applied' && (
+                                  <div className="pt-1 border-t border-[#1A3629]/15 flex items-center justify-between">
+                                    <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30">
+                                      ✓ Added to My Recipes
+                                    </span>
+                                    <span className="text-[10px] font-mono text-[#4A5D4E]">
+                                      Saved in Recipes Catalog
+                                    </span>
+                                  </div>
+                                )}
+                                {act.status === 'dismissed' && (
+                                  <div className="pt-1 border-t border-[#1A3629]/15">
+                                    <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                                      Dismissed
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={i}
+                              className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-xs"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] font-cabinet font-bold text-[#1A3629] leading-snug">
+                                  {act.summary || `Proposed ${act.type}`}
                                 </span>
-                              )}
-                              {act.status === 'dismissed' && (
-                                <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
-                                  Dismissed
-                                </span>
+                                {act.status === 'applied' && (
+                                  <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0">
+                                    ✓ Added
+                                  </span>
+                                )}
+                                {act.status === 'dismissed' && (
+                                  <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
+                                    Dismissed
+                                  </span>
+                                )}
+                              </div>
+
+                              {act.status === 'pending' && (
+                                <div className="flex items-center gap-1.5 pt-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleApplyAction(msg.id, i)}
+                                    className="flex-1 py-1 px-3 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                  >
+                                    {act.type === 'ADD_HABIT' ? '+ Add to Habits' : act.type === 'LOG_RECIPE' ? '✓ Quick Log' : 'Apply'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDismissAction(msg.id, i)}
+                                    className="py-1 px-2.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
+                                  >
+                                    Dismiss
+                                  </button>
+                                </div>
                               )}
                             </div>
-
-                            {act.status === 'pending' && (
-                              <div className="flex items-center gap-1.5 pt-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleApplyAction(msg.id, i)}
-                                  className="flex-1 py-1 px-3 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
-                                >
-                                  {act.type === 'ADD_HABIT' ? '+ Add to Habits' : act.type === 'LOG_RECIPE' ? '✓ Quick Log' : 'Apply'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDismissAction(msg.id, i)}
-                                  className="py-1 px-2.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
-                                >
-                                  Dismiss
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

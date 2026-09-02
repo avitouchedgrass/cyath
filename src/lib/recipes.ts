@@ -1429,3 +1429,99 @@ export const RECIPES: Recipe[] = [
     ]
   }
 ];
+
+export function findClosestRecipe(customDish: {
+  name?: string;
+  subtitle?: string;
+  category?: string;
+  dietType?: string;
+  ingredients?: { item: string; amount?: string }[];
+  tags?: string[];
+  calories?: number;
+  protein?: number;
+}): { recipe: Recipe; spriteUrl: string; score: number } {
+  const normName = (customDish.name || '').toLowerCase();
+  const normSubtitle = (customDish.subtitle || '').toLowerCase();
+  const normCat = (customDish.category || '').toLowerCase();
+  const normDiet = (customDish.dietType || 'omnivore').toLowerCase();
+  const normIngredients = (customDish.ingredients || [])
+    .map((i) => (typeof i === 'string' ? i : i.item || '').toLowerCase())
+    .join(' ');
+  const normTags = (customDish.tags || []).join(' ').toLowerCase();
+  const allText = [normName, normSubtitle, normCat, normIngredients, normTags].join(' ');
+
+  let bestRecipe = RECIPES[0];
+  let bestScore = -9999;
+
+  const keyAnchorMap: { keys: string[]; ids: string[] }[] = [
+    { keys: ['tofu'], ids: ['japanese-sesame-tofu-stirfry', 'vietnamese-crispy-tofu-spring-rolls', 'korean-crispy-tofu-bibimbap'] },
+    { keys: ['salmon', 'white fish', 'cod', 'trout', 'fish'], ids: ['greek-lemon-herb-salmon', 'moroccan-chermoula-fish-fillet'] },
+    { keys: ['prawn', 'shrimp', 'seafood'], ids: ['garlic-prawn-linguine', 'thai-red-coconut-curry-prawns'] },
+    { keys: ['steak', 'beef', 'tenderloin', 'ribeye', 'sirloin'], ids: ['chimichurri-flank-steak', 'tuscan-garlic-rosemary-steak'] },
+    { keys: ['paneer', 'cottage cheese'], ids: ['paneer-bhurji-tiffin', 'paneer-kathi-roll', 'besan-paneer-chilla'] },
+    { keys: ['egg', 'eggs', 'omelet', 'scramble', 'frittata'], ids: ['cast-iron-skillet-eggs', 'tamago-sesame-rice-bowl', 'dhabawala-egg-curry', 'garlic-chili-egg-fried-rice', 'masala-french-toast', 'mediterranean-halloumi-shakshuka'] },
+    { keys: ['pasta', 'tagliatelle', 'fettuccine', 'spaghetti', 'linguine', 'noodle', 'noodles'], ids: ['truffle-tagliatelle-pasta', 'thai-peanut-sesame-noodles', 'garlic-prawn-linguine'] },
+    { keys: ['oat', 'oats', 'oatmeal', 'porridge'], ids: ['savory-masala-oats', 'peanut-butter-banana-oats'] },
+    { keys: ['khichdi', 'lentil', 'dal', 'dhal'], ids: ['healing-moong-khichdi', 'moroccan-spiced-lentil-tagine'] },
+    { keys: ['chana', 'chickpea', 'hummus'], ids: ['kala-chana-sundal', 'mediterranean-chickpea-salad', 'mediterranean-hummus-platter'] },
+    { keys: ['black bean', 'burrito', 'fajita', 'taco', 'mexican'], ids: ['mexican-chipotle-black-bean-bowl', 'sizzling-chicken-fajita-platter', 'smoked-citrus-taco-bowl'] },
+    { keys: ['soya', 'soy chunk', 'nutrela'], ids: ['soya-matar-pulao'] },
+    { keys: ['avocado', 'sourdough', 'toast'], ids: ['avocado-sourdough-toast'] },
+    { keys: ['curd rice', 'dahi rice', 'thayir sadam'], ids: ['tempered-curd-rice'] },
+    { keys: ['rajma', 'kidney bean'], ids: ['rajma-chawal-bowl'] },
+    { keys: ['shakshuka'], ids: ['mediterranean-halloumi-shakshuka'] },
+    { keys: ['paella'], ids: ['spanish-saffron-chicken-paella'] },
+    { keys: ['teriyaki', 'donburi'], ids: ['japanese-teriyaki-chicken-donburi'] },
+    { keys: ['souvlaki', 'gyro', 'tzatziki'], ids: ['greek-lemon-chicken-souvlaki'] },
+    { keys: ['tikka', 'kebab'], ids: ['tawa-chicken-tikka'] },
+    { keys: ['curry', 'tariwala'], ids: ['homestyle-tariwala-chicken', 'dhabawala-egg-curry', 'thai-red-coconut-curry-prawns'] },
+    { keys: ['pepper chicken', 'chettinad'], ids: ['chettinad-pepper-chicken'] },
+    { keys: ['grain', 'quinoa', 'bowl'], ids: ['warm-ancient-grain-bowl'] },
+    { keys: ['chicken', 'turkey', 'poultry'], ids: ['herb-grilled-chicken', 'homestyle-tariwala-chicken', 'sizzling-chicken-fajita-platter', 'tawa-chicken-tikka', 'japanese-teriyaki-chicken-donburi', 'greek-lemon-chicken-souvlaki'] }
+  ];
+
+  for (const recipe of RECIPES) {
+    let score = 0;
+
+    // Diet type penalty
+    if (normDiet === 'vegan' && recipe.dietType !== 'vegan') score -= 100;
+    else if (normDiet === 'vegetarian' && recipe.dietType !== 'vegan' && recipe.dietType !== 'vegetarian') score -= 100;
+    else if (normDiet === 'eggetarian' && recipe.dietType === 'omnivore') score -= 80;
+    else if (normDiet === 'pescatarian' && recipe.dietType === 'omnivore') score -= 50;
+
+    // Key culinary anchor match
+    for (const anchor of keyAnchorMap) {
+      if (anchor.keys.some((k) => allText.includes(k))) {
+        if (anchor.ids.includes(recipe.id)) score += 30;
+      }
+    }
+
+    // Direct token matches with recipe name & ingredients
+    const rName = recipe.name.toLowerCase();
+    const rIngs = recipe.ingredients.map((i) => i.item.toLowerCase()).join(' ');
+    const tokens = normName.split(/\s+/).filter((w) => w.length > 3);
+    for (const token of tokens) {
+      if (rName.includes(token)) score += 8;
+      if (rIngs.includes(token)) score += 4;
+    }
+
+    // Category match
+    if (normCat && recipe.category.toLowerCase() === normCat) score += 5;
+    // Diet match
+    if (normDiet && recipe.dietType.toLowerCase() === normDiet) score += 5;
+
+    // Macro proximity
+    if (customDish.protein && recipe.protein) {
+      const pDiff = Math.abs(customDish.protein - recipe.protein);
+      score += Math.max(0, 5 - pDiff / 10);
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestRecipe = recipe;
+    }
+  }
+
+  const spriteUrl = bestRecipe.image.replace('.webp', '.png');
+  return { recipe: bestRecipe, spriteUrl, score: bestScore };
+}

@@ -100,6 +100,7 @@ function RecipesContent() {
   // Modals for scanning & custom entry
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
@@ -133,6 +134,7 @@ function RecipesContent() {
   const closeRecipeModal = () => {
     retroAudio.playBlip();
     setSelectedRecipe(null);
+    setConfirmDeleteId(null);
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.has('inspect') || params.has('recipe')) {
@@ -533,7 +535,10 @@ function RecipesContent() {
                         </span>
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629] shrink-0 whitespace-nowrap">
+                      <span
+                        className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[#1A3629] shrink-0 whitespace-nowrap cursor-help"
+                        title="Focus Score: Proprietary rating (1-10) measuring sustained mental energy, amino acid bioavailability, and minimal post-meal glycemic crash."
+                      >
                         <span>Focus {recipe.focusScore}</span>
                       </span>
                     </div>
@@ -638,25 +643,51 @@ function RecipesContent() {
             {/* Modal Header Controls */}
             <div className="absolute right-6 top-6 flex items-center gap-2 z-20">
               {selectedRecipe.isCustom && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm(`Delete custom recipe "${selectedRecipe.name}"? This action cannot be undone.`)) {
-                      deleteCustomRecipe(selectedRecipe.id);
-                      closeRecipeModal();
-                      setLoggedToast({
-                        name: `${selectedRecipe.name} (Deleted)`,
-                        protein: 0,
-                        portion: 1.0,
-                      });
-                      setTimeout(() => setLoggedToast(null), 3000);
-                    }
-                  }}
-                  className="rounded-full px-3 py-1 border-2 border-red-500 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white font-mono font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-sm"
-                  title="Delete this custom recipe"
-                >
-                  <span>Delete Recipe</span>
-                </button>
+                confirmDeleteId === selectedRecipe.id ? (
+                  <div className="flex items-center gap-1.5 bg-[#FFFDF9] p-1 rounded-full border-2 border-red-500 shadow-sm animate-in fade-in">
+                    <span className="text-[10px] font-mono font-bold text-red-600 px-1.5">Delete?</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playInspectConfirm();
+                        deleteCustomRecipe(selectedRecipe.id);
+                        setConfirmDeleteId(null);
+                        closeRecipeModal();
+                        setLoggedToast({
+                          name: `${selectedRecipe.name} (Deleted)`,
+                          protein: 0,
+                          portion: 1.0,
+                        });
+                        setTimeout(() => setLoggedToast(null), 3000);
+                      }}
+                      className="rounded-full px-2.5 py-0.5 bg-red-600 text-white font-mono font-bold text-[10px] hover:bg-red-700 transition-colors cursor-pointer"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playBlip();
+                        setConfirmDeleteId(null);
+                      }}
+                      className="rounded-full px-2 py-0.5 bg-gray-100 text-gray-700 font-mono font-bold text-[10px] hover:bg-gray-200 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setConfirmDeleteId(selectedRecipe.id);
+                    }}
+                    className="rounded-full px-3 py-1 border-2 border-red-500 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white font-mono font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+                    title="Delete this custom recipe"
+                  >
+                    <span>Delete Recipe</span>
+                  </button>
+                )
               )}
 
               {/* Close Button */}
@@ -750,7 +781,12 @@ function RecipesContent() {
                 <span>·</span>
                 <span>{selectedRecipe.prepTimeMinutes} mins prep</span>
                 <span>·</span>
-                <span>Focus {selectedRecipe.focusScore}</span>
+                <span
+                  className="cursor-help border-b border-dotted border-[#1A3629]/50"
+                  title="Focus Score: Proprietary rating (1-10) measuring sustained mental energy, amino acid bioavailability, and minimal post-meal glycemic crash."
+                >
+                  Focus {selectedRecipe.focusScore}
+                </span>
               </div>
               <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight leading-tight text-[#1A3629]">
                 {selectedRecipe.name}

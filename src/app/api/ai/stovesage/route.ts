@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { RECIPES } from '@/lib/recipes';
+import { RECIPES, findClosestRecipe } from '@/lib/recipes';
 import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
@@ -242,6 +242,25 @@ ${RECIPE_CATALOG_SUMMARY}`;
         { error: `StoveSage encountered a magical disturbance: ${lastError || 'Unable to generate response'}` },
         { status: 502 }
       );
+    }
+
+    if (parsedResult && Array.isArray(parsedResult.actions)) {
+      parsedResult.actions = parsedResult.actions.map((act: any) => {
+        if (act.type === 'ADD_RECIPE' && act.payload) {
+          const match = findClosestRecipe(act.payload);
+          return {
+            ...act,
+            payload: {
+              ...act.payload,
+              closestRecipeId: match.recipe.id,
+              closestRecipeName: match.recipe.name,
+              sprite: match.spriteUrl,
+              image: act.payload.image || match.spriteUrl,
+            },
+          };
+        }
+        return act;
+      });
     }
 
     return NextResponse.json(parsedResult);

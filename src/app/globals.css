@@ -214,7 +214,7 @@ body {
 }
 
 .animate-count-pop {
-  animation: countPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: countPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* CRT Retro Phosphor Scanline Screen Filter */

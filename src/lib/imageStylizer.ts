@@ -232,7 +232,11 @@ export async function generatePixelatedPlate(imageSrc: string): Promise<string> 
 }
 
 // 2. Retro 16-bit Polaroid / GameBoy Camera Cartridge Badge
-export async function generateRetroFramedBadge(imageSrc: string): Promise<string> {
+export async function generateRetroFramedBadge(
+  imageSrc: string,
+  customLabel = 'CYATH · 16-BIT SCAN',
+  fitMode: 'contain' | 'cover' = 'contain'
+): Promise<string> {
   const img = await loadImage(imageSrc);
   const size = 320;
   const canvas = document.createElement('canvas');
@@ -269,18 +273,26 @@ export async function generateRetroFramedBadge(imageSrc: string): Promise<string
   ctx.save();
   ctx.beginPath();
   ctx.roundRect(photoX, photoY, photoW, photoH, photoRadius);
+  ctx.fillStyle = '#FAF6EE';
+  ctx.fill();
   ctx.clip();
 
-  // Draw user photo scaled and centered
-  const scale = Math.max(photoW / img.width, photoH / img.height);
+  // Draw sprite or user photo scaled and centered
+  const scale =
+    fitMode === 'contain'
+      ? Math.min(photoW / img.width, photoH / img.height) * 0.92
+      : Math.max(photoW / img.width, photoH / img.height);
   const dw = img.width * scale;
   const dh = img.height * scale;
   const dx = photoX + (photoW - dw) / 2;
   const dy = photoY + (photoH - dh) / 2;
+
+  // Disable smoothing for authentic crisp retro pixel art
+  ctx.imageSmoothingEnabled = false;
   ctx.drawImage(img, dx, dy, dw, dh);
 
   // Subtle scanline overlay
-  ctx.fillStyle = 'rgba(26, 54, 41, 0.08)';
+  ctx.fillStyle = 'rgba(26, 54, 41, 0.06)';
   for (let i = 0; i < photoH; i += 4) {
     ctx.fillRect(photoX, photoY + i, photoW, 2);
   }
@@ -305,10 +317,10 @@ export async function generateRetroFramedBadge(imageSrc: string): Promise<string
   ctx.strokeStyle = '#1A3629';
   ctx.stroke();
 
-  // Text Stamp: CYATH · FUEL CARTRIDGE
+  // Text Stamp: e.g. CYATH · AI RECIPE or CYATH · 16-BIT SCAN
   ctx.font = 'bold 11px monospace';
   ctx.fillStyle = '#1A3629';
-  ctx.fillText('CYATH · 16-BIT SCAN', photoX + 22, bottomY + 16);
+  ctx.fillText(customLabel, photoX + 22, bottomY + 16);
 
   // Mini Barcode / Grate Accent
   const barX = photoX + photoW - 40;
@@ -319,3 +331,5 @@ export async function generateRetroFramedBadge(imageSrc: string): Promise<string
 
   return canvas.toDataURL('image/png');
 }
+
+export { findClosestRecipe } from './recipes';

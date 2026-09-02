@@ -501,14 +501,14 @@ export default function DashboardPage() {
                   <div
                     key={habit.id}
                     onClick={(e) => handleToggleHabit(habit.id, e)}
-                    className={`group flex items-center justify-between py-2 px-2.5 rounded-xl transition-all ${
+                    className={`group flex items-center justify-between min-h-[44px] py-2.5 px-3 rounded-xl transition-all ${
                       !isViewingToday
                         ? 'opacity-70 cursor-not-allowed'
-                        : 'hover:bg-[#FAF6EE] cursor-pointer'
+                        : 'hover:bg-[#FAF6EE] active:bg-[#F4F0EA] cursor-pointer'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center font-mono text-xs font-black transition-all ${
+                      <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center font-mono text-xs font-black shrink-0 transition-all ${
                         isDone
                           ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] scale-105 shadow-xs'
                           : !isViewingToday
@@ -517,7 +517,7 @@ export default function DashboardPage() {
                       }`}>
                         {isDone ? '✓' : ''}
                       </div>
-                      <span className={`text-xs font-cabinet font-bold truncate text-[#1A3629] transition-opacity ${
+                      <span className={`text-xs sm:text-sm font-cabinet font-bold truncate text-[#1A3629] transition-opacity ${
                         isDone ? 'line-through opacity-50' : ''
                       }`}>
                         {habit.title}
@@ -531,7 +531,8 @@ export default function DashboardPage() {
                           e.stopPropagation();
                           deleteHabit(habit.id);
                         }}
-                        className="opacity-0 group-hover:opacity-100 px-1.5 py-0.5 text-[9px] font-mono font-bold text-red-600 hover:text-red-800 transition-opacity cursor-pointer border border-red-600/30 rounded"
+                        className="opacity-0 group-hover:opacity-100 max-sm:opacity-80 px-2 py-1 text-[10px] font-mono font-bold text-red-600 hover:text-red-800 transition-opacity cursor-pointer border border-red-600/30 rounded min-h-[30px] flex items-center justify-center"
+                        title="Delete custom habit"
                       >
                         DEL
                       </button>
@@ -669,17 +670,17 @@ export default function DashboardPage() {
                   {todayLog.totalProteinLogged}g <span className="text-[#4A5D4E] font-medium">/ 160g</span>
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-3 gap-2">
                 {[15, 30, 45].map((amt) => (
                   <button
                     key={amt}
                     type="button"
                     disabled={!isViewingToday}
                     onClick={(e) => handleSetProtein(todayLog.totalProteinLogged + amt, e)}
-                    className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
+                    className={`border-2 rounded-xl h-10 text-xs font-mono font-bold transition-all active:scale-95 flex items-center justify-center ${
                       !isViewingToday
                         ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
-                        : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                        : 'border-[#1A3629]/30 hover:border-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer shadow-xs'
                     }`}
                   >
                     +{amt}g
@@ -689,24 +690,24 @@ export default function DashboardPage() {
             </div>
 
             {/* Hydration */}
-            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
+            <div className="p-3.5 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2.5">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="font-bold text-[#1A3629]">Water Intake</span>
                 <span className="tabular-nums font-bold text-[#2563EB]">
-                  {todayLog.hydrationLiters.toFixed(1)}L <span className="text-[#4A5D4E] font-medium">/ 3.0L</span>
+                  {todayLog.hydrationLiters.toFixed(1)}L <span className="text-[#2C4A3B] font-medium">/ 3.0L</span>
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-3 gap-2">
                 {[0.25, 0.5, 1.0].map((amt) => (
                   <button
                     key={amt}
                     type="button"
                     disabled={!isViewingToday}
                     onClick={(e) => handleSetHydration(Number((todayLog.hydrationLiters + amt).toFixed(2)), e)}
-                    className={`border rounded-lg py-1 text-xs font-mono font-bold transition-colors ${
+                    className={`border-2 rounded-xl h-10 text-xs font-mono font-bold transition-all active:scale-95 flex items-center justify-center ${
                       !isViewingToday
                         ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
-                        : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                        : 'border-[#1A3629]/30 hover:border-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer shadow-xs'
                     }`}
                   >
                     +{amt}L
@@ -716,7 +717,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Energy Rating Slider */}
-            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-1.5">
+            <div className="p-3.5 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="font-bold text-[#1A3629]">Energy Rating</span>
                 <span className="font-bold text-[#D97706] tabular-nums">{todayLog.energyLevel}/10</span>
@@ -728,14 +729,14 @@ export default function DashboardPage() {
                 value={todayLog.energyLevel}
                 disabled={!isViewingToday}
                 onChange={(e) => handleSetEnergy(Number(e.target.value))}
-                className={`w-full accent-[#1A3629] h-1.5 rounded-full ${
-                  !isViewingToday ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                className={`w-full accent-[#1A3629] h-2.5 rounded-full cursor-pointer transition-all ${
+                  !isViewingToday ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               />
             </div>
 
             {/* Sleep Hours Stepper */}
-            <div className="p-3 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2">
+            <div className="p-3.5 rounded-xl bg-[#FAF6EE]/70 border border-[#1A3629]/15 flex flex-col gap-2.5">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="font-bold text-[#1A3629]">Sleep Duration</span>
                 <span className="tabular-nums font-bold text-[#1A3629]">{todayLog.sleepHours} hrs</span>
@@ -745,10 +746,10 @@ export default function DashboardPage() {
                   type="button"
                   disabled={!isViewingToday}
                   onClick={() => handleSetSleep(Math.max(0, todayLog.sleepHours - 0.5))}
-                  className={`flex-1 py-1 rounded-lg border text-xs font-mono font-bold transition-colors ${
+                  className={`flex-1 h-10 rounded-xl border-2 text-xs font-mono font-bold transition-all active:scale-95 flex items-center justify-center ${
                     !isViewingToday
                       ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
-                      : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                      : 'border-[#1A3629]/30 hover:border-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer shadow-xs'
                   }`}
                 >
                   -0.5h
@@ -757,10 +758,10 @@ export default function DashboardPage() {
                   type="button"
                   disabled={!isViewingToday}
                   onClick={() => handleSetSleep(todayLog.sleepHours + 0.5)}
-                  className={`flex-1 py-1 rounded-lg border text-xs font-mono font-bold transition-colors ${
+                  className={`flex-1 h-10 rounded-xl border-2 text-xs font-mono font-bold transition-all active:scale-95 flex items-center justify-center ${
                     !isViewingToday
                       ? 'border-[#1A3629]/10 bg-gray-100 text-[#1A3629]/40 cursor-not-allowed'
-                      : 'border-[#1A3629]/25 hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer'
+                      : 'border-[#1A3629]/30 hover:border-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] bg-white text-[#1A3629] cursor-pointer shadow-xs'
                   }`}
                 >
                   +0.5h

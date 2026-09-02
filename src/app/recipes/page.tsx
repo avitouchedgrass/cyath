@@ -625,13 +625,16 @@ function RecipesContent() {
 
       {/* Retro Recipe Detail Modal */}
       {selectedRecipe && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
           <div
             onClick={closeRecipeModal}
             className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
-          <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-4 border-[#1A3629] bg-[#FFFDF9] p-6 sm:p-8 shadow-2xl flex flex-col gap-6 scrollbar-none">
+          <div className="relative z-10 w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border-3 sm:border-4 border-[#1A3629] bg-[#FFFDF9] p-5 sm:p-8 shadow-[0_-10px_30px_rgba(0,0,0,0.25)] sm:shadow-2xl flex flex-col gap-5 sm:gap-6 scrollbar-none">
+            {/* Mobile Drag Indicator */}
+            <div className="sm:hidden w-12 h-1.5 bg-[#1A3629]/25 rounded-full mx-auto -mt-1 mb-1 shrink-0" />
+
             {/* Modal Header Controls */}
             <div className="absolute right-6 top-6 flex items-center gap-2 z-20">
               {selectedRecipe.isCustom && (
@@ -777,10 +780,10 @@ function RecipesContent() {
                         retroAudio.playBlip();
                         setPortionMultiplier(multiplier);
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                      className={`px-3.5 py-2 sm:py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer min-h-[42px] min-w-[42px] flex items-center justify-center ${
                         isSelected
-                          ? 'bg-[#1A3629] text-[#FFFDF9]'
-                          : 'text-[#2C4A3B]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                          : 'text-[#2C4A3B] hover:bg-[#FAF6EE]'
                       }`}
                     >
                       {multiplier}x

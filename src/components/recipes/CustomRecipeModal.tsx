@@ -122,10 +122,13 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#1A3629]/70 backdrop-blur-md animate-[fadeScale_0.25s_ease-out]">
-      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl shadow-[8px_8px_0px_#1A3629] overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/70 backdrop-blur-md animate-[fadeScale_0.25s_ease-out]">
+      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border-3 border-[#1A3629] rounded-t-3xl sm:rounded-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.25)] sm:shadow-[8px_8px_0px_#1A3629] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+        {/* Mobile Drag Handle */}
+        <div className="sm:hidden w-12 h-1.5 bg-[#1A3629]/25 rounded-full mx-auto mt-2 -mb-1 shrink-0" />
+
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b-2 border-[#1A3629] bg-[#FAF6EE] flex items-center justify-between">
+        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b-2 border-[#1A3629] bg-[#FAF6EE] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-fraunces font-black text-xl text-[#1A3629]">
               {initialRecipe ? 'Edit Custom Recipe' : 'Add Custom Recipe'}

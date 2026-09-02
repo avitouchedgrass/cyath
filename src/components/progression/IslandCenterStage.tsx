@@ -82,7 +82,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
                 >
                   <img
                     src={tier.image}
-                    alt={tier.name}
+                    alt={`${tier.name} - Tier ${tier.tier} Floating Sanctuary Island`}
                     draggable={false}
                     loading={isSelected ? 'eager' : 'lazy'}
                     decoding="async"

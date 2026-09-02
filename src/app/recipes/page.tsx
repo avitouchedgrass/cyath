@@ -12,6 +12,7 @@ import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { formatLocalDate } from '@/lib/dateUtils';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -270,7 +271,11 @@ function RecipesContent() {
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
         
-        {/* Header Title Section & Action Bar */}
+        {/* Breadcrumb Navigation */}
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: 'Fuel Recipes' }]} />
+        </div>
+
         {/* Header Title Section & Action Bar */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-[#1A3629]/15 pb-5">
           <div>

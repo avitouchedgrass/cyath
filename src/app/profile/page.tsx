@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
@@ -121,11 +122,16 @@ export default function ProfilePage() {
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-10 pt-28 pb-24">
         
+        {/* Breadcrumb Navigation */}
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: 'Profile' }]} />
+        </div>
+
         {/* Header Section */}
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
-              Explorer Dossier
+              Profile &amp; Settings
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
               Your account settings, baseline targets, and daily progress summary.

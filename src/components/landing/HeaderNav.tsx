@@ -135,7 +135,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               type="button"
               onClick={() => setIsInviteModalOpen(true)}
               className="border-2 border-[#065F46] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] px-3.5 sm:px-4 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#10B981] hover:shadow-[4px_4px_0px_#10B981] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer h-10 select-none shrink-0"
-              title="Adventurer's Guild Pact: Invite Friends for +250 XP"
+              title="Invite Friends for +250 XP"
               aria-label="Invite friends to Cyath for +250 XP"
             >
               <Gift className="w-3.5 h-3.5 text-[#059669] shrink-0" />

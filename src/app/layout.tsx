@@ -8,6 +8,7 @@ import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough"
 import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { GlobalJsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,35 +44,56 @@ const pixelFont = Pixelify_Sans({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.app'),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Cyath · 16-Bit Metabolic Health & Habit Tracking',
+    default: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
     template: '%s · Cyath',
   },
   description:
-    'A retro neobrutalist metabolic health platform combining behavioral habit tracking, whole-food culinary recipes, and a 16-bit RPG sanctuary diorama.',
+    'Frictionless 30-second daily habit tracking, whole-food high-protein recipes, circadian protocols, and statistical energy pattern insights.',
   keywords: [
-    'metabolic health',
     'habit tracker',
+    'metabolic health',
     'high protein recipes',
-    'gamified wellness',
-    'retro pixel art',
-    'circadian protocols',
+    'whole food nutrition',
+    'energy tracking',
+    'circadian rhythm',
+    'gamified habits',
   ],
-  authors: [{ name: 'Cyath' }],
+  authors: [{ name: 'Cyath Health', url: SITE_URL }],
+  creator: 'Cyath',
+  publisher: 'Cyath Health',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'Cyath · 16-Bit Metabolic Health & Habit Tracking',
+    title: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
     description:
-      'Gamified daily wellness combining behavioral psychology, whole-food fuel recipes, and an evolving pixel-art sanctuary.',
-    url: 'https://cyath.app',
+      'Track daily habits in 30 seconds, calibrate whole-food protein targets, and uncover what drives your best energy days.',
+    url: SITE_URL,
     siteName: 'Cyath',
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cyath · 16-Bit Metabolic Health',
-    description: 'Track habits, calibrate protein, and evolve your 16-bit floating sanctuary.',
+    title: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
+    description: 'Track daily habits, hit protein goals, and discover what fuels your good days.',
+    creator: '@CyathHealth',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -91,6 +113,7 @@ export default function RootLayout({
           href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@100,200,300,400,500,700,800,900&display=swap"
           rel="stylesheet"
         />
+        <GlobalJsonLd />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-[#1A3629] selection:text-[#FFFDF9]">
         <AuthProvider>

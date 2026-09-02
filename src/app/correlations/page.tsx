@@ -7,6 +7,7 @@ import { deriveCorrelations } from '@/lib/correlation';
 import { retroAudio } from '@/lib/retroAudio';
 import { InteractiveCorrelationMatrix, MatrixDataPoint } from '@/components/correlations/InteractiveCorrelationMatrix';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Activity, Sparkles, TrendingUp, BarChart3, Info } from 'lucide-react';
 
 export default function CorrelationsPage() {
@@ -56,6 +57,11 @@ export default function CorrelationsPage() {
       {/* Main Content */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-28 pb-24">
         
+        {/* Breadcrumb Navigation */}
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: 'Daily Insights' }]} />
+        </div>
+
         {/* Navigation & Header */}
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

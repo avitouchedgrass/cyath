@@ -16,6 +16,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface ProtocolBlueprint {
   id: string;
@@ -209,6 +210,11 @@ export default function ProtocolsPage() {
       {/* Main Container */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-28 pb-20">
         
+        {/* Breadcrumb Navigation */}
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: 'Guided Routines' }]} />
+        </div>
+
         {/* Header Title Section */}
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

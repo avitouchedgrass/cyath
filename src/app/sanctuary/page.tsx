@@ -10,6 +10,7 @@ import { IslandCenterStage } from '@/components/progression/IslandCenterStage';
 import { HabitCalendarMini } from '@/components/progression/HabitCalendarMini';
 import { StreakCardMini } from '@/components/progression/StreakCardMini';
 import { HabitStatsCard } from '@/components/progression/HabitStatsCard';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function SanctuaryPage() {
   const router = useRouter();
@@ -42,7 +43,10 @@ export default function SanctuaryPage() {
     <div className="min-h-[100dvh] bg-[#F4F0EA] text-[#1A3629] flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       <HeaderNav />
 
-      <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex flex-col gap-8">
+      <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex flex-col gap-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumbs items={[{ label: 'Sanctuary' }]} />
+
         {/* Top Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1A3629]/15 pb-4">
           <div>

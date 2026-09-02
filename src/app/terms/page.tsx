@@ -1,20 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, AlertCircle, ShieldAlert, Sparkles, ArrowLeft } from 'lucide-react';
-
-export const metadata = {
-  title: 'Terms of Service',
-  description: 'Cyath Terms of Service: Platform terms, health disclaimer, intellectual property, and acceptable use.',
-};
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       <HeaderNav />
 
-      <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-24">
-        
+      <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-6 pt-32 pb-24">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumbs items={[{ label: 'Terms of Service' }]} />
+        </div>
+
         {/* Header */}
         <div className="mb-10 border-b-2 border-[#1A3629]/15 pb-6">
           <Link

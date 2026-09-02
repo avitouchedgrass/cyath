@@ -96,7 +96,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
               >
                 <img
                   src={tier.image}
-                  alt={tier.name}
+                  alt={`${tier.name} - Tier ${tier.tier} Floating Sanctuary Diorama`}
                   draggable={false}
                   loading={isSelected ? 'eager' : 'lazy'}
                   decoding="async"

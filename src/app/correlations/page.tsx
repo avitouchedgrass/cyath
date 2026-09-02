@@ -6,6 +6,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { deriveCorrelations } from '@/lib/correlation';
 import { retroAudio } from '@/lib/retroAudio';
 import { InteractiveCorrelationMatrix, MatrixDataPoint } from '@/components/correlations/InteractiveCorrelationMatrix';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Activity, Sparkles, TrendingUp, BarChart3, Info } from 'lucide-react';
 
 export default function CorrelationsPage() {
@@ -186,23 +187,25 @@ export default function CorrelationsPage() {
               </div>
 
               {/* Interactive Physics Scatter Matrix */}
-              <InteractiveCorrelationMatrix
-                key={activeCorrelation.id}
-                initialPoints={matrixPoints}
-                xLabel={activeCorrelation.xLabel}
-                yLabel={activeCorrelation.yLabel}
-                xUnit={
-                  activeCorrelation.id.includes('protein')
-                    ? 'g'
-                    : activeCorrelation.id.includes('sleep')
-                    ? 'h'
-                    : activeCorrelation.id.includes('hydration')
-                    ? 'L'
-                    : activeCorrelation.id.includes('momentum') || activeCorrelation.id.includes('adherence')
-                    ? '%'
-                    : 'pts'
-                }
-              />
+              <ErrorBoundary name="Interactive Matrix">
+                <InteractiveCorrelationMatrix
+                  key={activeCorrelation.id}
+                  initialPoints={matrixPoints}
+                  xLabel={activeCorrelation.xLabel}
+                  yLabel={activeCorrelation.yLabel}
+                  xUnit={
+                    activeCorrelation.id.includes('protein')
+                      ? 'g'
+                      : activeCorrelation.id.includes('sleep')
+                      ? 'h'
+                      : activeCorrelation.id.includes('hydration')
+                      ? 'L'
+                      : activeCorrelation.id.includes('momentum') || activeCorrelation.id.includes('adherence')
+                      ? '%'
+                      : 'pts'
+                  }
+                />
+              </ErrorBoundary>
 
               {/* Executive Actionable Takeaway Box */}
               <div className="p-5 rounded-2xl border-2 border-[#1A3629] bg-[#FAF6EE] space-y-2 shadow-inner">

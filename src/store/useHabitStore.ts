@@ -167,17 +167,27 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
   try {
     const raw = localStorage.getItem(`cyath_user_progression_${userId}`);
     const existing: Partial<UserLocalProgressData> = raw ? JSON.parse(raw) : {};
+    const safeTotalXp = typeof data.totalXp === 'number' && Number.isFinite(data.totalXp)
+      ? Math.max(0, data.totalXp)
+      : Math.max(0, existing.totalXp ?? 0);
+    const safeStreakCount = typeof data.streakCount === 'number' && Number.isFinite(data.streakCount)
+      ? Math.max(0, data.streakCount)
+      : Math.max(0, existing.streakCount ?? 0);
+    const safeStreakFreeze = typeof data.streakFreezeStock === 'number' && Number.isFinite(data.streakFreezeStock)
+      ? Math.max(0, data.streakFreezeStock)
+      : Math.max(0, existing.streakFreezeStock ?? 1);
+
     const merged: UserLocalProgressData = {
-      totalXp: data.totalXp !== undefined ? data.totalXp : (existing.totalXp ?? 0),
-      streakCount: data.streakCount !== undefined ? data.streakCount : (existing.streakCount ?? 0),
-      streakFreezeStock: data.streakFreezeStock !== undefined ? data.streakFreezeStock : (existing.streakFreezeStock ?? 1),
-      claimedMilestones: data.claimedMilestones !== undefined ? data.claimedMilestones : (existing.claimedMilestones ?? []),
-      completedQuestIdsByDate: data.completedQuestIdsByDate !== undefined ? data.completedQuestIdsByDate : (existing.completedQuestIdsByDate ?? {}),
-      xpHistory: data.xpHistory !== undefined ? data.xpHistory : (existing.xpHistory ?? []),
-      logsByDate: data.logsByDate !== undefined ? data.logsByDate : (existing.logsByDate ?? {}),
-      customRecipes: data.customRecipes !== undefined ? data.customRecipes : (existing.customRecipes ?? []),
+      totalXp: safeTotalXp,
+      streakCount: safeStreakCount,
+      streakFreezeStock: safeStreakFreeze,
+      claimedMilestones: Array.isArray(data.claimedMilestones) ? data.claimedMilestones : (existing.claimedMilestones ?? []),
+      completedQuestIdsByDate: data.completedQuestIdsByDate && typeof data.completedQuestIdsByDate === 'object' ? data.completedQuestIdsByDate : (existing.completedQuestIdsByDate ?? {}),
+      xpHistory: Array.isArray(data.xpHistory) ? data.xpHistory : (existing.xpHistory ?? []),
+      logsByDate: data.logsByDate && typeof data.logsByDate === 'object' ? data.logsByDate : (existing.logsByDate ?? {}),
+      customRecipes: Array.isArray(data.customRecipes) ? data.customRecipes : (existing.customRecipes ?? []),
       userProfile: data.userProfile !== undefined ? data.userProfile : (existing.userProfile ?? null),
-      habits: data.habits !== undefined ? data.habits : (existing.habits ?? DEFAULT_HABITS),
+      habits: Array.isArray(data.habits) && data.habits.length > 0 ? data.habits : (existing.habits ?? DEFAULT_HABITS),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -187,7 +197,10 @@ const getUserLocalProgress = (userId: string): UserLocalProgressData | null => {
   if (typeof window === 'undefined' || !userId || userId.startsWith('guest_')) return null;
   try {
     const raw = localStorage.getItem(`cyath_user_progression_${userId}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
   } catch {
     return null;
   }
@@ -625,19 +638,32 @@ export const useHabitStore = create<HabitStoreState>()(
 
       getDailyLog: (date) => {
         const targetDate = date || get().currentDate;
-        return get().logsByDate[targetDate] || createEmptyDailyLog();
+        const rawLog = get().logsByDate[targetDate];
+        if (!rawLog) return createEmptyDailyLog();
+        return {
+          habitsCompleted: rawLog.habitsCompleted && typeof rawLog.habitsCompleted === 'object' ? rawLog.habitsCompleted : {},
+          totalProteinLogged: typeof rawLog.totalProteinLogged === 'number' && Number.isFinite(rawLog.totalProteinLogged) ? Math.max(0, rawLog.totalProteinLogged) : 0,
+          totalCaloriesLogged: typeof rawLog.totalCaloriesLogged === 'number' && Number.isFinite(rawLog.totalCaloriesLogged) ? Math.max(0, rawLog.totalCaloriesLogged) : 0,
+          hydrationLiters: typeof rawLog.hydrationLiters === 'number' && Number.isFinite(rawLog.hydrationLiters) ? Math.max(0, rawLog.hydrationLiters) : 0,
+          sleepHours: typeof rawLog.sleepHours === 'number' && Number.isFinite(rawLog.sleepHours) ? Math.max(0, rawLog.sleepHours) : 7.5,
+          energyLevel: typeof rawLog.energyLevel === 'number' && Number.isFinite(rawLog.energyLevel) ? rawLog.energyLevel : 7,
+          moodScore: typeof rawLog.moodScore === 'number' && Number.isFinite(rawLog.moodScore) ? rawLog.moodScore : 8,
+          notes: typeof rawLog.notes === 'string' ? rawLog.notes : '',
+          loggedRecipeIds: Array.isArray(rawLog.loggedRecipeIds) ? rawLog.loggedRecipeIds : [],
+        };
       },
 
       gainXp: (amount, reason, source = 'app') => {
-        const currentXp = get().totalXp;
-        const newXp = Math.max(0, currentXp + amount);
+        const safeAmount = typeof amount === 'number' && Number.isFinite(amount) ? amount : 0;
+        const currentXp = typeof get().totalXp === 'number' && Number.isFinite(get().totalXp) ? get().totalXp : 0;
+        const newXp = Math.max(0, currentXp + safeAmount);
         const oldLevelInfo = calculateLevel(currentXp);
         const newLevelInfo = calculateLevel(newXp);
         const leveledUp = newLevelInfo.level > oldLevelInfo.level;
 
         const newHistoryItem: XpHistoryItem = {
           id: `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          amount,
+          amount: safeAmount,
           reason,
           timestamp: new Date().toISOString(),
         };

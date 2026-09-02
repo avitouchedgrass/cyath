@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RECIPES } from '@/lib/recipes';
+import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -85,12 +86,13 @@ const CANDIDATE_MODELS = [
   'gemini-2.5-pro',
 ];
 
-async function callGeminiChat(apiKey: string, model: string, contents: any[]) {
+async function callGeminiChat(apiKey: string, model: string, contents: any[], signal?: AbortSignal) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   return await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal,
     body: JSON.stringify({
       contents,
       generationConfig: {
@@ -101,16 +103,58 @@ async function callGeminiChat(apiKey: string, model: string, contents: any[]) {
   });
 }
 
+const MAX_CHAT_PAYLOAD_BYTES = 100 * 1024; // 100KB
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    // 1. IP Sliding Window Rate Limiting (30 requests / min)
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit('stovesage_chat', clientIp, {
+      windowMs: 60 * 1000,
+      maxRequests: 30,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(
+        'Chat rate limit reached. Please wait a moment before sending another message.',
+        rateLimit.retryAfterSeconds
+      );
+    }
+
+    // 2. Payload size check
+    const contentLength = Number(req.headers.get('content-length') || '0');
+    if (contentLength > MAX_CHAT_PAYLOAD_BYTES) {
+      return NextResponse.json(
+        { error: 'Message payload too large. Max limit is 100KB.' },
+        { status: 413 }
+      );
+    }
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
+    }
+
     const { messages = [], userContext = {}, apiKey } = body as {
       messages: ChatMessage[];
       userContext: UserContext;
       apiKey?: string;
     };
 
-    const activeKey = apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    // 3. Message validation & clamp to max 20 history items
+    if (!Array.isArray(messages)) {
+      return NextResponse.json({ error: 'Messages must be an array.' }, { status: 400 });
+    }
+
+    const safeMessages = messages
+      .slice(-20)
+      .filter((m) => m && typeof m.content === 'string')
+      .map((m) => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: String(m.content).slice(0, 2000), // Max 2,000 chars per message
+      }));
+
+    const activeKey = (typeof apiKey === 'string' && apiKey.trim()) || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     if (!activeKey) {
       return NextResponse.json(
@@ -156,7 +200,7 @@ ${RECIPE_CATALOG_SUMMARY}`;
       },
     ];
 
-    for (const msg of messages) {
+    for (const msg of safeMessages) {
       geminiContents.push({
         role: msg.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: msg.content }],
@@ -167,8 +211,13 @@ ${RECIPE_CATALOG_SUMMARY}`;
     let lastError = '';
 
     for (const model of CANDIDATE_MODELS) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       try {
-        const response = await callGeminiChat(activeKey, model, geminiContents);
+        const response = await callGeminiChat(activeKey, model, geminiContents, controller.signal);
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
           const errText = await response.text();
           lastError = `Model ${model} returned HTTP ${response.status}: ${errText}`;
@@ -183,7 +232,8 @@ ${RECIPE_CATALOG_SUMMARY}`;
         parsedResult = JSON.parse(rawText);
         break;
       } catch (err: any) {
-        lastError = err?.message || 'Unknown parsing error';
+        clearTimeout(timeoutId);
+        lastError = err?.name === 'AbortError' ? `Model ${model} timed out after 15s` : err?.message || 'Unknown parsing error';
       }
     }
 

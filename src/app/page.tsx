@@ -7,6 +7,7 @@ import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelS
 import { TextType } from '@/components/reactbits/TextType';
 import { InteractiveCorrelationMatrix } from '@/components/correlations/InteractiveCorrelationMatrix';
 import { useHabitStore } from '@/store/useHabitStore';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 const STEP_LOOP = [
   {
@@ -176,9 +177,11 @@ export default function Home() {
 
             {/* Hero Right Column: Massive Unboxed Pixel Art Showcase */}
             <div className="lg:col-span-6 w-full flex items-center justify-center">
-              <PixelShowcase 
-                onDishChange={(dish) => setCurrentDish(dish)} 
-              />
+              <ErrorBoundary name="Food Showcase">
+                <PixelShowcase 
+                  onDishChange={(dish) => setCurrentDish(dish)} 
+                />
+              </ErrorBoundary>
             </div>
 
           </div>
@@ -318,11 +321,13 @@ export default function Home() {
 
                   {/* Interactive Physics Scatter Matrix with Live Dynamic Forecasting */}
                   <div className="w-full mb-4">
-                    <InteractiveCorrelationMatrix
-                      xLabel="Protein Fuel"
-                      yLabel="Focus Score"
-                      xUnit="g"
-                    />
+                    <ErrorBoundary name="Scatter Matrix">
+                      <InteractiveCorrelationMatrix
+                        xLabel="Protein Fuel"
+                        yLabel="Focus Score"
+                        xUnit="g"
+                      />
+                    </ErrorBoundary>
                   </div>
                 </div>
 

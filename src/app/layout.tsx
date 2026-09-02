@@ -7,6 +7,7 @@ import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLev
 import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough";
 import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import "./globals.css";
 
 const inter = Inter({
@@ -94,12 +95,24 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-[#1A3629] selection:text-[#FFFDF9]">
         <AuthProvider>
           {children}
-          <XpParticleCanvas />
-          <XpToastLayer />
-          <LevelUpModal />
-          <BottomCornerLevelBadge />
-          <PioneerWalkthrough />
-          <StoveSageChatbot />
+          <ErrorBoundary name="Particles">
+            <XpParticleCanvas />
+          </ErrorBoundary>
+          <ErrorBoundary name="Toast Layer">
+            <XpToastLayer />
+          </ErrorBoundary>
+          <ErrorBoundary name="Level Up Modal">
+            <LevelUpModal />
+          </ErrorBoundary>
+          <ErrorBoundary name="Level Badge">
+            <BottomCornerLevelBadge />
+          </ErrorBoundary>
+          <ErrorBoundary name="Walkthrough">
+            <PioneerWalkthrough />
+          </ErrorBoundary>
+          <ErrorBoundary name="AI Coach" fallback={null}>
+            <StoveSageChatbot />
+          </ErrorBoundary>
         </AuthProvider>
       </body>
     </html>

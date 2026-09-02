@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -203,12 +204,13 @@ function generateSmartFallbackRecipe(): VisionExtractionResult {
   };
 }
 
-async function callGeminiVision(apiKey: string, model: string, base64Data: string, mimeType: string) {
+async function callGeminiVision(apiKey: string, model: string, base64Data: string, mimeType: string, signal?: AbortSignal) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal,
     body: JSON.stringify({
       contents: [
         {
@@ -234,31 +236,29 @@ async function callGeminiVision(apiKey: string, model: string, base64Data: strin
   return res;
 }
 
-// In-memory rate limiting map: ip -> timestamps
-const rateLimitMap = new Map<string, number[]>();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 25;
 const MAX_IMAGE_PAYLOAD_BYTES = 10 * 1024 * 1024; // 10MB
-const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. IP Rate Limiting
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown_ip';
-    const now = Date.now();
-    const windowStart = now - RATE_LIMIT_WINDOW_MS;
-    const timestamps = (rateLimitMap.get(ip) || []).filter((t) => t > windowStart);
+    // 1. IP Sliding Window Rate Limiting (20 scans / min)
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit('scan_recipe', clientIp, {
+      windowMs: 60 * 1000,
+      maxRequests: 20,
+    });
 
-    if (timestamps.length >= MAX_REQUESTS_PER_WINDOW) {
-      return NextResponse.json(
-        { error: 'Scan request limit reached. Please wait a minute before scanning another meal.' },
-        { status: 429 }
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(
+        'Scan request limit reached. Please wait a minute before scanning another meal.',
+        rateLimit.retryAfterSeconds
       );
     }
-    timestamps.push(now);
-    rateLimitMap.set(ip, timestamps);
 
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
+    }
+
     const { image, mimeType = 'image/jpeg', apiKey } = body;
 
     // 2. Input Validation
@@ -288,8 +288,12 @@ export async function POST(req: NextRequest) {
       const base64Data = image.replace(/^data:image\/[a-z]+;base64,/, '');
 
       for (const model of CANDIDATE_MODELS) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
         try {
-          const response = await callGeminiVision(activeKey, model, base64Data, mimeType);
+          const response = await callGeminiVision(activeKey, model, base64Data, mimeType, controller.signal);
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
             continue;
@@ -343,7 +347,8 @@ export async function POST(req: NextRequest) {
             source: 'gemini-live-vision',
           });
         } catch {
-          // Model attempt failed; try next model candidate
+          clearTimeout(timeoutId);
+          // Model attempt failed or timed out; try next model candidate
         }
       }
     }

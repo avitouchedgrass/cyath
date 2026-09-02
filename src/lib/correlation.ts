@@ -26,32 +26,43 @@ export interface CorrelationResult {
  * Calculates Pearson Correlation Coefficient (r) between two continuous variable series
  */
 export function calculatePearson(x: number[], y: number[]): number {
+  if (!Array.isArray(x) || !Array.isArray(y)) return 0;
   const n = x.length;
   if (n < 2 || n !== y.length) return 0;
 
-  const sumX = x.reduce((a, b) => a + b, 0);
-  const sumY = y.reduce((a, b) => a + b, 0);
+  const validPairs: [number, number][] = [];
+  for (let i = 0; i < n; i++) {
+    if (typeof x[i] === 'number' && Number.isFinite(x[i]) && typeof y[i] === 'number' && Number.isFinite(y[i])) {
+      validPairs.push([x[i], y[i]]);
+    }
+  }
 
-  const meanX = sumX / n;
-  const meanY = sumY / n;
+  const validN = validPairs.length;
+  if (validN < 2) return 0;
+
+  const sumX = validPairs.reduce((a, b) => a + b[0], 0);
+  const sumY = validPairs.reduce((a, b) => a + b[1], 0);
+
+  const meanX = sumX / validN;
+  const meanY = sumY / validN;
 
   let numerator = 0;
   let denomX = 0;
   let denomY = 0;
 
-  for (let i = 0; i < n; i++) {
-    const diffX = x[i] - meanX;
-    const diffY = y[i] - meanY;
+  for (let i = 0; i < validN; i++) {
+    const diffX = validPairs[i][0] - meanX;
+    const diffY = validPairs[i][1] - meanY;
     numerator += diffX * diffY;
     denomX += diffX * diffX;
     denomY += diffY * diffY;
   }
 
   const denominator = Math.sqrt(denomX * denomY);
-  if (denominator === 0) return 0;
+  if (!Number.isFinite(denominator) || denominator === 0) return 0;
 
   const r = numerator / denominator;
-  return Math.round(r * 100) / 100;
+  return Number.isFinite(r) ? Math.round(r * 100) / 100 : 0;
 }
 
 /**

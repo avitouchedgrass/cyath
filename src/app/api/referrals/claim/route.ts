@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { validateReferralCodeInput, KNOWN_SEED_CODES } from '@/lib/referralUtils';
+import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. IP Sliding Window Rate Limiting (15 attempts / min)
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit('referral_claim', clientIp, {
+      windowMs: 60 * 1000,
+      maxRequests: 15,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(
+        'Too many referral attempts. Please wait a moment before trying again.',
+        rateLimit.retryAfterSeconds
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const { referralCode, recruitUserId, recruitEmail } = body;
 
-    // 1. Strict input & format validation (no links, URLs, or gibberish)
+    // 2. Strict input & format validation (no links, URLs, or gibberish)
     const validation = validateReferralCodeInput(referralCode);
     if (!validation.valid || !validation.cleanCode) {
       return NextResponse.json(

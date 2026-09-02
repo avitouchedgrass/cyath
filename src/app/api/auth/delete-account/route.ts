@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit('delete_account', clientIp, {
+      windowMs: 60 * 1000,
+      maxRequests: 5,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(
+        'Too many account deletion attempts. Please wait a minute.',
+        rateLimit.retryAfterSeconds
+      );
+    }
+
     const authHeader = req.headers.get('Authorization') || '';
     const token = authHeader.replace('Bearer ', '').trim();
 

@@ -1139,6 +1139,326 @@ export const RECIPES: Recipe[] = [
       'Squeeze fresh lime juice over the smoking skillet and remove from heat.',
       'Serve sizzling chicken and peppers wrapped inside warm whole wheat rotis.'
     ]
+  },
+  {
+    id: 'greek-lemon-herb-salmon',
+    name: 'Greek Lemon Herb Salmon & Warm Orzo',
+    subtitle: 'Pan-seared crispy skin salmon fillet with fresh dill, lemon-herb orzo, and cool cucumber tzatziki',
+    image: '/assets/food/greek-salmon-1.0.webp',
+    calories: 540,
+    protein: 46,
+    carbs: 38,
+    fats: 20,
+    prepTimeMinutes: 16,
+    category: 'High Protein',
+    dietType: 'pescatarian',
+    tags: ['Omega-3 Rich', 'High Protein', 'Pescatarian', 'Mediterranean', 'Post Workout'],
+    focusScore: '9.5/10',
+    description:
+      'Restaurant-quality Mediterranean salmon dinner ready in under 20 minutes. High in EPA/DHA omega-3 fatty acids to lower neuroinflammation and boost afternoon cognitive stamina, paired with light orzo and cooling tzatziki.',
+    ingredients: [
+      { item: 'Wild-Caught Salmon Fillet (Skin-On)', amount: '220g' },
+      { item: 'Orzo Pasta', amount: '60g dry' },
+      { item: 'Greek Yogurt (0% or 2%)', amount: '3 tbsp' },
+      { item: 'Grated English Cucumber & Garlic', amount: '1/4 cup + 1 clove minced' },
+      { item: 'Fresh Dill & Lemon Juice', amount: '1 tbsp dill + 1/2 lemon' },
+      { item: 'Extra Virgin Olive Oil & Sea Salt', amount: '1 tbsp + to taste' }
+    ],
+    instructions: [
+      'Boil orzo in salted water for 8 minutes until al dente; drain and toss with 1 tsp olive oil, fresh dill, and lemon zest.',
+      'Mix Greek yogurt, grated squeezed cucumber, minced garlic, lemon juice, and a pinch of salt for a quick tzatziki.',
+      'Pat salmon skin dry with a paper towel and season flesh with sea salt and black pepper.',
+      'Heat a skillet over medium-high with 1 tsp olive oil; place salmon skin-side down and press gently with a spatula for 4 minutes until skin is crackling crisp.',
+      'Flip and cook for 2 more minutes until medium-rare to medium; serve hot over herb orzo with a dollop of tzatziki.'
+    ]
+  },
+  {
+    id: 'thai-red-coconut-curry-prawns',
+    name: 'Creamy Thai Red Coconut Curry & Tiger Prawns',
+    subtitle: 'Wild tiger prawns and tender bok choy simmered in aromatic lemongrass-coconut broth with jasmine rice',
+    image: '/assets/food/thai-curry-1.0.webp',
+    calories: 490,
+    protein: 42,
+    carbs: 44,
+    fats: 16,
+    prepTimeMinutes: 15,
+    category: 'High Protein',
+    dietType: 'pescatarian',
+    tags: ['Lean Protein', 'Fast Prep', 'Pescatarian', 'Thai Bistro', 'Clean Fuel'],
+    focusScore: '9.3/10',
+    description:
+      'Deceptively simple 15-minute bistro curry. Sautéing red curry paste in light coconut milk creates an intensely fragrant, velvety broth that gently poaches tiger prawns and bok choy for complete protein and zero heaviness.',
+    ingredients: [
+      { item: 'Peeled Wild Tiger Prawns', amount: '240g' },
+      { item: 'Light Coconut Milk', amount: '180ml' },
+      { item: 'Authentic Thai Red Curry Paste', amount: '1.5 tbsp' },
+      { item: 'Baby Bok Choy (Halved)', amount: '2 heads' },
+      { item: 'Steamed Jasmine Rice', amount: '120g cooked' },
+      { item: 'Fish Sauce (or Tamari) & Lime Juice', amount: '1 tsp each' },
+      { item: 'Fresh Cilantro & Red Chili Slices', amount: 'For garnish' }
+    ],
+    instructions: [
+      'Heat 1 tbsp coconut milk in a pan over medium heat; fry red curry paste for 60 seconds until fragrant and oils split.',
+      'Pour in remaining coconut milk, 1/4 cup water, and 1 tsp fish sauce; bring to a gentle simmer.',
+      'Add halved baby bok choy and tiger prawns directly into the bubbling broth.',
+      'Simmer gently for 3.5 to 4 minutes until prawns curl pink and bok choy stems turn tender.',
+      'Remove from heat, stir in fresh lime juice, and ladle over steaming jasmine rice with fresh cilantro.'
+    ]
+  },
+  {
+    id: 'spanish-saffron-chicken-paella',
+    name: 'Spanish Saffron & Smoked Paprika Chicken Skillet',
+    subtitle: 'One-pan caramelized chicken and bomba rice infused with saffron, sweet peas, and smoked paprika',
+    image: '/assets/food/spanish-paella-1.0.webp',
+    calories: 530,
+    protein: 44,
+    carbs: 56,
+    fats: 14,
+    prepTimeMinutes: 24,
+    category: 'Steady Carbs',
+    dietType: 'omnivore',
+    tags: ['One-Pan Wonder', 'High Protein', 'Omnivore', 'Spanish Style', 'Glycogen Reload'],
+    focusScore: '9.2/10',
+    description:
+      'A simplified Spanish paella skillet delivering rich restaurant flavors in one pan. Saffron threads and smoked pimentón infuse the rice with deep aromatic compounds while pasture-raised chicken supplies dense amino acids.',
+    ingredients: [
+      { item: 'Boneless Skinless Chicken Thighs (Cubed)', amount: '240g' },
+      { item: 'Short-Grain Paella / Bomba Rice', amount: '70g dry' },
+      { item: 'Sweet Green Peas & Red Bell Pepper Strips', amount: '1/2 cup' },
+      { item: 'Chicken Broth & Saffron Threads', amount: '1.5 cups broth + pinch saffron' },
+      { item: 'Smoked Spanish Paprika & Garlic', amount: '1 tsp paprika + 2 cloves minced' },
+      { item: 'Olive Oil & Fresh Lemon Wedges', amount: '1 tbsp + 2 wedges' }
+    ],
+    instructions: [
+      'Heat olive oil in a wide heavy skillet; sear chicken cubes with smoked paprika and salt for 4 minutes until golden.',
+      'Push chicken aside, add minced garlic and bell pepper strips; sauté for 1 minute.',
+      'Stir in dry rice, coating the grains in flavorful pan oils for 60 seconds.',
+      'Pour in warm chicken broth with saffron threads; stir once, distribute chicken and sweet peas evenly.',
+      'Simmer on medium-low undisturbed for 14 minutes until liquid is absorbed and a light crispy crust (socarrat) forms at bottom. Rest 3 mins and serve with lemon.'
+    ]
+  },
+  {
+    id: 'mediterranean-halloumi-shakshuka',
+    name: 'Skillet Shakshuka with Golden Halloumi & Runny Yolks',
+    subtitle: 'Pasture-raised eggs poached in rich tomato-bell pepper reduction with seared halloumi cheese cubes',
+    image: '/assets/food/halloumi-shakshuka-1.0.webp',
+    calories: 470,
+    protein: 30,
+    carbs: 24,
+    fats: 28,
+    prepTimeMinutes: 14,
+    category: 'Quick Fuel',
+    dietType: 'vegetarian',
+    tags: ['Choline Rich', 'High Calcium', 'Vegetarian', 'Fast Prep', 'Mediterranean'],
+    focusScore: '9.4/10',
+    description:
+      'Middle Eastern brunch classic elevated with crispy golden halloumi cheese. Rich in dietary choline, lycopene, and calcium. The runny egg yolks blend with roasted tomato juices for a deeply satisfying, low-glycemic fuel meal.',
+    ingredients: [
+      { item: 'Farm-Fresh Large Eggs', amount: '3 whole' },
+      { item: 'Halloumi Cheese or Firm Paneer (Cubed)', amount: '80g' },
+      { item: 'Crushed San Marzano Tomatoes / Tomato Puree', amount: '1 cup' },
+      { item: 'Sweet Red Bell Pepper & Onion', amount: '1/2 cup finely diced' },
+      { item: 'Ground Cumin, Smoked Paprika & Garlic', amount: '1 tbsp spice blend' },
+      { item: 'Olive Oil & Fresh Cilantro / Parsley', amount: '1 tbsp + handful herbs' }
+    ],
+    instructions: [
+      'Heat 1 tsp olive oil in a skillet; sear halloumi cubes for 2 minutes per side until golden brown and crispy; set aside.',
+      'In the same pan, sauté diced onion, bell pepper, and garlic with cumin and smoked paprika for 3 minutes.',
+      'Pour in crushed tomatoes and simmer on medium heat for 4 minutes until thickened.',
+      'Make 3 wells in sauce, crack in eggs, and scatter golden halloumi cubes around the pan.',
+      'Cover and cook on low heat for 3–4 minutes until whites are set and yolks remain molten. Garnish with fresh herbs.'
+    ]
+  },
+  {
+    id: 'japanese-teriyaki-chicken-donburi',
+    name: 'Glazed Teriyaki Chicken Donburi with Edamame',
+    subtitle: 'Pan-caramelized chicken thigh slices in sweet ginger-soy glaze over steamed rice with sweet edamame',
+    image: '/assets/food/teriyaki-chicken-1.0.webp',
+    calories: 540,
+    protein: 48,
+    carbs: 52,
+    fats: 14,
+    prepTimeMinutes: 16,
+    category: 'High Protein',
+    dietType: 'omnivore',
+    tags: ['High Protein', 'Japanese Bistro', 'Omnivore', 'Post Workout', 'Gym Favorite'],
+    focusScore: '9.5/10',
+    description:
+      'Japanese izakaya favorite made in 15 minutes. High-protein chicken thighs seared crisp and glazed in a simple 3-ingredient soy, ginger, and honey reduction over short-grain rice with steamed edamame.',
+    ingredients: [
+      { item: 'Boneless Skinless Chicken Thighs', amount: '260g' },
+      { item: 'Steamed Short-Grain White or Brown Rice', amount: '140g cooked' },
+      { item: 'Shelled Edamame Beans', amount: '60g steamed' },
+      { item: 'Tamari / Soy Sauce & Honey', amount: '2 tbsp soy + 1 tbsp honey' },
+      { item: 'Freshly Grated Ginger & Garlic', amount: '1 tsp each' },
+      { item: 'Toasted White Sesame Seeds & Sliced Scallions', amount: '1 tbsp each' }
+    ],
+    instructions: [
+      'Season chicken thighs with a pinch of sea salt and sear in a hot skillet for 4–5 minutes per side until deeply browned and cooked through.',
+      'Whisk soy sauce, honey, grated ginger, and minced garlic with 2 tbsp water.',
+      'Pour sauce directly into the hot pan around chicken; simmer vigorously for 90 seconds until sauce reduces to a glossy, bubbling lacquer.',
+      'Transfer chicken to a cutting board and slice into neat strips.',
+      'Ladle warm rice into a bowl, arrange sliced glazed chicken and bright green edamame side-by-side, drizzle residual pan glaze, and scatter sesame and scallions.'
+    ]
+  },
+  {
+    id: 'moroccan-chermoula-fish-fillet',
+    name: 'Moroccan Chermoula Seared White Fish & Couscous',
+    subtitle: 'Tender golden sea bass fillet drizzled with zesty cilantro-garlic chermoula over lemon herb couscous',
+    image: '/assets/food/chermoula-fish-1.0.webp',
+    calories: 430,
+    protein: 40,
+    carbs: 42,
+    fats: 10,
+    prepTimeMinutes: 12,
+    category: 'Quick Fuel',
+    dietType: 'pescatarian',
+    tags: ['Ultra Fast Prep', 'Clean Protein', 'Pescatarian', 'Mediterranean', 'Polyphenol Rich'],
+    focusScore: '9.3/10',
+    description:
+      'The fastest gourmet fish dinner in modern cooking. Fluffy couscous steams in 5 minutes with boiling water while tender white fish pan-sears in 5 minutes and is blanketed in fresh Moroccan herb chermoula.',
+    ingredients: [
+      { item: 'White Fish Fillet (Sea Bass, Cod, or Tilapia)', amount: '220g' },
+      { item: 'Instant Semolina Couscous', amount: '60g dry' },
+      { item: 'Fresh Cilantro & Parsley (Finely Chopped)', amount: '1/2 cup total' },
+      { item: 'Garlic Cloves, Ground Cumin & Paprika', amount: '2 cloves + 1/2 tsp each' },
+      { item: 'Extra Virgin Olive Oil & Fresh Lemon Juice', amount: '1.5 tbsp oil + 1 tbsp lemon' },
+      { item: 'Sea Salt & Cracked Pepper', amount: 'To taste' }
+    ],
+    instructions: [
+      'Place couscous in a bowl with a pinch of salt; pour 90ml boiling water, cover with a plate, and let steam for 5 minutes. Fluff with a fork and lemon zest.',
+      'Make quick chermoula: stir chopped cilantro, parsley, minced garlic, cumin, paprika, olive oil, lemon juice, and sea salt in a small cup.',
+      'Season fish fillet with salt and pepper; sear in a hot skillet with 1 tsp oil for 2.5 minutes per side until golden and flaky.',
+      'Spoon warm couscous onto a plate and set seared fish fillet on top.',
+      'Spoon generous spoonfuls of vibrant green chermoula over the warm fish and serve with lemon wedges.'
+    ]
+  },
+  {
+    id: 'tuscan-garlic-rosemary-steak',
+    name: 'Tuscan Garlic Rosemary Steak & Crisp Potatoes',
+    subtitle: 'Cast-iron seared ribeye steak basted with rosemary garlic butter served with golden roasted baby potatoes',
+    image: '/assets/food/tuscan-steak-1.0.webp',
+    calories: 580,
+    protein: 50,
+    carbs: 32,
+    fats: 26,
+    prepTimeMinutes: 18,
+    category: 'High Protein',
+    dietType: 'omnivore',
+    tags: ['High Bioavailability Iron', 'Massive Protein', 'Omnivore', 'Italian Classic', 'Post Workout'],
+    focusScore: '9.6/10',
+    description:
+      'Italian steakhouse perfection recreated on home stovetops. Lean tender beef steak seared in cast iron with crushed garlic and rosemary-infused butter, delivering heme iron, creatine, and 50g complete protein.',
+    ingredients: [
+      { item: 'Lean Sirloin or Ribeye Steak', amount: '250g' },
+      { item: 'Pre-Boiled Baby Potatoes (Halved)', amount: '140g' },
+      { item: 'Fresh Rosemary Sprigs & Garlic Cloves', amount: '2 sprigs + 3 cloves crushed' },
+      { item: 'Grass-Fed Butter or Ghee', amount: '1 tbsp' },
+      { item: 'Flaky Sea Salt & Coarse Black Pepper', amount: '1 tsp' },
+      { item: 'Aged Balsamic Drizzle (Optional)', amount: '1 tsp' }
+    ],
+    instructions: [
+      'Pat steak completely dry and season generously with flaky sea salt and coarse black pepper.',
+      'Heat a cast-iron skillet on high until smoking; add 1 tsp oil and lay steak down to sear for 3 minutes.',
+      'Flip steak; drop butter, crushed garlic, and rosemary sprigs into the hot pan.',
+      'Tilt pan and continuously spoon bubbling aromatic herb butter over the steak for 2 minutes for medium-rare.',
+      'In the same pan, toss halved baby potatoes in the remaining beef juices for 2 minutes until crispy; rest steak 5 minutes, slice across the grain, and serve.'
+    ]
+  },
+  {
+    id: 'greek-lemon-chicken-souvlaki',
+    name: 'Greek Lemon Chicken Souvlaki & Tzatziki Plate',
+    subtitle: 'Charred lemon-oregano chicken skewers with warm toasted pita triangles, tomato cucumber salad, and tzatziki',
+    image: '/assets/food/chicken-souvlaki-1.0.webp',
+    calories: 510,
+    protein: 48,
+    carbs: 36,
+    fats: 18,
+    prepTimeMinutes: 16,
+    category: 'High Protein',
+    dietType: 'omnivore',
+    tags: ['High Protein', 'Mediterranean', 'Omnivore', 'Clean Energy', 'Post Workout'],
+    focusScore: '9.4/10',
+    description:
+      'Classic Greek street food optimized for high protein and anti-inflammatory balance. Lean chicken breast cubes marinated in lemon, oregano, and garlic, seared on skewers and served with cool tzatziki and crisp salad.',
+    ingredients: [
+      { item: 'Boneless Chicken Breast (Cubed)', amount: '250g' },
+      { item: 'Dried Greek Oregano, Garlic & Lemon Juice', amount: '1 tbsp oregano + 2 cloves + 1 lemon' },
+      { item: 'Greek Yogurt Cucumber Tzatziki', amount: '3 tbsp' },
+      { item: 'Diced Cucumber, Tomato & Kalamata Olives', amount: '1 cup' },
+      { item: 'Whole Wheat Pita Bread', amount: '1 pita cut into triangles' },
+      { item: 'Olive Oil & Sea Salt', amount: '1 tbsp + to taste' }
+    ],
+    instructions: [
+      'Toss chicken cubes in olive oil, lemon juice, dried oregano, minced garlic, and sea salt.',
+      'Thread chicken onto 2 skewers and sear in a screaming-hot grill pan or cast iron for 3.5 minutes per side until charred.',
+      'Toast pita triangles in the pan for 60 seconds until warm and pliable.',
+      'Toss cucumber, tomato, and olives with a drop of olive oil and pinch of oregano.',
+      'Arrange skewers on a wide plate alongside warm pita triangles, crisp salad, and a ramekin of chilled tzatziki.'
+    ]
+  },
+  {
+    id: 'korean-crispy-tofu-bibimbap',
+    name: 'Korean Crispy Tofu & Sesame Bibimbap',
+    subtitle: 'Steamed short-grain rice topped with golden tofu cubes, seasoned spinach, kimchi, and a sunny egg',
+    image: '/assets/food/korean-bibimbap-1.0.webp',
+    calories: 510,
+    protein: 28,
+    carbs: 62,
+    fats: 16,
+    prepTimeMinutes: 14,
+    category: 'Steady Carbs',
+    dietType: 'vegetarian',
+    tags: ['Probiotic Kimchi', 'Plant & Egg Protein', 'Vegetarian', 'Korean Style', 'Gut Health'],
+    focusScore: '9.2/10',
+    description:
+      'Vibrant Korean staple engineered for gut microbiome biodiversity and steady glucose delivery. Pan-crisped tofu cubes and a runny pasture-raised egg provide complete proteins over warm rice with probiotic kimchi.',
+    ingredients: [
+      { item: 'Firm Soya Tofu (Cubed & Pressed)', amount: '180g' },
+      { item: 'Steamed Short-Grain Rice', amount: '150g cooked' },
+      { item: 'Farm-Fresh Egg', amount: '1 sunny-side up' },
+      { item: 'Traditional Fermented Kimchi', amount: '60g' },
+      { item: 'Blanched Sesame Spinach & Grated Carrots', amount: '1 cup total' },
+      { item: 'Gochujang / Tamari & Toasted Sesame Oil', amount: '1 tbsp each' }
+    ],
+    instructions: [
+      'Pan-sear tofu cubes in 1 tsp sesame oil on medium-high for 5 minutes until crispy on all edges.',
+      'Quickly flash-fry an egg sunny-side up until white is set but yolk remains liquid.',
+      'Layer warm steamed rice into the bottom of a wide ceramic bowl.',
+      'Arrange crispy tofu, fermented kimchi, blanched sesame spinach, and carrots in distinct colorful sections over rice.',
+      'Place the sunny-side-up egg in the center, drizzle with sesame oil and gochujang, and mix thoroughly before eating.'
+    ]
+  },
+  {
+    id: 'chimichurri-flank-steak',
+    name: 'Seared Flank Steak with Herb Chimichurri',
+    subtitle: 'Charred lean flank steak slices drizzled with zesty parsley-oregano chimichurri and sweet potato wedges',
+    image: '/assets/food/steak-chimichurri-1.0.webp',
+    calories: 550,
+    protein: 52,
+    carbs: 34,
+    fats: 20,
+    prepTimeMinutes: 18,
+    category: 'High Protein',
+    dietType: 'omnivore',
+    tags: ['Massive Protein', 'Heme Iron', 'Omnivore', 'Argentine Grill', 'Post Workout'],
+    focusScore: '9.6/10',
+    description:
+      'Argentine steakhouse staple prepared with lean flank steak and fresh uncooked herb chimichurri. Loaded with bioavailable iron, B-vitamins, and polyphenols to drive swift recovery without heavy digestion.',
+    ingredients: [
+      { item: 'Lean Flank or Skirt Steak', amount: '260g' },
+      { item: 'Roasted Sweet Potato Wedges', amount: '130g' },
+      { item: 'Fresh Flat-Leaf Parsley & Oregano', amount: '1/2 cup finely chopped' },
+      { item: 'Garlic Cloves & Red Wine Vinegar', amount: '2 cloves minced + 1 tbsp vinegar' },
+      { item: 'Extra Virgin Olive Oil & Red Chili Flakes', amount: '1.5 tbsp oil + 1/2 tsp chili' },
+      { item: 'Sea Salt & Black Pepper', amount: 'To taste' }
+    ],
+    instructions: [
+      'Whisk chopped parsley, oregano, minced garlic, red wine vinegar, olive oil, chili flakes, and sea salt into a punchy chimichurri sauce.',
+      'Heat a cast-iron skillet on high heat; season flank steak with salt and pepper.',
+      'Sear steak for 3.5 minutes per side for a deep crust and juicy medium center.',
+      'Transfer steak to a cutting board and allow to rest for 5 minutes so juices redistribute.',
+      'Slice thinly across the grain at a 45-degree angle; fan across plate with roasted sweet potato wedges and drizzle chimichurri generously.'
+    ]
   }
 ];
-

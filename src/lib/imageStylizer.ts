@@ -36,6 +36,33 @@ export const SPRITE_OPTIONS = [
 export function getBestMatchingSprite(name: string, category: string, dietType: string): string {
   const query = `${name} ${category} ${dietType}`.toLowerCase();
 
+  if (query.includes('salmon') || query.includes('orzo')) {
+    return '/assets/food/greek-salmon-1.0.png';
+  }
+  if (query.includes('thai') || (query.includes('curry') && query.includes('coconut'))) {
+    return '/assets/food/thai-curry-1.0.png';
+  }
+  if (query.includes('paella') || query.includes('saffron')) {
+    return '/assets/food/spanish-paella-1.0.png';
+  }
+  if (query.includes('halloumi')) {
+    return '/assets/food/halloumi-shakshuka-1.0.png';
+  }
+  if (query.includes('teriyaki') || query.includes('donburi')) {
+    return '/assets/food/teriyaki-chicken-1.0.png';
+  }
+  if (query.includes('chermoula') || query.includes('couscous')) {
+    return '/assets/food/chermoula-fish-1.0.png';
+  }
+  if (query.includes('steak') || query.includes('chimichurri') || query.includes('ribeye') || query.includes('sirloin')) {
+    return '/assets/food/tuscan-steak-1.0.png';
+  }
+  if (query.includes('souvlaki') || query.includes('gyro') || query.includes('tzatziki')) {
+    return '/assets/food/chicken-souvlaki-1.0.png';
+  }
+  if (query.includes('bibimbap') || query.includes('kimchi')) {
+    return '/assets/food/korean-bibimbap-1.0.png';
+  }
   if (query.includes('soya') || query.includes('soy chunk') || query.includes('pulao') || query.includes('nutrela')) {
     return '/assets/food/soya-pulao-1.0.png';
   }

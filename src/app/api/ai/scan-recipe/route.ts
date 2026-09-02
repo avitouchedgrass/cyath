@@ -240,16 +240,16 @@ const MAX_IMAGE_PAYLOAD_BYTES = 10 * 1024 * 1024; // 10MB
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. IP Sliding Window Rate Limiting (20 scans / min)
+    // 1. IP Sliding Window Rate Limiting (6 scans / min)
     const clientIp = getClientIp(req);
     const rateLimit = checkRateLimit('scan_recipe', clientIp, {
       windowMs: 60 * 1000,
-      maxRequests: 20,
+      maxRequests: 6,
     });
 
     if (!rateLimit.allowed) {
       return createRateLimitResponse(
-        'Scan request limit reached. Please wait a minute before scanning another meal.',
+        `Meal scan limit reached. Please wait ${rateLimit.retryAfterSeconds}s before scanning another dish.`,
         rateLimit.retryAfterSeconds
       );
     }

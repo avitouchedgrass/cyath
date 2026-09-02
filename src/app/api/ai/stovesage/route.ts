@@ -107,16 +107,16 @@ const MAX_CHAT_PAYLOAD_BYTES = 100 * 1024; // 100KB
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. IP Sliding Window Rate Limiting (30 requests / min)
+    // 1. IP Sliding Window Rate Limiting (12 requests / min)
     const clientIp = getClientIp(req);
     const rateLimit = checkRateLimit('stovesage_chat', clientIp, {
       windowMs: 60 * 1000,
-      maxRequests: 30,
+      maxRequests: 12,
     });
 
     if (!rateLimit.allowed) {
       return createRateLimitResponse(
-        'Chat rate limit reached. Please wait a moment before sending another message.',
+        `Chat limit reached. Please wait ${rateLimit.retryAfterSeconds}s before sending another message.`,
         rateLimit.retryAfterSeconds
       );
     }

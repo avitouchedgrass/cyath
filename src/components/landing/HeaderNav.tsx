@@ -153,9 +153,8 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
           ) : (
             <Link
               href={mounted && userSession ? "/dashboard" : "/login"}
-              className="border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer h-10"
+              className="border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 sm:px-5 rounded-full font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center cursor-pointer h-10"
             >
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
               <span className="hidden xs:inline">{mounted && userSession ? "Dashboard" : "Log In"}</span>
               <span className="xs:hidden">App</span>
             </Link>

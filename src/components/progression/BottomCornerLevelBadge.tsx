@@ -39,8 +39,7 @@ export function BottomCornerLevelBadge() {
         aria-label={`Current Level: Level ${progress.level}`}
       >
         {/* Floating Level Badge Circle */}
-        <div className="flex items-center gap-1.5 bg-[#FAF6EE] px-2 py-1 rounded-xl border border-[#1A3629]/30 group-hover:border-[#1A3629] transition-colors">
-          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+        <div className="flex items-center justify-center bg-[#FAF6EE] px-2.5 py-1 rounded-xl border border-[#1A3629]/30 group-hover:border-[#1A3629] transition-colors">
           <span className="font-cabinet text-xs font-black text-[#1A3629] tabular-nums">
             Lv.{progress.level}
           </span>

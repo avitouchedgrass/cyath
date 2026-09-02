@@ -359,8 +359,7 @@ export function StoveSageChatbot() {
               <div>
                 <h3 className="font-cabinet font-bold text-sm text-[#1A3629] flex items-center gap-2 leading-none">
                   <span>Cyath AI Coach</span>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full border border-[#10B981]/40 bg-[#ECFDF5] text-[#065F46] flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#FAF6EE] text-[#1A3629]">
                     Online
                   </span>
                 </h3>
@@ -571,7 +570,6 @@ export function StoveSageChatbot() {
           aria-label="Open Cyath AI Coach (Cmd+J)"
           title="Open Cyath AI Coach (⌘J / Ctrl+J)"
         >
-          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
           <span className="font-cabinet font-bold text-xs text-[#FFFDF9]">✦ AI Coach</span>
           <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#2C4A3B] border border-[#FFFDF9]/20 text-[#A7F3D0]">
             ⌘J

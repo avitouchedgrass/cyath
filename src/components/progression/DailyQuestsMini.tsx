@@ -114,7 +114,7 @@ export function DailyQuestsMini() {
                       retroAudio.playBlip();
                       claimQuest(quest.id, currentDate);
                     }}
-                    className="font-mono text-[10px] font-bold text-[#FFFDF9] bg-[#10B981] hover:bg-[#059669] px-2.5 py-1 rounded-md border border-[#1A3629] shadow-[1px_1px_0px_#1A3629] transition-all active:scale-95 cursor-pointer shrink-0 animate-pulse uppercase tracking-wider tabular-nums"
+                    className="font-mono text-[10px] font-bold text-[#FFFDF9] bg-[#10B981] hover:bg-[#059669] px-2.5 py-1 rounded-md border border-[#1A3629] shadow-[1px_1px_0px_#1A3629] transition-all active:scale-95 cursor-pointer shrink-0 uppercase tracking-wider tabular-nums"
                   >
                     Claim +{quest.xpAward} XP
                   </button>

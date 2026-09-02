@@ -228,6 +228,8 @@ export function PixelWaveDish({
       {/* Crisp 60fps Hardware-Accelerated 2D Canvas with Pixel-Wave Filter */}
       <canvas
         ref={canvasRef}
+        role="img"
+        aria-label="16-bit whole-food meal illustration preview"
         className="w-full h-full pixel-art select-none"
         style={{
           filter: 'url(#pixel-wave-subtle)',

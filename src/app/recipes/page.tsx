@@ -13,6 +13,7 @@ import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { formatLocalDate } from '@/lib/dateUtils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { SingleRecipeJsonLd } from '@/components/seo/JsonLd';
 
 const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -273,6 +274,7 @@ function RecipesContent() {
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col">
+      {selectedRecipe && <SingleRecipeJsonLd recipe={selectedRecipe} />}
       {/* Navigation Header */}
       <HeaderNav />
 
@@ -541,7 +543,7 @@ function RecipesContent() {
                       <div className="w-48 h-48 sm:w-52 sm:h-52 relative flex items-center justify-center">
                         <img
                           src={recipe.image}
-                          alt={recipe.name}
+                          alt={`${recipe.name} — ${recipe.protein}g protein whole-food plate`}
                           loading="lazy"
                           decoding="async"
                           onError={(e) => {

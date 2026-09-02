@@ -1,25 +1,80 @@
 import { MetadataRoute } from 'next';
+import { RECIPES } from '@/lib/recipes';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
   const currentDate = new Date().toISOString();
 
-  const routes: { path: string; changeFrequency: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly'; priority: number }[] = [
-    { path: '', changeFrequency: 'daily', priority: 1.0 },
-    { path: '/recipes', changeFrequency: 'daily', priority: 0.9 },
-    { path: '/protocols', changeFrequency: 'weekly', priority: 0.9 },
-    { path: '/correlations', changeFrequency: 'daily', priority: 0.85 },
-    { path: '/sanctuary', changeFrequency: 'weekly', priority: 0.8 },
-    { path: '/dashboard', changeFrequency: 'always', priority: 0.8 },
-    { path: '/auth', changeFrequency: 'monthly', priority: 0.6 },
-    { path: '/privacy', changeFrequency: 'monthly', priority: 0.4 },
-    { path: '/terms', changeFrequency: 'monthly', priority: 0.4 },
+  const staticRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 1.0,
+      images: [`${baseUrl}/assets/cyath-hero-preview.png`],
+    },
+    {
+      url: `${baseUrl}/recipes`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.95,
+      images: [`${baseUrl}/assets/food/greek-salmon-1.0.webp`],
+    },
+    {
+      url: `${baseUrl}/protocols`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/correlations`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/sanctuary`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/dashboard`,
+      lastModified: currentDate,
+      changeFrequency: 'always',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/auth`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
   ];
 
-  return routes.map((r) => ({
-    url: `${baseUrl}${r.path}`,
+  const recipeRoutes: MetadataRoute.Sitemap = RECIPES.map((recipe) => ({
+    url: `${baseUrl}/recipes?inspect=${encodeURIComponent(recipe.id)}`,
     lastModified: currentDate,
-    changeFrequency: r.changeFrequency,
-    priority: r.priority,
+    changeFrequency: 'weekly',
+    priority: 0.85,
+    images: [
+      recipe.image.startsWith('http')
+        ? recipe.image
+        : `${baseUrl}${recipe.image}`,
+    ],
   }));
+
+  return [...staticRoutes, ...recipeRoutes];
 }

@@ -47,15 +47,14 @@ export const TextType = ({
   reverseMode = false,
   ...props
 }: TextTypeProps) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+  const [displayedText, setDisplayedText] = useState(textArray[0] || '');
+  const [currentCharIndex, setCurrentCharIndex] = useState(textArray[0]?.length || 0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLElement>(null);
-
-  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
 
   const getRandomSpeed = useCallback(() => {
     if (!variableSpeed) return typingSpeed;

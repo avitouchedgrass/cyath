@@ -369,44 +369,84 @@ export default function DashboardPage() {
           </div>
 
           {/* Heatmap Grid */}
-          <div className={`grid gap-1.5 ${
-            historyRange === 7
-              ? 'grid-cols-7'
-              : 'grid-cols-7 sm:grid-cols-14 lg:grid-cols-28'
-          }`}>
-            {heatmapDays.map((day) => {
-              const isSelected = day.isSelected;
-              const levelClasses = {
-                0: 'bg-transparent border border-transparent text-[#1A3629]/40 hover:bg-black/5',
-                1: 'bg-[#E8E0D2] border border-[#1A3629]/30 text-[#1A3629]',
-                2: 'bg-[#C2D7C7] border border-[#1A3629]/60 text-[#1A3629] font-bold',
-                3: 'bg-[#6D9F80] border border-[#1A3629] text-[#FFFDF9] font-bold',
-                4: 'bg-[#1A3629] border border-[#1A3629] text-[#FFFDF9] font-black',
-              }[day.level];
+          {historyRange === 7 ? (
+            <div className="grid grid-cols-7 gap-2 sm:gap-3">
+              {heatmapDays.map((day) => {
+                const isSelected = day.isSelected;
+                const levelStyle = {
+                  0: 'bg-[#FAF6EE] border-[#1A3629]/20 text-[#1A3629]/60 hover:border-[#1A3629]/50 hover:bg-[#F4EFE6]',
+                  1: 'bg-[#E8DECF] border-[#1A3629]/30 text-[#1A3629]',
+                  2: 'bg-[#C2DCC9] border-[#1A3629]/50 text-[#1A3629] font-bold',
+                  3: 'bg-[#4E8B67] border-[#1A3629] text-[#FFFDF9] font-bold shadow-xs',
+                  4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-black shadow-xs',
+                }[day.level];
 
-              return (
-                <button
-                  key={day.dateStr}
-                  type="button"
-                  onClick={() => {
-                    retroAudio.playBlip();
-                    setDate(day.dateStr);
-                  }}
-                  className={`w-full aspect-square rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${levelClasses} ${
-                    isSelected ? 'ring-2 ring-[#1A3629] scale-105 font-bold shadow-xs' : 'hover:scale-105'
-                  }`}
-                  title={`${day.dateStr}: ${day.totalActions} actions ${day.isToday ? '(Today)' : '(Read-only)'}`}
-                >
-                  <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
-                    {day.dayNum}
-                  </span>
-                  <span className="text-[8px] font-mono mt-0.5 uppercase leading-none opacity-80">
-                    {day.dayName.charAt(0)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={day.dateStr}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setDate(day.dateStr);
+                    }}
+                    className={`h-20 sm:h-22 rounded-xl border-2 flex flex-col items-center justify-between p-2 transition-all cursor-pointer ${levelStyle} ${
+                      isSelected
+                        ? 'ring-2 ring-[#1A3629] ring-offset-2 ring-offset-[#FFFDF9] -translate-y-0.5 shadow-[3px_3px_0px_#1A3629]'
+                        : 'hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#1A3629]'
+                    }`}
+                    title={`${day.dateStr}: ${day.totalActions} actions ${day.isToday ? '(Today)' : '(Read-only)'}`}
+                  >
+                    <span className="text-[10px] font-mono uppercase tracking-wider opacity-80 leading-none">
+                      {day.dayName}
+                    </span>
+                    <span className="font-fraunces text-base sm:text-lg font-bold leading-none">
+                      {day.dayNum}
+                    </span>
+                    <span className="text-[9px] font-mono tabular-nums leading-none opacity-80">
+                      {day.totalActions === 0 ? '—' : `${day.totalActions} acts`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-7 sm:grid-cols-14 lg:grid-cols-28 gap-1.5">
+              {heatmapDays.map((day) => {
+                const isSelected = day.isSelected;
+                const levelStyle = {
+                  0: 'bg-[#FAF6EE] border-[#1A3629]/15 text-[#1A3629]/50 hover:bg-[#F4EFE6]',
+                  1: 'bg-[#E8DECF] border-[#1A3629]/30 text-[#1A3629]',
+                  2: 'bg-[#C2DCC9] border-[#1A3629]/50 text-[#1A3629] font-bold',
+                  3: 'bg-[#4E8B67] border-[#1A3629] text-[#FFFDF9] font-bold',
+                  4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-black',
+                }[day.level];
+
+                return (
+                  <button
+                    key={day.dateStr}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      setDate(day.dateStr);
+                    }}
+                    className={`h-10 sm:h-12 rounded-lg border flex flex-col items-center justify-center transition-all cursor-pointer ${levelStyle} ${
+                      isSelected
+                        ? 'ring-2 ring-[#1A3629] scale-105 font-bold shadow-xs'
+                        : 'hover:scale-105'
+                    }`}
+                    title={`${day.dateStr}: ${day.totalActions} actions ${day.isToday ? '(Today)' : '(Read-only)'}`}
+                  >
+                    <span className="text-[10px] font-mono tabular-nums leading-none font-bold">
+                      {day.dayNum}
+                    </span>
+                    <span className="text-[8px] font-mono mt-0.5 uppercase leading-none opacity-75">
+                      {day.dayName.charAt(0)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {!isViewingToday && (
             <div className="mt-3 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-xs font-mono text-[#92400E] bg-[#FEF3C7]/60 px-3 py-2 rounded-lg border border-[#D97706]/30">

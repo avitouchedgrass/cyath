@@ -20,6 +20,7 @@ const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
 const DIET_FILTERS = [
   { id: 'All', label: 'All Diets' },
   { id: 'Vegetarian', label: 'Vegetarian' },
+  { id: 'Eggetarian', label: 'Eggetarian' },
   { id: 'Vegan', label: 'Vegan' },
   { id: 'Pescatarian', label: 'Pescatarian' },
   { id: 'Omnivore', label: 'Omnivore' },
@@ -38,6 +39,12 @@ function getDietBadgeDetails(dietType?: string) {
         label: 'Vegan',
         dotColor: 'bg-[#10B981]',
         pillStyle: 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/60',
+      };
+    case 'eggetarian':
+      return {
+        label: 'Eggetarian',
+        dotColor: 'bg-[#EAB308]',
+        pillStyle: 'bg-[#FEFCE8] text-[#854D0E] border-[#EAB308]/60',
       };
     case 'vegetarian':
       return {
@@ -193,9 +200,10 @@ function RecipesContent() {
       const matchesDiet =
         selectedDietFilter === 'All' ||
         (selectedDietFilter === 'Vegetarian' && (r.dietType === 'vegetarian' || r.dietType === 'vegan')) ||
+        (selectedDietFilter === 'Eggetarian' && r.dietType === 'eggetarian') ||
         (selectedDietFilter === 'Vegan' && r.dietType === 'vegan') ||
-        (selectedDietFilter === 'Pescatarian' && (r.dietType === 'pescatarian' || r.dietType === 'vegetarian' || r.dietType === 'vegan')) ||
-        (selectedDietFilter === 'Omnivore' && (r.dietType === 'omnivore' || !r.dietType));
+        (selectedDietFilter === 'Pescatarian' && r.dietType === 'pescatarian') ||
+        (selectedDietFilter === 'Omnivore' && r.dietType === 'omnivore');
 
       const query = searchQuery.trim().toLowerCase();
       const matchesSearch =

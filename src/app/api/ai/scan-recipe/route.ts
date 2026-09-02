@@ -34,7 +34,7 @@ Your task:
    - Fats (g)
 4. Classify:
    - category: strictly one of ["High Protein", "Steady Carbs", "Quick Fuel", "Keto Clean", "Post Workout"]
-   - dietType: strictly one of ["vegetarian", "vegan", "pescatarian", "omnivore"]
+   - dietType: strictly one of ["vegetarian", "vegan", "eggetarian", "pescatarian", "omnivore"]
 5. Provide culinary preparation instructions to recreate the dish.
 
 Output strictly valid JSON matching this schema:
@@ -42,7 +42,7 @@ Output strictly valid JSON matching this schema:
   "name": "string",
   "subtitle": "string",
   "category": "High Protein" | "Steady Carbs" | "Quick Fuel" | "Keto Clean" | "Post Workout",
-  "dietType": "vegetarian" | "vegan" | "pescatarian" | "omnivore",
+  "dietType": "vegetarian" | "vegan" | "eggetarian" | "pescatarian" | "omnivore",
   "calories": number,
   "protein": number,
   "carbs": number,

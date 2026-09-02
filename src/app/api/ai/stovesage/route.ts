@@ -62,7 +62,7 @@ You MUST respond strictly in valid JSON matching this schema:
         // "title": string, "category": "morning" | "nutrition" | "movement" | "evening" | "recovery" | "custom"
 
         // For ADD_RECIPE (only for brand new custom recipes):
-        // "name": string, "subtitle": string, "category": "High Protein" | "Steady Carbs" | "Quick Fuel" | "Keto Clean" | "Post Workout", "dietType": "omnivore" | "vegetarian" | "vegan" | "pescatarian", "calories": number, "protein": number, "carbs": number, "fats": number, "prepTimeMinutes": number, "focusScore": string, "ingredients": [{"item": string, "amount": string}], "instructions": [string], "tags": [string]
+        // "name": string, "subtitle": string, "category": "High Protein" | "Steady Carbs" | "Quick Fuel" | "Keto Clean" | "Post Workout", "dietType": "omnivore" | "vegetarian" | "eggetarian" | "vegan" | "pescatarian", "calories": number, "protein": number, "carbs": number, "fats": number, "prepTimeMinutes": number, "focusScore": string, "ingredients": [{"item": string, "amount": string}], "instructions": [string], "tags": [string]
 
         // For SET_METRIC:
         // "metric": "protein" | "hydration" | "sleep" | "energy" | "mood", "value": number

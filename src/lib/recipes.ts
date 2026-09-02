@@ -10,7 +10,7 @@ export interface Recipe {
   fats: number;
   prepTimeMinutes: number;
   category: 'High Protein' | 'Steady Carbs' | 'Quick Fuel' | 'Keto Clean' | 'Post Workout';
-  dietType: 'vegetarian' | 'vegan' | 'pescatarian' | 'omnivore';
+  dietType: 'vegetarian' | 'vegan' | 'eggetarian' | 'pescatarian' | 'omnivore';
   tags: string[];
   focusScore: string;
   description: string;
@@ -115,8 +115,8 @@ export const RECIPES: Recipe[] = [
     fats: 28,
     prepTimeMinutes: 12,
     category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Choline Rich', 'Brain Fuel', 'Vegetarian', 'Morning Alert'],
+    dietType: 'eggetarian',
+    tags: ['Choline Rich', 'Brain Fuel', 'Eggetarian', 'Morning Alert'],
     focusScore: '9.1/10',
     description:
       'Loaded with dietary choline and healthy fats from pasture-raised yolks to stimulate morning acetylcholine production, alertness, and mental clarity.',
@@ -228,8 +228,8 @@ export const RECIPES: Recipe[] = [
     fats: 18,
     prepTimeMinutes: 10,
     category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Fast Prep', 'Healthy Fats', 'Vegetarian', 'Breakfast'],
+    dietType: 'eggetarian',
+    tags: ['Fast Prep', 'Healthy Fats', 'Eggetarian', 'Breakfast'],
     focusScore: '9.0/10',
     description:
       'Whole-grain sourdough toast paired with rich avocado and eggs for steady morning energy.',
@@ -264,8 +264,8 @@ export const RECIPES: Recipe[] = [
     fats: 14,
     prepTimeMinutes: 14,
     category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Clean Fuel', 'Japanese Minimalist', 'Vegetarian', 'Daily Staple'],
+    dietType: 'eggetarian',
+    tags: ['Clean Fuel', 'Japanese Minimalist', 'Eggetarian', 'Daily Staple'],
     focusScore: '8.8/10',
     description:
       'Clean, hypoallergenic fuel with easily assimilated rice starches and high-quality egg albumen. Perfect pre-training fuel or recovery comfort bowl.',
@@ -464,8 +464,8 @@ export const RECIPES: Recipe[] = [
     fats: 18,
     prepTimeMinutes: 20,
     category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Choline Rich', 'Omnivore', 'Post Workout'],
+    dietType: 'eggetarian',
+    tags: ['High Protein', 'Choline Rich', 'Eggetarian', 'Post Workout'],
     focusScore: '9.2/10',
     description:
       'A beloved roadside dhaba staple featuring farm eggs lightly pan-seared in turmeric and chili until blistered, then simmered in a reduced tomato, onion, and roasted garam masala gravy. High in natural choline and leucine for muscle protein synthesis and neural resilience.',
@@ -520,39 +520,6 @@ export const RECIPES: Recipe[] = [
     ]
   },
   {
-    id: 'desi-skillet-shakshuka',
-    name: 'Desi Skillet Shakshuka with Poached Eggs',
-    subtitle: 'Runny pasture-raised eggs poached in spiced tomato, bell pepper, and roasted cumin reduction',
-    image: '/assets/food/desi-shakshuka-1.0.webp',
-    calories: 420,
-    protein: 28,
-    carbs: 22,
-    fats: 24,
-    prepTimeMinutes: 15,
-    category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Choline Rich', 'Fast Prep', 'Vegetarian', 'Brain Fuel', 'Low Carb'],
-    focusScore: '9.2/10',
-    description:
-      'A vibrant cross between Mediterranean shakshuka and Indian tomato-egg curry. Rich in dietary choline, carotenoids, and lycopene. The runny yolks create an unctuous sauce when scooped with hot roti or crisp toast.',
-    ingredients: [
-      { item: 'Farm-Fresh Large Eggs', amount: '3 whole' },
-      { item: 'Ripe Plum Tomatoes', amount: '3 finely chopped' },
-      { item: 'Green Bell Pepper (Capsicum)', amount: '1/2 diced' },
-      { item: 'Red Onion & Garlic', amount: '1 small diced + 3 cloves minced' },
-      { item: 'Roasted Jeera, Smoked Paprika & Coriander', amount: '1 tbsp blend' },
-      { item: 'Olive Oil or Desi Ghee', amount: '1 tbsp' },
-      { item: 'Fresh Coriander & Green Chili', amount: 'For garnish' }
-    ],
-    instructions: [
-      'Heat olive oil or ghee in a skillet; sauté cumin seeds, onions, garlic, and diced capsicum until soft.',
-      'Add chopped tomatoes, turmeric, paprika, coriander, and salt; simmer for 6–7 minutes until thick and glossy.',
-      'Make 3 small hollow wells in the simmering tomato sauce and crack eggs directly into each well.',
-      'Cover with lid on medium-low heat for 3–4 minutes until egg whites are set but yolks remain molten and runny.',
-      'Scatter fresh chopped coriander and green chilies; serve immediately hot from the skillet with warm phulkas or toast.'
-    ]
-  },
-  {
     id: 'paneer-kathi-roll',
     name: 'Tawa Paneer Tikka Kathi Roll',
     subtitle: 'Spiced charred paneer batons wrapped in whole-wheat flatbread with mint chutney and crisp onions',
@@ -596,8 +563,8 @@ export const RECIPES: Recipe[] = [
     fats: 14,
     prepTimeMinutes: 12,
     category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Quick Fuel', 'Fast Prep', 'Vegetarian', 'Comfort Food'],
+    dietType: 'eggetarian',
+    tags: ['Quick Fuel', 'Fast Prep', 'Eggetarian', 'Comfort Food'],
     focusScore: '8.9/10',
     description:
       'The ultimate quick pantry dish using leftover rice and eggs. Fast-absorbing carbs combine with protein and toasted garlic for a quick, energizing meal.',
@@ -662,8 +629,8 @@ export const RECIPES: Recipe[] = [
     fats: 12,
     prepTimeMinutes: 12,
     category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['High Fiber', 'Fast Prep', 'Vegetarian', 'Morning Fuel', 'Steady Energy'],
+    dietType: 'eggetarian',
+    tags: ['High Fiber', 'Fast Prep', 'Eggetarian', 'Morning Fuel', 'Steady Energy'],
     focusScore: '9.1/10',
     description:
       'Rolled oats simmered with golden turmeric, cumin, and vegetables, topped with a soft-boiled egg for clean, satisfying morning fuel.',
@@ -824,8 +791,8 @@ export const RECIPES: Recipe[] = [
     fats: 18,
     prepTimeMinutes: 8,
     category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Fast Prep', 'Choline Rich', 'Vegetarian', 'Street Classic', 'Breakfast'],
+    dietType: 'eggetarian',
+    tags: ['Fast Prep', 'Choline Rich', 'Eggetarian', 'Street Classic', 'Breakfast'],
     focusScore: '9.1/10',
     description:
       'The beloved Indian roadside upgrade to European French toast. Whisked eggs infused with finely minced red onions, fiery green chilies, cilantro, and turmeric, crisped in a skillet for an instant 8-minute protein breakfast.',
@@ -1248,8 +1215,8 @@ export const RECIPES: Recipe[] = [
     fats: 28,
     prepTimeMinutes: 14,
     category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Choline Rich', 'High Calcium', 'Vegetarian', 'Fast Prep', 'Mediterranean'],
+    dietType: 'eggetarian',
+    tags: ['Choline Rich', 'High Calcium', 'Eggetarian', 'Fast Prep', 'Mediterranean'],
     focusScore: '9.4/10',
     description:
       'Middle Eastern brunch classic elevated with crispy golden halloumi cheese. Rich in dietary choline, lycopene, and calcium. The runny egg yolks blend with roasted tomato juices for a deeply satisfying, low-glycemic fuel meal.',
@@ -1355,7 +1322,7 @@ export const RECIPES: Recipe[] = [
       { item: 'Fresh Rosemary Sprigs & Garlic Cloves', amount: '2 sprigs + 3 cloves crushed' },
       { item: 'Grass-Fed Butter or Ghee', amount: '1 tbsp' },
       { item: 'Flaky Sea Salt & Coarse Black Pepper', amount: '1 tsp' },
-      { item: 'Aged Balsamic Drizzle (Optional)', amount: '1 tsp' }
+{ item: 'Aged Balsamic Drizzle (Optional)', amount: '1 tsp' }
     ],
     instructions: [
       'Pat steak completely dry and season generously with flaky sea salt and coarse black pepper.',
@@ -1408,8 +1375,8 @@ export const RECIPES: Recipe[] = [
     fats: 16,
     prepTimeMinutes: 14,
     category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Probiotic Kimchi', 'Plant & Egg Protein', 'Vegetarian', 'Korean Style', 'Gut Health'],
+    dietType: 'eggetarian',
+    tags: ['Probiotic Kimchi', 'Plant & Egg Protein', 'Eggetarian', 'Korean Style', 'Gut Health'],
     focusScore: '9.2/10',
     description:
       'Vibrant Korean staple engineered for gut microbiome biodiversity and steady glucose delivery. Pan-crisped tofu cubes and a runny pasture-raised egg provide complete proteins over warm rice with probiotic kimchi.',

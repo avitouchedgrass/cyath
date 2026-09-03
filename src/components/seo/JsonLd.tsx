@@ -181,7 +181,7 @@ function buildRecipeSchema(recipe: Recipe) {
   const imageUrl = recipe.image.startsWith('http')
     ? recipe.image
     : `${SITE_URL}${recipe.image}`;
-  const recipeUrl = `${SITE_URL}/recipes?inspect=${encodeURIComponent(recipe.id)}`;
+  const recipeUrl = `${SITE_URL}/recipes/${encodeURIComponent(recipe.id)}`;
 
   return {
     '@type': 'Recipe',
@@ -244,6 +244,134 @@ export function RecipeListJsonLd({ recipes }: { recipes: Recipe[] }) {
       position: index + 1,
       item: buildRecipeSchema(recipe),
     })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+export function ProtocolsJsonLd() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Circadian Health Protocols & Guided Routines',
+    description:
+      'Evidence-based daily routines for morning sunlight, deep sleep restoration, sustained mental focus, and muscle recovery.',
+    url: `${SITE_URL}/protocols`,
+    itemListElement: [
+      {
+        '@type': 'HowTo',
+        position: 1,
+        name: 'Morning Sunlight & Energy Protocol',
+        description: 'Clears morning grogginess and resets your circadian clock in 15 minutes.',
+        totalTime: 'PT30M',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: '15m outdoor morning sunlight',
+            text: 'Get 10-15 minutes of natural sunlight in your eyes without sunglasses to reset your master circadian clock.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: '500ml water with pinch of sea salt',
+            text: 'Rehydrate cells and replenish morning electrolytes with filtered water and a pinch of unrefined sea salt.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: 'Cold splash or quick rinse',
+            text: 'Splash cold water on your face or take a brisk cold rinse to naturally elevate cortisol and morning alertness.',
+          },
+        ],
+      },
+      {
+        '@type': 'HowTo',
+        position: 2,
+        name: 'Deep Focus Sprint Protocol',
+        description: 'Protects focus and metabolic energy for deep creative and analytical work.',
+        totalTime: 'PT90M',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: 'Zero phone input first 30 mins',
+            text: 'Protect dopamine and attention by leaving phone notifications off for the first 30 minutes of the morning.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: 'High-protein breakfast (35g+)',
+            text: 'Consume whole-food protein (eggs, smoked salmon, or Greek yogurt) to stabilize blood sugar without a mid-morning crash.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: '90-min single-task work block',
+            text: 'Work on your single highest-leverage task for 90 uninterrupted minutes aligned with ultradian rhythms.',
+          },
+        ],
+      },
+      {
+        '@type': 'HowTo',
+        position: 3,
+        name: 'Restful Sleep Wind-Down Protocol',
+        description: 'Calms your nervous system and triggers melatonin production for deep, restorative sleep.',
+        totalTime: 'PT60M',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: 'Screens off 60 mins before bed',
+            text: 'Eliminate blue and bright white screens 60 minutes before sleep to allow endogenous melatonin secretion.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: 'Cool bedroom temperature (~67°F)',
+            text: 'Lower room temperature to 65-68°F to facilitate natural core body temperature drop required for REM sleep.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: 'Evening relaxation tea or mineral magnesium',
+            text: 'Sip hot herbal chamomile or take bioavailable magnesium glycinate to relax smooth muscles and calm neural excitation.',
+          },
+        ],
+      },
+      {
+        '@type': 'HowTo',
+        position: 4,
+        name: 'Daily Movement & Posture Protocol',
+        description: 'Improves metabolic glucose clearance and undoes postural stagnation throughout the work day.',
+        totalTime: 'PT20M',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: 'Post-meal 10-min walk',
+            text: 'Take a brisk 10-minute walk after lunch or dinner to stimulate GLUT4 transporters and blunt glucose spikes by up to 30%.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: 'Desk mobility and thoracic opening',
+            text: 'Perform 2 minutes of shoulder rolls, neck stretches, and thoracic extensions every 60 minutes at your workstation.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: 'Zone 2 aerobic flush',
+            text: 'Complete 20 minutes of nasal-breathing aerobic movement (walking, light cycling, or rucking) to build mitochondrial density.',
+          },
+        ],
+      },
+    ],
   };
 
   return (

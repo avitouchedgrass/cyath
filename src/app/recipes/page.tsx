@@ -14,6 +14,7 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { formatLocalDate } from '@/lib/dateUtils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SingleRecipeJsonLd } from '@/components/seo/JsonLd';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 
 const CATEGORIES = ['All', 'Custom', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean', 'Post Workout'] as const;
 const PORTION_MULTIPLIERS = [0.5, 1.0, 1.5, 2.0] as const;
@@ -980,6 +981,7 @@ function RecipesContent() {
           setTimeout(() => setLoggedToast(null), 4000);
         }}
       />
+      <SiteFooter />
     </div>
   );
 }

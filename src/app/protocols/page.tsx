@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 
 interface ProtocolBlueprint {
   id: string;
@@ -219,7 +220,7 @@ export default function ProtocolsPage() {
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
-              Guided Routines
+              Circadian Health Protocols &amp; Guided Routines
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
               Science-backed daily habit routines for morning energy, deep focus, and better sleep.
@@ -465,7 +466,7 @@ export default function ProtocolsPage() {
           </div>
         </div>
       )}
-
+      <SiteFooter />
     </div>
   );
 }

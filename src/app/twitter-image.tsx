@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
 export const alt = 'Cyath · 16-Bit Metabolic Health & Habit Engine';
 export const size = {
   width: 1200,

@@ -9,6 +9,7 @@ import { InteractiveCorrelationMatrix, MatrixDataPoint } from '@/components/corr
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Activity, Sparkles, TrendingUp, BarChart3, Info } from 'lucide-react';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 
 export default function CorrelationsPage() {
   const [timeHorizon, setTimeHorizon] = useState<7 | 14 | 30>(14);
@@ -66,7 +67,7 @@ export default function CorrelationsPage() {
         <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
-              Habit Insights
+              Daily Pattern &amp; Energy Insights
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
               See how your meals, sleep, and daily habits directly affect your energy and focus.
@@ -233,6 +234,7 @@ export default function CorrelationsPage() {
         </div>
 
       </main>
+      <SiteFooter />
     </div>
   );
 }

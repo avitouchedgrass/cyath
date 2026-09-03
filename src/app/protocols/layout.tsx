@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
+import { ProtocolsJsonLd } from '@/components/seo/JsonLd';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
 export const metadata: Metadata = {
-  title: 'Circadian Health Protocols',
+  title: 'Circadian Health Protocols & Guided Routines',
   description:
     'Evidence-based daily routines for morning sunlight, deep sleep restoration, sustained mental focus, and muscle recovery.',
   alternates: {
@@ -28,5 +29,10 @@ export default function ProtocolsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <ProtocolsJsonLd />
+      {children}
+    </>
+  );
 }

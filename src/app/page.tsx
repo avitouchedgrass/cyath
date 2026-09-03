@@ -8,6 +8,7 @@ import { TextType } from '@/components/reactbits/TextType';
 import { InteractiveCorrelationMatrix } from '@/components/correlations/InteractiveCorrelationMatrix';
 import { useHabitStore } from '@/store/useHabitStore';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 
 const STEP_LOOP = [
   {
@@ -600,99 +601,7 @@ export default function Home() {
 
       </main>
 
-      {/* ========================================================================= */}
-      {/* 6. RETRO FIELD-GUIDE FOOTER */}
-      {/* ========================================================================= */}
-      <footer className="relative z-10 border-t-4 border-[#1A3629] bg-[#EFE9DF] pt-16 pb-12 px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b-2 border-[#1A3629]/20">
-          
-          {/* Col 1 & 2: Brand & Mission */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="font-pixel font-bold text-2xl tracking-wider lowercase text-[#1A3629]">
-                cyath
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold">
-                v1.0 Retro
-              </span>
-            </div>
-            <p className="text-xs font-cabinet font-medium max-w-sm leading-relaxed text-[#2C4A3B]">
-              A simple daily habit and nutrition journal built on 30-second check-ins, whole-food recipes, and clear personal discoveries.
-            </p>
-          </div>
-
-          {/* Col 3: Platform */}
-          <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Platform</div>
-            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
-              <li>
-                <Link href="/dashboard" className="hover:underline">Daily Planner</Link>
-              </li>
-              <li>
-                <Link href="/sanctuary" className="hover:underline">Island Sanctuary</Link>
-              </li>
-              <li>
-                <Link href="/correlations" className="hover:underline">Personal Discoveries</Link>
-              </li>
-              <li>
-                <Link href="/protocols" className="hover:underline">Daily Blueprints</Link>
-              </li>
-              <li>
-                <Link href="/recipes" className="hover:underline">Whole-Food Recipes</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 4: Protocols */}
-          <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Blueprints</div>
-            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
-              <li>
-                <Link href="/protocols" className="hover:underline">Morning Sunlight &amp; Energy</Link>
-              </li>
-              <li>
-                <Link href="/protocols" className="hover:underline">Restful Sleep Wind-Down</Link>
-              </li>
-              <li>
-                <Link href="/protocols" className="hover:underline">Deep Focus Sprint</Link>
-              </li>
-              <li>
-                <Link href="/protocols" className="hover:underline">Daily Movement &amp; Posture</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 5: Account & Legal */}
-          <div className="space-y-3">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Account &amp; Legal</div>
-            <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
-              <li>
-                <Link href="/auth" className="hover:underline">Sign Up</Link>
-              </li>
-              <li>
-                <Link href="/login" className="hover:underline">Log In</Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:underline">Terms of Service</Link>
-              </li>
-            </ul>
-          </div>
-
-        </div>
-
-        {/* Bottom copyright line */}
-        <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold text-[#2C4A3B]">
-          <div>© {new Date().getFullYear()} cyath. Handcrafted with retro precision.</div>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
-            <span>·</span>
-            <Link href="/terms" className="hover:underline">Terms of Service</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

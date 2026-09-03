@@ -13,12 +13,22 @@ interface BreadcrumbsProps {
   className?: string;
 }
 
+const DEFAULT_ROUTE_MAP: Record<string, string> = {
+  'Fuel Recipes': '/recipes',
+  'Guided Routines': '/protocols',
+  'Daily Insights': '/correlations',
+  'Sanctuary': '/sanctuary',
+  'Profile': '/profile',
+  'Privacy Policy': '/privacy',
+  'Terms of Service': '/terms',
+};
+
 export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
   const allItems = [{ label: 'Home', href: '/' }, ...items];
 
   const jsonLdItems = allItems.map((item) => ({
     name: item.label,
-    item: item.href || '/',
+    item: item.href || DEFAULT_ROUTE_MAP[item.label] || `/${item.label.toLowerCase().replace(/\s+/g, '-')}`,
   }));
 
   return (

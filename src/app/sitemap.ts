@@ -65,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const recipeRoutes: MetadataRoute.Sitemap = RECIPES.map((recipe) => ({
-    url: `${baseUrl}/recipes?inspect=${encodeURIComponent(recipe.id)}`,
+    url: `${baseUrl}/recipes/${encodeURIComponent(recipe.id)}`,
     lastModified: currentDate,
     changeFrequency: 'weekly',
     priority: 0.85,

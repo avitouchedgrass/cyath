@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
 export const alt = 'Cyath · 16-Bit Metabolic Health & Habit Engine';
 export const size = {
   width: 1200,
@@ -94,6 +93,8 @@ export default async function Image() {
         >
           <div
             style={{
+              display: 'flex',
+              flexDirection: 'column',
               fontSize: '64px',
               fontWeight: '900',
               color: '#1A3629',
@@ -101,9 +102,8 @@ export default async function Image() {
               letterSpacing: '-2px',
             }}
           >
-            Pixel-Perfect Habits.
-            <br />
-            Calibrated Whole-Food Fuel.
+            <span>Pixel-Perfect Habits.</span>
+            <span>Calibrated Whole-Food Fuel.</span>
           </div>
           <div
             style={{

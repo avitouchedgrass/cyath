@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { RECIPES } from '@/lib/recipes';
 import { RecipeListJsonLd } from '@/components/seo/JsonLd';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
 export const metadata: Metadata = {
   title: 'Whole-Food Fuel Recipes',

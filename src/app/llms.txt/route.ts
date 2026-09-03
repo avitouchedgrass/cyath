@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-const LLMS_TEXT_CONTENT = `# Cyath (https://cyath.health)
+const LLMS_TEXT_CONTENT = `# Cyath (https://cyath.space)
 
 > A retro 16-bit metabolic health and daily habit platform combining 30-second daily check-ins, whole-food fuel recipes, circadian protocols, and statistical energy correlations.
 

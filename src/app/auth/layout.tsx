@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
 export const metadata: Metadata = {
   title: 'Sign In & Account Access',

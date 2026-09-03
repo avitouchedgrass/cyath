@@ -1,7 +1,7 @@
 import React from 'react';
 import { Recipe } from '@/lib/recipes';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
 export function GlobalJsonLd() {
   const websiteSchema = {
@@ -177,13 +177,19 @@ export function BreadcrumbsJsonLd({ items }: { items: { name: string; item: stri
   );
 }
 
-export function SingleRecipeJsonLd({ recipe }: { recipe: Recipe }) {
-  const schema = {
-    '@context': 'https://schema.org',
+function buildRecipeSchema(recipe: Recipe) {
+  const imageUrl = recipe.image.startsWith('http')
+    ? recipe.image
+    : `${SITE_URL}${recipe.image}`;
+  const recipeUrl = `${SITE_URL}/recipes?inspect=${encodeURIComponent(recipe.id)}`;
+
+  return {
     '@type': 'Recipe',
     name: recipe.name,
+    headline: recipe.subtitle || recipe.name,
     description: recipe.description,
-    image: recipe.image.startsWith('http') ? recipe.image : `${SITE_URL}${recipe.image}`,
+    url: recipeUrl,
+    image: [imageUrl],
     recipeCategory: recipe.category,
     recipeCuisine: 'Healthy Whole-Food',
     author: {
@@ -207,8 +213,18 @@ export function SingleRecipeJsonLd({ recipe }: { recipe: Recipe }) {
     recipeInstructions: recipe.instructions.map((inst, idx) => ({
       '@type': 'HowToStep',
       position: idx + 1,
+      name: `Step ${idx + 1}`,
       text: inst,
+      url: `${recipeUrl}#step-${idx + 1}`,
+      image: imageUrl,
     })),
+  };
+}
+
+export function SingleRecipeJsonLd({ recipe }: { recipe: Recipe }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    ...buildRecipeSchema(recipe),
   };
 
   return (
@@ -226,30 +242,7 @@ export function RecipeListJsonLd({ recipes }: { recipes: Recipe[] }) {
     itemListElement: recipes.map((recipe, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      item: {
-        '@type': 'Recipe',
-        name: recipe.name,
-        description: recipe.description,
-        image: recipe.image.startsWith('http') ? recipe.image : `${SITE_URL}${recipe.image}`,
-        recipeCategory: recipe.category,
-        recipeCuisine: 'Healthy Whole-Food',
-        prepTime: `PT${recipe.prepTimeMinutes}M`,
-        cookTime: `PT${recipe.prepTimeMinutes}M`,
-        totalTime: `PT${recipe.prepTimeMinutes}M`,
-        nutrition: {
-          '@type': 'NutritionInformation',
-          calories: `${recipe.calories} calories`,
-          proteinContent: `${recipe.protein} g`,
-          carbohydrateContent: `${recipe.carbs} g`,
-          fatContent: `${recipe.fats} g`,
-        },
-        recipeIngredient: recipe.ingredients.map((i) => `${i.amount} ${i.item}`),
-        recipeInstructions: recipe.instructions.map((inst, idx) => ({
-          '@type': 'HowToStep',
-          position: idx + 1,
-          text: inst,
-        })),
-      },
+      item: buildRecipeSchema(recipe),
     })),
   };
 

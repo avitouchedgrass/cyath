@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { RECIPES } from '@/lib/recipes';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.health';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
   const currentDate = new Date().toISOString();
 
   const staticRoutes: MetadataRoute.Sitemap = [

@@ -16,6 +16,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export default function SanctuaryPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState<'matrix' | 'archive'>('matrix');
   const { userSession, totalXp, streakCount } = useHabitStore();
 
   useEffect(() => {
@@ -39,8 +40,6 @@ export default function SanctuaryPage() {
       </div>
     );
   }
-
-  const [activeTab, setActiveTab] = useState<'matrix' | 'archive'>('matrix');
 
   return (
     <div className="min-h-[100dvh] bg-[#F4F0EA] text-[#1A3629] flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">

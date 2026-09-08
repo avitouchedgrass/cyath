@@ -138,7 +138,7 @@ export const RECIPES: Recipe[] = [
   {
     id: 'smoked-citrus-taco-bowl',
     name: 'Smoked Citrus Fiesta Taco Bowl',
-    subtitle: 'Grass-fed lean beef, black beans, sweet corn, and lime pico',
+    subtitle: 'Lean seasoned chicken breast, black beans, sweet corn, and lime pico',
     image: '/assets/food/taco-bowl-1.0.webp',
     portionImages: {
       0.5: '/assets/food/taco-bowl-0.5.webp',
@@ -146,19 +146,19 @@ export const RECIPES: Recipe[] = [
       1.5: '/assets/food/taco-bowl-1.5.webp',
       2.0: '/assets/food/taco-bowl-2.0.webp',
     },
-    calories: 560,
-    protein: 42,
+    calories: 540,
+    protein: 44,
     carbs: 48,
-    fats: 16,
-    prepTimeMinutes: 22,
+    fats: 12,
+    prepTimeMinutes: 20,
     category: 'High Protein',
     dietType: 'omnivore',
     tags: ['High Protein', 'Whole Food', 'Comfort Classic', 'Clean Energy'],
     focusScore: '9.5/10',
     description:
-      'Rich protein and essential minerals from steak and eggs to restore energy and support muscle recovery.',
+      'Lean protein and complex carbohydrates to restore steady energy and support daily performance.',
     ingredients: [
-      { item: '90/10 Grass-Fed Minced Beef', amount: '180g' },
+      { item: 'Lean Seasoned Chicken Breast or Poultry', amount: '180g' },
       { item: 'Simmered Black Beans', amount: '80g' },
       { item: 'Fire-Roasted Sweet Corn', amount: '50g' },
       { item: 'Charred Tomato Pico de Gallo', amount: '3 tbsp' },
@@ -166,10 +166,10 @@ export const RECIPES: Recipe[] = [
       { item: 'Fresh Lime Wedges', amount: '2 slices' }
     ],
     instructions: [
-      'Brown minced beef in a hot pan, breaking into bite-sized crumbles.',
+      'Sear seasoned chicken in a hot skillet, slicing into bite-sized strips.',
       'Add cumin, coriander, chipotle, and 2 tbsp water; simmer for 4 minutes.',
       'Warm black beans and sweet corn with a pinch of sea salt.',
-      'Arrange beef, beans, and corn in equal sections in a wide shallow bowl.',
+      'Arrange chicken, beans, and corn in equal sections in a wide shallow bowl.',
       'Top with fresh pico de gallo and squeeze fresh lime juice right before enjoying.'
     ]
   },
@@ -456,7 +456,7 @@ export const RECIPES: Recipe[] = [
   {
     id: 'dhabawala-egg-curry',
     name: 'Dhabawala Spiced Egg Curry & Basmati',
-    subtitle: 'Golden pan-crisped farm eggs in a robust onion-tomato masala and steamed rice',
+    subtitle: 'Golden pan-crisped farm eggs in a spiced onion-tomato masala and steamed rice',
     image: '/assets/food/egg-curry-1.0.webp',
     calories: 490,
     protein: 30,
@@ -501,7 +501,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Plant Protein', 'Soya Nugget', 'Vegan', 'Post Workout', 'Easy One-Pot'],
     focusScore: '9.3/10',
     description:
-      'Soya chunks deliver over 52% protein density by dry weight. Tempered with fragrant cumin, cloves, cardamom, and fresh mint, this one-pot powerhouse restocks glycogen and supplies high BCAAs with minimal digestive drag.',
+      'Soya chunks deliver over 52% protein density by dry weight. Tempered with fragrant cumin, cloves, cardamom, and fresh mint, this one-pot meal restocks glycogen and supplies complete amino acids.',
     ingredients: [
       { item: 'Soya Chunks (Nutrela / Soy Nuggets)', amount: '60g dry' },
       { item: 'Aged Basmati Rice', amount: '80g dry' },
@@ -567,7 +567,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Quick Fuel', 'Fast Prep', 'Eggetarian', 'Comfort Food'],
     focusScore: '8.9/10',
     description:
-      'The ultimate quick pantry dish using leftover rice and eggs. Fast-absorbing carbs combine with protein and toasted garlic for a quick, energizing meal.',
+      'A quick pantry meal using leftover rice and eggs. Fast-absorbing carbs combine with protein and toasted garlic for an easy, energizing meal.',
     ingredients: [
       { item: 'Chilled Steamed Rice (Basmati or Jasmine)', amount: '180g cooked' },
       { item: 'Farm-Fresh Large Eggs', amount: '3 whisked' },
@@ -666,7 +666,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Ultra High Protein', 'Keto Clean', 'Omnivore', 'Post Workout', 'Thermogenic'],
     focusScore: '9.4/10',
     description:
-      'Southern Indian culinary mastery engineered for extreme protein density. Freshly ground piperine enhances nutrient assimilation, revs thermogenesis, and pairs with lean poultry cuts for rapid myofibrillar repair.',
+      'A classic South Indian pepper chicken recipe seasoned with freshly ground black pepper, curry leaves, and tender poultry for a high-protein meal.',
     ingredients: [
       { item: 'Boneless Chicken Thigh or Breast (cubed)', amount: '250g' },
       { item: 'Coarsely Crushed Black Peppercorns', amount: '1.5 tbsp freshly ground' },
@@ -746,7 +746,7 @@ export const RECIPES: Recipe[] = [
       'Heat coconut oil in a kadai or skillet; sputter mustard seeds, urad dal, and hing until dal is golden.',
       'Toss in green chili and curry leaves for 15 seconds until aromatic.',
       'Add the warm boiled black chickpeas, season with pink rock salt, and toss for 2 minutes to absorb flavors.',
-      'Turn off heat, fold in freshly grated coconut and fresh lemon juice; enjoy warm as a powerhouse protein snack or lunch bowl.'
+      'Turn off heat, fold in freshly grated coconut and fresh lemon juice; enjoy warm as a high-protein snack or lunch bowl.'
     ]
   },
   {
@@ -827,7 +827,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Zero Cook', 'Plant Protein', 'Vegetarian', 'Clean Balance', 'Fiber Rich'],
     focusScore: '9.2/10',
     description:
-      'No stove required if using cooked chickpeas. Combines prebiotic legumes with crisp hydrating vegetables, aged crumbled cheese, and polyphenol-dense extra virgin olive oil for effortless digestive vitality.',
+      'No stove required if using cooked chickpeas. Combines legumes with crisp hydrating vegetables, crumbled cheese, and extra virgin olive oil for healthy digestion.',
     ingredients: [
       { item: 'Boiled Kabuli Chana (Chickpeas)', amount: '180g' },
       { item: 'Diced English Cucumber & Cherry Tomatoes', amount: '1/2 cup each' },
@@ -926,7 +926,7 @@ export const RECIPES: Recipe[] = [
     tags: ['High Plant Protein', 'Isoflavone Rich', 'Vegan', 'Japanese Style', 'Post Workout'],
     focusScore: '9.4/10',
     description:
-      'High-yield plant protein powerhouse. Firm soya tofu cubes are pressed and pan-seared until crispy, then coated in a rich umami reduction of dark soy sauce, grated ginger, and toasted sesame seeds. Delivers complete branched-chain amino acids for lean muscle synthesis.',
+      'A high-protein plant-based meal. Firm tofu cubes are pressed and pan-seared until crispy, then coated in a reduction of dark soy sauce, grated ginger, and toasted sesame seeds.',
     ingredients: [
       { item: 'Firm Soya Tofu (Pressed & Cubed)', amount: '240g' },
       { item: 'Fresh Broccoli Florets', amount: '150g' },
@@ -959,7 +959,7 @@ export const RECIPES: Recipe[] = [
     tags: ['High Fiber', 'Glycogen Storage', 'Vegan', 'Mexican Style', 'Clean Fuel'],
     focusScore: '9.1/10',
     description:
-      'A nutrient-dense Latin American favorite easily crafted with Indian pantry essentials. Black beans (or tender small Kashmiri rajma) provide deep antioxidant anthocyanins, resistant starch, and sustained glucose delivery. Fresh coriander, tomatoes, and lime juice optimize micronutrient absorption.',
+      'A nutrient-dense Latin American meal made with simple pantry staples. Black beans (or tender small Kashmiri rajma) provide fiber, resistant starch, and sustained energy. Fresh coriander, tomatoes, and lime juice bring bright acidity.',
     ingredients: [
       { item: 'Boiled Black Beans or Small Kashmiri Rajma', amount: '200g tender' },
       { item: 'Sweet Corn Kernels (Steamed or Charred)', amount: '80g' },
@@ -1025,7 +1025,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Plant Fats', 'Prebiotic Fiber', 'Vegan', 'Thai Style', 'Quick Fuel'],
     focusScore: '8.9/10',
     description:
-      'Silky rice noodles tossed in an emulsified sauce of natural roasted ground peanuts, dark soy sauce, green chilies, and lime juice. Loaded with crunchy raw cabbage and cucumbers for enzymatic digestion and sustained daytime vitality.',
+      'Silky rice noodles tossed in a sauce of natural roasted ground peanuts, dark soy sauce, green chilies, and lime juice. Loaded with crunchy raw cabbage and cucumbers for digestion and sustained daytime energy.',
     ingredients: [
       { item: 'Rice Noodles or Whole Wheat Hakka Noodles', amount: '80g dry' },
       { item: '100% Roasted Peanut Butter (Unsweetened)', amount: '2 tbsp (32g)' },
@@ -1219,7 +1219,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Choline Rich', 'High Calcium', 'Eggetarian', 'Fast Prep', 'Mediterranean'],
     focusScore: '9.4/10',
     description:
-      'Middle Eastern brunch classic elevated with crispy golden halloumi cheese. Rich in dietary choline, lycopene, and calcium. The runny egg yolks blend with roasted tomato juices for a deeply satisfying, low-glycemic fuel meal.',
+      'A Middle Eastern shakshuka topped with seared halloumi cheese. Rich in dietary choline and calcium. The runny egg yolks blend with roasted tomato juices for a satisfying meal.',
     ingredients: [
       { item: 'Farm-Fresh Large Eggs', amount: '3 whole' },
       { item: 'Halloumi Cheese or Firm Paneer (Cubed)', amount: '80g' },
@@ -1301,38 +1301,6 @@ export const RECIPES: Recipe[] = [
     ]
   },
   {
-    id: 'tuscan-garlic-rosemary-steak',
-    name: 'Tuscan Garlic Rosemary Steak & Crisp Potatoes',
-    subtitle: 'Cast-iron seared ribeye steak basted with rosemary garlic butter served with golden roasted baby potatoes',
-    image: '/assets/food/tuscan-steak-1.0.webp',
-    calories: 580,
-    protein: 50,
-    carbs: 32,
-    fats: 26,
-    prepTimeMinutes: 18,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Bioavailability Iron', 'Massive Protein', 'Omnivore', 'Italian Classic', 'Post Workout'],
-    focusScore: '9.6/10',
-    description:
-      'Italian steakhouse perfection recreated on home stovetops. Lean tender beef steak seared in cast iron with crushed garlic and rosemary-infused butter, delivering heme iron, creatine, and 50g complete protein.',
-    ingredients: [
-      { item: 'Lean Sirloin or Ribeye Steak', amount: '250g' },
-      { item: 'Pre-Boiled Baby Potatoes (Halved)', amount: '140g' },
-      { item: 'Fresh Rosemary Sprigs & Garlic Cloves', amount: '2 sprigs + 3 cloves crushed' },
-      { item: 'Grass-Fed Butter or Ghee', amount: '1 tbsp' },
-      { item: 'Flaky Sea Salt & Coarse Black Pepper', amount: '1 tsp' },
-{ item: 'Aged Balsamic Drizzle (Optional)', amount: '1 tsp' }
-    ],
-    instructions: [
-      'Pat steak completely dry and season generously with flaky sea salt and coarse black pepper.',
-      'Heat a cast-iron skillet on high until smoking; add 1 tsp oil and lay steak down to sear for 3 minutes.',
-      'Flip steak; drop butter, crushed garlic, and rosemary sprigs into the hot pan.',
-      'Tilt pan and continuously spoon bubbling aromatic herb butter over the steak for 2 minutes for medium-rare.',
-      'In the same pan, toss halved baby potatoes in the remaining beef juices for 2 minutes until crispy; rest steak 5 minutes, slice across the grain, and serve.'
-    ]
-  },
-  {
     id: 'greek-lemon-chicken-souvlaki',
     name: 'Greek Lemon Chicken Souvlaki & Tzatziki Plate',
     subtitle: 'Charred lemon-oregano chicken skewers with warm toasted pita triangles, tomato cucumber salad, and tzatziki',
@@ -1379,7 +1347,7 @@ export const RECIPES: Recipe[] = [
     tags: ['Probiotic Kimchi', 'Plant & Egg Protein', 'Eggetarian', 'Korean Style', 'Gut Health'],
     focusScore: '9.2/10',
     description:
-      'Vibrant Korean staple engineered for gut microbiome biodiversity and steady glucose delivery. Pan-crisped tofu cubes and a runny pasture-raised egg provide complete proteins over warm rice with probiotic kimchi.',
+      'A classic Korean rice bowl with probiotic kimchi, pan-crisped tofu, and an egg for balanced protein, fiber, and sustained energy.',
     ingredients: [
       { item: 'Firm Soya Tofu (Cubed & Pressed)', amount: '180g' },
       { item: 'Steamed Short-Grain Rice', amount: '150g cooked' },
@@ -1394,38 +1362,6 @@ export const RECIPES: Recipe[] = [
       'Layer warm steamed rice into the bottom of a wide ceramic bowl.',
       'Arrange crispy tofu, fermented kimchi, blanched sesame spinach, and carrots in distinct colorful sections over rice.',
       'Place the sunny-side-up egg in the center, drizzle with sesame oil and gochujang, and mix thoroughly before eating.'
-    ]
-  },
-  {
-    id: 'chimichurri-flank-steak',
-    name: 'Seared Flank Steak with Herb Chimichurri',
-    subtitle: 'Charred lean flank steak slices drizzled with zesty parsley-oregano chimichurri and sweet potato wedges',
-    image: '/assets/food/steak-chimichurri-1.0.webp',
-    calories: 550,
-    protein: 52,
-    carbs: 34,
-    fats: 20,
-    prepTimeMinutes: 18,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['Massive Protein', 'Heme Iron', 'Omnivore', 'Argentine Grill', 'Post Workout'],
-    focusScore: '9.6/10',
-    description:
-      'Argentine steakhouse staple prepared with lean flank steak and fresh uncooked herb chimichurri. Loaded with bioavailable iron, B-vitamins, and polyphenols to drive swift recovery without heavy digestion.',
-    ingredients: [
-      { item: 'Lean Flank or Skirt Steak', amount: '260g' },
-      { item: 'Roasted Sweet Potato Wedges', amount: '130g' },
-      { item: 'Fresh Flat-Leaf Parsley & Oregano', amount: '1/2 cup finely chopped' },
-      { item: 'Garlic Cloves & Red Wine Vinegar', amount: '2 cloves minced + 1 tbsp vinegar' },
-      { item: 'Extra Virgin Olive Oil & Red Chili Flakes', amount: '1.5 tbsp oil + 1/2 tsp chili' },
-      { item: 'Sea Salt & Black Pepper', amount: 'To taste' }
-    ],
-    instructions: [
-      'Whisk chopped parsley, oregano, minced garlic, red wine vinegar, olive oil, chili flakes, and sea salt into a punchy chimichurri sauce.',
-      'Heat a cast-iron skillet on high heat; season flank steak with salt and pepper.',
-      'Sear steak for 3.5 minutes per side for a deep crust and juicy medium center.',
-      'Transfer steak to a cutting board and allow to rest for 5 minutes so juices redistribute.',
-      'Slice thinly across the grain at a 45-degree angle; fan across plate with roasted sweet potato wedges and drizzle chimichurri generously.'
     ]
   }
 ];
@@ -1457,7 +1393,6 @@ export function findClosestRecipe(customDish: {
     { keys: ['tofu'], ids: ['japanese-sesame-tofu-stirfry', 'vietnamese-crispy-tofu-spring-rolls', 'korean-crispy-tofu-bibimbap'] },
     { keys: ['salmon', 'white fish', 'cod', 'trout', 'fish'], ids: ['greek-lemon-herb-salmon', 'moroccan-chermoula-fish-fillet'] },
     { keys: ['prawn', 'shrimp', 'seafood'], ids: ['garlic-prawn-linguine', 'thai-red-coconut-curry-prawns'] },
-    { keys: ['steak', 'beef', 'tenderloin', 'ribeye', 'sirloin'], ids: ['chimichurri-flank-steak', 'tuscan-garlic-rosemary-steak'] },
     { keys: ['paneer', 'cottage cheese'], ids: ['paneer-bhurji-tiffin', 'paneer-kathi-roll', 'besan-paneer-chilla'] },
     { keys: ['egg', 'eggs', 'omelet', 'scramble', 'frittata'], ids: ['cast-iron-skillet-eggs', 'tamago-sesame-rice-bowl', 'dhabawala-egg-curry', 'garlic-chili-egg-fried-rice', 'masala-french-toast', 'mediterranean-halloumi-shakshuka'] },
     { keys: ['pasta', 'tagliatelle', 'fettuccine', 'spaghetti', 'linguine', 'noodle', 'noodles'], ids: ['truffle-tagliatelle-pasta', 'thai-peanut-sesame-noodles', 'garlic-prawn-linguine'] },

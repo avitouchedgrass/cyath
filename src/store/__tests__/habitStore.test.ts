@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useHabitStore } from '../useHabitStore';
 import { Recipe } from '@/lib/recipes';
+import { extractReferralCode } from '@/lib/referralUtils';
+import { getDailyCommandProtocol, getDailyBriefing } from '@/lib/dailyProtocolEngine';
+import { formatLocalDate } from '@/lib/dateUtils';
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
@@ -260,6 +263,14 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     const duplicateClaim = await useHabitStore.getState().claimReferralCode('CYATH-DIFF');
     expect(duplicateClaim.success).toBe(false);
     expect(duplicateClaim.message).toContain('already claimed');
+
+    // Verify extractReferralCode cleanly parses full URLs and bare codes
+    expect(extractReferralCode('https://www.cyath.space/auth?ref=AVITE-RRYW')).toBe('AVITE-RRYW');
+    expect(extractReferralCode('HTTPS://WWW.CYATH.SPACE/AUTH?REF=AVITE-RRYW')).toBe('AVITE-RRYW');
+    expect(extractReferralCode('AVITE-RRYW')).toBe('AVITE-RRYW');
+    expect(extractReferralCode('https://cyath.space/auth?ref=ALEX-8K9L&source=twitter')).toBe('ALEX-8K9L');
+    expect(extractReferralCode('')).toBe('');
+    expect(extractReferralCode(null)).toBe('');
   });
 
   it('completes pioneer walkthrough and awards +50 XP calibration quest bonus', () => {
@@ -281,6 +292,93 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     useHabitStore.getState().completeWalkthrough();
     expect(useHabitStore.getState().totalXp).toBe(50);
     expect(useHabitStore.getState().xpHistory.length).toBe(1);
+  });
+
+  it('manages daily command protocol commitments, rewards +50 XP, and executes desk rituals', () => {
+    const today = formatLocalDate();
+    useHabitStore.getState().setDate(today);
+
+    // 1. Daily Protocol Engine hypothesis generation
+    const protocol = getDailyCommandProtocol(today, 'focus');
+    expect(protocol.id).toBeDefined();
+    expect(protocol.title).toBeDefined();
+    expect(protocol.directive).toBeDefined();
+    expect(protocol.xpReward).toBe(50);
+
+    // Test sleep deficit triggers Adenosine Reset
+    const deficitProtocol = getDailyCommandProtocol(today, 'focus', {
+      habitsCompleted: {},
+      totalProteinLogged: 50,
+      totalCaloriesLogged: 1200,
+      hydrationLiters: 1.5,
+      sleepHours: 5.5,
+      energyLevel: 4,
+      moodScore: 5,
+      notes: '',
+      loggedRecipeIds: [],
+    });
+    expect(deficitProtocol.id).toBe('delay-caffeine-90m');
+
+    // 2. Daily Briefing Generation
+    const briefing = getDailyBriefing(today, {
+      fullName: 'Dr. John',
+      age: 30,
+      sex: 'male',
+      heightCm: 180,
+      weightKg: 75,
+      primaryGoal: 'focus',
+      allergies: [],
+      dietaryRestrictions: [],
+      onboardingCompleted: true,
+    });
+    expect(briefing.greeting).toContain('John');
+    expect(briefing.yesterdayHighlights.length).toBeGreaterThan(0);
+
+    // 3. Store actions: Accept Protocol
+    expect(useHabitStore.getState().dailyProtocolsAcceptedByDate[today]).toBeUndefined();
+    const initialXp = useHabitStore.getState().totalXp;
+
+    useHabitStore.getState().acceptDailyProtocol(today);
+    expect(useHabitStore.getState().dailyProtocolsAcceptedByDate[today]).toBe(true);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+
+    // Second accept should be idempotent
+    useHabitStore.getState().acceptDailyProtocol(today);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+
+    // 4. Store actions: Complete Protocol
+    useHabitStore.getState().completeDailyProtocol(today);
+    expect(useHabitStore.getState().dailyProtocolsCompletedByDate[today]).toBe(true);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
+
+    // 5. Store actions: Morning Boot
+    useHabitStore.getState().completeMorningBoot({
+      sleepHours: 8.0,
+      restedRating: 9,
+      sunlightDone: true,
+      targetFocusHours: 5,
+    }, today);
+
+    const rituals = useHabitStore.getState().deskRitualsByDate[today];
+    expect(rituals.morningBootCompleted).toBe(true);
+    expect(rituals.morningRestedRating).toBe(9);
+    expect(rituals.targetFocusHours).toBe(5);
+    expect(useHabitStore.getState().getDailyLog(today).sleepHours).toBe(8.0);
+    // Morning Boot awards +50 XP ritual + 15 XP for checking the sunlight habit
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 165);
+
+    // 6. Store actions: Evening Wrap
+    useHabitStore.getState().completeEveningWrap({
+      caffeineCutoffRespected: true,
+      wholeFoodRating: 5,
+      afternoonSlumpScore: 2,
+    }, today);
+
+    const updatedRituals = useHabitStore.getState().deskRitualsByDate[today];
+    expect(updatedRituals.eveningWrapCompleted).toBe(true);
+    expect(updatedRituals.afternoonSlumpScore).toBe(2);
+    // Evening Wrap awards +50 XP ritual + 15 XP for checking digital sunset habit
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 230);
   });
 });
 

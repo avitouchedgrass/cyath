@@ -352,7 +352,7 @@ export default function Home() {
                     </h3>
                   </div>
                   <p className="text-xs sm:text-sm font-cabinet font-medium mb-6 text-[#2C4A3B]">
-                    Curated whole-food recipes with step-by-step prep and retro pixel art.
+                    Whole-food recipes with step-by-step prep and retro pixel art.
                   </p>
 
                   <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-3">

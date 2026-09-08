@@ -61,7 +61,7 @@ export const ISLAND_TIERS: IslandTier[] = [
   { tier: 7, minLevel: 28, name: 'The Forest Haven', image: '/islands/r7.webp', description: 'An expansive woodland island of verified daily discipline.' },
   { tier: 8, minLevel: 35, name: 'The Celestial Observatory', image: '/islands/r8.webp', description: 'Reaching into the stars with brass spires and hanging lanterns.' },
   { tier: 9, minLevel: 42, name: 'The Skylands Estate', image: '/islands/r9.webp', description: 'A grand multi-tier sky estate overlooking the morning clouds.' },
-  { tier: 10, minLevel: 50, name: 'The Eden Canopy', image: '/islands/r10.webp', description: 'The pinnacle sky haven, vibrant and blooming.' },
+  { tier: 10, minLevel: 50, name: 'The Eden Canopy', image: '/islands/r10.webp', description: 'The canopy sanctuary, vibrant and blooming.' },
 ];
 
 export function getIslandTier(level: number): IslandTier {

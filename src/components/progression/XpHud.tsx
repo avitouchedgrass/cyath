@@ -38,7 +38,7 @@ export function XpHud() {
             </span>
           </div>
           <p className="font-mono text-[11px] text-[#4A5D4E] mt-0.5">
-            {progress.isMaxLevel ? 'Pinnacle Level Reached' : `${progress.xpForNextLevel - progress.currentLevelXp} XP needed for Level ${progress.level + 1}`}
+            {progress.isMaxLevel ? 'Maximum Level Reached' : `${progress.xpForNextLevel - progress.currentLevelXp} XP needed for Level ${progress.level + 1}`}
           </p>
         </div>
       </div>

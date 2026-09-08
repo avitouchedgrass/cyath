@@ -84,11 +84,12 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-4 sm:px-6 lg:px-12 transition-transform duration-300 ease-out pointer-events-none ${
-        isVisible || isMobileMenuOpen ? "translate-y-0" : "-translate-y-full"
-      }`}
-    >
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-center px-4 sm:px-6 lg:px-12 transition-transform duration-300 ease-out pointer-events-none ${
+          isVisible || isMobileMenuOpen ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
       <div className="w-full max-w-7xl relative flex items-center justify-between pointer-events-auto">
         
         {/* Left: Authentic Lowercase Pixel Brand Text */}
@@ -130,6 +131,17 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
         {/* Right: Referral Action + User Nav Actions + Mobile Menu Toggle */}
         <div className="flex items-center gap-2 sm:gap-3 z-10">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
+            className="hidden lg:flex items-center gap-1 border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4EDE0] px-3 rounded-full font-mono text-xs font-semibold shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-[1px] active:translate-x-[1px] active:shadow-none transition-all cursor-pointer h-10 select-none"
+            title="Open Command Palette (Cmd+K / Ctrl+K)"
+            aria-label="Open Command Palette"
+          >
+            <span className="text-[10px] opacity-60">⌘</span>
+            <span>K</span>
+          </button>
+
           {mounted && (
             <button
               type="button"
@@ -172,11 +184,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
           </button>
         </div>
 
-        {/* Guild Invite Modal */}
-        <GuildInviteModal
-          isOpen={isInviteModalOpen}
-          onClose={() => setIsInviteModalOpen(false)}
-        />
 
         {/* Mobile Navigation Drawer Sheet (<768px) */}
         {isMobileMenuOpen && (
@@ -237,5 +244,12 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
       </div>
     </header>
+
+    {/* Guild Invite Modal */}
+    <GuildInviteModal
+      isOpen={isInviteModalOpen}
+      onClose={() => setIsInviteModalOpen(false)}
+    />
+  </>
   );
 }

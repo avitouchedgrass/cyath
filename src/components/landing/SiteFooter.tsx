@@ -111,7 +111,7 @@ export function SiteFooter({ className = '' }: SiteFooterProps) {
 
       {/* Bottom copyright line */}
       <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono font-bold text-[#2C4A3B]">
-        <div>© {new Date().getFullYear()} cyath. Handcrafted with retro precision.</div>
+        <div>© {new Date().getFullYear()} Cyath.</div>
         <div className="flex items-center gap-4">
           <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
           <span>·</span>

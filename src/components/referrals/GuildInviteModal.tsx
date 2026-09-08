@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { extractReferralCode } from '@/lib/referralUtils';
 import { Gift, Copy, Check, X, Share2 } from 'lucide-react';
 
 interface GuildInviteModalProps {
@@ -12,10 +14,15 @@ interface GuildInviteModalProps {
 
 export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
   const { userProfile, userSession, claimReferralCode } = useHabitStore();
+  const [mounted, setMounted] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [referralInput, setReferralInput] = useState('');
   const [referralMsg, setReferralMsg] = useState<{ text: string; isError?: boolean } | null>(null);
   const [isClaimingRef, setIsClaimingRef] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const userReferralCode = userProfile?.referralCode || 'CYATH-JOIN';
   const inviteUrl = typeof window !== 'undefined'
@@ -33,7 +40,9 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
+
+  const displayReferredBy = extractReferralCode(userProfile?.referredBy) || userProfile?.referredBy || 'INVITE';
 
   const handleCopyInviteLink = async () => {
     retroAudio.playInspectConfirm();
@@ -64,11 +73,16 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/70 backdrop-blur-sm animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A3629]/70 backdrop-blur-sm animate-fade-in"
     >
       <div className="relative w-full max-w-lg bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#1A3629] flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
         
@@ -192,7 +206,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
           ) : (
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#065F46]">
               <Check className="w-4 h-4 text-[#10B981]" />
-              <span>Referral Bonus Claimed ({userProfile.referredBy || 'INVITE'})</span>
+              <span>Referral Bonus Claimed ({displayReferredBy})</span>
             </div>
           )}
 
@@ -211,6 +225,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
           Close
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

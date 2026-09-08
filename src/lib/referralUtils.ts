@@ -16,6 +16,22 @@ export interface ReferralValidationResult {
 }
 
 /**
+ * Extracts a clean referral code from a string that might be either a bare code
+ * (e.g. "AVITE-RRYW") or a full URL/path (e.g. "https://www.cyath.space/auth?ref=AVITE-RRYW").
+ */
+export function extractReferralCode(input?: string | null): string {
+  if (!input || typeof input !== 'string') return '';
+  let str = input.trim();
+  const refMatch = str.match(/[?&]ref=([^&#\s]+)/i);
+  if (refMatch && refMatch[1]) {
+    str = decodeURIComponent(refMatch[1]);
+  } else if (str.includes('/')) {
+    str = str.split('/').filter(Boolean).pop() || '';
+  }
+  return str.replace(/[^a-zA-Z0-9-]/g, '').trim().toUpperCase();
+}
+
+/**
  * Validates that an input is a genuine referral code and NOT a full website URL or invalid string.
  */
 export function validateReferralCodeInput(input: unknown): ReferralValidationResult {

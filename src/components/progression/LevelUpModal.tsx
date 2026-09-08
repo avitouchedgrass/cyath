@@ -151,7 +151,7 @@ export function LevelUpModal() {
           type="button"
           className="w-full py-3 px-6 bg-[#1A3629] text-[#FFFDF9] font-cabinet text-sm font-bold rounded-xl border-2 border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
         >
-          Continue Journey →
+          Continue →
         </button>
       </div>
     </div>

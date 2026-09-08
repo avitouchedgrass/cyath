@@ -10,6 +10,7 @@ import { IslandCenterStage } from '@/components/progression/IslandCenterStage';
 import { HabitCalendarMini } from '@/components/progression/HabitCalendarMini';
 import { StreakCardMini } from '@/components/progression/StreakCardMini';
 import { HabitStatsCard } from '@/components/progression/HabitStatsCard';
+import { BiologicalReflectionMatrix } from '@/components/sanctuary/BiologicalReflectionMatrix';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function SanctuaryPage() {
@@ -38,6 +39,8 @@ export default function SanctuaryPage() {
       </div>
     );
   }
+
+  const [activeTab, setActiveTab] = useState<'matrix' | 'archive'>('matrix');
 
   return (
     <div className="min-h-[100dvh] bg-[#F4F0EA] text-[#1A3629] flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
@@ -81,12 +84,58 @@ export default function SanctuaryPage() {
           />
         </section>
 
-        {/* Bottom Consistency & Progress Grid (3 Balanced Cards) */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start mt-4">
-          <HabitStatsCard />
-          <StreakCardMini />
-          <HabitCalendarMini />
-        </section>
+        {/* Sanctuary Console View Switcher */}
+        <div className="w-full flex items-center justify-between border-b-2 border-[#1A3629]/15 pb-3 pt-2">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('matrix')}
+              className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'matrix'
+                  ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                  : 'bg-[#FFFDF9] border-2 border-[#1A3629] text-[#1A3629] hover:bg-[#FAF8F5]'
+              }`}
+            >
+              <span>◈</span>
+              <span>Biological Reflection Matrix</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('archive')}
+              className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'archive'
+                  ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
+                  : 'bg-[#FFFDF9] border-2 border-[#1A3629] text-[#1A3629] hover:bg-[#FAF8F5]'
+              }`}
+            >
+              <span>◷</span>
+              <span>Historical Archive & Cadence</span>
+            </button>
+          </div>
+
+          <span className="hidden sm:inline font-mono text-[11px] text-[#4A5D4E]">
+            {activeTab === 'matrix' ? 'Real-time physiological telemetry' : 'Cumulative activity & streaks'}
+          </span>
+        </div>
+
+        {/* View Mode 1: Biological Reflection Matrix */}
+        {activeTab === 'matrix' && (
+          <section className="w-full animate-in fade-in duration-300">
+            <BiologicalReflectionMatrix />
+          </section>
+        )}
+
+        {/* View Mode 2: Historical Archive & Activity Grid */}
+        {activeTab === 'archive' && (
+          <section className="w-full animate-in fade-in duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+              <HabitStatsCard />
+              <StreakCardMini />
+              <HabitCalendarMini />
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

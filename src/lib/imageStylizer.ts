@@ -54,9 +54,6 @@ export function getBestMatchingSprite(name: string, category: string, dietType: 
   if (query.includes('chermoula') || query.includes('couscous')) {
     return '/assets/food/chermoula-fish-1.0.png';
   }
-  if (query.includes('steak') || query.includes('chimichurri') || query.includes('ribeye') || query.includes('sirloin')) {
-    return '/assets/food/tuscan-steak-1.0.png';
-  }
   if (query.includes('souvlaki') || query.includes('gyro') || query.includes('tzatziki')) {
     return '/assets/food/chicken-souvlaki-1.0.png';
   }

@@ -3,23 +3,23 @@ import type { Metadata } from 'next';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
 export const metadata: Metadata = {
-  title: 'Pioneer Calibration & Goal Setup',
+  title: 'Daily Plan & Habit Setup',
   description:
-    'Calibrate your personalized daily protein target, primary energy goal, and custom habit baseline in under 60 seconds on Cyath.',
+    'Set up your daily hydration, protein targets, and core habits in under 60 seconds on Cyath.',
   alternates: {
     canonical: `${SITE_URL}/onboarding`,
   },
   openGraph: {
-    title: 'Pioneer Calibration & Goal Setup · Cyath',
-    description: 'Calibrate your daily health baseline in 60 seconds.',
+    title: 'Daily Plan & Habit Setup · Cyath',
+    description: 'Set up your daily health habits in 60 seconds.',
     url: `${SITE_URL}/onboarding`,
     siteName: 'Cyath',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'Pioneer Calibration & Goal Setup · Cyath',
-    description: 'Calibrate your personalized daily wellness baseline.',
+    title: 'Daily Plan & Habit Setup · Cyath',
+    description: 'Set up your personalized daily health habits.',
   },
 };
 

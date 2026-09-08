@@ -286,7 +286,7 @@ export function ProtocolsJsonLd() {
             '@type': 'HowToStep',
             position: 3,
             name: 'Cold splash or quick rinse',
-            text: 'Splash cold water on your face or take a brisk cold rinse to naturally elevate cortisol and morning alertness.',
+            text: 'Splash cold water on your face or take a brisk cold rinse to increase cortisol and morning alertness.',
           },
         ],
       },

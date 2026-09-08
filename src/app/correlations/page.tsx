@@ -158,7 +158,7 @@ export default function CorrelationsPage() {
             </div>
           </div>
 
-          {/* Right: Deep Dive Scatter Stage & Executive Intelligence (8 Cols) */}
+          {/* Right: Scatter Matrix & Correlation Analysis (8 Cols) */}
           <div className="lg:col-span-8 space-y-6">
             
             {/* Main Scatter Container */}

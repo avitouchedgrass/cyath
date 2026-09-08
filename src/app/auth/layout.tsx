@@ -5,7 +5,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 export const metadata: Metadata = {
   title: 'Sign In & Account Access',
   description:
-    'Sign in or start your free journey on Cyath to sync your daily habit checklists, whole-food recipes, and sanctuary progress across devices.',
+    'Sign in to Cyath to sync your daily habit checklists, whole-food recipes, and sanctuary progress across devices.',
   alternates: {
     canonical: `${SITE_URL}/auth`,
   },

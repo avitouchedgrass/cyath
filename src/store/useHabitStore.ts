@@ -14,7 +14,7 @@ import {
 import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe } from '@/lib/recipes';
-import { validateReferralCodeInput, KNOWN_SEED_CODES } from '@/lib/referralUtils';
+import { validateReferralCodeInput, KNOWN_SEED_CODES, extractReferralCode } from '@/lib/referralUtils';
 import { formatLocalDate } from '@/lib/dateUtils';
 
 export interface HabitItem {
@@ -34,6 +34,14 @@ export interface DailyLogData {
   moodScore: number;
   notes: string;
   loggedRecipeIds: string[];
+}
+
+export interface DeskRitualData {
+  morningBootCompleted?: boolean;
+  eveningWrapCompleted?: boolean;
+  morningRestedRating?: number;
+  afternoonSlumpScore?: number;
+  targetFocusHours?: number;
 }
 
 export interface PendingUserAction {
@@ -57,6 +65,13 @@ export interface UserProfile {
   referredBy?: string;
   referralCount?: number;
   claimedReferral?: boolean;
+  energyAudit?: {
+    hoursLostPerDay: number;
+    daysLostPerYear: number;
+    enduranceDeficitPercent: number;
+    primaryLeverTitle: string;
+    protocolId: string;
+  };
 }
 
 export function generateReferralCode(identifier?: string): string {
@@ -100,6 +115,9 @@ export interface HabitStoreState {
   userSession: { id: string; email?: string } | null;
   userProfile: UserProfile | null;
   pendingAction: PendingUserAction | null;
+  dailyProtocolsAcceptedByDate: Record<string, boolean>;
+  dailyProtocolsCompletedByDate: Record<string, boolean>;
+  deskRitualsByDate: Record<string, DeskRitualData>;
 
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
@@ -133,6 +151,10 @@ export interface HabitStoreState {
   deleteAccountData: () => Promise<void>;
   resetUserProgress: () => Promise<void>;
   completeWalkthrough: () => void;
+  acceptDailyProtocol: (date?: string) => void;
+  completeDailyProtocol: (date?: string) => void;
+  completeMorningBoot: (data: { sleepHours: number; restedRating: number; sunlightDone: boolean; targetFocusHours: number }, date?: string) => void;
+  completeEveningWrap: (data: { caffeineCutoffRespected: boolean; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
 }
 
 const getTodayString = () => formatLocalDate();
@@ -226,6 +248,9 @@ export const useHabitStore = create<HabitStoreState>()(
       userSession: null,
       userProfile: null,
       pendingAction: null,
+      dailyProtocolsAcceptedByDate: {},
+      dailyProtocolsCompletedByDate: {},
+      deskRitualsByDate: {},
 
       setDate: (date) => set({ currentDate: date }),
 
@@ -425,7 +450,7 @@ export const useHabitStore = create<HabitStoreState>()(
               onboardingCompleted: isOnboardingDone,
               walkthroughCompleted: !!((profile as any)?.walkthrough_completed || currentLocalProfile?.walkthroughCompleted),
               referralCode: finalReferralCode,
-              referredBy: (profile as any)?.referred_by || currentLocalProfile?.referredBy,
+              referredBy: extractReferralCode((profile as any)?.referred_by || currentLocalProfile?.referredBy) || ((profile as any)?.referred_by || currentLocalProfile?.referredBy),
               claimedReferral: !!((profile as any)?.referred_by || currentLocalProfile?.claimedReferral),
             };
 
@@ -878,6 +903,105 @@ export const useHabitStore = create<HabitStoreState>()(
           message: serverMessage,
           xpAwarded: 250,
         };
+      },
+
+      acceptDailyProtocol: (date) => {
+        const targetDate = date || get().currentDate;
+        if (get().dailyProtocolsAcceptedByDate[targetDate]) return;
+
+        set((state) => ({
+          dailyProtocolsAcceptedByDate: {
+            ...state.dailyProtocolsAcceptedByDate,
+            [targetDate]: true,
+          },
+        }));
+
+        get().gainXp(50, 'Committed to Daily Protocol', 'protocol');
+        retroAudio.playTierUpgrade();
+      },
+
+      completeDailyProtocol: (date) => {
+        const targetDate = date || get().currentDate;
+        if (get().dailyProtocolsCompletedByDate[targetDate]) return;
+
+        set((state) => ({
+          dailyProtocolsCompletedByDate: {
+            ...state.dailyProtocolsCompletedByDate,
+            [targetDate]: true,
+          },
+        }));
+
+        get().gainXp(50, 'Mastered Daily Protocol', 'protocol');
+        retroAudio.playTierUpgrade();
+      },
+
+      completeMorningBoot: (data, date) => {
+        const targetDate = date || get().currentDate;
+        const currentRituals = get().deskRitualsByDate[targetDate] || {};
+
+        if (data.sleepHours > 0) {
+          get().setSleep(data.sleepHours, targetDate);
+        }
+
+        if (data.sunlightDone) {
+          const habits = get().habits;
+          const sunHabit = habits.find((h) => h.id === 'sunlight' || h.title.toLowerCase().includes('sunlight'));
+          if (sunHabit) {
+            const dailyLog = get().getDailyLog(targetDate);
+            if (!dailyLog.habitsCompleted[sunHabit.id]) {
+              get().toggleHabit(sunHabit.id, targetDate);
+            }
+          }
+        }
+
+        set((state) => ({
+          deskRitualsByDate: {
+            ...state.deskRitualsByDate,
+            [targetDate]: {
+              ...currentRituals,
+              morningBootCompleted: true,
+              morningRestedRating: data.restedRating,
+              targetFocusHours: data.targetFocusHours,
+            },
+          },
+        }));
+
+        if (!currentRituals.morningBootCompleted) {
+          get().gainXp(50, 'Morning Boot Primed', 'ritual');
+          retroAudio.playTierUpgrade();
+        }
+      },
+
+      completeEveningWrap: (data, date) => {
+        const targetDate = date || get().currentDate;
+        const currentRituals = get().deskRitualsByDate[targetDate] || {};
+
+        if (data.caffeineCutoffRespected) {
+          const habits = get().habits;
+          const sunsetHabit = habits.find((h) => h.id === 'digital_sunset' || h.title.toLowerCase().includes('sunset'));
+          if (sunsetHabit) {
+            const dailyLog = get().getDailyLog(targetDate);
+            if (!dailyLog.habitsCompleted[sunsetHabit.id]) {
+              get().toggleHabit(sunsetHabit.id, targetDate);
+            }
+          }
+        }
+
+        set((state) => ({
+          deskRitualsByDate: {
+            ...state.deskRitualsByDate,
+            [targetDate]: {
+              ...currentRituals,
+              eveningWrapCompleted: true,
+              afternoonSlumpScore: data.afternoonSlumpScore,
+            },
+          },
+        }));
+
+        if (!currentRituals.eveningWrapCompleted) {
+          get().gainXp(50, 'Evening Wrap Sealed', 'ritual');
+          retroAudio.playTierUpgrade();
+        }
       },
 
       toggleHabit: (habitId, date) => {

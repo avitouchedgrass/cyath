@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
 import { retroAudio } from '@/lib/retroAudio';
+import { extractReferralCode } from '@/lib/referralUtils';
 import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock, Gift } from 'lucide-react';
 
 function AuthContent() {
@@ -33,7 +34,7 @@ function AuthContent() {
   useEffect(() => {
     const urlRef = searchParams.get('ref');
     if (urlRef) {
-      const clean = urlRef.trim().toUpperCase();
+      const clean = extractReferralCode(urlRef) || urlRef.trim().toUpperCase();
       try {
         localStorage.setItem('cyath_pending_referral', clean);
       } catch {}
@@ -42,7 +43,8 @@ function AuthContent() {
       try {
         const saved = localStorage.getItem('cyath_pending_referral');
         if (saved) {
-          setPendingRefCode(saved);
+          const cleanSaved = extractReferralCode(saved) || saved;
+          setPendingRefCode(cleanSaved);
         }
       } catch {}
     }
@@ -116,7 +118,8 @@ function AuthContent() {
       try {
         const pendingRef = typeof window !== 'undefined' ? localStorage.getItem('cyath_pending_referral') : null;
         if (pendingRef) {
-          await useHabitStore.getState().claimReferralCode(pendingRef);
+          const cleanPending = extractReferralCode(pendingRef) || pendingRef;
+          await useHabitStore.getState().claimReferralCode(cleanPending);
           localStorage.removeItem('cyath_pending_referral');
         }
       } catch {}

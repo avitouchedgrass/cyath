@@ -139,7 +139,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             </h2>
             <p className="text-neutral-400 text-sm mt-1 font-sans">
               {mode === 'signup'
-                ? 'Calibrate habits and unlock correlation telemetry.'
+                ? 'Track daily habits and discover your energy patterns.'
                 : 'Access your saved routines and streak logs.'}
             </p>
           </div>

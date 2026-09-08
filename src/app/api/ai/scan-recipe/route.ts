@@ -353,7 +353,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 5. Seamless Smart Fallback (Guarantees user always gets an actionable recipe)
+    // Fallback recipe generation if model candidates time out or fail
     const fallbackRecipe = generateSmartFallbackRecipe();
     return NextResponse.json({
       success: true,

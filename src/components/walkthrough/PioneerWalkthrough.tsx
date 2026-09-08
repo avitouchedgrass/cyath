@@ -70,7 +70,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     title: '16-Bit Floating Island',
     subtitle: 'Your daily habits directly evolve this island',
     description:
-      'This floating island is directly connected to your daily habits. As you level up, new landmarks and island details unlock in real time.',
+      'This floating island is directly connected to your daily habits. As you level up, new landmarks and island details appear in real time.',
     icon: Sparkles,
     accentColor: '#8B5CF6',
     bgTint: '#F5F3FF',
@@ -84,7 +84,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     title: 'Friend Referrals & XP Bonus',
     subtitle: 'Invite friends and earn mutual +250 XP bonuses',
     description:
-      'Building habits is better together. Use the "Invite (+250 XP)" button in the top navbar or in your profile to share your invite code. When a friend joins, you both unlock +250 Bonus XP!',
+      'Building habits is better together. Use the "Invite (+250 XP)" button in the top navbar or in your profile to share your invite code. When a friend joins, you both receive +250 Bonus XP!',
     icon: Gift,
     accentColor: '#10B981',
     bgTint: '#ECFDF5',

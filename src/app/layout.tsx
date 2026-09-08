@@ -6,6 +6,7 @@ import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLevelBadge";
 import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough";
 import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
+import { CommandPalette } from "@/components/commands/CommandPalette";
 import { XpParticleCanvas } from "@/components/effects/XpParticleCanvas";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { GlobalJsonLd } from "@/components/seo/JsonLd";
@@ -135,6 +136,9 @@ export default function RootLayout({
           </ErrorBoundary>
           <ErrorBoundary name="AI Coach" fallback={null}>
             <StoveSageChatbot />
+          </ErrorBoundary>
+          <ErrorBoundary name="Command Palette" fallback={null}>
+            <CommandPalette />
           </ErrorBoundary>
         </AuthProvider>
       </body>

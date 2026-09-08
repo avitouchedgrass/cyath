@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier, xpToReachLevel } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
+import { LivingEmberCanopy } from './LivingEmberCanopy';
+import { useHabitStore } from '@/store/useHabitStore';
+import { calculateSanctuaryMatrix } from '@/lib/sanctuaryMatrixEngine';
 
 interface IslandCenterStageProps {
   currentLevel: number;
@@ -14,6 +17,32 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
   const currentIsland = getIslandTier(currentLevel);
   const nextIsland = getNextIslandTier(currentLevel);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(currentIsland.tier - 1);
+
+  const { currentDate, getDailyLog, userProfile, dailyProtocolsAcceptedByDate, deskRitualsByDate } =
+    useHabitStore();
+  const currentLog = getDailyLog(currentDate);
+  const protocolAccepted = !!dailyProtocolsAcceptedByDate[currentDate];
+  const sunlightDone = !!currentLog.habitsCompleted['sunlight'];
+  const deskRitual = deskRitualsByDate[currentDate];
+  const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
+  const targetHydration = userProfile?.weightKg ? Number((userProfile.weightKg * 0.04).toFixed(1)) : 2.5;
+
+  const matrix = calculateSanctuaryMatrix({
+    sleepHours: currentLog.sleepHours || 7.5,
+    restedRating: deskRitual?.morningRestedRating,
+    energyLevel: currentLog.energyLevel,
+    totalProteinLogged: currentLog.totalProteinLogged,
+    targetProtein,
+    hydrationLiters: currentLog.hydrationLiters,
+    targetHydration,
+    protocolAccepted,
+    sunlightDone,
+    caffeineCutoffRespected: deskRitual?.eveningWrapCompleted,
+    slumpScore: deskRitual?.afternoonSlumpScore,
+  });
+
+  const isRestorativeSleep = matrix.hearth.score >= 70;
+  const isAtmosphereClear = matrix.atmosphere.score >= 60;
 
   // Preload remaining island tier assets progressively during idle time
   useEffect(() => {
@@ -55,9 +84,26 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
   return (
     <div className="flex flex-col items-center justify-center w-full">
       {/* 1. Free-floating Pixel Island on Cyath Canvas */}
-      <div className="relative flex flex-col items-center justify-center w-full min-h-[380px] sm:min-h-[460px] md:min-h-[500px] lg:min-h-[520px]">
-        {/* Soft Ambient Sky Glow */}
-        <div className="absolute w-80 h-80 sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-t from-[#A7F3D0]/25 via-[#FEF3C7]/20 to-transparent blur-3xl pointer-events-none" />
+      <div className="relative flex flex-col items-center justify-center w-full min-h-[380px] sm:min-h-[460px] md:min-h-[500px] lg:min-h-[520px] overflow-hidden">
+        {/* Dynamic Ambient Sky Glow linked to Biological Matrix */}
+        <div
+          className={`absolute w-80 h-80 sm:w-[480px] sm:h-[480px] rounded-full blur-3xl pointer-events-none transition-colors duration-1000 ${
+            isRestorativeSleep
+              ? 'bg-gradient-to-t from-[#A7F3D0]/30 via-[#FEF3C7]/25 to-transparent'
+              : 'bg-gradient-to-t from-[#94A3B8]/25 via-[#CBD5E1]/20 to-transparent'
+          }`}
+        />
+
+        {/* Ambient Spore & Ember Canopy Canvas */}
+        <LivingEmberCanopy
+          className="absolute inset-0 pointer-events-none z-0 opacity-70"
+          intensity={matrix.canopy.score >= 80 ? 'high' : 'ambient'}
+        />
+
+        {/* Atmospheric Mist Layer when circadian synchronization is low */}
+        {!isAtmosphereClear && (
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#E2E8F0]/30 to-transparent pointer-events-none z-0" />
+        )}
 
         {/* Floating Island Asset with Idle Float Keyframe */}
         <div className="relative z-10 w-[300px] sm:w-[420px] md:w-[480px] lg:w-[520px] xl:w-[560px] max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] cursor-default group/island">
@@ -120,60 +166,66 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
         <div className="w-56 sm:w-72 md:w-84 h-5 rounded-full bg-[#1A3629]/16 blur-md mt-2 animate-[shadowFloat_8s_ease-in-out_infinite]" />
       </div>
 
-      {/* 2. Tactile Chevron Scrubber (‹ Phase N ›) */}
-      <div className="flex items-center gap-3 my-4 z-10">
-        <button
-          type="button"
-          onClick={prevPhase}
-          aria-label="Previous Phase"
-          className="w-9 h-9 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] flex items-center justify-center hover:bg-[#FAF6EE] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-base shadow-[2px_2px_0px_#1A3629]"
-        >
-          ‹
-        </button>
-
-        <div className="px-5 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] flex items-center gap-2 tracking-wide">
-          <span>Phase {displayedIsland.tier}</span>
-          {!isUnlocked && <span className="text-[10px] text-[#A7F3D0] opacity-80 font-normal">[Locked]</span>}
-        </div>
-
-        <button
-          type="button"
-          onClick={nextPhase}
-          aria-label="Next Phase"
-          className="w-9 h-9 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] flex items-center justify-center hover:bg-[#FAF6EE] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-base shadow-[2px_2px_0px_#1A3629]"
-        >
-          ›
-        </button>
-      </div>
-
-      {/* 3. Tactile Progress Bar Card in Cyath Style */}
-      <div className="w-full max-w-2xl sm:max-w-3xl bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-3 mt-2 z-10">
-        <div className="flex items-center justify-between">
+      {/* 2. Integrated Sanctuary Stage Pedestal (Scrubber + Precision Progress Bar) */}
+      <div className="w-full max-w-2xl bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-3.5 mt-3 z-10">
+        {/* Phase Header & Tactile Scrubber */}
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-md border border-[#1A3629] text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FAF6EE] text-[#1A3629]">
-              Phase {displayedIsland.tier}
-            </span>
-            <span className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629] tracking-tight">
-              {displayedIsland.name}
+            <button
+              type="button"
+              onClick={prevPhase}
+              aria-label="Previous Sanctuary Phase"
+              className="w-8 h-8 rounded-lg border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] flex items-center justify-center hover:bg-[#EAE3D2] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-sm shadow-[1px_1px_0px_#1A3629]"
+            >
+              ‹
+            </button>
+
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Phase {displayedIsland.tier}
+                </span>
+                {!isUnlocked && (
+                  <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded border border-[#C9A84C]/50 bg-[#FEF3C7] text-[#92400E] font-bold">
+                    Locked
+                  </span>
+                )}
+              </div>
+              <h3 className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629] tracking-tight leading-none mt-0.5">
+                {displayedIsland.name}
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              onClick={nextPhase}
+              aria-label="Next Sanctuary Phase"
+              className="w-8 h-8 rounded-lg border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] flex items-center justify-center hover:bg-[#EAE3D2] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-sm shadow-[1px_1px_0px_#1A3629]"
+            >
+              ›
+            </button>
+          </div>
+
+          <div className="shrink-0">
+            <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#F4EFE6] px-3 py-1 rounded-full border border-[#1A3629]/20 tabular-nums">
+              {totalXp >= 1000 ? `${(totalXp / 1000).toFixed(1)}K` : totalXp} / {nextTierXp >= 1000 ? `${(nextTierXp / 1000).toFixed(1)}K` : nextTierXp} XP
             </span>
           </div>
-          <span className="font-mono text-xs sm:text-sm font-bold text-[#10B981] bg-[#ECFDF5] px-2.5 py-0.5 rounded-full border border-[#10B981]/30 tabular-nums">
-            {totalXp >= 1000 ? `${(totalXp / 1000).toFixed(1)}K` : totalXp} XP / {nextTierXp >= 1000 ? `${(nextTierXp / 1000).toFixed(1)}K` : nextTierXp} XP
-          </span>
         </div>
 
-        {/* Tactile Progress Bar Track */}
-        <div className="w-full h-4 sm:h-5 bg-[#EAE3D2] rounded-full overflow-hidden p-0.5 border-2 border-[#1A3629] shadow-inner">
+        {/* Precision Progress Track */}
+        <div className="w-full h-2.5 bg-[#EAE3D2] rounded-full overflow-hidden border border-[#1A3629]/20">
           <div
-            className="h-full bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#059669] rounded-full transition-all duration-700 ease-out"
+            className="h-full bg-[#1A3629] rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
 
+        {/* Level Progression Metadata */}
         <div className="flex items-center justify-between text-xs font-mono text-[#1A3629]">
-          <span className="font-bold tracking-tight">Level {currentLevel} Mastery</span>
-          <span className="text-[#4A5D4E] tabular-nums">
-            {nextIsland ? `Next Phase at Level ${nextIsland.minLevel} · ${xpRemaining.toLocaleString()} XP to evolve` : 'Pinnacle Evolution Reached'}
+          <span className="font-bold tracking-tight">Level {currentLevel}</span>
+          <span className="text-[#4A5D4E] tabular-nums text-[11px]">
+            {nextIsland ? `Level ${nextIsland.minLevel} Evolution · ${xpRemaining.toLocaleString()} XP to evolve` : 'Apex Sanctuary Reached'}
           </span>
         </div>
       </div>

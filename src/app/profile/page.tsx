@@ -10,7 +10,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Cloud, LogOut, RefreshCw, Sparkles, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -206,7 +206,7 @@ export default function ProfilePage() {
 
         {syncStatus && (
           <div className="mb-6 p-3.5 rounded-2xl border border-emerald-600/20 bg-emerald-50 text-xs font-mono font-bold text-[#065F46] flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#10B981]" />
+            <RefreshCw className="w-4 h-4 text-[#10B981]" />
             <span>{syncStatus}</span>
           </div>
         )}
@@ -302,20 +302,20 @@ export default function ProfilePage() {
               </h2>
               <ul className="space-y-2 font-cabinet font-semibold text-xs">
                 <li>
-                  <Link href="/protocols" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                  <Link href="/playbook?tab=protocols" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
                     <span>Protocol Cartridges</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/recipes" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                  <Link href="/playbook?tab=recipes" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
                     <span>Whole-Food Fuel Recipes</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/correlations" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Correlation Engine</span>
+                  <Link href="/dashboard?tab=dossier" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Correlation Engine &amp; Dossier</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>

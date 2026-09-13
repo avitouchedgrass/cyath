@@ -6,7 +6,32 @@ class RetroAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
 
-  private initCtx() {
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.enableOnFirstInteraction();
+    }
+  }
+
+  public enableOnFirstInteraction() {
+    if (typeof window === 'undefined') return;
+    const unlock = () => {
+      this.initCtx();
+      window.removeEventListener('pointerdown', unlock, true);
+      window.removeEventListener('keydown', unlock, true);
+      window.removeEventListener('touchstart', unlock, true);
+      window.removeEventListener('click', unlock, true);
+    };
+    window.addEventListener('pointerdown', unlock, true);
+    window.addEventListener('keydown', unlock, true);
+    window.addEventListener('touchstart', unlock, true);
+    window.addEventListener('click', unlock, true);
+  }
+
+  public resume() {
+    this.initCtx();
+  }
+
+  public initCtx() {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtxClass) {
@@ -14,12 +39,15 @@ class RetroAudioEngine {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
   }
 
   public toggleMute() {
     this.isMuted = !this.isMuted;
+    if (!this.isMuted) {
+      this.initCtx();
+    }
     return this.isMuted;
   }
 

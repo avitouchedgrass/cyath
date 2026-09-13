@@ -9,7 +9,7 @@ import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
 import {
   FileText,
   ArrowRight,
-  Sparkles,
+  Activity,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -51,8 +51,9 @@ export function DossierTab() {
         if (log.habitsCompleted) {
           habitsDone = Object.values(log.habitsCompleted).filter(Boolean).length;
         }
-        if (log.loggedRecipeIds && log.loggedRecipeIds.length > 0) {
-          mealsDone = log.loggedRecipeIds.length;
+        const totalLoggedMealsCount = (log.loggedMeals?.length || 0) + (log.loggedRecipeIds?.length || 0);
+        if (totalLoggedMealsCount > 0) {
+          mealsDone = totalLoggedMealsCount;
         } else if ((log.totalProteinLogged || 0) > 0) {
           mealsDone = 1;
         }
@@ -66,7 +67,8 @@ export function DossierTab() {
 
       if (dateKey === currentDate) {
         habitsDone = completedCount;
-        mealsDone = (todayLog.loggedRecipeIds || []).length || (todayLog.totalProteinLogged > 0 ? 1 : 0);
+        const todayMealsCount = (todayLog.loggedMeals?.length || 0) + (todayLog.loggedRecipeIds?.length || 0);
+        mealsDone = todayMealsCount || (todayLog.totalProteinLogged > 0 ? 1 : 0);
         hydrationDone = (todayLog.hydrationLiters || 0) > 0 ? 1 : 0;
         reflectionDone = (todayLog.energyLevel || 0) > 0 ? 1 : 0;
       }
@@ -326,7 +328,7 @@ export function DossierTab() {
       <div className="w-full rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-5 shadow-[0_2px_12px_rgba(26,54,41,0.03)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10 flex items-center justify-center text-[#1A3629] shrink-0">
-            <Sparkles className="w-4 h-4 text-[#C9A84C]" />
+            <Activity className="w-4 h-4 text-[#10B981]" />
           </div>
           <div>
             <h4 className="font-cabinet font-bold text-sm text-[#1A3629]">

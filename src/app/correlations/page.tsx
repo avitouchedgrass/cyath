@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function CorrelationsPage() {
-  redirect('/sanctuary?tab=archive');
+  redirect('/dashboard?tab=dossier');
 }

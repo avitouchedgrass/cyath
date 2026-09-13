@@ -14,10 +14,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: [`${baseUrl}/assets/cyath-hero-preview.png`],
     },
     {
-      url: `${baseUrl}/recipes`,
+      url: `${baseUrl}/playbook`,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/recipes`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.9,
       images: [`${baseUrl}/assets/food/greek-salmon-1.0.webp`],
     },
     {

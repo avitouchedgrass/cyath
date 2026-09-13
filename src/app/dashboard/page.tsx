@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
@@ -13,7 +13,7 @@ import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
 import { FuelTab } from '@/components/dashboard/FuelTab';
 import { DossierTab } from '@/components/dashboard/DossierTab';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
-import { Sparkles, FileText, Plus, Utensils } from 'lucide-react';
+import { FileText, Plus, Utensils } from 'lucide-react';
 
 function DashboardContent() {
   const router = useRouter();
@@ -23,6 +23,7 @@ function DashboardContent() {
 
   const [mounted, setMounted] = useState(false);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const hasCalibratedTodayRef = useRef(false);
 
   const {
     currentDate,
@@ -36,10 +37,17 @@ function DashboardContent() {
 
   useEffect(() => {
     setMounted(true);
+    if (!hasCalibratedTodayRef.current) {
+      hasCalibratedTodayRef.current = true;
+      const today = formatLocalDate();
+      if (currentDate !== today) {
+        setDate(today);
+      }
+    }
     if (isAuthenticated && (!userProfile || !userProfile.onboardingCompleted)) {
       router.push('/onboarding');
     }
-  }, [isAuthenticated, userProfile, router]);
+  }, [isAuthenticated, userProfile, router, currentDate, setDate]);
 
   const todayDateStr = useMemo(() => formatLocalDate(), []);
   const isViewingToday = currentDate === todayDateStr;
@@ -103,20 +111,6 @@ function DashboardContent() {
             >
               <FileText className="w-3.5 h-3.5" />
               <span>7-Day Dossier</span>
-            </button>
-
-            {/* Walkthrough Tour Replay Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                window.dispatchEvent(new CustomEvent('open-cyath-walkthrough'));
-              }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet text-xs font-bold hover:bg-[#FAF8F5] transition-all cursor-pointer shadow-2xs"
-              title="Interactive App Walkthrough"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
-              <span className="hidden sm:inline">Tour</span>
             </button>
 
             {!isViewingToday && (

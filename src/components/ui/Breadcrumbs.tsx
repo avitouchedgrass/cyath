@@ -14,10 +14,12 @@ interface BreadcrumbsProps {
 }
 
 const DEFAULT_ROUTE_MAP: Record<string, string> = {
-  'Fuel Recipes': '/recipes',
-  'Guided Routines': '/protocols',
-  'Daily Insights': '/correlations',
-  'Sanctuary': '/sanctuary',
+  'Playbook': '/playbook',
+  'Fuel Recipes': '/playbook?tab=recipes',
+  'Guided Routines': '/playbook?tab=protocols',
+  'Daily Insights': '/dashboard?tab=dossier',
+  'Dossier': '/dashboard?tab=dossier',
+  'Sanctuary': '/dashboard?tab=today',
   'Profile': '/profile',
   'Privacy Policy': '/privacy',
   'Terms of Service': '/terms',

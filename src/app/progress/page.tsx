@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function ProgressRedirect() {
-  redirect('/sanctuary');
+  redirect('/dashboard?tab=today');
 }

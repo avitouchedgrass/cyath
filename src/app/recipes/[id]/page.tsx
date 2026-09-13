@@ -8,7 +8,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SingleRecipeJsonLd } from '@/components/seo/JsonLd';
 import { RECIPES, Recipe } from '@/lib/recipes';
-import { Clock, Flame, Dumbbell, Sparkles, ArrowRight, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Clock, Flame, Dumbbell, ArrowRight, CheckCircle2, ChevronRight } from 'lucide-react';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
@@ -93,7 +93,7 @@ export default async function RecipeDetailPage({
     (r) => r.id !== recipe.id && (r.category === recipe.category || r.dietType === recipe.dietType)
   ).slice(0, 3);
 
-  const interactiveUrl = `/recipes?inspect=${encodeURIComponent(recipe.id)}`;
+  const interactiveUrl = `/playbook?tab=recipes&inspect=${encodeURIComponent(recipe.id)}`;
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] flex flex-col">
@@ -106,7 +106,7 @@ export default async function RecipeDetailPage({
         <div className="mb-6">
           <Breadcrumbs
             items={[
-              { label: 'Fuel Recipes', href: '/recipes' },
+              { label: 'Fuel Recipes', href: '/playbook?tab=recipes' },
               { label: recipe.name, href: `/recipes/${recipe.id}` },
             ]}
           />
@@ -206,7 +206,7 @@ export default async function RecipeDetailPage({
               {/* Interactive Logger CTA */}
               <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-5 shadow-2xs">
                 <div className="flex items-center gap-2 font-cabinet font-bold text-sm text-[#1A3629] mb-1">
-                  <Sparkles className="w-4 h-4 text-[#D97706]" />
+                  <Flame className="w-4 h-4 text-[#D97706]" />
                   <span>Dynamic Portion Scaler</span>
                 </div>
                 <p className="text-xs font-cabinet font-medium text-[#2C4A3B] leading-relaxed mb-4">

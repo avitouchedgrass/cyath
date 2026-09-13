@@ -6,88 +6,124 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import {
-  Compass,
+  Sparkles,
+  Activity,
   CheckCircle2,
   UtensilsCrossed,
-  Sparkles,
-  Gift,
+  FileText,
+  Bot,
+  Compass,
   ArrowRight,
   ArrowLeft,
   X,
   Award,
 } from 'lucide-react';
 
-interface WalkthroughStep {
+interface SpotlightStep {
   id: string;
+  targetId: string;
   stepNumber: number;
   totalSteps: number;
-  route: string;
   badge: string;
   title: string;
   subtitle: string;
   description: string;
-  highlightSelector?: string;
   icon: React.ComponentType<{ className?: string }>;
   accentColor: string;
   bgTint: string;
+  preferredPlacement?: 'top' | 'bottom';
 }
 
-const WALKTHROUGH_STEPS: WalkthroughStep[] = [
+const SPOTLIGHT_STEPS: SpotlightStep[] = [
   {
-    id: 'dashboard-habits',
+    id: 'master-observatory',
+    targetId: 'tour-living-sky',
     stepNumber: 1,
-    totalSteps: 4,
-    route: '/dashboard',
-    badge: 'Step 1 of 4 · Dashboard',
-    title: 'Daily Habits & Streaks',
-    subtitle: 'Check off daily habits & earn XP',
+    totalSteps: 6,
+    badge: 'Step 1 of 6 · Living Sanctuary',
+    title: 'Living Island Sanctuary',
+    subtitle: 'Your 16-bit sanctuary growing in real time',
     description:
-      'Your dashboard is customized for your daily goals. Checking off morning sunlight, protein targets, water, and sleep earns XP, builds your streak, and increases your level.',
+      'Your living sanctuary sits at the heart of Cyath. As you log habits and fuel, your cottage blooms and levels up through seasonal tiers.',
+    icon: Sparkles,
+    accentColor: '#10B981',
+    bgTint: '#ECFDF5',
+    preferredPlacement: 'bottom',
+  },
+  {
+    id: 'core-habits',
+    targetId: 'tour-core-habits',
+    stepNumber: 2,
+    totalSteps: 6,
+    badge: 'Step 2 of 6 · Non-Negotiables & Protocols',
+    title: 'Focus Habits & Daily Protocols',
+    subtitle: 'Morning Sunlight, Evening Wind-Down & Key Non-Negotiables',
+    description:
+      'Check off your daily baseline habits (+15 XP each) and initiate your 1-tap Morning Sunlight or Evening Wind-Down protocols (+15 XP) to calibrate your circadian rhythm.',
     icon: CheckCircle2,
     accentColor: '#10B981',
     bgTint: '#ECFDF5',
+    preferredPlacement: 'top',
   },
   {
-    id: 'recipes-fuel',
-    stepNumber: 2,
-    totalSteps: 4,
-    route: '/recipes',
-    badge: 'Step 2 of 4 · Recipes',
-    title: 'Whole Foods & AI Meal Scanner',
-    subtitle: 'High-protein recipes & quick photo logging',
+    id: 'quick-fuel',
+    targetId: 'tour-fuel-anchor',
+    stepNumber: 3,
+    totalSteps: 6,
+    badge: 'Step 3 of 6 · Fuel Telemetry',
+    title: 'Daily Fuel Anchor & Protein Floor',
+    subtitle: '1-tap amino calibration & recipe meal ledger',
     description:
-      'Explore high-protein, nutrient-dense recipes with smart portion multipliers. Need to log a meal quickly? Tap "Scan Meal with AI" to snap a photo and calculate nutrition in seconds.',
+      'Hit your daily protein floor with 1-tap quick logging (+25g, +40g, +50g) or log custom whole-food meals to maintain sustained cognitive stamina without afternoon dips.',
     icon: UtensilsCrossed,
     accentColor: '#D97706',
     bgTint: '#FEF3C7',
+    preferredPlacement: 'top',
   },
   {
-    id: 'sanctuary-diorama',
-    stepNumber: 3,
-    totalSteps: 4,
-    route: '/sanctuary',
-    badge: 'Step 3 of 4 · Sanctuary',
-    title: '16-Bit Floating Island',
-    subtitle: 'Your daily habits directly evolve this island',
+    id: 'dossier-review',
+    targetId: 'tour-dossier-button',
+    stepNumber: 4,
+    totalSteps: 6,
+    badge: 'Step 4 of 6 · Weekly Dossier',
+    title: '7-Day Energy Reclamation Dossier',
+    subtitle: 'Quantified focus hours & slump reduction debrief',
     description:
-      'This floating island is directly connected to your daily habits. As you level up, new landmarks and island details appear in real time.',
-    icon: Sparkles,
+      'Inspect your weekly focus hours, circadian alignment score, and habit consistency breakdown. Seal your weekly audit to collect bonus XP.',
+    icon: FileText,
     accentColor: '#8B5CF6',
     bgTint: '#F5F3FF',
+    preferredPlacement: 'bottom',
   },
   {
-    id: 'guild-referral',
-    stepNumber: 4,
-    totalSteps: 4,
-    route: '/profile',
-    badge: 'Step 4 of 4 · Invite Friends',
-    title: 'Friend Referrals & XP Bonus',
-    subtitle: 'Invite friends and earn mutual +250 XP bonuses',
+    id: 'ai-coach',
+    targetId: 'tour-ai-coach',
+    stepNumber: 5,
+    totalSteps: 6,
+    badge: 'Step 5 of 6 · AI Companion',
+    title: 'StoveSage AI Coach & Chef',
+    subtitle: 'Instant meal formulation & biological coaching',
     description:
-      'Building habits is better together. Use the "Invite (+250 XP)" button in the top navbar or in your profile to share your invite code. When a friend joins, you both receive +250 Bonus XP!',
-    icon: Gift,
+      'Tap your AI Coach (or press ⌘J / Ctrl+J) to formulate recipes tailored to your remaining macros, troubleshoot energy dips, or calibrate your daily protocols.',
+    icon: Bot,
     accentColor: '#10B981',
     bgTint: '#ECFDF5',
+    preferredPlacement: 'top',
+  },
+  {
+    id: 'app-navigation',
+    targetId: 'tour-navigation',
+    stepNumber: 6,
+    totalSteps: 6,
+    badge: 'Step 6 of 6 · Navigation Hub',
+    title: 'Fuel Recipes, Playbook & History',
+    subtitle: 'Explore recipes, reference science guides & track progress',
+    description:
+      'Navigate between your Daily Cockpit, the Fuel & Recipes meal ledger, the clinical Playbook guide, and your Dossier history.',
+    icon: Compass,
+    accentColor: '#10B981',
+    bgTint: '#ECFDF5',
+    preferredPlacement: 'bottom',
   },
 ];
 
@@ -100,6 +136,14 @@ export function PioneerWalkthrough() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [popoverPos, setPopoverPos] = useState<{
+    top: number;
+    left: number;
+    placement: 'top' | 'bottom';
+    arrowLeft: number;
+  } | null>(null);
+
   const userId = userSession?.id || 'guest';
   const storageKey = `cyath_walkthrough_completed_${userId}`;
 
@@ -108,16 +152,15 @@ export function PioneerWalkthrough() {
     setMounted(true);
     if (typeof window === 'undefined') return;
 
-    // Check if walkthrough already completed in store or localStorage
     const localCompleted = localStorage.getItem(storageKey) === 'true';
     const storeCompleted = userProfile?.walkthroughCompleted === true;
 
-    // Only auto-trigger when on dashboard, onboarding is completed, and walkthrough hasn't been done
     if (!localCompleted && !storeCompleted && pathname === '/dashboard') {
       const timer = setTimeout(() => {
         setIsOpen(true);
         setCurrentStepIndex(0);
         retroAudio.playInspectConfirm();
+        window.dispatchEvent(new CustomEvent('stovesage-walkthrough-start'));
       }, 1200);
       return () => clearTimeout(timer);
     }
@@ -127,69 +170,158 @@ export function PioneerWalkthrough() {
   useEffect(() => {
     const handleOpen = () => {
       retroAudio.playInspectConfirm();
-      setIsOpen(true);
-      setCurrentStepIndex(0);
+      if (pathname !== '/dashboard') {
+        router.push('/dashboard');
+        setTimeout(() => {
+          setIsOpen(true);
+          setCurrentStepIndex(0);
+          window.dispatchEvent(new CustomEvent('stovesage-walkthrough-start'));
+        }, 300);
+      } else {
+        setIsOpen(true);
+        setCurrentStepIndex(0);
+        window.dispatchEvent(new CustomEvent('stovesage-walkthrough-start'));
+      }
     };
 
     window.addEventListener('open-cyath-walkthrough', handleOpen);
     return () => window.removeEventListener('open-cyath-walkthrough', handleOpen);
-  }, []);
+  }, [pathname, router]);
 
-  const currentStep = WALKTHROUGH_STEPS[currentStepIndex];
+  // Update target rect and popover positioning
+  const updatePositions = useCallback(() => {
+    const step = SPOTLIGHT_STEPS[currentStepIndex];
+    if (!step) return;
+
+    const el = document.getElementById(step.targetId);
+    if (!el) {
+      setTargetRect(null);
+      setPopoverPos(null);
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    setTargetRect(rect);
+
+    const padding = 10;
+    const cardWidth = Math.min(420, window.innerWidth - 32);
+    const cardHeight = 260;
+
+    let placement: 'top' | 'bottom' = step.preferredPlacement || 'bottom';
+    const spaceBelow = window.innerHeight - (rect.bottom + padding);
+    const spaceAbove = rect.top - padding;
+
+    if (placement === 'bottom' && spaceBelow < cardHeight + 20 && spaceAbove > spaceBelow) {
+      placement = 'top';
+    } else if (placement === 'top' && spaceAbove < cardHeight + 20 && spaceBelow > spaceAbove) {
+      placement = 'bottom';
+    }
+
+    let top = 0;
+    if (placement === 'bottom') {
+      top = Math.min(window.innerHeight - cardHeight - 16, Math.max(16, rect.bottom + padding + 16));
+    } else {
+      top = Math.max(16, Math.min(window.innerHeight - cardHeight - 16, rect.top - padding - cardHeight - 16));
+    }
+
+    const elementCenter = rect.left + rect.width / 2;
+    let left = elementCenter - cardWidth / 2;
+    left = Math.max(16, Math.min(window.innerWidth - cardWidth - 16, left));
+
+    const arrowLeft = Math.max(24, Math.min(cardWidth - 24, elementCenter - left));
+
+    setPopoverPos({ top, left, placement, arrowLeft });
+  }, [currentStepIndex]);
+
+  // Scroll target element into view on step change
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const step = SPOTLIGHT_STEPS[currentStepIndex];
+    if (!step) return;
+
+    let retries = 0;
+    const tryScrollAndLocate = () => {
+      const el = document.getElementById(step.targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => updatePositions(), 300);
+      } else if (retries < 6) {
+        retries++;
+        setTimeout(tryScrollAndLocate, 100);
+      }
+    };
+
+    tryScrollAndLocate();
+  }, [isOpen, currentStepIndex, updatePositions]);
+
+  // Track window scroll and resize to keep spotlight locked to target
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleUpdate = () => {
+      requestAnimationFrame(updatePositions);
+    };
+
+    window.addEventListener('scroll', handleUpdate, { passive: true });
+    window.addEventListener('resize', handleUpdate, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleUpdate);
+      window.removeEventListener('resize', handleUpdate);
+    };
+  }, [isOpen, updatePositions]);
+
+  const currentStep = SPOTLIGHT_STEPS[currentStepIndex];
 
   const handleNext = useCallback(() => {
     retroAudio.playInspectConfirm();
-    if (currentStepIndex < WALKTHROUGH_STEPS.length - 1) {
-      const nextIndex = currentStepIndex + 1;
-      setCurrentStepIndex(nextIndex);
-      const nextRoute = WALKTHROUGH_STEPS[nextIndex].route;
-      if (pathname !== nextRoute) {
-        router.push(nextRoute);
-      }
+    if (currentStepIndex < SPOTLIGHT_STEPS.length - 1) {
+      setCurrentStepIndex((prev) => prev + 1);
     } else {
-      // Final step complete!
       completeWalkthrough();
       localStorage.setItem(storageKey, 'true');
       retroAudio.playTierUpgrade();
-      
-      // Emit celebratory particles to bottom corner badge
-      const badgeTarget = document.getElementById('xp-hud-badge-target');
+
+      const badgeTarget = document.getElementById('xp-hud-badge-target') || document.getElementById('tour-ai-coach');
       if (badgeTarget) {
         const rect = badgeTarget.getBoundingClientRect();
         xpParticleEmitter.emit(rect.left + rect.width / 2, rect.top + rect.height / 2, 24);
+      } else {
+        xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 24);
       }
+
       setIsOpen(false);
+      window.dispatchEvent(new CustomEvent('stovesage-walkthrough-end'));
     }
-  }, [currentStepIndex, pathname, router, completeWalkthrough, storageKey]);
+  }, [currentStepIndex, completeWalkthrough, storageKey]);
 
   const handlePrev = useCallback(() => {
     retroAudio.playBlip();
     if (currentStepIndex > 0) {
-      const prevIndex = currentStepIndex - 1;
-      setCurrentStepIndex(prevIndex);
-      const prevRoute = WALKTHROUGH_STEPS[prevIndex].route;
-      if (pathname !== prevRoute) {
-        router.push(prevRoute);
-      }
+      setCurrentStepIndex((prev) => prev - 1);
     }
-  }, [currentStepIndex, pathname, router]);
+  }, [currentStepIndex]);
 
   const handleSkip = useCallback(() => {
     retroAudio.playBlip();
     localStorage.setItem(storageKey, 'true');
     setIsOpen(false);
+    window.dispatchEvent(new CustomEvent('stovesage-walkthrough-end'));
   }, [storageKey]);
 
-  // Keyboard navigation
+  // Keyboard controls
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        e.preventDefault();
         handleNext();
       } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
         handlePrev();
       } else if (e.key === 'Escape') {
+        e.preventDefault();
         handleSkip();
       }
     };
@@ -201,139 +333,186 @@ export function PioneerWalkthrough() {
   if (!mounted || !isOpen) return null;
 
   const IconComponent = currentStep.icon;
-  const isFinalStep = currentStepIndex === WALKTHROUGH_STEPS.length - 1;
+  const isFinalStep = currentStepIndex === SPOTLIGHT_STEPS.length - 1;
+  const padding = 10;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="walkthrough-step-title"
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6 bg-[#1A3629]/40 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9990] select-none"
     >
-      <div className="relative w-full max-w-lg bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#1A3629] flex flex-col gap-5 animate-in zoom-in-95 duration-200">
-        
-        {/* Top Header: Badge, Progress Dots, Close Button */}
-        <div className="flex items-center justify-between gap-4 border-b-2 border-[#1A3629]/15 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-xl border-2 border-[#1A3629] flex items-center justify-center shadow-[2px_2px_0px_#1A3629]"
-              style={{ backgroundColor: currentStep.bgTint }}
-            >
-              <Compass className="w-4 h-4 text-[#1A3629]" />
-            </div>
-            <div>
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] block">
-                Getting Started Guide
-              </span>
-              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+      {/* SVG Spotlight Mask Cutout Overlay */}
+      <svg className="fixed inset-0 w-full h-full pointer-events-auto z-[9990]">
+        <defs>
+          <mask id="cyath-spotlight-mask">
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+            {targetRect && (
+              <rect
+                x={Math.max(0, targetRect.left - padding)}
+                y={Math.max(0, targetRect.top - padding)}
+                width={targetRect.width + padding * 2}
+                height={targetRect.height + padding * 2}
+                rx={18}
+                fill="black"
+              />
+            )}
+          </mask>
+        </defs>
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="rgba(10, 26, 19, 0.72)"
+          mask="url(#cyath-spotlight-mask)"
+          onClick={handleNext}
+          className="cursor-pointer"
+        />
+      </svg>
+
+      {/* Target Element Focus Halo Border */}
+      {targetRect && (
+        <div
+          className="fixed pointer-events-none z-[9992] rounded-2xl border-2 border-[#C9A84C] shadow-[0_0_24px_rgba(201,168,76,0.45)] transition-all duration-300 ease-out"
+          style={{
+            top: Math.max(0, targetRect.top - padding),
+            left: Math.max(0, targetRect.left - padding),
+            width: targetRect.width + padding * 2,
+            height: targetRect.height + padding * 2,
+          }}
+        />
+      )}
+
+      {/* Anchored Neo-Brutalist Guided Popover Card */}
+      {popoverPos && (
+        <div
+          className="fixed z-[9995] w-[420px] max-w-[calc(100vw-32px)] bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_25px_60px_rgba(26,54,41,0.18)] flex flex-col gap-4 transition-all duration-200 ease-out animate-in zoom-in-95"
+          style={{
+            top: popoverPos.top,
+            left: popoverPos.left,
+          }}
+        >
+          {/* Directional Arrow Pointer */}
+          <div
+            className={`w-3.5 h-3.5 bg-[#FFFDF9] border-[#1A3629]/20 rotate-45 absolute pointer-events-none ${
+              popoverPos.placement === 'bottom'
+                ? '-top-2 border-t border-l'
+                : '-bottom-2 border-b border-r'
+            }`}
+            style={{
+              left: popoverPos.arrowLeft - 7,
+            }}
+          />
+
+          {/* Top Header Row: Step Badge + Dot Indicators + Exit Button */}
+          <div className="flex items-center justify-between gap-3 border-b border-[#1A3629]/10 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
                 {currentStep.badge}
               </span>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            {/* Step Indicator Dots */}
-            <div className="flex items-center gap-1.5" aria-hidden="true">
-              {WALKTHROUGH_STEPS.map((step, idx) => (
-                <div
-                  key={step.id}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx === currentStepIndex
-                      ? 'w-6 bg-[#10B981] border border-[#1A3629]'
-                      : idx < currentStepIndex
-                      ? 'w-2 bg-[#1A3629]'
-                      : 'w-2 bg-[#EAE3D2] border border-[#1A3629]/30'
-                  }`}
-                />
-              ))}
+            <div className="flex items-center gap-2.5">
+              {/* Step indicator dots */}
+              <div className="flex items-center gap-1" aria-hidden="true">
+                {SPOTLIGHT_STEPS.map((s, idx) => (
+                  <div
+                    key={s.id}
+                    className={`h-1.5 rounded-full transition-all duration-200 ${
+                      idx === currentStepIndex
+                        ? 'w-5 bg-[#10B981]'
+                        : idx < currentStepIndex
+                        ? 'w-1.5 bg-[#1A3629]'
+                        : 'w-1.5 bg-[#EAE3D2]'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Close / Skip button */}
+              <button
+                type="button"
+                onClick={handleSkip}
+                className="p-1 rounded-lg border border-[#1A3629]/15 hover:bg-[#FAF6EE] text-[#1A3629] cursor-pointer transition-colors"
+                title="Skip Walkthrough (Esc)"
+                aria-label="Skip Walkthrough"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-
-            {/* Skip / Close Button */}
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="p-1.5 rounded-lg border border-[#1A3629]/20 hover:border-[#1A3629] hover:bg-[#FAF6EE] text-[#1A3629] cursor-pointer transition-colors"
-              title="Skip Tour"
-              aria-label="Skip walkthrough"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
-        </div>
 
-        {/* Card Body: Icon, Title, Subtitle, Description */}
-        <div className="space-y-3">
+          {/* Step Hero & Description */}
           <div className="flex items-start gap-3.5">
             <div
-              className="w-12 h-12 rounded-2xl border-2 border-[#1A3629] flex items-center justify-center shrink-0 shadow-[3px_3px_0px_#1A3629]"
+              className="w-10 h-10 rounded-2xl border border-[#1A3629]/15 flex items-center justify-center shrink-0"
               style={{ backgroundColor: currentStep.bgTint }}
             >
-              <IconComponent className="w-6 h-6 text-[#1A3629]" />
+              <IconComponent className="w-5 h-5 text-[#1A3629]" />
             </div>
 
-            <div>
-              <h2
+            <div className="flex flex-col min-w-0">
+              <h3
                 id="walkthrough-step-title"
-                className="font-fraunces font-black text-xl sm:text-2xl text-[#1A3629] tracking-tight leading-tight"
+                className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629] leading-tight"
               >
                 {currentStep.title}
-              </h2>
-              <p className="font-mono text-[11px] font-bold text-[#4A5D4E] mt-0.5">
+              </h3>
+              <span className="font-cabinet font-semibold text-xs text-[#1A3629]/80 mt-0.5">
                 {currentStep.subtitle}
+              </span>
+              <p className="font-cabinet text-xs sm:text-sm text-[#2C4A3B] leading-relaxed mt-2">
+                {currentStep.description}
               </p>
             </div>
           </div>
 
-          <p className="font-cabinet font-medium text-xs sm:text-sm text-[#2C4A3B] leading-relaxed bg-[#FAF6EE] p-4 rounded-2xl border-2 border-[#1A3629]/15">
-            {currentStep.description}
-          </p>
-        </div>
-
-        {/* Bottom Actions: Back, Skip text, Next / Complete Button */}
-        <div className="flex items-center justify-between pt-2">
-          {currentStepIndex > 0 ? (
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] hover:bg-[#E8DECF] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back</span>
-            </button>
-          ) : (
+          {/* Bottom Action Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10">
             <button
               type="button"
               onClick={handleSkip}
-              className="text-xs font-mono font-bold text-[#4A5D4E] hover:text-[#1A3629] underline underline-offset-4 cursor-pointer"
+              className="text-xs font-mono font-medium text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer px-1 py-1"
             >
               Skip Tour
             </button>
-          )}
 
-          <button
-            type="button"
-            onClick={handleNext}
-            className={`px-5 py-2.5 rounded-xl border-2 font-cabinet font-bold text-xs shadow-[3px_3px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center gap-2 cursor-pointer ${
-              isFinalStep
-                ? 'bg-[#10B981] text-white border-[#1A3629] shadow-[3px_3px_0px_#1A3629]'
-                : 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
-            }`}
-          >
-            {isFinalStep ? (
-              <>
-                <Award className="w-4 h-4 text-white" />
-                <span>Complete Quest (+50 XP)</span>
-              </>
-            ) : (
-              <>
-                <span>Next Objective</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+            <div className="flex items-center gap-2">
+              {currentStepIndex > 0 && (
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="px-3.5 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-4 py-2 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-semibold hover:bg-[#234535] transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                {isFinalStep ? (
+                  <>
+                    <Award className="w-4 h-4 text-[#C9A84C]" />
+                    <span>Complete Tour (+50 XP)</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Next</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
-
-      </div>
+      )}
     </div>
   );
 }

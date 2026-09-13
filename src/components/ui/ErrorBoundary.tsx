@@ -42,8 +42,8 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-6 rounded-2xl border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] text-center my-4 flex flex-col items-center justify-center gap-3">
-          <div className="w-10 h-10 rounded-xl border-2 border-[#1A3629] bg-[#FEF2F2] flex items-center justify-center text-red-600">
+        <div className="p-6 rounded-3xl border border-red-200 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(239,68,68,0.06)] text-center my-4 flex flex-col items-center justify-center gap-3">
+          <div className="w-10 h-10 rounded-xl border border-red-200 bg-red-50 flex items-center justify-center text-red-600">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
@@ -57,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <button
             type="button"
             onClick={this.reset}
-            className="px-4 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-mono font-bold text-xs shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer inline-flex items-center gap-1.5"
+            className="px-4 py-1.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Try Again</span>

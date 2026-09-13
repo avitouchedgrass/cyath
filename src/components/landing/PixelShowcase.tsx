@@ -251,8 +251,8 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           />
         </div>
 
-        {/* Chunky Neobrutalist Inspect Recipe Pill Badge */}
-        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 flex items-center justify-center gap-2 px-5 py-2 rounded-full border-3 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[3px_3px_0px_#1A3629] whitespace-nowrap">
+        {/* Refined Inspect Recipe Pill Badge */}
+        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-0.5 flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-xs text-[#1A3629] shadow-[0_4px_16px_rgba(26,54,41,0.08)] whitespace-nowrap">
           <span className="font-cabinet font-bold text-xs sm:text-sm">
             Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>
@@ -260,12 +260,12 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
 
       </div>
 
-      {/* Retro 8-Bit Audio & CRT Screen Phosphor Controls */}
+      {/* Audio & CRT Screen Phosphor Controls */}
       <div className="mt-4 flex items-center justify-center gap-2.5 z-20 mx-auto">
         <button
           type="button"
           onClick={handleToggleSound}
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 text-[10px] font-mono font-bold bg-[#FFFDF9] text-[#1A3629] shadow-2xs hover:bg-[#FAF6EE] hover:border-[#1A3629]/30 active:scale-95 transition-all cursor-pointer"
         >
           <span>{isMuted ? '8-BIT FX: OFF' : '8-BIT FX: ON'}</span>
         </button>
@@ -273,10 +273,10 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         <button
           type="button"
           onClick={handleToggleCrt}
-          className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 text-[10px] font-mono font-bold shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer ${
+          className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[10px] font-mono font-bold shadow-2xs active:scale-95 transition-all cursor-pointer ${
             isCrtEnabled
               ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
-              : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]'
+              : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:bg-[#FAF6EE] hover:border-[#1A3629]/30'
           }`}
         >
           <span>{isCrtEnabled ? 'CRT SHADER: ON' : 'CRT SHADER: OFF'}</span>

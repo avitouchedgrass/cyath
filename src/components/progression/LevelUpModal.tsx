@@ -55,11 +55,11 @@ export function LevelUpModal() {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/70 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in"
     >
-      <div className="relative w-full max-w-md bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#1A3629] text-center flex flex-col items-center">
+      <div className="relative w-full max-w-md bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.16)] text-center flex flex-col items-center animate-in zoom-in-95 duration-150">
         {/* Floating Level Badge */}
-        <div className="w-20 h-20 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex items-center justify-center mb-5 -mt-12 bg-gradient-to-br from-[#F5E6C8] to-[#EBD5B3]">
+        <div className="w-20 h-20 rounded-2xl bg-[#F4EDE0] border border-[#1A3629]/15 flex items-center justify-center mb-5 -mt-12 shadow-2xs">
           <span className="font-cabinet text-2xl font-black text-[#1A3629]">
             Lv.{data.newLevel}
           </span>
@@ -69,36 +69,36 @@ export function LevelUpModal() {
           Milestone Ascended
         </span>
 
-        <h2 className="font-fraunces font-black text-3xl sm:text-4xl text-[#1A3629] mb-2 tracking-tight">
+        <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl text-[#1A3629] mb-2 tracking-tight">
           Level {data.newLevel} Reached!
         </h2>
 
-        <p className="font-sans text-sm text-[#4A5D4E] mb-5 max-w-xs">
+        <p className="font-cabinet font-medium text-sm text-[#4A5D4E] mb-5 max-w-xs">
           Your sustained consistency has fortified your daily foundation.
         </p>
 
         {data.unlockedTitle ? (
-          <div className="w-full bg-[#FAF6EE] border-2 border-[#D97706] rounded-2xl p-4 mb-4 shadow-[3px_3px_0px_#D97706]">
+          <div className="w-full bg-[#FAF6EE] border border-amber-600/30 rounded-2xl p-4 mb-4">
             <span className="block font-mono text-[11px] font-bold text-[#D97706] uppercase tracking-wider mb-1">
               New Title Unlocked
             </span>
-            <span className="font-fraunces font-black text-xl text-[#1A3629]">
+            <span className="font-cabinet font-bold text-xl text-[#1A3629]">
               {data.unlockedTitle}
             </span>
           </div>
         ) : (
-          <div className="w-full bg-[#FAF6EE] border-2 border-[#1A3629] rounded-2xl p-4 mb-4 shadow-[3px_3px_0px_#1A3629]">
+          <div className="w-full bg-[#FAF6EE] border border-[#1A3629]/10 rounded-2xl p-4 mb-4">
             <span className="block font-mono text-[11px] font-bold text-[#4A5D4E] uppercase tracking-wider mb-0.5">
               Current Rank
             </span>
-            <span className="font-fraunces font-bold text-lg text-[#1A3629]">
+            <span className="font-cabinet font-bold text-lg text-[#1A3629]">
               {data.title}
             </span>
           </div>
         )}
 
         {/* Strategic Referral Guild Invite Card on Level-Up */}
-        <div className="w-full p-3.5 rounded-2xl border-2 border-[#10B981] bg-[#ECFDF5] mb-5 flex flex-col gap-2.5 shadow-[2px_2px_0px_#10B981]">
+        <div className="w-full p-3.5 rounded-2xl border border-emerald-600/20 bg-emerald-50 mb-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between text-left">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-[#065F46]">
@@ -109,7 +109,7 @@ export function LevelUpModal() {
                 Share Level {data.newLevel} &amp; Earn +250 XP
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-[#10B981] text-white text-[10px] font-mono font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-mono font-bold">
               +250 XP
             </span>
           </div>
@@ -118,7 +118,7 @@ export function LevelUpModal() {
             <button
               type="button"
               onClick={handleCopyInviteLink}
-              className="flex-1 py-2 px-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="flex-1 py-2 px-3 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {copiedLink ? (
                 <>
@@ -138,7 +138,7 @@ export function LevelUpModal() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => retroAudio.playInspectConfirm()}
-              className="p-2 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center shrink-0"
+              className="p-2 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center shrink-0"
               title="Share to WhatsApp"
             >
               <Share2 className="w-4 h-4 text-[#1A3629]" />
@@ -149,7 +149,7 @@ export function LevelUpModal() {
         <button
           onClick={handleClose}
           type="button"
-          className="w-full py-3 px-6 bg-[#1A3629] text-[#FFFDF9] font-cabinet text-sm font-bold rounded-xl border-2 border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+          className="w-full py-3 px-6 bg-[#1A3629] text-[#FFFDF9] font-cabinet text-sm font-semibold rounded-xl border border-[#1A3629] hover:bg-[#234535] transition-colors cursor-pointer"
         >
           Continue →
         </button>

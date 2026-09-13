@@ -242,7 +242,7 @@ export function InteractiveCorrelationMatrix({
     <div className={`flex flex-col gap-4 w-full select-none ${className}`}>
       
       {/* Live Regression Header Telemetry */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[3px_3px_0px_#1A3629]">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_8px_rgba(26,54,41,0.03)]">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629] animate-pulse" />
           <span className="font-mono text-xs font-bold text-[#1A3629] uppercase tracking-wider">
@@ -251,7 +251,7 @@ export function InteractiveCorrelationMatrix({
         </div>
 
         <div className="flex items-center gap-3 font-mono text-xs font-bold">
-          <div className="px-2.5 py-1 rounded-md bg-[#F4F0EA] border border-[#1A3629]/20 text-[#1A3629]">
+          <div className="px-2.5 py-1 rounded-md bg-[#F4F0EA] border border-[#1A3629]/15 text-[#1A3629]">
             r = {stats.r >= 0 ? '+' : ''}{stats.r.toFixed(2)} ({Math.round(stats.rSquared * 100)}% Confidence)
           </div>
           <button
@@ -265,7 +265,7 @@ export function InteractiveCorrelationMatrix({
       </div>
 
       {/* Interactive Helper Banner / Drag Reminder */}
-      <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629]/25 text-[#1A3629] text-[11px] font-mono font-bold shadow-sm">
+      <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FAF6EE] border border-[#1A3629]/15 text-[#1A3629] text-[11px] font-mono font-bold shadow-2xs">
         <span className="flex items-center gap-2">
           <span className="font-bold text-[#10B981]">[TIP]</span>
           <span>Click and drag any data circle to test live biometric responses</span>
@@ -280,7 +280,7 @@ export function InteractiveCorrelationMatrix({
         ref={containerRef}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className="relative w-full h-64 sm:h-72 rounded-2xl border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] p-4 overflow-hidden touch-none cursor-crosshair"
+        className="relative w-full h-64 sm:h-72 rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(26,54,41,0.04)] p-4 overflow-hidden touch-none cursor-crosshair"
       >
         {/* SVG Grid Lines & Trendlines (100% Deterministic Percentage Coordinates) */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
@@ -298,7 +298,7 @@ export function InteractiveCorrelationMatrix({
             x2="90%"
             y2={`${y2Percent.toFixed(1)}%`}
             stroke="#1A3629"
-            strokeWidth="3"
+            strokeWidth="2.5"
             strokeDasharray="6 4"
             className="transition-all duration-75"
           />
@@ -310,7 +310,7 @@ export function InteractiveCorrelationMatrix({
             x2={`${simulatedLineX.toFixed(1)}%`}
             y2="92%"
             stroke="#3A6B52"
-            strokeWidth="2"
+            strokeWidth="1.5"
             strokeDasharray="3 3"
             className="opacity-70"
           />
@@ -350,10 +350,10 @@ export function InteractiveCorrelationMatrix({
             >
               {/* Node Pill */}
               <div
-                className={`w-6 h-6 rounded-full border-2 border-[#1A3629] flex items-center justify-center font-mono font-bold text-[10px] shadow-[2px_2px_0px_#1A3629] transition-colors ${
+                className={`w-6 h-6 rounded-full border flex items-center justify-center font-mono font-bold text-[10px] shadow-2xs transition-colors ${
                   isDragging || isHovered
-                    ? 'bg-[#1A3629] text-[#FFFDF9]'
-                    : 'bg-[#FFFDF9] text-[#1A3629]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629]'
+                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/30'
                 }`}
               >
                 {pt.y.toFixed(0)}
@@ -361,7 +361,7 @@ export function InteractiveCorrelationMatrix({
 
               {/* Floating Tooltip */}
               <div
-                className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 rounded-md border border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-mono text-[9px] font-bold whitespace-nowrap shadow-[2px_2px_0px_#1A3629] pointer-events-none transition-opacity ${
+                className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 rounded-lg border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-mono text-[9px] font-bold whitespace-nowrap shadow-xs pointer-events-none transition-opacity ${
                   isDragging || isHovered ? 'opacity-100' : 'opacity-0'
                 }`}
               >
@@ -373,7 +373,7 @@ export function InteractiveCorrelationMatrix({
       </div>
 
       {/* Real-time Predictive Simulation Slider */}
-      <div className="p-4 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_8px_rgba(26,54,41,0.03)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1.5">
             <span className="font-mono text-xs font-bold text-[#1A3629] uppercase tracking-wider">
@@ -395,7 +395,7 @@ export function InteractiveCorrelationMatrix({
         </div>
 
         {/* Live Forecast Result Pill */}
-        <div className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] flex items-center justify-between sm:justify-center gap-3 shrink-0 shadow-[2px_2px_0px_#1A3629]">
+        <div className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] flex items-center justify-between sm:justify-center gap-3 shrink-0 shadow-2xs">
           <span className="font-cabinet font-bold text-xs uppercase tracking-wider">
             Predicted {yLabel}:
           </span>

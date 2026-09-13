@@ -184,21 +184,18 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/70 backdrop-blur-md animate-[fadeScale_0.25s_ease-out]">
-      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border-3 border-[#1A3629] rounded-t-3xl sm:rounded-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.25)] sm:shadow-[8px_8px_0px_#1A3629] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
-        {/* Mobile Drag Handle */}
-        <div className="sm:hidden w-12 h-1.5 bg-[#1A3629]/25 rounded-full mx-auto mt-2 -mb-1 shrink-0" />
-
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]">
+      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl shadow-[0_25px_60px_rgba(26,54,41,0.14)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
         {/* Header Ribbon */}
-        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b-2 border-[#1A3629] bg-[#FAF6EE] flex items-center justify-between">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
+        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#1A3629]/8 bg-[#FAF8F5] flex items-center justify-between">
+          <span className="font-cabinet text-xs font-bold uppercase tracking-wider text-[#1A3629]">
             Scan Meal with AI
           </span>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center cursor-pointer shadow-[1px_1px_0px_#1A3629]"
+            className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
             aria-label="Close modal"
           >
             ✕
@@ -211,7 +208,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
           {step === 'upload' && (
             <div className="flex flex-col gap-5">
               <div className="text-center sm:text-left">
-                <h3 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
+                <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
                   Scan Any Meal
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-1">
@@ -220,7 +217,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
               </div>
 
               {errorMsg && (
-                <div className="p-3 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 text-xs font-mono font-bold">
+                <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-xs font-mono font-bold shadow-2xs">
                   {errorMsg}
                 </div>
               )}
@@ -230,7 +227,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-3 border-dashed border-[#1A3629]/40 hover:border-[#1A3629] bg-[#FAF6EE]/60 hover:bg-[#FAF6EE] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all group"
+                className="border border-dashed border-[#1A3629]/25 hover:border-[#1A3629]/60 bg-[#FAF6EE]/60 hover:bg-[#FAF6EE] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all group"
               >
                 <input
                   ref={fileInputRef}
@@ -244,7 +241,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   }}
                 />
 
-                <div className="w-16 h-16 rounded-2xl border-2 border-[#1A3629] bg-[#FFFDF9] flex items-center justify-center shadow-[3px_3px_0px_#1A3629] group-hover:-translate-y-1 transition-transform mb-3">
+                <div className="w-16 h-16 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] flex items-center justify-center group-hover:-translate-y-0.5 transition-transform mb-3 shadow-2xs">
                   <svg className="w-8 h-8 text-[#1A3629]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -267,7 +264,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   <button
                     type="button"
                     onClick={() => handleSampleSelect('/assets/food/grilled-chicken-1.0.png')}
-                    className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 hover:border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2"
+                    className="p-2.5 rounded-xl border border-[#1A3629]/15 hover:border-[#1A3629]/40 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
                   >
                     <img src="/assets/food/grilled-chicken-1.0.png" alt="Grilled Chicken" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
@@ -279,7 +276,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   <button
                     type="button"
                     onClick={() => handleSampleSelect('/assets/food/grain-bowl-1.0.png')}
-                    className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 hover:border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2"
+                    className="p-2.5 rounded-xl border border-[#1A3629]/15 hover:border-[#1A3629]/40 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
                   >
                     <img src="/assets/food/grain-bowl-1.0.png" alt="Quinoa Bowl" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
@@ -291,7 +288,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   <button
                     type="button"
                     onClick={() => handleSampleSelect('/assets/food/paneer-bhurji-1.0.png')}
-                    className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 hover:border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2"
+                    className="p-2.5 rounded-xl border border-[#1A3629]/15 hover:border-[#1A3629]/40 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-left transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
                   >
                     <img src="/assets/food/paneer-bhurji-1.0.png" alt="Paneer Bhurji" className="w-6 h-6 object-contain shrink-0 [image-rendering:pixelated]" />
                     <div className="min-w-0">
@@ -309,7 +306,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
           {step === 'scanning' && (
             <div className="flex flex-col items-center justify-center py-8 gap-5 text-center">
               {/* Image Preview */}
-              <div className="relative w-44 h-44 rounded-2xl border-3 border-[#1A3629] overflow-hidden bg-[#1A3629] shadow-[5px_5px_0px_#1A3629]">
+              <div className="relative w-44 h-44 rounded-2xl border border-[#1A3629]/20 overflow-hidden bg-[#1A3629] shadow-lg">
                 {selectedImage && (
                   <img
                     src={selectedImage}
@@ -336,7 +333,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
               <div className="flex flex-col gap-3.5 p-4 rounded-2xl border-2 border-[#1A3629]/20 bg-[#FAF6EE]">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   {/* Styled Image Preview */}
-                  <div className="relative w-32 h-32 shrink-0 rounded-2xl border-2 border-[#1A3629] overflow-hidden bg-[#FFFDF9] shadow-[3px_3px_0px_#1A3629] flex items-center justify-center p-1.5">
+                  <div className="relative w-32 h-32 shrink-0 rounded-2xl border border-[#1A3629]/15 overflow-hidden bg-[#FFFDF9] shadow-2xs flex items-center justify-center p-1.5">
                     <img
                       src={currentDisplayedImage}
                       alt="Custom plate preview"
@@ -347,10 +344,10 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                   {/* Title & Subtitle */}
                   <div className="flex-1 min-w-0 flex flex-col gap-1 w-full">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase bg-[#10B981] text-[#FFFDF9] border-[#1A3629]">
+                      <span className="px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold uppercase bg-[#10B981] text-[#FFFDF9] border-[#10B981]">
                         Verified
                       </span>
-                      <span className="px-2 py-0.5 rounded-md border text-[10px] font-mono font-bold uppercase bg-[#FFFDF9] border-[#1A3629] text-[#1A3629]">
+                      <span className="px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold uppercase bg-[#FFFDF9] border-[#1A3629]/20 text-[#1A3629]">
                         {extractedRecipe.category}
                       </span>
                     </div>
@@ -359,7 +356,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                       type="text"
                       value={extractedRecipe.name || ''}
                       onChange={(e) => setExtractedRecipe({ ...extractedRecipe, name: e.target.value })}
-                      className="font-fraunces font-black text-xl text-[#1A3629] bg-transparent border-b border-[#1A3629]/20 focus:border-[#1A3629] outline-none mt-1"
+                      className="font-cabinet font-extrabold text-xl text-[#1A3629] bg-transparent border-b border-[#1A3629]/20 focus:border-[#1A3629] outline-none mt-1"
                       placeholder="Dish Name"
                     />
 
@@ -393,10 +390,10 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                         setPhotoStyle('pixel_plate');
                         retroAudio.playBlip();
                       }}
-                      className={`py-2 px-2.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`py-2 px-2.5 rounded-xl border font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         photoStyle === 'pixel_plate'
-                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                          : 'border-[#1A3629]/25 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE]'
+                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF8F5]'
                       }`}
                     >
                       <span>Pixel Plate</span>
@@ -408,10 +405,10 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                         setPhotoStyle('matched_sprite');
                         retroAudio.playBlip();
                       }}
-                      className={`py-2 px-2.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`py-2 px-2.5 rounded-xl border font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         photoStyle === 'matched_sprite'
-                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                          : 'border-[#1A3629]/25 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE]'
+                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF8F5]'
                       }`}
                     >
                       <span>Matched Sprite</span>
@@ -423,10 +420,10 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                         setPhotoStyle('retro_frame');
                         retroAudio.playBlip();
                       }}
-                      className={`py-2 px-2.5 rounded-xl border-2 font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`py-2 px-2.5 rounded-xl border font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         photoStyle === 'retro_frame'
-                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52]'
-                          : 'border-[#1A3629]/25 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE]'
+                          ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF8F5]'
                       }`}
                     >
                       <span>Retro Frame</span>
@@ -446,7 +443,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                           }}
                           className={`p-1.5 rounded-lg border shrink-0 transition-all flex items-center gap-1 cursor-pointer ${
                             matchedSpriteImage === sp.url
-                              ? 'border-[#1A3629] bg-[#ECFDF5] shadow-[1px_1px_0px_#1A3629]'
+                              ? 'border-emerald-600 bg-emerald-50 shadow-2xs'
                               : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:border-[#1A3629]'
                           }`}
                         >
@@ -461,46 +458,46 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
 
               {/* Macros Dashboard Strip */}
               <div className="grid grid-cols-4 gap-2 text-center">
-                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                <div className="p-3 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs">
                   <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Calories</span>
                   <input
                     type="number"
                     value={extractedRecipe.calories || 0}
                     onChange={(e) => setExtractedRecipe({ ...extractedRecipe, calories: Number(e.target.value) })}
-                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                    className="font-cabinet font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
                   />
                   <span className="text-[9px] font-mono text-[#4A5D4E]">kcal</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5]">
+                <div className="p-3 rounded-2xl border border-[#10B981]/30 bg-[#ECFDF5] shadow-2xs">
                   <span className="text-[10px] font-mono font-bold text-[#065F46] uppercase block">Protein</span>
                   <input
                     type="number"
                     value={extractedRecipe.protein || 0}
                     onChange={(e) => setExtractedRecipe({ ...extractedRecipe, protein: Number(e.target.value) })}
-                    className="font-fraunces font-black text-lg text-[#065F46] w-full text-center bg-transparent outline-none"
+                    className="font-cabinet font-black text-lg text-[#065F46] w-full text-center bg-transparent outline-none"
                   />
                   <span className="text-[9px] font-mono text-[#065F46]">grams</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                <div className="p-3 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs">
                   <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Carbs</span>
                   <input
                     type="number"
                     value={extractedRecipe.carbs || 0}
                     onChange={(e) => setExtractedRecipe({ ...extractedRecipe, carbs: Number(e.target.value) })}
-                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                    className="font-cabinet font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
                   />
                   <span className="text-[9px] font-mono text-[#4A5D4E]">grams</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9]">
+                <div className="p-3 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs">
                   <span className="text-[10px] font-mono font-bold text-[#8C9B90] uppercase block">Fats</span>
                   <input
                     type="number"
                     value={extractedRecipe.fats || 0}
                     onChange={(e) => setExtractedRecipe({ ...extractedRecipe, fats: Number(e.target.value) })}
-                    className="font-fraunces font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
+                    className="font-cabinet font-black text-lg text-[#1A3629] w-full text-center bg-transparent outline-none"
                   />
                   <span className="text-[9px] font-mono text-[#4A5D4E]">grams</span>
                 </div>
@@ -509,7 +506,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
               {/* Ingredients & Instructions Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Ingredients */}
-                <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/15 bg-[#FFFDF9] flex flex-col gap-2">
+                <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs flex flex-col gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
                     Decomposed Ingredients ({extractedRecipe.ingredients?.length || 0})
                   </span>
@@ -524,7 +521,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 </div>
 
                 {/* Instructions */}
-                <div className="p-3.5 rounded-xl border-2 border-[#1A3629]/15 bg-[#FFFDF9] flex flex-col gap-2">
+                <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs flex flex-col gap-2">
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
                     Prep Instructions ({extractedRecipe.instructions?.length || 0})
                   </span>
@@ -544,7 +541,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 <button
                   type="button"
                   onClick={() => setStep('upload')}
-                  className="px-4 py-2 rounded-xl border-2 border-[#1A3629]/25 hover:border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs cursor-pointer"
+                  className="px-4 py-2 rounded-full border border-[#1A3629]/20 hover:border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs cursor-pointer"
                 >
                   ← Rescan Plate
                 </button>
@@ -552,7 +549,7 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
                 <button
                   type="button"
                   onClick={handleSaveAndClose}
-                  className="px-6 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-2xs transition-all cursor-pointer flex items-center gap-2"
                 >
                   <span>Save to Whole-Food Catalog →</span>
                 </button>

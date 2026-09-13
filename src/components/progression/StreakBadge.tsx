@@ -22,7 +22,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none group"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] shadow-2xs hover:bg-[#F4F0EA] transition-colors cursor-pointer select-none group"
         aria-label="View streak details"
       >
         <div className="flex items-center gap-1.5">
@@ -34,7 +34,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
 
         {streakFreezeStock > 0 && (
           <div
-            className="flex items-center gap-1 pl-2 border-l border-[#1A3629]/20 text-[11px] font-mono font-bold text-[#2563EB]"
+            className="flex items-center gap-1 pl-2 border-l border-[#1A3629]/15 text-[11px] font-mono font-bold text-[#2563EB]"
             title={`${streakFreezeStock} Streak Freeze available`}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
@@ -44,7 +44,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
       </button>
 
       {(open || showDetails) && (
-        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 p-4 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl shadow-[4px_4px_0px_#1A3629] z-40 text-left animate-card-enter">
+        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 p-4 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl shadow-[0_10px_30px_rgba(26,54,41,0.12)] z-40 text-left animate-in fade-in zoom-in-95 duration-150">
           <div className="flex items-center justify-between mb-2">
             <span className="font-cabinet text-xs font-bold text-[#1A3629] uppercase tracking-wider">
               Consistency Streak

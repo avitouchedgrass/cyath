@@ -122,15 +122,12 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/70 backdrop-blur-md animate-[fadeScale_0.25s_ease-out]">
-      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border-3 border-[#1A3629] rounded-t-3xl sm:rounded-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.25)] sm:shadow-[8px_8px_0px_#1A3629] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
-        {/* Mobile Drag Handle */}
-        <div className="sm:hidden w-12 h-1.5 bg-[#1A3629]/25 rounded-full mx-auto mt-2 -mb-1 shrink-0" />
-
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]">
+      <div className="relative w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl shadow-[0_25px_60px_rgba(26,54,41,0.14)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
         {/* Modal Header */}
-        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b-2 border-[#1A3629] bg-[#FAF6EE] flex items-center justify-between">
+        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#1A3629]/8 bg-[#FAF8F5] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-fraunces font-black text-xl text-[#1A3629]">
+            <span className="font-cabinet font-extrabold text-xl text-[#1A3629]">
               {initialRecipe ? 'Edit Custom Recipe' : 'Add Custom Recipe'}
             </span>
           </div>
@@ -138,7 +135,7 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center cursor-pointer shadow-[1px_1px_0px_#1A3629]"
+            className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
             aria-label="Close modal"
           >
             ✕
@@ -280,10 +277,10 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
                   key={p.url}
                   type="button"
                   onClick={() => setSelectedImage(p.url)}
-                  className={`p-2 rounded-xl border-2 transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                  className={`p-2 rounded-xl border transition-all cursor-pointer flex flex-col items-center gap-1 ${
                     selectedImage === p.url
-                      ? 'border-[#1A3629] bg-[#FAF6EE] shadow-[2px_2px_0px_#1A3629] -translate-y-0.5'
-                      : 'border-[#1A3629]/20 hover:border-[#1A3629] bg-[#FFFDF9]'
+                      ? 'border-[#1A3629] bg-[#FAF6EE] shadow-2xs'
+                      : 'border-[#1A3629]/15 hover:border-[#1A3629]/40 bg-[#FFFDF9]'
                   }`}
                 >
                   <img
@@ -364,14 +361,14 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF6EE] cursor-pointer"
+              className="px-5 py-2.5 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF8F5] cursor-pointer"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="flex-1 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="flex-1 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>✓ Save Custom Recipe</span>
             </button>

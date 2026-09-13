@@ -4,7 +4,8 @@ import React, { useMemo } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { calculateWeeklyReclamation } from '@/lib/weeklyReclamationEngine';
 import { retroAudio } from '@/lib/retroAudio';
-import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { getLocalWeekKey } from '@/lib/dateUtils';
+import { X, Check } from 'lucide-react';
 
 interface WeeklyDossierModalProps {
   isOpen: boolean;
@@ -17,8 +18,12 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
     logsByDate,
     deskRitualsByDate,
     dailyProtocolsAcceptedByDate,
-    gainXp,
+    claimedDossiersByWeek,
+    claimWeeklyDossier,
   } = useHabitStore();
+
+  const currentWeekKey = useMemo(() => getLocalWeekKey(currentDate), [currentDate]);
+  const isAlreadyClaimed = !!claimedDossiersByWeek[currentWeekKey];
 
   const report = useMemo(() => {
     return calculateWeeklyReclamation({
@@ -33,119 +38,113 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
   if (!isOpen) return null;
 
   const handleClaim = () => {
+    if (isAlreadyClaimed) {
+      onClose();
+      return;
+    }
     retroAudio.playTierUpgrade();
-    xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 15);
-    gainXp(100, 'Weekly Energy Dossier Reviewed');
+    claimWeeklyDossier(currentWeekKey);
     onClose();
   };
 
-  const getGradeBadge = (grade: string) => {
-    if (grade.startsWith('A')) {
-      return 'bg-[#ECFDF5] text-[#065F46] border-[#065F46]/30';
-    }
-    if (grade.startsWith('B')) {
-      return 'bg-[#FEF3C7] text-[#92400E] border-[#92400E]/30';
-    }
-    return 'bg-[#F1F5F9] text-[#475569] border-[#475569]/30';
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/50 backdrop-blur-sm animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in">
       <div
-        className="w-full max-w-2xl bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_#1A3629] max-h-[90vh] overflow-y-auto flex flex-col gap-6"
+        className="w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.14)] max-h-[90vh] overflow-y-auto flex flex-col gap-6"
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 pb-4 border-b-2 border-[#1A3629]/15">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#1A3629]/10">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#1A3629]/70">
-                7-DAY RECLAMATION DOSSIER
+              <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[#4A5D4E]">
+                7-Day Reclamation Dossier
               </span>
             </div>
-            <h2 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] mt-1.5 tracking-tight">
+            <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1.5 tracking-tight">
               Weekly Energy Audit &amp; Impact
             </h2>
-            <p className="font-cabinet text-xs sm:text-sm font-medium text-[#2C4A3B] mt-0.5">
+            <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
               Correlating daily circadian protocols against recorded afternoon energy dips.
             </p>
           </div>
 
-          <div
-            className={`px-3 py-1.5 rounded-xl border-2 font-mono font-black text-base ${getGradeBadge(
-              report.consistencyGrade
-            )} shrink-0 shadow-[2px_2px_0px_#1A3629]`}
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
+            aria-label="Close modal"
           >
-            Grade {report.consistencyGrade}
-          </div>
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Core Metric Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          <div className="p-4 rounded-2xl border border-[#1A3629]/20 bg-[#F4EFE6] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
+          <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
               Focus Hours Reclaimed
             </span>
-            <span className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
+            <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
               +{report.focusHoursReclaimed}h
             </span>
-            <span className="font-cabinet text-xs text-[#2C4A3B] mt-0.5">
+            <span className="font-sans text-[11px] text-[#4A5D4E] mt-0.5">
               High-clarity cognitive output
             </span>
           </div>
 
-          <div className="p-4 rounded-2xl border border-[#1A3629]/20 bg-[#F4EFE6] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
+          <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
               2 PM Slump Reduction
             </span>
-            <span className="font-fraunces font-black text-2xl sm:text-3xl text-[#065F46] mt-1 tabular-nums">
+            <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
               -{report.slumpReductionPercent}%
             </span>
-            <span className="font-cabinet text-xs text-[#2C4A3B] mt-0.5">
+            <span className="font-sans text-[11px] text-[#4A5D4E] mt-0.5">
               Avg {report.averageCompliantSlump}/10 vs {report.averageBaselineSlump}/10 baseline
             </span>
           </div>
 
-          <div className="p-4 rounded-2xl border border-[#1A3629]/20 bg-[#F4EFE6] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
+          <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
               Directives Locked
             </span>
-            <span className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
+            <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
               {report.protocolsCommittedCount} / 7
             </span>
-            <span className="font-cabinet text-xs text-[#2C4A3B] mt-0.5">
+            <span className="font-sans text-[11px] text-[#4A5D4E] mt-0.5">
               Days protocol executed
             </span>
           </div>
         </div>
 
         {/* 7-Day Micro-Timeline Breakdown */}
-        <div className="p-4 rounded-2xl border border-[#1A3629]/20 bg-[#FAF8F5] flex flex-col gap-2.5">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
-            Day-by-Day Protocol Log
+        <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2.5">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+            Day-by-Day Protocol Execution
           </span>
           <div className="grid grid-cols-7 gap-1.5 text-center">
             {report.dailyBreakdown.map((d) => (
               <div
                 key={d.date}
-                className={`p-2 rounded-xl border flex flex-col items-center justify-between gap-1 text-xs transition-colors ${
+                className={`p-2.5 rounded-xl border flex flex-col items-center justify-between gap-1 text-xs transition-colors ${
                   d.protocolCommitted
-                    ? 'border-[#065F46]/30 bg-[#ECFDF5]'
-                    : 'border-[#1A3629]/15 bg-[#FFFDF9]'
+                    ? 'border-[#1A3629]/20 bg-[#FFFDF9]'
+                    : 'border-[#1A3629]/8 bg-[#FAF8F5]'
                 }`}
               >
-                <span className="font-mono text-[10px] font-bold text-[#1A3629]/70">
+                <span className="font-mono text-[10px] font-semibold text-[#1A3629]/70">
                   {d.dayName}
                 </span>
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    d.protocolCommitted ? 'bg-[#065F46]' : 'bg-[#1A3629]/25'
+                    d.protocolCommitted ? 'bg-[#1A3629]' : 'bg-[#1A3629]/20'
                   }`}
                 />
-                <span className="font-mono text-[10px] font-bold text-[#1A3629]">
-                  {d.slumpScore !== undefined ? `${d.slumpScore}/10` : '-'}
+                <span className="font-mono text-[10px] font-semibold text-[#1A3629]">
+                  {d.slumpScore !== undefined ? `${d.slumpScore}/10` : '—'}
                 </span>
               </div>
             ))}
@@ -154,49 +153,56 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
 
         {/* Clinical Insights */}
         <div className="space-y-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
             Observed Biological Correlations
           </span>
           <div className="space-y-2">
             {report.insights.map((insight, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] text-xs font-cabinet font-medium text-[#2C4A3B] flex items-start gap-2.5"
+                className="p-3 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs font-sans font-medium text-[#1A3629] flex items-start gap-2.5"
               >
-                <span className="text-[#065F46] font-bold mt-0.5">✓</span>
+                <Check className="w-3.5 h-3.5 text-[#1A3629] shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{insight}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Next 7-Day Recommended Progression */}
-        <div className="p-4 rounded-2xl border-2 border-[#1A3629] bg-[#EAE3D2] flex flex-col gap-1">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]">
+        {/* Next 7-Day Progression */}
+        <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FAF8F5] flex flex-col gap-1">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
             NEXT 7-DAY PROGRESSION DIRECTIVE
           </span>
-          <p className="font-cabinet text-xs font-bold text-[#1A3629] leading-relaxed">
+          <p className="font-cabinet text-xs font-semibold text-[#1A3629] leading-relaxed">
             {report.nextWeekAction}
           </p>
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/15">
+        <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-[#1A3629]/30 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629] hover:bg-[#FAF8F5] cursor-pointer"
+            className="px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] font-cabinet text-xs font-bold text-[#1A3629] hover:bg-[#F5F1EA] cursor-pointer"
           >
             Close
           </button>
 
-          <button
-            type="button"
-            onClick={handleClaim}
-            className="px-6 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
-          >
-            Seal Weekly Dossier (+100 XP) →
-          </button>
+          {isAlreadyClaimed ? (
+            <div className="px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold flex items-center gap-1.5">
+              <span>✓</span>
+              <span>Weekly Dossier Sealed (+100 XP Claimed)</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleClaim}
+              className="px-6 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet text-xs font-bold transition-all cursor-pointer shadow-2xs"
+            >
+              Seal Weekly Dossier (+100 XP) →
+            </button>
+          )}
         </div>
       </div>
     </div>

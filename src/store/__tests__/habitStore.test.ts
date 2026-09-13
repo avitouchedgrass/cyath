@@ -380,5 +380,61 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     // Evening Wrap awards +50 XP ritual + 15 XP for checking digital sunset habit
     expect(useHabitStore.getState().totalXp).toBe(initialXp + 230);
   });
+
+  it('deduplicates custom recipes on addition and successfully logs custom recipes to daily log', () => {
+    useHabitStore.setState({ customRecipes: [] });
+
+    const recipe1 = {
+      id: 'custom-protein-pancakes',
+      name: 'High Protein Pancakes',
+      subtitle: 'Formulated by AI',
+      image: '/assets/food/pancakes.png',
+      calories: 420,
+      protein: 38,
+      carbs: 45,
+      fats: 8,
+      prepTimeMinutes: 15,
+      category: 'High Protein' as const,
+      dietType: 'vegetarian' as const,
+      tags: ['High Protein'],
+      focusScore: '9.5/10',
+      description: 'Fluffy protein pancakes',
+      ingredients: [{ item: 'Oats', amount: '60g' }],
+      instructions: ['Blend and cook'],
+      isCustom: true,
+    };
+
+    // Add first time
+    useHabitStore.getState().addCustomRecipe(recipe1);
+    expect(useHabitStore.getState().customRecipes.length).toBe(1);
+
+    // Attempt to add second time with same ID or same name (case-insensitive)
+    const duplicateRecipe = {
+      ...recipe1,
+      id: 'custom-protein-pancakes-dup',
+      name: '  high protein pancakes  ',
+      calories: 440,
+    };
+
+    useHabitStore.getState().addCustomRecipe(duplicateRecipe);
+    // Should NOT create 2 instances! Should replace/update
+    expect(useHabitStore.getState().customRecipes.length).toBe(1);
+    expect(useHabitStore.getState().customRecipes[0].calories).toBe(440);
+
+    // Log the custom recipe to today
+    const today = useHabitStore.getState().currentDate;
+    const initialProtein = useHabitStore.getState().getDailyLog(today).totalProteinLogged || 0;
+
+    useHabitStore.getState().logRecipeToDay(
+      useHabitStore.getState().customRecipes[0].id,
+      38,
+      440,
+      today
+    );
+
+    const logAfter = useHabitStore.getState().getDailyLog(today);
+    expect(logAfter.totalProteinLogged).toBe(initialProtein + 38);
+    expect(logAfter.loggedRecipeIds).toContain('custom-protein-pancakes-dup');
+  });
 });
 

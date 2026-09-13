@@ -33,3 +33,12 @@ export function getRelativeLocalDate(daysOffset: number, baseDate?: Date | null)
   return formatLocalDate(safeDate);
 }
 
+export function getLocalWeekKey(dateStr?: string | null): string {
+  const d = parseLocalDate(dateStr);
+  const day = d.getDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diffToMonday);
+  return `week_${formatLocalDate(monday)}`;
+}
+

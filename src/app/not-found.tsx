@@ -16,10 +16,10 @@ export default function NotFound() {
 
       {/* Main Container */}
       <main className="w-full max-w-lg mx-auto my-auto py-8">
-        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center gap-6">
+        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-8 sm:p-10 text-center flex flex-col items-center gap-6">
           
           {/* 16-Bit Mascot */}
-          <div className="w-24 h-24 rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center p-3 shadow-[3px_3px_0px_#1A3629]">
+          <div className="w-24 h-24 rounded-2xl border border-[#1A3629]/15 bg-[#F4F0EA] flex items-center justify-center p-3 shadow-2xs">
             <Image
               src="/assets/stovesage.png"
               alt="Cyath AI Coach Mascot"
@@ -30,10 +30,10 @@ export default function NotFound() {
           </div>
 
           <div>
-            <span className="px-3 py-1 rounded-full border-2 border-[#1A3629] bg-[#FAF6EE] text-[11px] font-mono font-bold uppercase tracking-widest text-[#1A3629] inline-block mb-3">
+            <span className="px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#FAF6EE] text-[11px] font-mono font-bold uppercase tracking-widest text-[#1A3629] inline-block mb-3">
               Error 404
             </span>
-            <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
+            <h1 className="font-cabinet font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
               Page Not Found
             </h1>
             <p className="text-sm font-medium text-[#2C4A3B] mt-2 leading-relaxed max-w-sm">
@@ -42,22 +42,22 @@ export default function NotFound() {
           </div>
 
           {/* Navigation Links */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full pt-2 border-t-2 border-[#1A3629]/15">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full pt-2 border-t border-[#1A3629]/10">
             <Link
               href="/dashboard"
-              className="w-full py-3 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] font-bold text-xs shadow-[3px_3px_0px_#3A6B52] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block text-center cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#234535] font-semibold text-xs transition-colors block text-center cursor-pointer"
             >
               Open Daily Planner →
             </Link>
             <Link
-              href="/recipes"
-              className="w-full py-3 px-4 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] hover:bg-[#EFE9DF] font-bold text-xs shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block text-center cursor-pointer"
+              href="/playbook?tab=recipes"
+              className="w-full py-3 px-4 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629] hover:bg-[#EBE5DC] font-semibold text-xs transition-colors block text-center cursor-pointer"
             >
               Browse Recipes
             </Link>
             <Link
               href="/"
-              className="w-full py-3 px-4 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4F0EA] font-bold text-xs shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block text-center cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4F0EA] font-semibold text-xs transition-colors block text-center cursor-pointer"
             >
               Home
             </Link>

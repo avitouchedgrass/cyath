@@ -13,15 +13,32 @@ import {
 } from '@/lib/progression/engine';
 import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
-import { Recipe } from '@/lib/recipes';
+import { Recipe, RECIPES } from '@/lib/recipes';
 import { validateReferralCodeInput, KNOWN_SEED_CODES, extractReferralCode } from '@/lib/referralUtils';
-import { formatLocalDate } from '@/lib/dateUtils';
+import { formatLocalDate, getLocalWeekKey } from '@/lib/dateUtils';
 
 export interface HabitItem {
   id: string;
   title: string;
   category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'mindset' | 'custom';
   targetDaysPerWeek: number;
+}
+
+export interface LoggedMealEntry {
+  id: string;
+  name: string;
+  protein: number;
+  calories: number;
+  carbs?: number;
+  fats?: number;
+  dietType?: 'vegetarian' | 'vegan' | 'eggetarian' | 'pescatarian' | 'omnivore';
+  isVegetarian?: boolean;
+  category?: 'High Protein' | 'Steady Carbs' | 'Quick Fuel' | 'Keto Clean' | 'Post Workout';
+  ingredients?: Array<{ item: string; amount: string }>;
+  suggestedSprite?: string;
+  loggedAt: string;
+  recipeId?: string;
+  savedAsRecipe?: boolean;
 }
 
 export interface DailyLogData {
@@ -34,6 +51,7 @@ export interface DailyLogData {
   moodScore: number;
   notes: string;
   loggedRecipeIds: string[];
+  loggedMeals?: LoggedMealEntry[];
 }
 
 export interface DeskRitualData {
@@ -118,6 +136,7 @@ export interface HabitStoreState {
   dailyProtocolsAcceptedByDate: Record<string, boolean>;
   dailyProtocolsCompletedByDate: Record<string, boolean>;
   deskRitualsByDate: Record<string, DeskRitualData>;
+  claimedDossiersByWeek: Record<string, boolean>;
 
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
@@ -142,9 +161,13 @@ export interface HabitStoreState {
   deleteCustomRecipe: (id: string) => void;
   logRecipeToDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
   removeRecipeFromDay: (recipeId: string, protein: number, calories: number, date?: string) => void;
+  logMealToDay: (meal: Omit<LoggedMealEntry, 'id' | 'loggedAt'> & { id?: string; loggedAt?: string }, date?: string) => LoggedMealEntry;
+  removeMealFromDay: (mealId: string, date?: string) => void;
+  markMealSavedAsRecipe: (mealId: string, date?: string) => void;
   gainXp: (amount: number, reason: string, source?: string) => { oldLevel: number; newLevel: number; leveledUp: boolean };
   claimQuest: (questId: string, date?: string) => void;
   claimReferralCode: (code: string) => Promise<{ success: boolean; message: string; xpAwarded: number }>;
+  claimWeeklyDossier: (weekKey?: string) => { success: boolean; xpAwarded: number };
   getDailyLog: (date?: string) => DailyLogData;
   syncWithSupabase: (date?: string) => Promise<void>;
   initDemoSession: () => void;
@@ -169,6 +192,7 @@ const createEmptyDailyLog = (): DailyLogData => ({
   moodScore: 8,
   notes: '',
   loggedRecipeIds: [],
+  loggedMeals: [],
 });
 
 interface UserLocalProgressData {
@@ -182,6 +206,7 @@ interface UserLocalProgressData {
   customRecipes?: Recipe[];
   userProfile?: UserProfile | null;
   habits?: HabitItem[];
+  claimedDossiersByWeek?: Record<string, boolean>;
 }
 
 const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressData>) => {
@@ -210,6 +235,7 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       customRecipes: Array.isArray(data.customRecipes) ? data.customRecipes : (existing.customRecipes ?? []),
       userProfile: data.userProfile !== undefined ? data.userProfile : (existing.userProfile ?? null),
       habits: Array.isArray(data.habits) && data.habits.length > 0 ? data.habits : (existing.habits ?? DEFAULT_HABITS),
+      claimedDossiersByWeek: data.claimedDossiersByWeek && typeof data.claimedDossiersByWeek === 'object' ? data.claimedDossiersByWeek : (existing.claimedDossiersByWeek ?? {}),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -251,6 +277,7 @@ export const useHabitStore = create<HabitStoreState>()(
       dailyProtocolsAcceptedByDate: {},
       dailyProtocolsCompletedByDate: {},
       deskRitualsByDate: {},
+      claimedDossiersByWeek: {},
 
       setDate: (date) => set({ currentDate: date }),
 
@@ -675,6 +702,7 @@ export const useHabitStore = create<HabitStoreState>()(
           moodScore: typeof rawLog.moodScore === 'number' && Number.isFinite(rawLog.moodScore) ? rawLog.moodScore : 8,
           notes: typeof rawLog.notes === 'string' ? rawLog.notes : '',
           loggedRecipeIds: Array.isArray(rawLog.loggedRecipeIds) ? rawLog.loggedRecipeIds : [],
+          loggedMeals: Array.isArray(rawLog.loggedMeals) ? rawLog.loggedMeals : [],
         };
       },
 
@@ -905,6 +933,34 @@ export const useHabitStore = create<HabitStoreState>()(
         };
       },
 
+      claimWeeklyDossier: (weekKey) => {
+        const targetKey = weekKey || getLocalWeekKey(get().currentDate);
+        const currentClaimed = get().claimedDossiersByWeek || {};
+        if (currentClaimed[targetKey]) {
+          return { success: false, xpAwarded: 0 };
+        }
+
+        const updatedClaimed = {
+          ...currentClaimed,
+          [targetKey]: true,
+        };
+
+        set({
+          claimedDossiersByWeek: updatedClaimed,
+        });
+
+        get().gainXp(100, 'Weekly Energy Dossier Reviewed', 'dossier');
+
+        const session = get().userSession;
+        if (session && !session.id.startsWith('guest_')) {
+          saveUserLocalProgress(session.id, {
+            claimedDossiersByWeek: updatedClaimed,
+          });
+        }
+
+        return { success: true, xpAwarded: 100 };
+      },
+
       acceptDailyProtocol: (date) => {
         const targetDate = date || get().currentDate;
         if (get().dailyProtocolsAcceptedByDate[targetDate]) return;
@@ -1093,7 +1149,28 @@ export const useHabitStore = create<HabitStoreState>()(
 
       deleteHabit: (habitId) => {
         const updated = get().habits.filter((h) => h.id !== habitId);
-        set({ habits: updated });
+        const currentDate = get().currentDate;
+        const currentLog = get().getDailyLog(currentDate);
+
+        // If this custom habit was completed today, revoke the awarded XP to prevent add-complete-delete farming
+        if (currentLog.habitsCompleted[habitId]) {
+          get().gainXp(-XP_AWARDS.habitComplete, 'Custom Habit Deleted', 'habit');
+          const updatedHabitsCompleted = { ...currentLog.habitsCompleted };
+          delete updatedHabitsCompleted[habitId];
+
+          set((state) => ({
+            habits: updated,
+            logsByDate: {
+              ...state.logsByDate,
+              [currentDate]: {
+                ...currentLog,
+                habitsCompleted: updatedHabitsCompleted,
+              },
+            },
+          }));
+        } else {
+          set({ habits: updated });
+        }
 
         const session = get().userSession;
         if (session && !session.id.startsWith('guest_')) {
@@ -1246,7 +1323,13 @@ export const useHabitStore = create<HabitStoreState>()(
       },
 
       addCustomRecipe: (recipe) => {
-        const updated = [recipe, ...get().customRecipes.filter((r) => r.id !== recipe.id)];
+        const normalizedName = recipe.name.toLowerCase().trim();
+        const updated = [
+          recipe,
+          ...get().customRecipes.filter(
+            (r) => r.id !== recipe.id && r.name.toLowerCase().trim() !== normalizedName
+          ),
+        ];
         set({ customRecipes: updated });
 
         const userId = get().userSession?.id;
@@ -1344,7 +1427,28 @@ export const useHabitStore = create<HabitStoreState>()(
       logRecipeToDay: (recipeId, protein, calories, date) => {
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const existingMeals = currentLog.loggedMeals || [];
+        const alreadyLoggedCount = existingMeals.length + currentLog.loggedRecipeIds.length;
         const updatedRecipes = [...currentLog.loggedRecipeIds, recipeId];
+
+        const allRecipes = [...get().customRecipes, ...RECIPES];
+        const matched = allRecipes.find((r) => r.id === recipeId);
+
+        const newMealEntry: LoggedMealEntry = {
+          id: `recipe_log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          name: matched?.name || 'Logged Dish',
+          protein,
+          calories,
+          carbs: matched?.carbs,
+          fats: matched?.fats,
+          dietType: matched?.dietType,
+          isVegetarian: matched?.dietType === 'vegetarian' || matched?.dietType === 'vegan',
+          ingredients: matched?.ingredients,
+          suggestedSprite: matched?.image,
+          loggedAt: new Date().toISOString(),
+          recipeId,
+          savedAsRecipe: true,
+        };
 
         set((state) => ({
           logsByDate: {
@@ -1354,11 +1458,15 @@ export const useHabitStore = create<HabitStoreState>()(
               totalProteinLogged: currentLog.totalProteinLogged + protein,
               totalCaloriesLogged: currentLog.totalCaloriesLogged + calories,
               loggedRecipeIds: updatedRecipes,
+              loggedMeals: [...existingMeals, newMealEntry],
             },
           },
         }));
 
-        get().gainXp(XP_AWARDS.recipeLogged, 'Whole Food Dish Prepared', 'recipe');
+        // Cap recipe XP at 3 meals per day (max 60 XP/day) to prevent infinite spam farming
+        if (alreadyLoggedCount < 3) {
+          get().gainXp(XP_AWARDS.recipeLogged, 'Whole Food Dish Prepared', 'recipe');
+        }
         get().syncWithSupabase(targetDate);
       },
 
@@ -1371,6 +1479,12 @@ export const useHabitStore = create<HabitStoreState>()(
         const updatedRecipes = [...currentLog.loggedRecipeIds];
         updatedRecipes.splice(index, 1);
 
+        const existingMeals = currentLog.loggedMeals || [];
+        const mealIndex = existingMeals.findIndex((m) => m.recipeId === recipeId);
+        const updatedMeals = mealIndex !== -1 
+          ? existingMeals.filter((_, i) => i !== mealIndex)
+          : existingMeals;
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
@@ -1379,6 +1493,103 @@ export const useHabitStore = create<HabitStoreState>()(
               totalProteinLogged: Math.max(0, currentLog.totalProteinLogged - protein),
               totalCaloriesLogged: Math.max(0, currentLog.totalCaloriesLogged - calories),
               loggedRecipeIds: updatedRecipes,
+              loggedMeals: updatedMeals,
+            },
+          },
+        }));
+
+        // Deduct recipe XP if the removed recipe was within the daily XP reward cap (<= 3 meals)
+        if (currentLog.loggedRecipeIds.length <= 3) {
+          get().gainXp(-XP_AWARDS.recipeLogged, 'Whole Food Dish Removed', 'recipe');
+        }
+        get().syncWithSupabase(targetDate);
+      },
+
+      logMealToDay: (meal, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const existingMeals = currentLog.loggedMeals || [];
+        const alreadyLoggedCount = existingMeals.length + currentLog.loggedRecipeIds.length;
+
+        const newMealEntry: LoggedMealEntry = {
+          ...meal,
+          id: meal.id || `meal_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          loggedAt: meal.loggedAt || new Date().toISOString(),
+          savedAsRecipe: meal.savedAsRecipe ?? false,
+        };
+
+        const updatedMeals = [...existingMeals, newMealEntry];
+        const updatedRecipes = meal.recipeId 
+          ? [...currentLog.loggedRecipeIds, meal.recipeId]
+          : currentLog.loggedRecipeIds;
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              totalProteinLogged: currentLog.totalProteinLogged + (meal.protein || 0),
+              totalCaloriesLogged: currentLog.totalCaloriesLogged + (meal.calories || 0),
+              loggedMeals: updatedMeals,
+              loggedRecipeIds: updatedRecipes,
+            },
+          },
+        }));
+
+        if (alreadyLoggedCount < 3) {
+          get().gainXp(XP_AWARDS.recipeLogged, 'Whole Food Dish Prepared', 'recipe');
+        }
+        get().syncWithSupabase(targetDate);
+        return newMealEntry;
+      },
+
+      removeMealFromDay: (mealId, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const existingMeals = currentLog.loggedMeals || [];
+        const mealIndex = existingMeals.findIndex((m) => m.id === mealId);
+        if (mealIndex === -1) return;
+
+        const meal = existingMeals[mealIndex];
+        const updatedMeals = existingMeals.filter((m) => m.id !== mealId);
+
+        let updatedRecipes = [...currentLog.loggedRecipeIds];
+        if (meal.recipeId) {
+          const rIndex = updatedRecipes.indexOf(meal.recipeId);
+          if (rIndex !== -1) {
+            updatedRecipes.splice(rIndex, 1);
+          }
+        }
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              totalProteinLogged: Math.max(0, currentLog.totalProteinLogged - (meal.protein || 0)),
+              totalCaloriesLogged: Math.max(0, currentLog.totalCaloriesLogged - (meal.calories || 0)),
+              loggedMeals: updatedMeals,
+              loggedRecipeIds: updatedRecipes,
+            },
+          },
+        }));
+        get().syncWithSupabase(targetDate);
+      },
+
+      markMealSavedAsRecipe: (mealId, date) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const existingMeals = currentLog.loggedMeals || [];
+        const updatedMeals = existingMeals.map((m) => 
+          m.id === mealId ? { ...m, savedAsRecipe: true } : m
+        );
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              loggedMeals: updatedMeals,
             },
           },
         }));

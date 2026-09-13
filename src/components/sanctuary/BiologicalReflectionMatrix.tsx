@@ -282,7 +282,7 @@ export function BiologicalReflectionMatrix() {
             <div className="flex items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded-md bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold flex items-center justify-center shadow-[1px_1px_0px_#C9A84C]">
-                  ⚡
+                  ◈
                 </span>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
                   ATMOSPHERE

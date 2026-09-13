@@ -16,13 +16,15 @@ export function BottomCornerLevelBadge() {
     setMounted(true);
   }, []);
 
-  // Hide on auth, login, and onboarding screens
+  // Hide on auth, login, onboarding, dashboard, and sanctuary screens
   if (!mounted) return null;
   if (
     pathname === '/auth' ||
     pathname === '/login' ||
     pathname === '/onboarding' ||
-    pathname.startsWith('/auth/')
+    pathname === '/sanctuary' ||
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/dashboard')
   ) {
     return null;
   }
@@ -33,13 +35,13 @@ export function BottomCornerLevelBadge() {
     <div className="fixed bottom-5 left-5 z-40 pointer-events-auto select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <Link
         id="xp-hud-badge-target"
-        href="/sanctuary"
-        className="flex items-center gap-3 px-3.5 py-2 rounded-2xl border-2 sm:border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] hover:shadow-[5px_5px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer group"
-        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) — Open Sanctuary`}
+        href="/dashboard?tab=today"
+        className="flex items-center gap-3 px-3.5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-xs shadow-[0_4px_20px_rgba(26,54,41,0.08)] hover:shadow-[0_8px_25px_rgba(26,54,41,0.12)] hover:border-[#1A3629]/30 transition-all cursor-pointer group"
+        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) — Open Cockpit`}
         aria-label={`Current Level: Level ${progress.level}`}
       >
         {/* Floating Level Badge Circle */}
-        <div className="flex items-center justify-center bg-[#FAF6EE] px-2.5 py-1 rounded-xl border border-[#1A3629]/30 group-hover:border-[#1A3629] transition-colors">
+        <div className="flex items-center justify-center bg-[#FAF6EE] px-2.5 py-1 rounded-full border border-[#1A3629]/15 group-hover:border-[#1A3629]/30 transition-colors">
           <span className="font-cabinet text-xs font-black text-[#1A3629] tabular-nums">
             Lv.{progress.level}
           </span>
@@ -56,7 +58,7 @@ export function BottomCornerLevelBadge() {
             </span>
           </div>
 
-          <div className="w-full h-1.5 rounded-full bg-[#EAE3D2] border border-[#1A3629]/30 overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-[#EAE3D2] border border-[#1A3629]/15 overflow-hidden">
             <div
               className="h-full bg-[#10B981] transition-all duration-500 ease-out rounded-full"
               style={{ width: `${progress.progressPercent}%` }}
@@ -64,8 +66,8 @@ export function BottomCornerLevelBadge() {
           </div>
         </div>
 
-        <span className="hidden md:inline-flex text-[10px] font-mono font-bold text-[#10B981] bg-[#ECFDF5] px-1.5 py-0.5 rounded border border-[#10B981]/30">
-          Sanctuary ↗
+        <span className="hidden md:inline-flex text-[10px] font-mono font-bold text-[#1A3629] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#1A3629]/15">
+          Cockpit ↗
         </span>
       </Link>
     </div>

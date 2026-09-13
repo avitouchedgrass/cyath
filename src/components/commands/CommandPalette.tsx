@@ -238,7 +238,7 @@ export function CommandPalette() {
       id: 'metric-energy-8',
       category: 'METRIC',
       categoryLabel: 'RAPID TELEMETRY',
-      glyph: '⚡',
+      glyph: '▲',
       title: 'Rate Daily Energy: Level 8 / 10',
       description: 'Record high vigor and steady alertness',
       badge: '8/10 VIGOR',
@@ -285,12 +285,12 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: '↗',
-      title: 'Visit Island Sanctuary',
-      description: 'Inspect floating ecosystem and biome vitalities',
+      title: 'Open Daily Island Cockpit',
+      description: 'Inspect full-screen floating ecosystem, habits, and circadian rhythm',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
-        router.push('/sanctuary');
+        router.push('/dashboard?tab=today');
       },
     });
 
@@ -333,6 +333,20 @@ export function CommandPalette() {
       action: () => {
         setIsOpen(false);
         window.dispatchEvent(new CustomEvent('open-ai-coach'));
+      },
+    });
+
+    items.push({
+      id: 'action-walkthrough',
+      category: 'NAVIGATION',
+      categoryLabel: 'WORKSPACE NAVIGATION',
+      glyph: '✦',
+      title: 'Launch Interactive Pioneer Walkthrough',
+      description: 'Step-by-step spotlight tour across cockpit, habits, fuel telemetry & AI coach',
+      badge: 'TOUR',
+      action: () => {
+        setIsOpen(false);
+        window.dispatchEvent(new CustomEvent('open-cyath-walkthrough'));
       },
     });
 
@@ -580,19 +594,19 @@ export function CommandPalette() {
   return (
     <>
       <div
-        className="fixed inset-0 z-[9999] bg-[#1A3629]/45 backdrop-blur-md flex items-start justify-center pt-16 sm:pt-24 md:pt-28 px-4 sm:px-6 transition-all animate-in fade-in duration-150"
+        className="fixed inset-0 z-[9999] bg-[#1A3629]/35 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 md:pt-28 px-4 sm:px-6 transition-all animate-in fade-in duration-150"
         onClick={() => setIsOpen(false)}
         role="dialog"
         aria-modal="true"
         aria-label="Universal Command Palette"
       >
         <div
-          className="w-full max-w-[640px] bg-[#FAF8F5] border-2 border-[#1A3629] shadow-[10px_10px_0px_#1A3629] rounded-2xl overflow-hidden flex flex-col max-h-[82vh] transition-all"
+          className="w-full max-w-[640px] bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_25px_60px_rgba(26,54,41,0.18)] rounded-3xl overflow-hidden flex flex-col max-h-[82vh] transition-all"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Search Bar */}
-          <div className="px-5 py-4 bg-[#F2EDE2] border-b-2 border-[#1A3629] flex items-center gap-3">
-            <div className="flex items-center gap-1 px-2 py-1 bg-[#1A3629] text-[#FFFDF9] rounded-md font-mono text-[11px] font-bold shadow-[2px_2px_0px_#C9A84C] shrink-0 select-none">
+          <div className="px-5 py-4 bg-[#FAF8F5] border-b border-[#1A3629]/10 flex items-center gap-3">
+            <div className="flex items-center gap-1 px-2 py-1 bg-[#1A3629] text-[#FFFDF9] rounded-lg font-mono text-[11px] font-bold shadow-2xs shrink-0 select-none">
               <span>⌘</span>
               <span>K</span>
             </div>
@@ -613,12 +627,12 @@ export function CommandPalette() {
             />
 
             <div className="flex items-center gap-2 shrink-0">
-              <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-[#E5DFC9] border border-[#1A3629]/30 text-[10px] font-mono font-bold text-[#1A3629]/70 shadow-[1px_1px_0px_#1A3629] select-none">
+              <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-[#F4F0EA] border border-[#1A3629]/15 text-[10px] font-mono font-bold text-[#1A3629]/70 select-none">
                 ESC
               </kbd>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-6 h-6 rounded-md border border-[#1A3629] flex items-center justify-center text-xs font-mono font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors"
+                className="w-6 h-6 rounded-full border border-[#1A3629]/15 flex items-center justify-center text-xs font-mono font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors"
                 aria-label="Close Command Palette"
               >
                 ✕
@@ -628,7 +642,7 @@ export function CommandPalette() {
 
           {/* Feedback or Loading Notice */}
           {(feedbackMessage || isAiLoading) && (
-            <div className="px-5 py-2.5 bg-[#EAE2D0] border-b border-[#1A3629]/30 flex items-center justify-between text-xs font-mono text-[#1A3629]">
+            <div className="px-5 py-2.5 bg-[#FAF6EE] border-b border-[#1A3629]/10 flex items-center justify-between text-xs font-mono text-[#1A3629]">
               <span className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#1A3629] animate-pulse" />
                 {feedbackMessage || 'Consulting StoveSage AI intelligence...'}
@@ -639,21 +653,21 @@ export function CommandPalette() {
 
           {/* Hero Live Parsed Card (Appears when Shorthand Token is Detected) */}
           {liveParsedCommand && (
-            <div className="p-3.5 bg-[#F2EDE2] border-b-2 border-[#1A3629]">
+            <div className="p-3.5 bg-[#FAF8F5] border-b border-[#1A3629]/10">
               <div
-                className={`p-4 rounded-xl border-2 border-[#1A3629] cursor-pointer transition-all ${
+                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                   selectedIndex === 0
-                    ? 'bg-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#C9A84C]'
-                    : 'bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] shadow-[3px_3px_0px_#1A3629]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
+                    : 'bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] border-[#1A3629]/15 shadow-2xs'
                 }`}
                 onClick={() => executeParsedCommand(liveParsedCommand)}
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <span
-                    className={`font-mono text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold ${
+                    className={`font-mono text-[10px] tracking-wider uppercase px-2 py-0.5 rounded-full font-bold ${
                       selectedIndex === 0
                         ? 'bg-[#FFFDF9]/15 text-[#FFFDF9] border border-[#FFFDF9]/30'
-                        : 'bg-[#1A3629]/10 text-[#1A3629] border border-[#1A3629]/20'
+                        : 'bg-[#1A3629]/10 text-[#1A3629] border border-[#1A3629]/15'
                     }`}
                   >
                     {liveParsedCommand.badge}
@@ -667,7 +681,7 @@ export function CommandPalette() {
                     <span>COMMIT</span>
                   </div>
                 </div>
-                <div className="font-serif text-lg sm:text-xl font-bold">
+                <div className="font-cabinet text-lg sm:text-xl font-bold">
                   {liveParsedCommand.title}
                 </div>
                 <div className="text-xs opacity-75 mt-0.5">
@@ -712,10 +726,10 @@ export function CommandPalette() {
                       return (
                         <div
                           key={item.id}
-                          className={`p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all border ${
+                          className={`p-3 rounded-2xl flex items-center justify-between cursor-pointer transition-all border ${
                             isSelected
-                              ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#C9A84C]'
-                              : 'bg-transparent border-transparent hover:bg-[#F2EDE2] text-[#1A3629]'
+                              ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
+                              : 'bg-transparent border-transparent hover:bg-[#FAF8F5] text-[#1A3629]'
                           }`}
                           onClick={() => item.action()}
                           onMouseEnter={() => setSelectedIndex(itemGlobalIndex)}
@@ -726,7 +740,7 @@ export function CommandPalette() {
                               className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-colors ${
                                 isSelected
                                   ? 'bg-[#FFFDF9]/15 text-[#FFFDF9] border border-[#FFFDF9]/30'
-                                  : 'bg-[#EAE3D2] text-[#1A3629] border border-[#1A3629]/20'
+                                  : 'bg-[#F4F0EA] text-[#1A3629] border border-[#1A3629]/15'
                               }`}
                             >
                               {item.glyph}
@@ -751,7 +765,7 @@ export function CommandPalette() {
                               className={`font-mono text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full font-bold border transition-colors ${
                                 isSelected
                                   ? 'border-[#FFFDF9]/30 bg-[#FFFDF9]/15 text-[#FFFDF9]'
-                                  : 'border-[#1A3629]/20 bg-[#EFE9DC] text-[#1A3629]/70'
+                                  : 'border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]/70'
                               }`}
                             >
                               {item.badge}
@@ -772,24 +786,24 @@ export function CommandPalette() {
           </div>
 
           {/* Refined Footer */}
-          <div className="px-5 py-3 bg-[#F2EDE2] border-t-2 border-[#1A3629] flex items-center justify-between font-mono text-[11px] text-[#1A3629]/70 rounded-b-2xl select-none">
+          <div className="px-5 py-3 bg-[#FAF8F5] border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-[11px] text-[#1A3629]/70 rounded-b-3xl select-none">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-[#E5DFC9] border border-[#1A3629]/30 text-[10px] font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.5 rounded bg-[#F4F0EA] border border-[#1A3629]/15 text-[10px] font-bold text-[#1A3629]">
                   ↑↓
                 </kbd>
                 <span className="hidden sm:inline">Navigate</span>
               </span>
               <span className="text-[#1A3629]/30">·</span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-[#E5DFC9] border border-[#1A3629]/30 text-[10px] font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.5 rounded bg-[#F4F0EA] border border-[#1A3629]/15 text-[10px] font-bold text-[#1A3629]">
                   ↵
                 </kbd>
                 <span className="hidden sm:inline">Select</span>
               </span>
               <span className="text-[#1A3629]/30">·</span>
               <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-[#E5DFC9] border border-[#1A3629]/30 text-[10px] font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.5 rounded bg-[#F4F0EA] border border-[#1A3629]/15 text-[10px] font-bold text-[#1A3629]">
                   ESC
                 </kbd>
                 <span className="hidden sm:inline">Dismiss</span>

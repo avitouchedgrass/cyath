@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { X, Check } from 'lucide-react';
 
 interface MorningBootModalProps {
   isOpen: boolean;
@@ -40,7 +40,6 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     retroAudio.playTierUpgrade();
-    xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 8);
     completeMorningBoot({
       sleepHours,
       restedRating,
@@ -57,22 +56,22 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A3629]/75 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in"
     >
-      <div className="relative w-full max-w-md bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-6 sm:p-7 shadow-[6px_6px_0px_#1A3629] flex flex-col gap-5 max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-7 shadow-[0_25px_60px_rgba(26,54,41,0.14)] flex flex-col gap-5 max-h-[92vh] overflow-y-auto">
         
         {/* Header */}
-        <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/15">
+        <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2 py-0.5 rounded border border-[#D97706]/40 bg-[#FEF3C7] text-[10px] font-mono font-bold uppercase tracking-wider text-[#92400E]">
+              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E]">
                 Desk Morning Boot
               </span>
-              <span className="px-2 py-0.5 rounded border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
+              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
                 +50 XP
               </span>
             </div>
-            <h2 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
+            <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
               10-Second Desk Check-in
             </h2>
           </div>
@@ -80,26 +79,26 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg border border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             aria-label="Close modal"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <p className="text-xs font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
+        <p className="text-xs font-sans text-[#4A5D4E] leading-relaxed">
           Calibrate your biological baseline before diving into deep work.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           
           {/* 1. Sleep Duration */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#1A3629]">
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
                 Sleep Duration
               </span>
-              <span className="font-mono font-bold text-xs text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/20">
+              <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 {sleepHours} Hours
               </span>
             </div>
@@ -112,10 +111,10 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
                     retroAudio.playBlip();
                     setSleepHours(hours);
                   }}
-                  className={`py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-1.5 rounded-xl border font-mono text-xs font-semibold transition-all cursor-pointer ${
                     sleepHours === hours
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
-                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]'
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                   }`}
                 >
                   {hours}h
@@ -125,12 +124,12 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
           </div>
 
           {/* 2. Morning Rested Readiness */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#1A3629]">
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
                 Waking Alertness (1–10)
               </span>
-              <span className="font-mono font-bold text-xs text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/20">
+              <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 Level {restedRating}/10
               </span>
             </div>
@@ -142,10 +141,10 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
               onChange={(e) => setRestedRating(Number(e.target.value))}
               className="w-full accent-[#1A3629] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] font-mono text-[#4A5D4E]">
+            <div className="flex justify-between text-[11px] font-sans text-[#4A5D4E]">
               <span>Groggy (1)</span>
               <span>Baseline (5)</span>
-              <span>Fully Primed (10)</span>
+              <span>Primed (10)</span>
             </div>
           </div>
 
@@ -156,36 +155,36 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
               retroAudio.playBlip();
               setSunlightDone(!sunlightDone);
             }}
-            className={`p-3.5 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
+            className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
               sunlightDone
-                ? 'bg-[#ECFDF5] border-[#10B981] text-[#065F46]'
-                : 'bg-[#FAF6EE] border-[#1A3629]/20 text-[#1A3629] hover:border-[#1A3629]'
+                ? 'bg-[#FAF8F5] border-[#1A3629]/30 text-[#1A3629]'
+                : 'bg-[#FAF8F5] border-[#1A3629]/10 text-[#1A3629] hover:border-[#1A3629]/25'
             }`}
           >
             <div className="text-left">
               <span className="block text-xs font-cabinet font-bold leading-tight">
                 10–15m Morning Natural Daylight
               </span>
-              <span className="block text-[10px] font-mono opacity-80 mt-0.5">
+              <span className="block text-[11px] font-sans text-[#4A5D4E] mt-0.5">
                 Resets master circadian clock &amp; clears adenosine
               </span>
             </div>
             <div className={`w-5 h-5 rounded-md border flex items-center justify-center font-mono text-xs font-bold shrink-0 ${
               sunlightDone
-                ? 'bg-[#10B981] border-[#065F46] text-[#FFFDF9]'
-                : 'bg-[#FFFDF9] border-[#1A3629]/30'
+                ? 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9]'
+                : 'bg-[#FFFDF9] border-[#1A3629]/25'
             }`}>
-              {sunlightDone ? '✓' : ''}
+              {sunlightDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </div>
           </button>
 
           {/* 4. Target Deep Focus Block */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#1A3629]">
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
                 Target Deep Work Block
               </span>
-              <span className="font-mono font-bold text-xs text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/20">
+              <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 {targetFocusHours}h Goal
               </span>
             </div>
@@ -198,10 +197,10 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
                     retroAudio.playBlip();
                     setTargetFocusHours(hours);
                   }}
-                  className={`py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-1.5 rounded-xl border font-mono text-xs font-semibold transition-all cursor-pointer ${
                     targetFocusHours === hours
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
-                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]'
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                   }`}
                 >
                   {hours}h
@@ -212,7 +211,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
 
           <button
             type="submit"
-            className="w-full mt-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center"
+            className="w-full mt-1 py-3 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all cursor-pointer shadow-2xs flex items-center justify-center"
           >
             Prime My Focus (+50 XP)
           </button>

@@ -45,9 +45,9 @@ export function XpToastLayer() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="pointer-events-auto flex items-center gap-3 px-4 py-2.5 bg-[#FFFDF9] border-2 border-[#1A3629] rounded-xl shadow-[4px_4px_0px_#1A3629] animate-card-enter transition-all"
+          className="pointer-events-auto flex items-center gap-3 px-4 py-2.5 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl shadow-[0_10px_25px_rgba(26,54,41,0.12)] animate-in slide-in-from-bottom-2 duration-150 transition-all"
         >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#EAE3D2] border border-[#1A3629] font-cabinet text-xs font-black text-[#D97706]">
+          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#EAE3D2]/70 border border-[#1A3629]/10 font-cabinet text-xs font-black text-[#D97706]">
             XP
           </div>
           <div className="flex flex-col">

@@ -74,7 +74,7 @@ export function TrajectorySimulator({
           <span className="font-mono text-[10px] uppercase tracking-widest text-[#1A3629]/60 font-bold block">
             90-DAY PROJECTION
           </span>
-          <h3 className="font-fraunces font-bold text-lg text-[#1A3629] mt-0.5">
+          <h3 className="font-cabinet font-bold text-lg text-[#1A3629] mt-0.5">
             Projected Daily Energy
           </h3>
         </div>

@@ -128,9 +128,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Header Section */}
-        <div className="mb-8 border-b-2 border-[#1A3629]/15 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="mb-8 border-b border-[#1A3629]/10 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="font-fraunces font-black text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
+            <h1 className="font-cabinet font-extrabold text-3xl sm:text-4xl tracking-tight text-[#1A3629]">
               Profile &amp; Settings
             </h1>
             <p className="text-sm sm:text-base font-cabinet font-medium mt-1 leading-relaxed text-[#2C4A3B]">
@@ -140,25 +140,25 @@ export default function ProfilePage() {
 
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-semibold text-xs shadow-2xs hover:bg-[#F4F0EA] transition-colors cursor-pointer self-start sm:self-auto"
           >
             <span>Open Daily Planner →</span>
           </Link>
         </div>
 
         {/* User Identity Banner */}
-        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 sm:gap-5">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 sm:border-3 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center font-cabinet font-black text-xl text-[#1A3629] shadow-[3px_3px_0px_#1A3629]">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border border-[#1A3629]/15 bg-[#F4F0EA] flex items-center justify-center font-cabinet font-extrabold text-xl text-[#1A3629]">
               {displayName.slice(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h2 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
+                <h2 className="font-cabinet font-bold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                   {displayName}
                 </h2>
                 {isGuest && (
-                  <span className="px-2 py-0.5 rounded-md border border-[#1A3629] bg-[#F4F0EA] text-[10px] font-mono font-bold">
+                  <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-[10px] font-mono font-semibold">
                     GUEST
                   </span>
                 )}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                 retroAudio.playInspectConfirm();
                 setIsInviteModalOpen(true);
               }}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#10B981] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-emerald-600/20 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/70 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               title="Invite Friends for +250 XP"
             >
               <Gift className="w-3.5 h-3.5 text-[#059669]" />
@@ -187,7 +187,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleForceSync}
               disabled={isSyncing}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4F0EA] font-cabinet font-semibold text-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? 'Syncing...' : 'Sync Cloud'}</span>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={handleSignOut}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#234535] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -205,7 +205,7 @@ export default function ProfilePage() {
         </div>
 
         {syncStatus && (
-          <div className="mb-6 p-3.5 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-xs font-mono font-bold text-[#065F46] flex items-center gap-2 shadow-xs">
+          <div className="mb-6 p-3.5 rounded-2xl border border-emerald-600/20 bg-emerald-50 text-xs font-mono font-bold text-[#065F46] flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#10B981]" />
             <span>{syncStatus}</span>
           </div>
@@ -218,7 +218,7 @@ export default function ProfilePage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
               Days Logged
             </span>
@@ -230,7 +230,7 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
               Habits Completed
             </span>
@@ -242,7 +242,7 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6">
+          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
               Total Protein Logged
             </span>
@@ -258,25 +258,25 @@ export default function ProfilePage() {
         {/* Account Details & Blueprints Configuration */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
+          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
-              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
+              <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
                 Calibrated Blueprint Targets
               </h2>
               <div className="space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Daily Protein:</span>
                   <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
                   </span>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Hydration:</span>
                   <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? (userProfile.weightKg * 0.04).toFixed(1) : '2.5'}L / day
                   </span>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/15">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Sleep:</span>
                   <span className="font-bold text-[#1A3629]">8.0 hours</span>
                 </div>
@@ -289,46 +289,46 @@ export default function ProfilePage() {
 
             <Link
               href="/onboarding"
-              className="mt-6 w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] font-cabinet font-bold text-xs text-center shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all block"
+              className="mt-6 w-full py-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs text-center transition-colors block"
             >
               Re-Calibrate Daily Targets →
             </Link>
           </div>
 
-          <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-6 flex flex-col justify-between">
+          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
-              <h2 className="font-fraunces font-bold text-xl mb-4 text-[#1A3629]">
+              <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
                 Core Pillars Navigation
               </h2>
-              <ul className="space-y-2.5 font-cabinet font-bold text-xs">
+              <ul className="space-y-2 font-cabinet font-semibold text-xs">
                 <li>
-                  <Link href="/protocols" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                  <Link href="/protocols" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
                     <span>Protocol Cartridges</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/recipes" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                  <Link href="/recipes" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
                     <span>Whole-Food Fuel Recipes</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/correlations" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
+                  <Link href="/correlations" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
                     <span>Correlation Engine</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sanctuary" className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/20 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Sanctuary Floating Island</span>
+                  <Link href="/dashboard?tab=today" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Island Cockpit</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
               </ul>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
+            <div className="mt-4 pt-3 border-t border-[#1A3629]/10 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
               <span>Cyath Engine v2.0</span>
               <span>Local-First · Encrypted</span>
             </div>
@@ -337,13 +337,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Getting Started Walkthrough Launcher Card */}
-        <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] rounded-2xl p-5 sm:p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#FAF6EE] border-2 border-[#1A3629] flex items-center justify-center shadow-[2px_2px_0px_#1A3629] shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/15 flex items-center justify-center shrink-0">
               <Compass className="w-5 h-5 text-[#1A3629]" />
             </div>
             <div>
-              <h3 className="font-fraunces font-bold text-lg text-[#1A3629]">
+              <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
                 Getting Started Walkthrough
               </h3>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
@@ -358,7 +358,7 @@ export default function ProfilePage() {
               retroAudio.playInspectConfirm();
               window.dispatchEvent(new CustomEvent('open-cyath-walkthrough'));
             }}
-            className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] hover:bg-[#E8DECF] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
+            className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
           >
             <Compass className="w-3.5 h-3.5" />
             <span>Launch Walkthrough Tour</span>
@@ -366,14 +366,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Danger Zone: Account & Data Reset */}
-        <div className="border-3 border-[#DC2626] bg-[#FEF2F2] shadow-[4px_4px_0px_#DC2626] rounded-2xl p-6 sm:p-7">
+        <div className="rounded-3xl border border-red-200/80 bg-red-50/40 p-6 sm:p-7">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#FFFDF9] border-2 border-[#DC2626] flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-white border border-red-200 flex items-center justify-center shrink-0 shadow-2xs">
                 <ShieldAlert className="w-5 h-5 text-[#DC2626]" />
               </div>
               <div>
-                <h3 className="font-fraunces font-bold text-lg text-[#991B1B]">
+                <h3 className="font-cabinet font-bold text-lg text-[#991B1B]">
                   Danger Zone · Account Telemetry &amp; Reset
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#7F1D1D] mt-0.5 max-w-xl leading-relaxed">
@@ -389,7 +389,7 @@ export default function ProfilePage() {
                   retroAudio.playBlip();
                   setShowResetModal(true);
                 }}
-                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#D97706] bg-[#FEF3C7] text-[#92400E] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#D97706] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-100/70 text-amber-900 hover:bg-amber-100 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset to Level 1</span>
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                   retroAudio.playBlip();
                   setShowDeleteModal(true);
                 }}
-                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-red-600 bg-red-600 text-white hover:bg-red-700 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete Account</span>
@@ -420,21 +420,21 @@ export default function ProfilePage() {
 
       {/* Reset Progress Modal */}
       {showResetModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-md w-full border-3 border-[#D97706] bg-[#FFFDF9] shadow-[8px_8px_0px_#D97706] rounded-3xl p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[#1A3629]/30 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="max-w-md w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 relative shadow-[0_25px_60px_rgba(26,54,41,0.14)] animate-in zoom-in-95 duration-150">
             <button
               type="button"
               onClick={() => setShowResetModal(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/20 hover:bg-[#F4F0EA] cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#F4F0EA] cursor-pointer"
             >
               <X className="w-4 h-4 text-[#1A3629]" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] border-2 border-[#D97706] flex items-center justify-center mb-4">
-              <RotateCcw className="w-6 h-6 text-[#92400E]" />
+            <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300 flex items-center justify-center mb-4">
+              <RotateCcw className="w-6 h-6 text-amber-900" />
             </div>
 
-            <h3 className="font-fraunces font-black text-2xl text-[#1A3629] mb-2">
+            <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mb-2">
               Reset Progress to Level 1?
             </h3>
 
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => setShowResetModal(false)}
                 disabled={isProcessing}
-                className="flex-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs hover:bg-[#EAE4D7] transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -456,7 +456,7 @@ export default function ProfilePage() {
                 type="button"
                 onClick={handleResetProgress}
                 disabled={isProcessing}
-                className="flex-1 py-3 rounded-xl border-2 border-[#D97706] bg-[#D97706] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#78350F] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border border-amber-600 bg-amber-600 text-white font-cabinet font-semibold text-xs hover:bg-amber-700 transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isProcessing ? <span>Resetting...</span> : <span>Confirm Reset (0 XP)</span>}
               </button>
@@ -467,22 +467,22 @@ export default function ProfilePage() {
 
       {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-md w-full border-3 border-[#DC2626] bg-[#FFFDF9] shadow-[8px_8px_0px_#DC2626] rounded-3xl p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-[#1A3629]/30 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="max-w-md w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 relative shadow-[0_25px_60px_rgba(26,54,41,0.14)] animate-in zoom-in-95 duration-150">
             
             <button
               type="button"
               onClick={() => setShowDeleteModal(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/20 hover:bg-[#F4F0EA] cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#F4F0EA] cursor-pointer"
             >
               <X className="w-4 h-4 text-[#1A3629]" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-[#FEF2F2] border-2 border-[#DC2626] flex items-center justify-center mb-4">
-              <AlertTriangle className="w-6 h-6 text-[#DC2626]" />
+            <div className="w-12 h-12 rounded-2xl bg-red-100/70 border border-red-300 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-700" />
             </div>
 
-            <h3 className="font-fraunces font-black text-2xl text-[#1A3629] mb-2">
+            <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mb-2">
               Permanently Delete Account?
             </h3>
 
@@ -495,7 +495,7 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isProcessing}
-                className="flex-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs hover:bg-[#EAE4D7] transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={isProcessing}
-                className="flex-1 py-3 rounded-xl border-2 border-[#DC2626] bg-[#DC2626] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#991B1B] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border border-red-600 bg-red-600 text-white font-cabinet font-semibold text-xs hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <span>Deleting...</span>

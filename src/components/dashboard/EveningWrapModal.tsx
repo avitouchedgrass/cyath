@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { X } from 'lucide-react';
 
 interface EveningWrapModalProps {
   isOpen: boolean;
@@ -39,7 +39,6 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     retroAudio.playTierUpgrade();
-    xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 8);
     completeEveningWrap({
       caffeineCutoffRespected,
       wholeFoodRating,
@@ -55,22 +54,22 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A3629]/75 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in"
     >
-      <div className="relative w-full max-w-md bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-6 sm:p-7 shadow-[6px_6px_0px_#1A3629] flex flex-col gap-5 max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-7 shadow-[0_25px_60px_rgba(26,54,41,0.14)] flex flex-col gap-5 max-h-[92vh] overflow-y-auto">
         
         {/* Header */}
-        <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/15">
+        <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2 py-0.5 rounded border border-[#4F46E5]/40 bg-[#EEF2FF] text-[10px] font-mono font-bold uppercase tracking-wider text-[#3730A3]">
+              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E]">
                 Desk Evening Shutdown
               </span>
-              <span className="px-2 py-0.5 rounded border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
+              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
                 +50 XP
               </span>
             </div>
-            <h2 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
+            <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
               15-Second Desk Wrap
             </h2>
           </div>
@@ -78,23 +77,23 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg border border-[#1A3629] bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             aria-label="Close modal"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <p className="text-xs font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
-          Record your day’s closing levers before shutting down. Synchronizes your biological recovery score.
+        <p className="text-xs font-sans text-[#4A5D4E] leading-relaxed">
+          Record your day’s closing levers before shutting down. Synchronizes your recovery score.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           
           {/* 1. Caffeine Cutoff */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
-            <span className="text-xs font-mono font-bold text-[#1A3629]">
-              Caffeine Cutoff (Honored Prior to 2:00 PM)
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
+            <span className="text-xs font-cabinet font-bold text-[#1A3629]">
+              Caffeine Cutoff (Prior to 2:00 PM)
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -103,13 +102,13 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                   retroAudio.playBlip();
                   setCaffeineCutoffRespected(true);
                 }}
-                className={`py-2 px-3 rounded-lg border font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center ${
+                className={`py-2 rounded-xl border text-xs font-cabinet font-bold transition-all cursor-pointer ${
                   caffeineCutoffRespected
-                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
-                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                ✓ Honored Cutoff
+                Honored ✓
               </button>
               <button
                 type="button"
@@ -117,56 +116,56 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                   retroAudio.playBlip();
                   setCaffeineCutoffRespected(false);
                 }}
-                className={`py-2 px-3 rounded-lg border font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center ${
+                className={`py-2 rounded-xl border text-xs font-cabinet font-bold transition-all cursor-pointer ${
                   !caffeineCutoffRespected
-                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
-                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                Had Late Caffeine
+                Late Caffeine
               </button>
             </div>
           </div>
 
-          {/* 2. Whole-Food Fuel Composition */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
+          {/* 2. Whole Food Quality Rating */}
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#1A3629]">
-                Whole-Food Diet Quality
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
+                Whole Food Quality
               </span>
-              <span className="font-mono font-bold text-xs text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/20">
-                Score: {wholeFoodRating} / 5
+              <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
+                {wholeFoodRating}/5 Quality
               </span>
             </div>
             <div className="grid grid-cols-5 gap-1.5">
-              {[1, 2, 3, 4, 5].map((tier) => (
+              {[1, 2, 3, 4, 5].map((rating) => (
                 <button
-                  key={tier}
+                  key={rating}
                   type="button"
                   onClick={() => {
                     retroAudio.playBlip();
-                    setWholeFoodRating(tier);
+                    setWholeFoodRating(rating);
                   }}
-                  className={`py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${
-                    wholeFoodRating === tier
-                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-xs'
-                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/20 hover:border-[#1A3629]'
+                  className={`py-2 rounded-xl border font-mono text-xs font-semibold transition-all cursor-pointer ${
+                    wholeFoodRating === rating
+                      ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                      : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                   }`}
                 >
-                  {tier}
+                  {rating}★
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 3. Afternoon Slump Severity */}
-          <div className="p-3.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] flex flex-col gap-2">
+          {/* 3. Afternoon Slump Score */}
+          <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-[#1A3629]">
-                Afternoon Slump Severity (1–10)
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
+                Postprandial Energy Dip (1–10)
               </span>
-              <span className="font-mono font-bold text-xs text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/20">
-                Score: {afternoonSlumpScore} / 10
+              <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
+                Severity {afternoonSlumpScore}/10
               </span>
             </div>
             <input
@@ -177,18 +176,18 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
               onChange={(e) => setAfternoonSlumpScore(Number(e.target.value))}
               className="w-full accent-[#1A3629] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] font-mono text-[#4A5D4E]">
+            <div className="flex justify-between text-[11px] font-sans text-[#4A5D4E]">
               <span>Zero Slump (1)</span>
-              <span>Mild Dip (5)</span>
-              <span>Total Crash (10)</span>
+              <span>Noticeable (5)</span>
+              <span>Severe Brain Fog (10)</span>
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full mt-1 py-3 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center"
+            className="w-full mt-1 py-3 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all cursor-pointer shadow-2xs flex items-center justify-center"
           >
-            Seal Today&apos;s Data (+50 XP)
+            Wrap Daily Ledger (+50 XP)
           </button>
         </form>
       </div>

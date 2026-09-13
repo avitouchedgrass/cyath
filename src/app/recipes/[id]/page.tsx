@@ -113,23 +113,23 @@ export default async function RecipeDetailPage({
         </div>
 
         {/* Recipe Article Container */}
-        <article className="border-3 border-[#1A3629] bg-[#FFFDF9] rounded-2xl shadow-[6px_6px_0px_#1A3629] p-6 sm:p-10 mb-12">
+        <article className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-10 mb-12">
           
           {/* Header Area */}
-          <header className="border-b-2 border-[#1A3629]/15 pb-8 mb-8">
-            <div className="flex flex-wrap items-center gap-2.5 mb-3">
-              <span className="px-3 py-1 rounded-full border-2 border-[#1A3629] bg-[#EFE9DF] text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
+          <header className="border-b border-[#1A3629]/10 pb-8 mb-8">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#EFE9DF] text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">
                 {recipe.category}
               </span>
-              <span className="px-3 py-1 rounded-full border-2 border-[#1A3629]/30 bg-[#FFFDF9] text-xs font-cabinet font-bold capitalize text-[#2C4A3B]">
+              <span className="px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-xs font-cabinet font-semibold capitalize text-[#2C4A3B]">
                 {recipe.dietType}
               </span>
-              <span className="px-3 py-1 rounded-full border-2 border-[#D97706]/40 bg-[#FEF3C7] text-xs font-mono font-bold text-[#92400E]">
+              <span className="px-3 py-1 rounded-full border border-amber-600/20 bg-amber-50 text-xs font-mono font-bold text-amber-900">
                 Focus {recipe.focusScore}
               </span>
             </div>
 
-            <h1 className="font-fraunces font-black text-3xl sm:text-5xl tracking-tight text-[#1A3629] leading-tight mb-3">
+            <h1 className="font-cabinet font-extrabold text-3xl sm:text-5xl tracking-tight text-[#1A3629] leading-tight mb-3">
               {recipe.name}
             </h1>
 
@@ -139,24 +139,24 @@ export default async function RecipeDetailPage({
 
             {/* Macro Summary Strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-              <div className="border-2 border-[#1A3629] bg-[#F4F0EA] rounded-xl p-3.5 text-center shadow-[2px_2px_0px_#1A3629]">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Protein</div>
-                <div className="font-fraunces font-black text-2xl sm:text-3xl text-[#10B981] mt-0.5">{recipe.protein}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-emerald-700 mt-0.5">{recipe.protein}g</div>
               </div>
 
-              <div className="border-2 border-[#1A3629] bg-[#F4F0EA] rounded-xl p-3.5 text-center shadow-[2px_2px_0px_#1A3629]">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Calories</div>
-                <div className="font-fraunces font-black text-2xl sm:text-3xl text-[#D97706] mt-0.5">{recipe.calories}</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-amber-700 mt-0.5">{recipe.calories}</div>
               </div>
 
-              <div className="border-2 border-[#1A3629] bg-[#F4F0EA] rounded-xl p-3.5 text-center shadow-[2px_2px_0px_#1A3629]">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Carbs</div>
-                <div className="font-fraunces font-black text-2xl sm:text-3xl text-[#2563EB] mt-0.5">{recipe.carbs}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-blue-700 mt-0.5">{recipe.carbs}g</div>
               </div>
 
-              <div className="border-2 border-[#1A3629] bg-[#F4F0EA] rounded-xl p-3.5 text-center shadow-[2px_2px_0px_#1A3629]">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Fats</div>
-                <div className="font-fraunces font-black text-2xl sm:text-3xl text-[#7C3AED] mt-0.5">{recipe.fats}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-purple-700 mt-0.5">{recipe.fats}g</div>
               </div>
             </div>
           </header>
@@ -166,7 +166,7 @@ export default async function RecipeDetailPage({
             
             {/* Left Column: Visual & Interactive Scaler CTA */}
             <div className="lg:col-span-5 flex flex-col space-y-6">
-              <div className="relative aspect-square w-full rounded-2xl border-3 border-[#1A3629] bg-[#F4F0EA] overflow-hidden flex items-center justify-center p-6 shadow-[4px_4px_0px_#1A3629]">
+              <div className="relative aspect-square w-full rounded-3xl border border-[#1A3629]/15 bg-[#FAF6EE] overflow-hidden flex items-center justify-center p-6 shadow-2xs">
                 <Image
                   src={recipe.image}
                   alt={recipe.name}
@@ -177,7 +177,7 @@ export default async function RecipeDetailPage({
                 />
               </div>
 
-              <div className="border-2 border-[#1A3629]/20 bg-[#F4F0EA] rounded-xl p-4.5 space-y-3">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-4.5 space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono font-bold text-[#1A3629]">
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-[#D97706]" />
@@ -194,9 +194,9 @@ export default async function RecipeDetailPage({
                   <span>{recipe.focusScore}</span>
                 </div>
 
-                <div className="pt-2 border-t border-[#1A3629]/15 flex flex-wrap gap-1.5">
+                <div className="pt-2 border-t border-[#1A3629]/10 flex flex-wrap gap-1.5">
                   {recipe.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-md border border-[#1A3629]/20 bg-[#FFFDF9] text-[#2C4A3B]">
+                    <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FFFDF9] text-[#2C4A3B]">
                       #{tag}
                     </span>
                   ))}
@@ -204,7 +204,7 @@ export default async function RecipeDetailPage({
               </div>
 
               {/* Interactive Logger CTA */}
-              <div className="border-3 border-[#1A3629] bg-[#EFE9DF] rounded-xl p-5 shadow-[3px_3px_0px_#1A3629]">
+              <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-5 shadow-2xs">
                 <div className="flex items-center gap-2 font-cabinet font-bold text-sm text-[#1A3629] mb-1">
                   <Sparkles className="w-4 h-4 text-[#D97706]" />
                   <span>Dynamic Portion Scaler</span>
@@ -214,7 +214,7 @@ export default async function RecipeDetailPage({
                 </p>
                 <Link
                   href={interactiveUrl}
-                  className="w-full inline-flex items-center justify-center gap-2 text-xs font-cabinet font-bold px-4 py-3 rounded-xl border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer text-center"
+                  className="w-full inline-flex items-center justify-center gap-2 text-xs font-cabinet font-semibold px-4 py-3 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#234535] transition-colors cursor-pointer text-center"
                 >
                   <span>Open in Interactive Scaler</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -227,7 +227,7 @@ export default async function RecipeDetailPage({
               
               {/* Metabolic Philosophy Description */}
               <div>
-                <h2 className="font-fraunces font-black text-xl text-[#1A3629] mb-2.5">
+                <h2 className="font-cabinet font-bold text-xl text-[#1A3629] mb-2.5">
                   Metabolic Calibration
                 </h2>
                 <p className="text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
@@ -237,8 +237,8 @@ export default async function RecipeDetailPage({
 
               {/* Ingredients List */}
               <div>
-                <div className="flex items-center justify-between mb-3 border-b-2 border-[#1A3629]/15 pb-2">
-                  <h2 className="font-fraunces font-black text-xl text-[#1A3629]">
+                <div className="flex items-center justify-between mb-3 border-b border-[#1A3629]/10 pb-2">
+                  <h2 className="font-cabinet font-bold text-xl text-[#1A3629]">
                     Whole-Food Ingredients
                   </h2>
                   <span className="text-xs font-mono font-bold text-[#4A5D4E]">
@@ -246,14 +246,14 @@ export default async function RecipeDetailPage({
                   </span>
                 </div>
 
-                <ul className="space-y-2.5">
+                <ul className="space-y-2">
                   {recipe.ingredients.map((ing, idx) => (
                     <li
                       key={idx}
-                      className="flex items-center justify-between p-3 rounded-xl border-2 border-[#1A3629]/15 bg-[#F4F0EA] text-xs sm:text-sm font-cabinet font-bold text-[#1A3629]"
+                      className="flex items-center justify-between p-3 rounded-xl border border-[#1A3629]/10 bg-[#FAF6EE] text-xs sm:text-sm font-cabinet font-semibold text-[#1A3629]"
                     >
                       <span className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                         <span>{ing.item}</span>
                       </span>
                       <span className="font-mono text-xs text-[#2C4A3B] shrink-0 ml-2 bg-[#FFFDF9] px-2.5 py-1 rounded-md border border-[#1A3629]/15">
@@ -266,8 +266,8 @@ export default async function RecipeDetailPage({
 
               {/* Preparation Steps */}
               <div>
-                <div className="flex items-center justify-between mb-3 border-b-2 border-[#1A3629]/15 pb-2">
-                  <h2 className="font-fraunces font-black text-xl text-[#1A3629]">
+                <div className="flex items-center justify-between mb-3 border-b border-[#1A3629]/10 pb-2">
+                  <h2 className="font-cabinet font-bold text-xl text-[#1A3629]">
                     Step-by-Step Instructions
                   </h2>
                   <span className="text-xs font-mono font-bold text-[#4A5D4E]">
@@ -275,14 +275,14 @@ export default async function RecipeDetailPage({
                   </span>
                 </div>
 
-                <ol className="space-y-3.5">
+                <ol className="space-y-3">
                   {recipe.instructions.map((step, idx) => (
                     <li
                       key={idx}
                       id={`step-${idx + 1}`}
-                      className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#FFFDF9] shadow-[2px_2px_0px_rgba(26,54,41,0.08)] flex items-start gap-3.5"
+                      className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs flex items-start gap-3.5"
                     >
-                      <span className="w-6 h-6 rounded-full border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-6 h-6 rounded-full border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <div className="space-y-1 text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
@@ -304,10 +304,10 @@ export default async function RecipeDetailPage({
 
         {/* Related Recipes Section */}
         {relatedRecipes.length > 0 && (
-          <section className="mt-16 pt-10 border-t-2 border-[#1A3629]/15">
+          <section className="mt-16 pt-10 border-t border-[#1A3629]/10">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <h2 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629]">
+                <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629]">
                   Related Whole-Food Recipes
                 </h2>
                 <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B] mt-0.5">
@@ -315,8 +315,8 @@ export default async function RecipeDetailPage({
                 </p>
               </div>
               <Link
-                href="/recipes"
-                className="text-xs font-mono font-bold text-[#1A3629] hover:underline inline-flex items-center gap-1 shrink-0"
+                href="/playbook?tab=recipes"
+                className="text-xs font-mono font-semibold text-[#1A3629] hover:underline inline-flex items-center gap-1 shrink-0"
               >
                 <span>View All 42</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -328,10 +328,10 @@ export default async function RecipeDetailPage({
                 <Link
                   key={rel.id}
                   href={`/recipes/${rel.id}`}
-                  className="group border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4 shadow-[3px_3px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[5px_5px_0px_#1A3629] transition-all flex flex-col justify-between"
+                  className="group border border-[#1A3629]/10 bg-[#FFFDF9] rounded-3xl p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="relative aspect-square w-full rounded-lg bg-[#F4F0EA] border border-[#1A3629]/20 overflow-hidden flex items-center justify-center p-3 mb-3">
+                    <div className="relative aspect-square w-full rounded-2xl bg-[#FAF6EE] border border-[#1A3629]/10 overflow-hidden flex items-center justify-center p-3 mb-3">
                       <Image
                         src={rel.image}
                         alt={rel.name}
@@ -343,14 +343,14 @@ export default async function RecipeDetailPage({
                     <div className="text-[10px] font-mono uppercase tracking-wider text-[#4A5D4E] mb-1">
                       {rel.category} · {rel.dietType}
                     </div>
-                    <h3 className="font-fraunces font-bold text-base text-[#1A3629] line-clamp-1 group-hover:underline">
+                    <h3 className="font-cabinet font-bold text-base text-[#1A3629] line-clamp-1 group-hover:underline">
                       {rel.name}
                     </h3>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[#1A3629]/15 flex items-center justify-between text-xs font-mono font-bold">
-                    <span className="text-[#10B981]">{rel.protein}g Protein</span>
-                    <span className="text-[#D97706]">{rel.calories} kcal</span>
+                  <div className="mt-4 pt-3 border-t border-[#1A3629]/10 flex items-center justify-between text-xs font-mono font-semibold">
+                    <span className="text-emerald-700">{rel.protein}g Protein</span>
+                    <span className="text-amber-700">{rel.calories} kcal</span>
                   </div>
                 </Link>
               ))}

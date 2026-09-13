@@ -13,12 +13,12 @@ export function XpHud() {
   const islandTier = getIslandTier(progress.level);
 
   return (
-    <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[3px_3px_0px_#1A3629] flex flex-col md:flex-row md:items-center justify-between gap-5">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/10 rounded-3xl p-5 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
       {/* Left: Level, Sanctuary Stage & Title */}
       <div className="flex items-center gap-4">
         <div 
           id="xp-hud-target"
-          className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border-2 border-[#1A3629] shadow-[3px_3px_0px_#1A3629] flex flex-col items-center justify-center shrink-0 transition-transform"
+          className="w-14 h-14 rounded-2xl bg-[#F4EDE0] border border-[#1A3629]/15 flex flex-col items-center justify-center shrink-0 shadow-2xs"
         >
           <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
             LVL
@@ -30,10 +30,10 @@ export function XpHud() {
 
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h2 className="font-fraunces font-black text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+            <h2 className="font-cabinet font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
               Level {progress.level}
             </h2>
-            <span className="font-cabinet font-bold text-xs sm:text-sm text-[#4A5D4E]">
+            <span className="font-cabinet font-semibold text-xs sm:text-sm text-[#4A5D4E]">
               · Phase {islandTier.tier}: {islandTier.name}
             </span>
           </div>
@@ -52,7 +52,7 @@ export function XpHud() {
           </span>
         </div>
 
-        <div className="w-full h-3.5 bg-[#EAE3D2] rounded-full border-2 border-[#1A3629] overflow-hidden p-0.5">
+        <div className="w-full h-3 bg-[#EAE3D2]/70 rounded-full border border-[#1A3629]/15 overflow-hidden p-0.5">
           <div
             className="h-full bg-gradient-to-r from-[#D97706] to-[#F59E0B] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress.progressPercent}%` }}
@@ -69,10 +69,10 @@ export function XpHud() {
       <div className="flex items-center gap-3 self-end md:self-center">
         <StreakBadge />
         <Link
-          href="/sanctuary"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet text-xs font-bold border-2 border-[#1A3629] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+          href="/dashboard?tab=today"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet text-xs font-semibold hover:bg-[#234535] transition-colors"
         >
-          <span>Island Sanctuary →</span>
+          <span>Daily Cockpit →</span>
         </Link>
       </div>
     </div>

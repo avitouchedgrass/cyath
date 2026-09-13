@@ -61,15 +61,15 @@ export default function Home() {
       <main className="relative z-10 flex-1 flex flex-col">
         
         {/* ========================================================================= */}
-        {/* 1. HERO SECTION: Unboxed Retro Neobrutalism */}
+        {/* 1. HERO SECTION: Refined Swiss Editorial */}
         {/* ========================================================================= */}
-        <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b-4 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]">
+        <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b border-[#1A3629]/10 bg-[#F4F0EA] text-[#1A3629]">
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Hero Left Column */}
             <div className="lg:col-span-6 w-full flex flex-col items-start justify-center">
               
-              {/* Headline with High-Contrast Vintage Serif and TextType Animation */}
+              {/* Headline with High-Contrast Typography and TextType Animation */}
               <div className="min-h-[80px] sm:min-h-[96px] lg:min-h-[115px] flex items-center">
                 <TextType
                   text={[
@@ -84,7 +84,7 @@ export default function Home() {
                   showCursor={true}
                   cursorCharacter="▌"
                   cursorClassName="text-[#1A3629] font-bold ml-1 inline-block select-none text-[0.8em] align-baseline opacity-90"
-                  className="font-fraunces font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] text-[#1A3629]"
+                  className="font-cabinet font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] text-[#1A3629]"
                   as="h1"
                 />
               </div>
@@ -94,12 +94,12 @@ export default function Home() {
                 Log whole-food fuel, track daily routines in 30 seconds, and let our simple pattern engine uncover what drives your best energy days.
               </p>
 
-              {/* Primary & Secondary Chunky Neobrutalist CTAs */}
+              {/* Primary & Secondary Refined CTAs */}
               <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-3 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#3A6B52] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                   </button>
@@ -108,7 +108,7 @@ export default function Home() {
                 <Link href="/recipes" className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[54px] rounded-xl border-2 bg-transparent text-[#1A3629] border-[#1A3629]/70 hover:border-[#1A3629] hover:bg-[#1A3629]/5 shadow-none hover:shadow-[2px_2px_0px_#1A3629] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF6EE] shadow-2xs active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     Browse Recipes
                   </button>
@@ -116,10 +116,10 @@ export default function Home() {
               </div>
 
               {/* Bottom Metric Inset Micro-Cards */}
-              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 pt-6 border-t-2 border-[#1A3629]/15 w-full">
+              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 pt-6 border-t border-[#1A3629]/10 w-full">
                 
                 {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
                   <div className="flex items-center gap-1.5 mb-2">
                     {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
                       <span 
@@ -140,7 +140,7 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 2: Macro Fueling Preview */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] overflow-hidden shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] overflow-hidden shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
                   <div 
                     key={currentDish.id}
                     className="font-mono font-black text-base tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
@@ -158,7 +158,7 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 3: Discovery Rating */}
-                <div className="border-2 border-[#1A3629] bg-[#FFFDF9] rounded-xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[3px_3px_0px_#1A3629] transition-all">
+                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
                   <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
                     <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS LINK
                   </div>
@@ -191,15 +191,15 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 2. THE 3-STEP ROUTINE: "How Cyath Works" */}
         {/* ========================================================================= */}
-        <section id="methodology" className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#EFE9DF]">
+        <section id="methodology" className="px-6 lg:px-12 py-20 sm:py-28 border-b border-[#1A3629]/10 bg-[#EFE9DF]">
           <div className="w-full max-w-7xl mx-auto">
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">
-              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
+              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
                 Simple 3-Step Routine
               </span>
-              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
+              <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Built for Everyday Momentum
               </h2>
               <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
@@ -225,10 +225,10 @@ export default function Home() {
                         setActiveStepIndex(idx);
                       }
                     }}
-                    className={`border-3 p-8 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 cursor-pointer focus-visible:outline-none hover:-translate-y-1 ${
+                    className={`border p-8 rounded-3xl flex flex-col justify-between gap-4 transition-all duration-300 cursor-pointer focus-visible:outline-none hover:-translate-y-0.5 ${
                       isActive
-                        ? 'bg-[#FFFDF9] border-[#1A3629] shadow-[6px_6px_0px_#1A3629]'
-                        : 'bg-[#FFFDF9]/80 border-[#1A3629] shadow-[4px_4px_0px_#1A3629]'
+                        ? 'bg-[#FFFDF9] border-[#1A3629]/30 shadow-[0_8px_24px_rgba(26,54,41,0.06)]'
+                        : 'bg-[#FFFDF9]/90 border-[#1A3629]/10 shadow-[0_2px_12px_rgba(26,54,41,0.03)]'
                     }`}
                   >
                     <div>
@@ -237,14 +237,14 @@ export default function Home() {
                         <span className="font-mono text-3xl font-black tracking-tight tabular-nums text-[#1A3629]">
                           {item.step}
                         </span>
-                        <span className="px-3 py-1 rounded-full border-2 text-[11px] font-mono font-bold uppercase tracking-wider bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
+                        <span className="px-3 py-1 rounded-full border border-[#1A3629]/15 text-[11px] font-mono font-bold uppercase tracking-wider bg-[#F4F0EA] text-[#1A3629]">
                           {item.badge}
                         </span>
                       </div>
 
                       {/* Title & Tag */}
                       <div className="flex items-start gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
                           {item.step}
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629]">
@@ -259,7 +259,7 @@ export default function Home() {
                     </div>
 
                     {/* Highlights */}
-                    <div className="space-y-2.5 pt-4 border-t-2 border-[#1A3629]/15">
+                    <div className="space-y-2.5 pt-4 border-t border-[#1A3629]/10">
                       {item.highlights.map((point) => (
                         <div key={point} className="flex items-center gap-2.5 text-xs sm:text-sm font-cabinet font-bold text-[#1A3629]">
                           <span className="font-mono text-xs shrink-0 select-none text-[#3A6B52]">+</span>
@@ -278,14 +278,14 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 3. INTERACTIVE BENTO SHOWCASE: Fuel, Patterns & Energy */}
         {/* ========================================================================= */}
-        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#F4F0EA]">
+        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b border-[#1A3629]/10 bg-[#F4F0EA]">
           <div className="w-full max-w-7xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
+              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
                 What You Get
               </span>
-              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
+              <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Designed for Daily Energy
               </h2>
               <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
@@ -297,12 +297,12 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* BENTO 1: Food & Focus Patterns (8 Cols) */}
-              <div className="lg:col-span-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+              <div className="lg:col-span-8 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
                           ↗
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
@@ -314,7 +314,7 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 text-xs font-mono font-bold shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629]">
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold shrink-0 bg-[#F4F0EA] text-[#1A3629]">
                       <span>Strong Link:</span>
                       <span className="tabular-nums">84% Match</span>
                     </div>
@@ -332,7 +332,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold text-[#2C4A3B]">
+                <div className="flex items-center justify-between pt-4 border-t border-[#1A3629]/10 text-xs font-mono font-bold text-[#2C4A3B]">
                   <span>Daily habit &amp; meal insights</span>
                   <Link href="/correlations" className="hover:underline flex items-center gap-1 text-[#1A3629]">
                     <span>View All Insights →</span>
@@ -341,10 +341,10 @@ export default function Home() {
               </div>
 
               {/* BENTO 2: 16-Bit Food Fuel (4 Cols) */}
-              <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              <div className="lg:col-span-4 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
                       ✦
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
@@ -355,12 +355,12 @@ export default function Home() {
                     Whole-food recipes with step-by-step prep and retro pixel art.
                   </p>
 
-                  <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-3">
+                  <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-cabinet font-bold">Herb Grilled Chicken &amp; Greens</span>
                       <span className="text-[11px] font-mono font-bold tabular-nums">48g PRO</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full border border-[#1A3629] bg-[#FFFDF9] overflow-hidden">
+                    <div className="h-2.5 w-full rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] overflow-hidden">
                       <div className="h-full w-3/4 bg-[#1A3629]" />
                     </div>
                     <span className="text-[11px] font-cabinet font-medium block leading-relaxed opacity-85">
@@ -371,17 +371,17 @@ export default function Home() {
 
                 <Link
                   href="/recipes"
-                  className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t-2 border-[#1A3629]/15 hover:text-[#3A6B52] transition-colors"
+                  className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t border-[#1A3629]/10 hover:text-[#3A6B52] transition-colors"
                 >
                   <span>Browse Recipes Catalog →</span>
                 </Link>
               </div>
 
               {/* BENTO 3: Zero-Stress Streaks (4 Cols) */}
-              <div className="lg:col-span-4 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              <div className="lg:col-span-4 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
                       ■
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
@@ -392,7 +392,7 @@ export default function Home() {
                     Gentle pixel shading shows your consistency without guilt trips if you take a day off.
                   </p>
 
-                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA]">
+                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70">
                     {Array.from({ length: 28 }).map((_, i) => {
                       const opacity = [0.2, 0.45, 0.75, 0.9, 1.0, 0.6, 0.85][i % 7];
                       return (
@@ -406,16 +406,16 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t-2 border-[#1A3629]/15 text-[11px] font-mono font-bold text-[#2C4A3B]">
+                <div className="pt-4 border-t border-[#1A3629]/10 text-[11px] font-mono font-bold text-[#2C4A3B]">
                   28-Day Habit Activity
                 </div>
               </div>
 
               {/* BENTO 4: Daily Energy Journal (8 Cols) */}
-              <div className="lg:col-span-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[5px_5px_0px_#1A3629] rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              <div className="lg:col-span-8 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] font-mono font-bold text-xs">
+                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
                       ~
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
@@ -427,7 +427,7 @@ export default function Home() {
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-2">
+                    <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Daily Energy</span>
                         <span className="tabular-nums">{previewEnergy} / 10</span>
@@ -443,7 +443,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="p-4 rounded-xl border-2 border-[#1A3629]/20 bg-[#F4F0EA] space-y-2">
+                    <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Focus Rating</span>
                         <span className="tabular-nums">{previewFocus} / 10</span>
@@ -461,7 +461,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 mt-6 border-t-2 border-[#1A3629]/15 text-xs font-mono font-bold">
+                <div className="flex items-center justify-between pt-4 mt-6 border-t border-[#1A3629]/10 text-xs font-mono font-bold">
                   <span>Synced directly to your Daily Planner</span>
                   <Link href="/dashboard" className="hover:underline flex items-center gap-1 text-[#1A3629]">
                     <span>Open Dashboard →</span>
@@ -477,14 +477,14 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 4. THE DIFFERENCE: Why Old-School Trackers Fail */}
         {/* ========================================================================= */}
-        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b-4 border-[#1A3629] bg-[#EFE9DF]">
+        <section className="px-6 lg:px-12 py-20 sm:py-28 border-b border-[#1A3629]/10 bg-[#EFE9DF]">
           <div className="w-full max-w-5xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-4 py-1.5 rounded-full border-2 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]">
+              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
                 The Difference
               </span>
-              <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
+              <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Why Old-School Apps Burn You Out
               </h2>
               <p className="text-base sm:text-lg mt-4 font-cabinet font-medium leading-relaxed max-w-xl mx-auto text-[#2C4A3B]">
@@ -496,65 +496,65 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               
               {/* Old-School Apps (Dull & Dashed) */}
-              <div className="border-3 border-dashed border-[#1A3629]/40 bg-[#FFFDF9]/40 rounded-2xl p-8 flex flex-col justify-between h-full space-y-6 opacity-75">
+              <div className="border border-dashed border-[#1A3629]/25 bg-[#FAF8F5]/60 rounded-3xl p-8 flex flex-col justify-between h-full space-y-6 opacity-80">
                 <div>
                   <div className="flex items-center gap-2.5 mb-5">
-                    <span className="font-mono text-xs font-bold select-none">[x]</span>
-                    <h3 className="font-cabinet font-bold text-lg tracking-tight">
+                    <span className="font-mono text-xs font-bold select-none text-[#1A3629]/60">[x]</span>
+                    <h3 className="font-cabinet font-bold text-lg tracking-tight text-[#1A3629]">
                       Traditional Calorie &amp; Habit Apps
                     </h3>
                   </div>
                   
-                  <ul className="space-y-4 text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
+                  <ul className="space-y-4 text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[-]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-red-600">[-]</span>
                       <span>10+ minutes spent scanning barcodes, weighing individual grams, and guessing recipes.</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[-]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-red-600">[-]</span>
                       <span>Aggressive red alerts and guilt-tripping notifications that punish you for missing a day.</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[-]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-red-600">[-]</span>
                       <span>No useful takeaways: you log data for months and learn nothing about what actually fuels you.</span>
                     </li>
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t-2 border-dashed border-[#1A3629]/20 font-mono text-[11px]">
+                <div className="pt-4 border-t border-dashed border-[#1A3629]/20 font-mono text-[11px] text-[#1A3629]/60">
                   Old Routine · High Friction
                 </div>
               </div>
 
               {/* The Cyath Way (Tactile & Solid) */}
-              <div className="border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] rounded-2xl p-8 flex flex-col justify-between h-full space-y-6">
+              <div className="border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(26,54,41,0.05)] rounded-3xl p-8 flex flex-col justify-between h-full space-y-6">
                 <div>
                   <div className="flex items-center gap-2.5 mb-5">
-                    <span className="font-mono text-xs font-bold select-none">[+]</span>
-                    <h3 className="font-cabinet font-bold text-lg tracking-tight">
+                    <span className="font-mono text-xs font-bold select-none text-[#10B981]">[+]</span>
+                    <h3 className="font-cabinet font-bold text-lg tracking-tight text-[#1A3629]">
                       The Cyath Approach
                     </h3>
                   </div>
                   
-                  <ul className="space-y-4 text-xs sm:text-sm font-cabinet font-medium leading-relaxed">
+                  <ul className="space-y-4 text-xs sm:text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[+]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-[#10B981]">[+]</span>
                       <span>30-second rapid check-ins with one-tap whole-food macro increments (+15g / 30g / 45g).</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[+]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-[#10B981]">[+]</span>
                       <span>Gentle activity heatmaps that celebrate long-term consistency without anxiety.</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none">[+]</span>
+                      <span className="font-mono text-xs mt-0.5 shrink-0 select-none text-[#10B981]">[+]</span>
                       <span>Clear patterns that reveal which foods and routines give you steady all-day focus.</span>
                     </li>
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t-2 border-[#1A3629]/15 font-mono text-[11px] flex items-center justify-between font-bold">
+                <div className="pt-4 border-t border-[#1A3629]/10 font-mono text-[11px] flex items-center justify-between font-bold text-[#1A3629]">
                   <span>Everyday Standard</span>
-                  <span className="font-bold">Stress-Free Momentum →</span>
+                  <span className="font-bold text-[#10B981]">Stress-Free Momentum →</span>
                 </div>
               </div>
 
@@ -567,8 +567,8 @@ export default function Home() {
         {/* 5. FINALE CTA BANNER */}
         {/* ========================================================================= */}
         <section className="px-6 lg:px-12 py-20 sm:py-28 bg-[#F4F0EA]">
-          <div className="w-full max-w-5xl mx-auto border-4 border-[#1A3629] bg-[#FFFDF9] shadow-[8px_8px_0px_#1A3629] rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden">
-            <h2 className="font-fraunces font-black text-3xl sm:text-4xl md:text-5xl tracking-tight max-w-2xl mx-auto leading-tight text-[#1A3629]">
+          <div className="w-full max-w-5xl mx-auto border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_20px_50px_rgba(26,54,41,0.08)] rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden">
+            <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight max-w-2xl mx-auto leading-tight text-[#1A3629]">
               Build Daily Habits You Actually Enjoy
             </h2>
 
@@ -580,7 +580,7 @@ export default function Home() {
               <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[5px_5px_0px_#3A6B52] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#3A6B52] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center"
                 >
                   {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                 </button>
@@ -589,7 +589,7 @@ export default function Home() {
               <Link href="/recipes" className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-xl border-4 bg-[#FFFDF9] text-[#1A3629] border-[#1A3629] shadow-[5px_5px_0px_#1A3629] hover:-translate-y-1 hover:shadow-[7px_7px_0px_#1A3629] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all cursor-pointer inline-flex items-center justify-center"
+                  className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF6EE] shadow-2xs active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center"
                 >
                   Browse Recipes
                 </button>

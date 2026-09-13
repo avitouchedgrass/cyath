@@ -344,32 +344,32 @@ function AuthContent() {
       <div className="absolute top-6 left-6 right-6 sm:top-8 sm:left-8 sm:right-8 z-20 flex items-center justify-between pointer-events-auto">
         <Link 
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border-2 bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-cabinet font-bold px-4 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#1A3629] text-[#FFFDF9] shadow-2xs hover:bg-[#234535] transition-all cursor-pointer"
           aria-label="Back to home"
         >
           <span>← Back to Home</span>
         </Link>
       </div>
 
-      {/* Centered Retro Auth Card */}
-      <div className="w-full max-w-[430px] rounded-3xl p-8 border-3 border-[#1A3629] bg-[#FFFDF9] shadow-[6px_6px_0px_#1A3629] transition-all flex flex-col gap-6 relative z-10">
+      {/* Centered Modern Auth Card */}
+      <div className="w-full max-w-[440px] rounded-3xl p-8 sm:p-9 border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_20px_50px_rgba(26,54,41,0.08)] transition-all flex flex-col gap-6 relative z-10">
         
         {/* VIEW 1: Email Verification Sent Screen */}
         {isVerificationSent ? (
           <div className="flex flex-col gap-5 py-2">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629]">
+              <div className="h-12 w-12 rounded-2xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629]">
                 <Mail className="h-6 w-6 animate-pulse" />
               </div>
               <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629]">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Verification Sent
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" /> Verification Sent
                 </span>
               </div>
             </div>
 
             <div>
-              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
+              <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 Check your inbox
               </h1>
               <p className="text-xs sm:text-sm mt-2 font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
@@ -378,12 +378,12 @@ function AuthContent() {
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
@@ -393,7 +393,7 @@ function AuthContent() {
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resendCooldown > 0 || resending}
-                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -410,7 +410,7 @@ function AuthContent() {
               <button
                 type="button"
                 onClick={handleGuestAccess}
-                className="w-full py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold transition-all cursor-pointer"
+                className="w-full py-3 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-bold transition-all cursor-pointer shadow-2xs"
               >
                 <span>Explore Demo Dashboard</span>
               </button>
@@ -434,14 +434,14 @@ function AuthContent() {
           /* VIEW 2: Reset Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
+              <div className="h-10 w-10 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
                 <KeyRound className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
                   Account Recovery
                 </span>
-                <h1 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
+                <h1 className="font-cabinet font-extrabold text-2xl tracking-tight text-[#1A3629]">
                   Reset Password
                 </h1>
               </div>
@@ -452,12 +452,12 @@ function AuthContent() {
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
@@ -473,14 +473,14 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#1A3629]/40 shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] placeholder-[#1A3629]/40 focus:border-[#1A3629] text-sm font-cabinet font-bold focus:outline-none shadow-2xs"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>Send Reset Link</span>
@@ -506,14 +506,14 @@ function AuthContent() {
           /* VIEW 3: Set New Password */
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
+              <div className="h-10 w-10 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
                 <Lock className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
                   Security Update
                 </span>
-                <h1 className="font-fraunces font-black text-2xl tracking-tight text-[#1A3629]">
+                <h1 className="font-cabinet font-extrabold text-2xl tracking-tight text-[#1A3629]">
                   Set New Password
                 </h1>
               </div>
@@ -524,12 +524,12 @@ function AuthContent() {
             </p>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
             {successMsg && (
-              <div className="px-4 py-3 rounded-xl border-2 border-[#1A3629] bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] text-[#1A3629] text-xs font-mono font-bold">
                 {successMsg}
               </div>
             )}
@@ -545,7 +545,7 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] focus:border-[#1A3629] text-sm font-mono font-bold focus:outline-none shadow-2xs"
                 />
               </div>
 
@@ -559,14 +559,14 @@ function AuthContent() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] focus:border-[#1A3629] text-sm font-mono font-bold focus:outline-none shadow-2xs"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>Update Password</span>
@@ -577,7 +577,7 @@ function AuthContent() {
           /* VIEW 4: Login / Signup Mode */
           <div className="flex flex-col gap-5">
             {/* Mode Switcher Tabs */}
-            <div className="grid grid-cols-2 p-1 rounded-2xl border-2 border-[#1A3629] bg-[#F4F0EA]">
+            <div className="grid grid-cols-2 p-1 rounded-full border border-[#1A3629]/15 bg-[#F4F0EA]">
               <button
                 type="button"
                 onClick={() => {
@@ -585,9 +585,9 @@ function AuthContent() {
                   setMode('signup');
                   setErrorMsg(null);
                 }}
-                className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
                   mode === 'signup'
-                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]'
+                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-2xs'
                     : 'opacity-70 hover:opacity-100 text-[#1A3629]'
                 }`}
               >
@@ -600,9 +600,9 @@ function AuthContent() {
                   setMode('login');
                   setErrorMsg(null);
                 }}
-                className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
                   mode === 'login'
-                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-[2px_2px_0px_#1A3629]'
+                    ? 'bg-[#FFFDF9] text-[#1A3629] shadow-2xs'
                     : 'opacity-70 hover:opacity-100 text-[#1A3629]'
                 }`}
               >
@@ -611,7 +611,7 @@ function AuthContent() {
             </div>
 
             {pendingRefCode && (
-              <div className="p-3 rounded-2xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] flex items-center gap-2 shadow-xs">
+              <div className="p-3 rounded-2xl border border-[#10B981]/30 bg-[#ECFDF5] text-[#065F46] flex items-center gap-2 shadow-2xs">
                 <Gift className="w-4 h-4 text-[#10B981] shrink-0" />
                 <span className="font-mono text-xs font-bold">
                   Guild Invite [{pendingRefCode}] Applied · +250 Starter XP
@@ -620,7 +620,7 @@ function AuthContent() {
             )}
 
             <div>
-              <h1 className="font-fraunces font-black text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
+              <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
                 {mode === 'signup' ? 'Start Your Daily Protocol' : 'Welcome Back'}
               </h1>
               <p className="text-xs sm:text-sm mt-1 font-cabinet font-medium text-[#2C4A3B]">
@@ -631,7 +631,7 @@ function AuthContent() {
             </div>
 
             {errorMsg && (
-              <div className="px-4 py-3 rounded-xl bg-red-100 border-2 border-red-500 text-red-700 text-xs font-mono font-bold">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono font-bold">
                 {errorMsg}
               </div>
             )}
@@ -641,7 +641,7 @@ function AuthContent() {
               type="button"
               onClick={handleGoogleAuth}
               disabled={googleLoading}
-              className="w-full py-3 rounded-xl border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] hover:bg-[#F4F0EA] text-xs font-cabinet font-bold transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+              className="w-full py-3 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] shadow-2xs hover:bg-[#FAF6EE] hover:border-[#1A3629]/40 text-xs font-cabinet font-bold transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               {googleLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -671,7 +671,7 @@ function AuthContent() {
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-0.5 bg-[#1A3629]/15" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]">or email</span>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">or email</span>
               <div className="flex-1 h-0.5 bg-[#1A3629]/15" />
             </div>
 
@@ -687,7 +687,7 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] placeholder-[#1A3629]/40 shadow-[2px_2px_0px_#1A3629] text-sm font-cabinet font-bold focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] placeholder-[#1A3629]/40 focus:border-[#1A3629] text-sm font-cabinet font-bold focus:outline-none shadow-2xs"
                 />
               </div>
 
@@ -716,7 +716,7 @@ function AuthContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] focus:border-[#1A3629] text-sm font-mono font-bold focus:outline-none shadow-2xs"
                 />
               </div>
 
@@ -731,7 +731,7 @@ function AuthContent() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl border-2 bg-[#F4F0EA] border-[#1A3629] text-[#1A3629] shadow-[2px_2px_0px_#1A3629] text-sm font-mono font-bold focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] focus:border-[#1A3629] text-sm font-mono font-bold focus:outline-none shadow-2xs"
                   />
                 </div>
               )}
@@ -739,7 +739,7 @@ function AuthContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl font-cabinet font-bold text-xs border-2 bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>{mode === 'signup' ? 'Create Account & Continue' : 'Log In'}</span>

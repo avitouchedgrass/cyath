@@ -57,6 +57,7 @@ export function StoveSageChatbot() {
     userProfile,
     currentDate,
     getDailyLog,
+    customRecipes,
     addCustomHabit,
     addCustomRecipe,
     setHydration,
@@ -141,13 +142,17 @@ export function StoveSageChatbot() {
         addCustomHabit(title, category);
         retroAudio.playInspectConfirm();
       } else if (action.type === 'ADD_RECIPE') {
-        const fallbackId = `ai-recipe-${Date.now()}`;
+        const slug = (action.payload.name || 'custom-dish')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        const deterministicId = action.payload.id || `custom-${slug}`;
         const match = findClosestRecipe(action.payload);
         const spriteUrl = action.payload.sprite || match.spriteUrl;
         const framedImage = action.payload.image || spriteUrl;
 
         const newRecipe: Recipe = {
-          id: action.payload.id || fallbackId,
+          id: deterministicId,
           name: action.payload.name || 'Custom Chef Creation',
           subtitle: action.payload.subtitle || 'Formulated by Cyath AI',
           image: framedImage,
@@ -178,18 +183,36 @@ export function StoveSageChatbot() {
       } else if (action.type === 'SET_METRIC') {
         const metric = action.payload.metric;
         const val = Number(action.payload.value);
-        if (metric === 'hydration') setHydration(val);
-        else if (metric === 'sleep') setSleep(val);
-        else if (metric === 'energy') setEnergy(val);
-        else if (metric === 'mood') setMood(val);
-        else if (metric === 'protein') setProtein(val);
+        if (metric === 'hydration') setHydration(val, currentDate);
+        else if (metric === 'sleep') setSleep(val, currentDate);
+        else if (metric === 'energy') setEnergy(val, currentDate);
+        else if (metric === 'mood') setMood(val, currentDate);
+        else if (metric === 'protein') setProtein(val, currentDate);
         retroAudio.playBlip();
       } else if (action.type === 'LOG_RECIPE') {
-        logRecipeToDay(
-          action.payload.recipeId,
-          Number(action.payload.protein) || 30,
-          Number(action.payload.calories) || 400
-        );
+        const recipeName = action.payload.recipeName || '';
+        let targetId = action.payload.recipeId;
+        let protein = Number(action.payload.protein) || 30;
+        let calories = Number(action.payload.calories) || 400;
+
+        // If targetId is not provided or generic, look up in customRecipes by name
+        if ((!targetId || targetId === 'custom-recipe') && recipeName) {
+          const found = (customRecipes || []).find(
+            (r) => r.name.toLowerCase().trim() === recipeName.toLowerCase().trim()
+          );
+          if (found) {
+            targetId = found.id;
+            protein = found.protein;
+            calories = found.calories;
+          }
+        }
+
+        const slug = (recipeName || 'recipe')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        const finalId = targetId || `custom-${slug}`;
+        logRecipeToDay(finalId, protein, calories, currentDate);
         retroAudio.playInspectConfirm();
       }
       return true;
@@ -199,20 +222,23 @@ export function StoveSageChatbot() {
   };
 
   const handleApplyAction = (messageId: string, actionIndex: number) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id !== messageId || !msg.actions) return msg;
-        const targetAction = msg.actions[actionIndex];
-        if (!targetAction || targetAction.status !== 'pending') return msg;
+    const msg = messages.find((m) => m.id === messageId);
+    if (!msg || !msg.actions) return;
+    const targetAction = msg.actions[actionIndex];
+    if (!targetAction || targetAction.status !== 'pending') return;
 
-        const success = executeAction(targetAction);
-        const updatedActions = [...msg.actions];
+    // Execute side-effect outside setMessages to avoid React StrictMode double invocation
+    const success = executeAction(targetAction);
+
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId || !m.actions) return m;
+        const updatedActions = [...m.actions];
         updatedActions[actionIndex] = {
           ...targetAction,
           status: success ? 'applied' : 'dismissed',
         };
-
-        return { ...msg, actions: updatedActions };
+        return { ...m, actions: updatedActions };
       })
     );
   };
@@ -268,6 +294,13 @@ export function StoveSageChatbot() {
         activeProtocols: activeProtocolIds,
         totalXp,
         streakCount,
+        customRecipes: (customRecipes || []).map((r) => ({
+          id: r.id,
+          name: r.name,
+          protein: r.protein,
+          calories: r.calories,
+          category: r.category,
+        })),
       };
 
       const res = await fetch('/api/ai/stovesage', {
@@ -289,10 +322,31 @@ export function StoveSageChatbot() {
         throw new Error(data.error || 'Failed to reach AI Coach');
       }
 
+      const lowerQuery = query.toLowerCase();
+      const isLogCommand =
+        lowerQuery.includes('log') ||
+        lowerQuery.includes('ate') ||
+        lowerQuery.includes('had') ||
+        lowerQuery.includes('drank') ||
+        lowerQuery.includes('drink') ||
+        lowerQuery.includes('track');
+      const isCreateCommand =
+        lowerQuery.includes('make') ||
+        lowerQuery.includes('create') ||
+        lowerQuery.includes('invent') ||
+        lowerQuery.includes('cook') ||
+        lowerQuery.includes('formulate') ||
+        lowerQuery.includes('custom');
+
       const pendingActions = await Promise.all(
         (data.actions || []).map(async (action: any) => {
           if (action.type === 'ADD_RECIPE' && action.payload) {
             const match = findClosestRecipe(action.payload);
+            const slug = (action.payload.name || 'custom-dish')
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)/g, '');
+            const deterministicId = action.payload.id || `custom-${slug}`;
             const spriteUrl = action.payload.sprite || match.spriteUrl;
             let framed = action.payload.image;
             if (!framed || framed.startsWith('/assets/')) {
@@ -302,20 +356,56 @@ export function StoveSageChatbot() {
                 framed = spriteUrl;
               }
             }
-            return {
+            const populatedAction = {
               ...action,
               payload: {
                 ...action.payload,
+                id: deterministicId,
                 sprite: spriteUrl,
                 image: framed,
                 closestRecipeName: action.payload.closestRecipeName || match.recipe.name,
               },
-              status: 'pending' as 'pending' | 'applied' | 'dismissed',
+            };
+
+            // Auto-apply custom recipes immediately when user requested recipe creation
+            executeAction(populatedAction);
+
+            return {
+              ...populatedAction,
+              status: 'applied' as const,
             };
           }
+
+          if (action.type === 'LOG_RECIPE' && isLogCommand) {
+            executeAction(action);
+            return {
+              ...action,
+              status: 'applied' as const,
+            };
+          }
+
+          if (action.type === 'SET_METRIC' && isLogCommand) {
+            executeAction(action);
+            return {
+              ...action,
+              status: 'applied' as const,
+            };
+          }
+
+          if (
+            action.type === 'ADD_HABIT' &&
+            (lowerQuery.includes('add') || lowerQuery.includes('create') || lowerQuery.includes('track'))
+          ) {
+            executeAction(action);
+            return {
+              ...action,
+              status: 'applied' as const,
+            };
+          }
+
           return {
             ...action,
-            status: 'pending' as 'pending' | 'applied' | 'dismissed',
+            status: 'pending' as const,
           };
         })
       );
@@ -387,18 +477,18 @@ export function StoveSageChatbot() {
       
       {/* Expanded Professional Coach Modal / Drawer */}
       {isOpen && (
-        <div className="relative mb-3 w-[92vw] sm:w-[440px] max-h-[82vh] h-[580px] bg-[#FFFDF9] border-3 border-[#1A3629] rounded-3xl shadow-[6px_6px_0px_#1A3629] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="relative mb-3 w-[92vw] sm:w-[440px] max-h-[82vh] h-[580px] bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl shadow-[0_25px_60px_rgba(26,54,41,0.16)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
           
           {/* Header */}
-          <div className="p-4 bg-[#FAF6EE] border-b-2 border-[#1A3629]/15 flex items-center justify-between">
+          <div className="p-4 bg-[#FAF6EE] border-b border-[#1A3629]/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center font-bold text-sm shadow-[2px_2px_0px_#3A6B52] shrink-0">
-                ✦
+              <div className="w-8 h-8 rounded-xl bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center font-bold text-sm shrink-0">
+                <Bot className="w-4 h-4 text-[#10B981]" />
               </div>
               <div>
                 <h3 className="font-cabinet font-bold text-sm text-[#1A3629] flex items-center gap-2 leading-none">
                   <span>Cyath AI Coach</span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#FAF6EE] text-[#1A3629]">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629]">
                     Online
                   </span>
                 </h3>
@@ -413,7 +503,7 @@ export function StoveSageChatbot() {
               <button
                 type="button"
                 onClick={resetChat}
-                className="w-7 h-7 rounded-lg border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629] transition-colors flex items-center justify-center cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629] transition-colors flex items-center justify-center cursor-pointer"
                 title="Reset conversation"
                 aria-label="Reset conversation"
               >
@@ -423,7 +513,7 @@ export function StoveSageChatbot() {
               <button
                 type="button"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className={`w-7 h-7 rounded-lg border border-[#1A3629]/20 transition-colors flex items-center justify-center cursor-pointer ${
+                className={`w-7 h-7 rounded-lg border border-[#1A3629]/15 transition-colors flex items-center justify-center cursor-pointer ${
                   showKeyInput ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9] hover:bg-[#F4EDE0] text-[#1A3629]'
                 }`}
                 title="Configure custom API key (optional)"
@@ -438,7 +528,7 @@ export function StoveSageChatbot() {
                   retroAudio.playBlip();
                   setIsOpen(false);
                 }}
-                className="w-7 h-7 rounded-full border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors flex items-center justify-center cursor-pointer ml-1"
+                className="w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors flex items-center justify-center cursor-pointer ml-1"
                 aria-label="Close AI Coach"
               >
                 ✕
@@ -454,7 +544,7 @@ export function StoveSageChatbot() {
 
           {/* Optional Custom API Key Drawer */}
           {showKeyInput && (
-            <div className="p-3.5 bg-[#FAF6EE] border-b-2 border-[#1A3629]/20 text-xs font-cabinet flex flex-col gap-2">
+            <div className="p-3.5 bg-[#FAF6EE] border-b border-[#1A3629]/15 text-xs font-cabinet flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-[#1A3629]">Custom Gemini API Key (Optional)</span>
                 <span className="text-[10px] font-mono text-[#4A5D4E]">Overrides system key</span>
@@ -464,7 +554,7 @@ export function StoveSageChatbot() {
                 value={customKey}
                 onChange={(e) => handleSaveApiKey(e.target.value)}
                 placeholder="Leave blank to use Cyath's default key"
-                className="w-full px-3 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none"
+                className="w-full px-3 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none focus:border-[#1A3629]/40"
               />
             </div>
           )}
@@ -481,8 +571,8 @@ export function StoveSageChatbot() {
                   <div
                     className={`max-w-[88%] p-3.5 rounded-2xl text-xs sm:text-sm font-cabinet leading-relaxed ${
                       isBot
-                        ? 'bg-[#FAF6EE] border-2 border-[#1A3629]/25 text-[#1A3629] rounded-tl-xs shadow-xs'
-                        : 'bg-[#1A3629] text-[#FFFDF9] rounded-tr-xs shadow-md'
+                        ? 'bg-[#FAF6EE] border border-[#1A3629]/15 text-[#1A3629] rounded-tl-xs shadow-2xs'
+                        : 'bg-[#1A3629] text-[#FFFDF9] rounded-tr-xs shadow-xs'
                     }`}
                   >
                     <div className="space-y-1.5 whitespace-pre-wrap">
@@ -497,11 +587,11 @@ export function StoveSageChatbot() {
                             return (
                               <div
                                 key={i}
-                                className="flex flex-col gap-2.5 p-3 rounded-2xl border-2 border-[#1A3629] bg-[#FAF6EE] shadow-[3px_3px_0px_#1A3629]"
+                                className="flex flex-col gap-2.5 p-3 rounded-2xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs"
                               >
                                 <div className="flex items-start gap-3">
                                   {/* Retro Card Format Sprite Enclosure (AI Scanner format) */}
-                                  <div className="relative w-24 h-24 shrink-0 rounded-2xl border-2 border-[#1A3629] overflow-hidden bg-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] flex flex-col items-center justify-between p-1.5">
+                                  <div className="relative w-24 h-24 shrink-0 rounded-2xl border border-[#1A3629]/15 overflow-hidden bg-[#FFFDF9] flex flex-col items-center justify-between p-1.5">
                                     <div className="w-full flex-1 flex items-center justify-center bg-[#FAF6EE]/80 rounded-xl overflow-hidden relative">
                                       <img
                                         src={act.payload.sprite || act.payload.image || '/assets/food/grain-bowl-1.0.png'}
@@ -510,7 +600,7 @@ export function StoveSageChatbot() {
                                       />
                                       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(26,54,41,0.06)_1px,transparent_1px)] bg-[size:100%_4px]" />
                                     </div>
-                                    <div className="w-full flex items-center justify-between px-1 pt-1 border-t border-[#1A3629]/15 text-[8px] font-mono font-bold text-[#1A3629]">
+                                    <div className="w-full flex items-center justify-between px-1 pt-1 border-t border-[#1A3629]/10 text-[8px] font-mono font-bold text-[#1A3629]">
                                       <span className="flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] border border-[#1A3629]" />
                                         <span>AI SPEC</span>
@@ -522,10 +612,10 @@ export function StoveSageChatbot() {
                                   {/* Recipe Manifest Info */}
                                   <div className="flex-1 min-w-0 flex flex-col gap-1">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#10B981] text-[#FFFDF9] border border-[#1A3629]">
+                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-600 text-[#FFFDF9]">
                                         AI Custom
                                       </span>
-                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#FFFDF9] border border-[#1A3629] text-[#1A3629]">
+                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#FAF6EE] border border-[#1A3629]/15 text-[#1A3629]">
                                         {act.payload.category || 'High Protein'}
                                       </span>
                                     </div>
@@ -536,7 +626,7 @@ export function StoveSageChatbot() {
                                       {act.payload.subtitle || 'Formulated by Cyath AI Coach'}
                                     </p>
                                     <div className="flex items-center gap-2 mt-0.5 text-[10px] font-mono font-bold text-[#1A3629]">
-                                      <span className="bg-[#FFFDF9] px-1.5 py-0.5 rounded border border-[#1A3629]/20">
+                                      <span className="bg-[#FAF6EE] px-1.5 py-0.5 rounded border border-[#1A3629]/15">
                                         {act.payload.protein || 35}g Protein
                                       </span>
                                       <span className="text-[#4A5D4E]">
@@ -552,36 +642,53 @@ export function StoveSageChatbot() {
                                 </div>
 
                                 {act.status === 'pending' && (
-                                  <div className="flex items-center gap-2 pt-1 border-t border-[#1A3629]/15">
+                                  <div className="flex items-center gap-2 pt-1 border-t border-[#1A3629]/10">
                                     <button
                                       type="button"
                                       onClick={() => handleApplyAction(msg.id, i)}
-                                      className="flex-1 py-1.5 px-3 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                      className="flex-1 py-1.5 px-3 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-semibold hover:bg-[#234535] transition-colors cursor-pointer text-center"
                                     >
                                       + Add to My Recipes
                                     </button>
                                     <button
                                       type="button"
                                       onClick={() => handleDismissAction(msg.id, i)}
-                                      className="py-1.5 px-3 rounded-xl border border-[#1A3629]/30 hover:bg-[#FFFDF9] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
+                                      className="py-1.5 px-3 rounded-xl border border-[#1A3629]/15 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-medium transition-colors cursor-pointer"
                                     >
                                       Dismiss
                                     </button>
                                   </div>
                                 )}
                                 {act.status === 'applied' && (
-                                  <div className="pt-1 border-t border-[#1A3629]/15 flex items-center justify-between">
-                                    <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30">
-                                      ✓ Added to My Recipes
+                                  <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between gap-2">
+                                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20">
+                                      ✓ Saved to My Recipes
                                     </span>
-                                    <span className="text-[10px] font-mono text-[#4A5D4E]">
-                                      Saved in Recipes Catalog
-                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        retroAudio.playInspectConfirm();
+                                        const slug = (act.payload.name || 'custom-dish')
+                                          .toLowerCase()
+                                          .replace(/[^a-z0-9]+/g, '-')
+                                          .replace(/(^-|-$)/g, '');
+                                        const targetId = act.payload.id || `custom-${slug}`;
+                                        logRecipeToDay(
+                                          targetId,
+                                          Number(act.payload.protein) || 35,
+                                          Number(act.payload.calories) || 450,
+                                          currentDate
+                                        );
+                                      }}
+                                      className="px-2.5 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-[10px] font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer"
+                                    >
+                                      + Log to Today ({act.payload.protein || 35}g Pro)
+                                    </button>
                                   </div>
                                 )}
                                 {act.status === 'dismissed' && (
-                                  <div className="pt-1 border-t border-[#1A3629]/15">
-                                    <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                                  <div className="pt-1 border-t border-[#1A3629]/10">
+                                    <span className="text-[10px] font-mono font-medium text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
                                       Dismissed
                                     </span>
                                   </div>
@@ -593,19 +700,19 @@ export function StoveSageChatbot() {
                           return (
                             <div
                               key={i}
-                              className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-xs"
+                              className="flex flex-col gap-2 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs"
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <span className="text-[11px] font-cabinet font-bold text-[#1A3629] leading-snug">
                                   {act.summary || `Proposed ${act.type}`}
                                 </span>
                                 {act.status === 'applied' && (
-                                  <span className="text-[10px] font-mono font-bold text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0">
+                                  <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20 shrink-0">
                                     ✓ Added
                                   </span>
                                 )}
                                 {act.status === 'dismissed' && (
-                                  <span className="text-[10px] font-mono font-bold text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
+                                  <span className="text-[10px] font-mono font-medium text-[#4A5D4E] bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
                                     Dismissed
                                   </span>
                                 )}
@@ -616,14 +723,14 @@ export function StoveSageChatbot() {
                                   <button
                                     type="button"
                                     onClick={() => handleApplyAction(msg.id, i)}
-                                    className="flex-1 py-1 px-3 rounded-lg border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-[2px_2px_0px_#3A6B52] transition-all cursor-pointer text-center"
+                                    className="flex-1 py-1 px-3 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer text-center"
                                   >
                                     {act.type === 'ADD_HABIT' ? '+ Add to Habits' : act.type === 'LOG_RECIPE' ? '✓ Quick Log' : 'Apply'}
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDismissAction(msg.id, i)}
-                                    className="py-1 px-2.5 rounded-lg border border-[#1A3629]/30 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-bold transition-colors cursor-pointer"
+                                    className="py-1 px-2.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#FAF6EE] text-[#1A3629] text-xs font-mono font-medium transition-colors cursor-pointer"
                                   >
                                     Dismiss
                                   </button>
@@ -640,9 +747,9 @@ export function StoveSageChatbot() {
             })}
 
             {isLoading && (
-              <div className="flex items-center gap-2 p-3 bg-[#FAF6EE] border-2 border-[#1A3629]/20 rounded-2xl w-fit text-xs font-mono text-[#3A6B52]">
-                <span className="animate-spin text-sm">✦</span>
-                <span>Formulating personalized recommendation...</span>
+              <div className="flex items-center gap-2 p-3 bg-[#FAF6EE] border border-[#1A3629]/15 rounded-2xl w-fit text-xs font-mono text-[#3A6B52]">
+                <Sparkles className="w-3.5 h-3.5 animate-spin text-[#10B981]" />
+                <span>Formulating recommendation...</span>
               </div>
             )}
 
@@ -657,7 +764,7 @@ export function StoveSageChatbot() {
                   key={i}
                   type="button"
                   onClick={() => handleSendMessage(prompt)}
-                  className="shrink-0 px-2.5 py-1 rounded-full border border-[#1A3629]/30 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] text-[11px] font-cabinet font-bold transition-colors cursor-pointer"
+                  className="shrink-0 px-2.5 py-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] text-[11px] font-cabinet font-semibold transition-colors cursor-pointer"
                 >
                   {prompt}
                 </button>
@@ -666,7 +773,7 @@ export function StoveSageChatbot() {
           )}
 
           {/* Input Footer */}
-          <div className="p-3 bg-[#FFFDF9] border-t-2 border-[#1A3629]/15 flex items-center gap-2">
+          <div className="p-3 bg-[#FFFDF9] border-t border-[#1A3629]/10 flex items-center gap-2">
             <input
               ref={inputRef}
               type="text"
@@ -679,13 +786,13 @@ export function StoveSageChatbot() {
                 }
               }}
               placeholder="Ask for meals, habit ideas, or metric logging..."
-              className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] text-xs sm:text-sm font-cabinet text-[#1A3629] placeholder-[#1A3629]/50 focus:outline-none focus:bg-[#FFFDF9]"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-xs sm:text-sm font-cabinet text-[#1A3629] placeholder-[#1A3629]/40 focus:outline-none focus:bg-[#FFFDF9] focus:border-[#1A3629]/30"
             />
             <button
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="px-4 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1"
+              className="px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-semibold text-xs sm:text-sm hover:bg-[#234535] transition-colors cursor-pointer flex items-center gap-1"
               aria-label="Send message"
             >
               <span>Send</span>
@@ -696,19 +803,23 @@ export function StoveSageChatbot() {
         </div>
       )}
 
-      {/* Sleek, Professional Floating Action Trigger Pill (Negative Style: Forest Green with White Text) */}
+      {/* Modern Floating Action Trigger Pill */}
       {!isOpen && (
         <button
+          id="tour-ai-coach"
           type="button"
           onClick={() => {
             retroAudio.playBlip();
             setIsOpen(true);
           }}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-[3px_3px_0px_#3A6B52] hover:shadow-[4px_4px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer group select-none"
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-md hover:bg-[#234535] hover:shadow-lg transition-all cursor-pointer group select-none"
           aria-label="Open Cyath AI Coach (Cmd+J)"
           title="Open Cyath AI Coach (⌘J / Ctrl+J)"
         >
-          <span className="font-cabinet font-bold text-xs text-[#FFFDF9]">✦ AI Coach</span>
+          <span className="font-cabinet font-semibold text-xs text-[#FFFDF9] flex items-center gap-1.5">
+            <Bot className="w-3.5 h-3.5 text-[#10B981]" />
+            <span>AI Coach</span>
+          </span>
           <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#2C4A3B] border border-[#FFFDF9]/20 text-[#A7F3D0]">
             ⌘J
           </span>

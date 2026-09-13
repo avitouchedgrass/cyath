@@ -5,6 +5,7 @@
 export type PhotoStyleMode = 'pixel_plate' | 'matched_sprite' | 'retro_frame';
 
 export const SPRITE_OPTIONS = [
+  { id: 'generic-plate', name: 'Custom Plate', url: '/assets/food/generic-plate.webp' },
   { id: 'rajma-chawal', name: 'Rajma Chawal', url: '/assets/food/rajma-chawal-1.0.png' },
   { id: 'paneer-bhurji', name: 'Paneer Bhurji', url: '/assets/food/paneer-bhurji-1.0.png' },
   { id: 'chicken-curry', name: 'Chicken Curry', url: '/assets/food/chicken-curry-1.0.png' },
@@ -136,7 +137,7 @@ export function getBestMatchingSprite(name: string, category: string, dietType: 
     return '/assets/food/egg-rice-bowl-1.0.png';
   }
 
-  return '/assets/food/grain-bowl-1.0.png';
+  return '/assets/food/generic-plate.webp';
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {

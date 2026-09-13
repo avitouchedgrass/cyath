@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Recipe } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 import {
@@ -35,6 +35,14 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
   const [extractedRecipe, setExtractedRecipe] = useState<Partial<Recipe> | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const currentDisplayedImage = useMemo(() => {
     if (photoStyle === 'matched_sprite') {
@@ -184,7 +192,14 @@ export function ScanRecipeModal({ isOpen, onClose, onSaveRecipe }: ScanRecipeMod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]"
+    >
       <div className="relative w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl shadow-[0_25px_60px_rgba(26,54,41,0.14)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
         {/* Header Ribbon */}
         <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#1A3629]/8 bg-[#FAF8F5] flex items-center justify-between">

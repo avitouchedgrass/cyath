@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Recipe } from '@/lib/recipes';
 import { retroAudio } from '@/lib/retroAudio';
 
@@ -28,6 +28,7 @@ const DIET_OPTIONS: Recipe['dietType'][] = [
 ];
 
 const DEFAULT_PLATES = [
+  { label: 'Custom Plate', url: '/assets/food/generic-plate.webp' },
   { label: 'Grilled Chicken', url: '/assets/food/grilled-chicken-1.0.png' },
   { label: 'Egg Rice Bowl', url: '/assets/food/egg-rice-bowl-1.0.png' },
   { label: 'Ancient Grain', url: '/assets/food/grain-bowl-1.0.png' },
@@ -68,6 +69,14 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
     initialRecipe?.instructions.join('\n') ||
       'Prepare ingredients and heat pan over medium heat.\nSear or sauté main protein with spices.\nAssemble on plate and serve hot.'
   );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -122,7 +131,14 @@ export function CustomRecipeModal({ isOpen, onClose, onSaveRecipe, initialRecipe
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#1A3629]/30 backdrop-blur-xs animate-[fadeScale_0.25s_ease-out]"
+    >
       <div className="relative w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl shadow-[0_25px_60px_rgba(26,54,41,0.14)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
         {/* Modal Header */}
         <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#1A3629]/8 bg-[#FAF8F5] flex items-center justify-between">

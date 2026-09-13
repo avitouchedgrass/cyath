@@ -298,6 +298,12 @@ export const useHabitStore = create<HabitStoreState>()(
           });
         }
 
+        // If session is unchanged, preserve existing in-memory state and avoid wiping with cached data
+        if (prevSession && session && prevSession.id === session.id) {
+          set({ userSession: session });
+          return;
+        }
+
         set({ userSession: session });
 
         if (session && !session.id.startsWith('guest_')) {
@@ -377,6 +383,11 @@ export const useHabitStore = create<HabitStoreState>()(
             .select('*')
             .eq('user_id', session.id);
 
+          // If the user changed or logged out while remote fetch was in flight, abort applying to store
+          if (get().userSession?.id !== session.id) {
+            return;
+          }
+
           // Merge custom recipes safely
           let finalRecipes = [...currentLocalRecipes];
           if (remoteRecipes && remoteRecipes.length > 0) {
@@ -438,20 +449,26 @@ export const useHabitStore = create<HabitStoreState>()(
             }
           }
 
-          // Merge daily logs if remote logs exist
+          // Merge daily logs if remote logs exist, preserving in-memory logged meals and local recipe entries
           const mergedLogs = { ...get().logsByDate };
           if (remoteLogs && remoteLogs.length > 0) {
             remoteLogs.forEach((l) => {
+              const currentLocalLog = mergedLogs[l.log_date] || get().logsByDate[l.log_date];
+              const remoteRecipeIds = l.logged_recipes || [];
+              const localRecipeIds = currentLocalLog?.loggedRecipeIds || [];
+              const mergedRecipeIds = Array.from(new Set([...remoteRecipeIds, ...localRecipeIds]));
+
               mergedLogs[l.log_date] = {
-                habitsCompleted: l.habits_completed || {},
-                totalProteinLogged: Number(l.total_protein || 0),
-                totalCaloriesLogged: Number(l.total_calories || 0),
-                hydrationLiters: Number(l.hydration_liters || 0),
-                sleepHours: Number(l.sleep_hours || 7.5),
-                energyLevel: l.energy_level || 7,
-                moodScore: l.mood_score || 7,
-                notes: l.notes || '',
-                loggedRecipeIds: l.logged_recipes || [],
+                habitsCompleted: { ...(currentLocalLog?.habitsCompleted || {}), ...(l.habits_completed || {}) },
+                totalProteinLogged: Math.max(Number(l.total_protein || 0), currentLocalLog?.totalProteinLogged || 0),
+                totalCaloriesLogged: Math.max(Number(l.total_calories || 0), currentLocalLog?.totalCaloriesLogged || 0),
+                hydrationLiters: Math.max(Number(l.hydration_liters || 0), currentLocalLog?.hydrationLiters || 0),
+                sleepHours: Number(l.sleep_hours || currentLocalLog?.sleepHours || 7.5),
+                energyLevel: l.energy_level || currentLocalLog?.energyLevel || 7,
+                moodScore: l.mood_score || currentLocalLog?.moodScore || 7,
+                notes: l.notes || currentLocalLog?.notes || '',
+                loggedRecipeIds: mergedRecipeIds,
+                loggedMeals: currentLocalLog?.loggedMeals || [],
               };
             });
           }
@@ -527,7 +544,7 @@ export const useHabitStore = create<HabitStoreState>()(
                   }, { onConflict: 'user_id' });
               } catch {}
             }
-          } else if (cached && (currentLocalXp > 0 || currentLocalProfile?.onboardingCompleted)) {
+          } else if (cached && (currentLocalXp > 0 || currentLocalProfile?.onboardingCompleted || (cached.logsByDate && Object.keys(cached.logsByDate).length > 0))) {
             // User had cached local progress on this machine: upload/persist it
             try {
               await supabase
@@ -555,6 +572,7 @@ export const useHabitStore = create<HabitStoreState>()(
               streakCount: currentLocalStreak,
               streakFreezeStock: currentLocalFreeze,
               customRecipes: finalRecipes,
+              logsByDate: mergedLogs,
               userProfile: currentLocalProfile,
               habits: currentLocalHabits,
             });
@@ -563,22 +581,36 @@ export const useHabitStore = create<HabitStoreState>()(
               streakCount: currentLocalStreak,
               streakFreezeStock: currentLocalFreeze,
               customRecipes: finalRecipes,
+              logsByDate: mergedLogs,
               userProfile: currentLocalProfile,
               habits: currentLocalHabits,
             });
           } else {
-            // Brand new account with zero cached progress
+            // Brand new account or session with active in-memory progress: preserve mergedLogs and local progress
+            const finalXp = Math.max(currentLocalXp, get().totalXp);
+            const finalProfile = currentLocalProfile || get().userProfile;
+            const finalStreak = Math.max(currentLocalStreak, get().streakCount);
+
             set({
-              totalXp: 0,
-              streakCount: 0,
-              streakFreezeStock: 1,
-              claimedMilestones: [],
-              completedQuestIdsByDate: {},
-              xpHistory: [],
-              customRecipes: [],
-              habits: DEFAULT_HABITS,
-              logsByDate: { [getTodayString()]: createEmptyDailyLog() },
-              userProfile: null,
+              totalXp: finalXp,
+              streakCount: finalStreak,
+              streakFreezeStock: get().streakFreezeStock || 1,
+              claimedMilestones: get().claimedMilestones || [],
+              completedQuestIdsByDate: get().completedQuestIdsByDate || {},
+              xpHistory: get().xpHistory || [],
+              customRecipes: finalRecipes,
+              habits: currentLocalHabits,
+              logsByDate: mergedLogs,
+              userProfile: finalProfile,
+            });
+            saveUserLocalProgress(session.id, {
+              totalXp: finalXp,
+              streakCount: finalStreak,
+              streakFreezeStock: get().streakFreezeStock || 1,
+              customRecipes: finalRecipes,
+              logsByDate: mergedLogs,
+              userProfile: finalProfile,
+              habits: currentLocalHabits,
             });
           }
         } catch (err) {
@@ -1871,20 +1903,20 @@ export const useHabitStore = create<HabitStoreState>()(
       partialize: (state) => {
         if (!state.userSession || state.userSession.id.startsWith('guest_')) {
           return {
-            userSession: null,
-            userProfile: null,
-            habits: DEFAULT_HABITS,
-            activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
-            logsByDate: { [getTodayString()]: createEmptyDailyLog() },
-            streakCount: 0,
-            streakFreezeStock: 1,
-            claimedMilestones: [],
-            totalXp: 0,
-            xpHistory: [],
-            completedQuestIdsByDate: {},
-            pendingAction: null,
+            userSession: state.userSession,
+            userProfile: state.userProfile,
+            habits: state.habits,
+            activeProtocolIds: state.activeProtocolIds,
+            logsByDate: state.logsByDate,
+            streakCount: state.streakCount,
+            streakFreezeStock: state.streakFreezeStock,
+            claimedMilestones: state.claimedMilestones,
+            totalXp: state.totalXp,
+            xpHistory: state.xpHistory,
+            completedQuestIdsByDate: state.completedQuestIdsByDate,
+            pendingAction: state.pendingAction,
             currentDate: state.currentDate,
-            customRecipes: [],
+            customRecipes: state.customRecipes,
           };
         }
         return state;

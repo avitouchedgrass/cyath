@@ -435,6 +435,32 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     const logAfter = useHabitStore.getState().getDailyLog(today);
     expect(logAfter.totalProteinLogged).toBe(initialProtein + 38);
     expect(logAfter.loggedRecipeIds).toContain('custom-protein-pancakes-dup');
+    expect(logAfter.loggedMeals?.some((m) => m.recipeId === 'custom-protein-pancakes-dup')).toBe(true);
+  });
+
+  it('preserves logged recipe and logged meal when reconcileUserSession and setUserSession run', async () => {
+    const today = useHabitStore.getState().currentDate;
+    const testUser = { id: 'test_user_persistence', email: 'persist@cyath.space' };
+    useHabitStore.getState().setUserSession(testUser);
+
+    // 1. Log a recipe
+    useHabitStore.getState().logRecipeToDay('greek-salmon-bowl', 42, 580, today);
+    const beforeReconcile = useHabitStore.getState().getDailyLog(today);
+    expect(beforeReconcile.loggedRecipeIds).toContain('greek-salmon-bowl');
+    expect(beforeReconcile.loggedMeals?.length).toBeGreaterThan(0);
+
+    // 2. Call setUserSession with the same user (simulating auth events/token refresh)
+    useHabitStore.getState().setUserSession(testUser);
+    const afterSameSession = useHabitStore.getState().getDailyLog(today);
+    expect(afterSameSession.loggedRecipeIds).toContain('greek-salmon-bowl');
+    expect(afterSameSession.loggedMeals?.length).toBeGreaterThan(0);
+
+    // 3. Reconcile user session (simulating remote fetch resolving 1s later)
+    await useHabitStore.getState().reconcileUserSession(testUser);
+    const afterReconcile = useHabitStore.getState().getDailyLog(today);
+    expect(afterReconcile.loggedRecipeIds).toContain('greek-salmon-bowl');
+    expect(afterReconcile.loggedMeals?.length).toBeGreaterThan(0);
+    expect(afterReconcile.totalProteinLogged).toBeGreaterThanOrEqual(42);
   });
 });
 

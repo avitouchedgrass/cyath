@@ -12,7 +12,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { PixelSteam } from '@/components/landing/PixelSteam';
-import { Search, Sparkles, Plus, Check, Clock, Zap, Bot, X, Utensils, Activity } from 'lucide-react';
+import { Search, Plus, Check, Clock, Zap, Bot, X, Utensils, Activity } from 'lucide-react';
 
 const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean'] as const;
 const PROTOCOL_CATEGORIES = ['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const;
@@ -94,16 +94,25 @@ function PlaybookContent() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'protocols') setActiveTab('protocols');
-    if (tabParam === 'recipes' || tabParam === 'fuel') setActiveTab('fuel');
-  }, [searchParams]);
-
   // Combined recipes catalog
   const allRecipes = useMemo(() => {
     return [...(customRecipes || []), ...RECIPES];
   }, [customRecipes]);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'protocols') setActiveTab('protocols');
+    if (tabParam === 'recipes' || tabParam === 'fuel') setActiveTab('fuel');
+    const inspectParam = searchParams.get('inspect');
+    if (inspectParam) {
+      const match = allRecipes.find((r) => r.id === inspectParam);
+      if (match) {
+        setSelectedRecipe(match);
+        setPortionMultiplier(1.0);
+        setActiveTab('fuel');
+      }
+    }
+  }, [searchParams, allRecipes]);
 
   // Filtered recipes
   const filteredRecipes = useMemo(() => {
@@ -260,7 +269,6 @@ function PlaybookContent() {
                   onClick={() => setIsScanModalOpen(true)}
                   className="px-4 py-2 rounded-full border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#C9A84C]" />
                   <span>Scan Meal</span>
                 </button>
 
@@ -297,6 +305,27 @@ function PlaybookContent() {
             </div>
 
             {/* Recipe Grid Featuring Pixel Art Dishes */}
+            {filteredRecipes.length === 0 ? (
+              <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-8 text-center flex flex-col items-center justify-center gap-3">
+                <Utensils className="w-8 h-8 text-[#1A3629]/30" />
+                <h3 className="font-cabinet font-bold text-base text-[#1A3629]">
+                  No recipes found matching your criteria
+                </h3>
+                <p className="text-xs text-[#4A5D4E] max-w-sm">
+                  Try searching for a different ingredient or reset your category and search filters.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('All');
+                  }}
+                  className="px-4 py-2 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRecipes.map((recipe) => {
                 const isLogged = currentLog.loggedRecipeIds?.includes(recipe.id);
@@ -342,6 +371,8 @@ function PlaybookContent() {
                               const target = e.currentTarget;
                               if (target.src.includes('.webp')) {
                                 target.src = target.src.replace('.webp', '.png');
+                              } else if (!target.src.endsWith('generic-plate.webp')) {
+                                target.src = '/assets/food/generic-plate.webp';
                               }
                             }}
                             className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[8px_8px_0px_rgba(26,54,41,0.12)] group-hover:scale-105 transition-transform duration-300 select-none"
@@ -384,6 +415,7 @@ function PlaybookContent() {
                 );
               })}
             </div>
+            )}
           </div>
         )}
 
@@ -411,7 +443,21 @@ function PlaybookContent() {
               ))}
             </div>
 
-            {/* Protocols Grid */}
+            {filteredProtocols.length === 0 ? (
+              <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-8 text-center flex flex-col items-center justify-center gap-3">
+                <Activity className="w-8 h-8 text-[#1A3629]/30" />
+                <h3 className="font-cabinet font-bold text-base text-[#1A3629]">
+                  No protocols found in this category
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setProtocolFilter('All')}
+                  className="px-4 py-2 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
+                >
+                  Show All Protocols
+                </button>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredProtocols.map((proto) => {
                 const isActive = activeProtocolIds.includes(proto.id);
@@ -489,6 +535,7 @@ function PlaybookContent() {
                 );
               })}
             </div>
+            )}
           </div>
         )}
 
@@ -556,6 +603,8 @@ function PlaybookContent() {
                       const target = e.currentTarget;
                       if (target.src.includes('.webp')) {
                         target.src = target.src.replace('.webp', '.png');
+                      } else if (!target.src.endsWith('generic-plate.webp')) {
+                        target.src = '/assets/food/generic-plate.webp';
                       }
                     }}
                     className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 select-none"

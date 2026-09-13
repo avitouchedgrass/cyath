@@ -122,5 +122,26 @@ describe('Anti-Crash & Resilience Architecture Tests', () => {
       useHabitStore.getState().gainXp(-500, 'Test penalty');
       expect(useHabitStore.getState().totalXp).toBe(0);
     });
+
+    it('should preserve manual historical date changes without resetting', () => {
+      const pastDate = '2026-08-15';
+      useHabitStore.getState().setDate(pastDate);
+      expect(useHabitStore.getState().currentDate).toBe(pastDate);
+    });
+  });
+
+  describe('Sprite Matching & Fallback (imageStylizer.ts)', () => {
+    it('should return specific sprite for known keywords and generic-plate fallback for unknown recipes', async () => {
+      const { getBestMatchingSprite } = await import('../imageStylizer');
+      expect(getBestMatchingSprite('Tawa Tikka', 'High Protein', 'omnivore')).toBe(
+        '/assets/food/chicken-tikka-1.0.png'
+      );
+      expect(getBestMatchingSprite('Greek Salmon Bowl', 'High Protein', 'pescatarian')).toBe(
+        '/assets/food/greek-salmon-1.0.png'
+      );
+      expect(getBestMatchingSprite('Mystery Powder Shake', 'Quick Fuel', 'vegan')).toBe(
+        '/assets/food/generic-plate.webp'
+      );
+    });
   });
 });

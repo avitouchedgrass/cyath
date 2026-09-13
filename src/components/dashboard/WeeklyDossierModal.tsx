@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { calculateWeeklyReclamation } from '@/lib/weeklyReclamationEngine';
 import { retroAudio } from '@/lib/retroAudio';
@@ -35,6 +35,14 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
     });
   }, [currentDate, logsByDate, deskRitualsByDate, dailyProtocolsAcceptedByDate]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleClaim = () => {
@@ -48,11 +56,16 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in">
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in"
+    >
       <div
         className="w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.14)] max-h-[90vh] overflow-y-auto flex flex-col gap-6"
-        role="dialog"
-        aria-modal="true"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#1A3629]/10">

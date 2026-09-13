@@ -209,31 +209,48 @@ export function FuelTab() {
   // Combined list of today's logged meals (direct AI logs + recipe logs)
   const allLoggedMeals = useMemo(() => {
     const directMeals = currentLog.loggedMeals || [];
-    if (directMeals.length > 0) {
-      return directMeals;
-    }
-
-    // Fallback if legacy loggedRecipeIds are present without loggedMeals
     const recipeMap = new Map<string, Recipe>();
     [...customRecipes, ...RECIPES].forEach((r) => recipeMap.set(r.id, r));
 
-    return currentLog.loggedRecipeIds.map((id, index) => {
-      const recipe = recipeMap.get(id);
-      return {
-        id: `legacy_${id}_${index}`,
-        name: recipe?.name || 'Logged Meal',
-        protein: recipe?.protein || 25,
-        calories: recipe?.calories || 350,
-        carbs: recipe?.carbs,
-        fats: recipe?.fats,
-        dietType: recipe?.dietType,
-        ingredients: recipe?.ingredients,
-        suggestedSprite: recipe?.image,
-        loggedAt: new Date().toISOString(),
-        recipeId: id,
-        savedAsRecipe: true,
-      };
+    // Count how many times each recipeId is already represented in directMeals
+    const directRecipeCounts = new Map<string, number>();
+    directMeals.forEach((m) => {
+      if (m.recipeId) {
+        directRecipeCounts.set(m.recipeId, (directRecipeCounts.get(m.recipeId) || 0) + 1);
+      }
     });
+
+    const syntheticMeals: LoggedMealEntry[] = [];
+    const synthesizedCounts = new Map<string, number>();
+
+    currentLog.loggedRecipeIds.forEach((id, index) => {
+      const alreadyInDirect = directRecipeCounts.get(id) || 0;
+      const alreadySynthesized = synthesizedCounts.get(id) || 0;
+      const totalAccountedFor = alreadyInDirect + alreadySynthesized;
+      const totalNeeded = currentLog.loggedRecipeIds.filter((rid) => rid === id).length;
+
+      if (totalAccountedFor < totalNeeded) {
+        synthesizedCounts.set(id, alreadySynthesized + 1);
+        const recipe = recipeMap.get(id);
+        syntheticMeals.push({
+          id: `legacy_${id}_${index}`,
+          name: recipe?.name || 'Logged Dish',
+          protein: recipe?.protein || 25,
+          calories: recipe?.calories || 350,
+          carbs: recipe?.carbs,
+          fats: recipe?.fats,
+          dietType: recipe?.dietType,
+          isVegetarian: recipe?.dietType === 'vegetarian' || recipe?.dietType === 'vegan',
+          ingredients: recipe?.ingredients || [{ item: recipe?.name || 'Whole food portion', amount: '1 serving' }],
+          suggestedSprite: recipe?.image || '/assets/food/generic-plate.webp',
+          loggedAt: new Date().toISOString(),
+          recipeId: id,
+          savedAsRecipe: true,
+        });
+      }
+    });
+
+    return [...directMeals, ...syntheticMeals];
   }, [currentLog.loggedMeals, currentLog.loggedRecipeIds, customRecipes]);
 
   const allAvailableRecipes = useMemo(() => {
@@ -505,7 +522,10 @@ export function FuelTab() {
                       alt={meal.name}
                       className="w-full h-full object-contain [image-rendering:pixelated]"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/food/generic-plate.webp';
+                        const target = e.target as HTMLImageElement;
+                        if (!target.src.endsWith('generic-plate.webp')) {
+                          target.src = '/assets/food/generic-plate.webp';
+                        }
                       }}
                     />
                   </div>
@@ -638,43 +658,62 @@ export function FuelTab() {
         </div>
 
         {/* Recipe Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allAvailableRecipes.slice(0, 9).map((recipe) => (
-            <div
-              key={recipe.id}
-              className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] overflow-hidden flex flex-col justify-between hover:border-[#1A3629]/25 transition-all group"
+        {allAvailableRecipes.length === 0 ? (
+          <div className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] p-6 text-center flex flex-col items-center justify-center gap-2">
+            <Utensils className="w-6 h-6 text-[#1A3629]/30" />
+            <h4 className="font-cabinet font-bold text-sm text-[#1A3629]">
+              No dishes found matching &quot;{searchFilter}&quot;
+            </h4>
+            <p className="font-sans text-xs text-[#4A5D4E]">
+              Try a different keyword or reset your filter to browse the catalog.
+            </p>
+            <button
+              type="button"
+              onClick={() => setSearchFilter('')}
+              className="mt-1 px-3 py-1 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
             >
-              <div className="p-4 flex flex-col gap-2">
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-tight">
-                    {recipe.name}
-                  </h4>
-                  <span className="font-mono text-xs font-semibold text-[#1A3629] shrink-0 bg-[#FFFDF9] px-2 py-0.5 rounded-full border border-[#1A3629]/10">
-                    {recipe.protein}g
-                  </span>
+              Clear Filter
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {allAvailableRecipes.slice(0, 9).map((recipe) => (
+              <div
+                key={recipe.id}
+                className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] overflow-hidden flex flex-col justify-between hover:border-[#1A3629]/25 transition-all group"
+              >
+                <div className="p-4 flex flex-col gap-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-tight">
+                      {recipe.name}
+                    </h4>
+                    <span className="font-mono text-xs font-semibold text-[#1A3629] shrink-0 bg-[#FFFDF9] px-2 py-0.5 rounded-full border border-[#1A3629]/10">
+                      {recipe.protein}g
+                    </span>
+                  </div>
+                  <p className="font-sans text-xs text-[#4A5D4E] line-clamp-2 leading-relaxed">
+                    {recipe.subtitle}
+                  </p>
                 </div>
-                <p className="font-sans text-xs text-[#4A5D4E] line-clamp-2 leading-relaxed">
-                  {recipe.subtitle}
-                </p>
-              </div>
 
-              <div className="p-3 border-t border-[#1A3629]/8 bg-[#FFFDF9] flex items-center justify-between">
-                <span className="font-mono text-[11px] text-[#4A5D4E]">
-                  {recipe.calories} kcal · {recipe.prepTimeMinutes}m
-                </span>
+                <div className="p-3 border-t border-[#1A3629]/8 bg-[#FFFDF9] flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-[#4A5D4E]">
+                    {recipe.calories} kcal · {recipe.prepTimeMinutes}m
+                  </span>
 
-                <button
-                  type="button"
-                  onClick={() => handleLogCatalogRecipe(recipe)}
-                  className="px-3.5 py-1.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>Log (+25 XP)</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleLogCatalogRecipe(recipe)}
+                    className="px-3.5 py-1.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Log (+25 XP)</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 5. Custom Recipe Creation / Permanent Save Modal */}

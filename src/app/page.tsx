@@ -54,6 +54,18 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden flex flex-col bg-[#F4F0EA] text-[#1A3629]">
+      {/* Subtle Archival Drafting Grid Pattern */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 opacity-40 mix-blend-multiply"
+        style={{
+          backgroundImage: 'radial-gradient(#1A3629 0.75px, transparent 0.75px)',
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse at 50% 25%, black 45%, transparent 85%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 25%, black 45%, transparent 85%)'
+        }}
+        aria-hidden="true"
+      />
+
       {/* Global Navigation Header */}
       <HeaderNav />
 
@@ -63,7 +75,7 @@ export default function Home() {
         {/* ========================================================================= */}
         {/* 1. HERO SECTION: Refined Swiss Editorial */}
         {/* ========================================================================= */}
-        <section className="px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b border-[#1A3629]/10 bg-[#F4F0EA] text-[#1A3629]">
+        <section className="relative px-6 lg:px-12 pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 border-b border-[#1A3629]/10 bg-transparent text-[#1A3629]">
           <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Hero Left Column */}
@@ -94,12 +106,12 @@ export default function Home() {
                 Log whole-food fuel, track daily routines in 30 seconds, and let our simple pattern engine uncover what drives your best energy days.
               </p>
 
-              {/* Primary & Secondary Refined CTAs */}
+              {/* Primary & Secondary Refined CTAs with Tactile Weight */}
               <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-[0_2px_8px_rgba(26,54,41,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#224736] hover:shadow-[0_4px_16px_rgba(26,54,41,0.22)] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
                   </button>
@@ -108,7 +120,7 @@ export default function Home() {
                 <Link href="/recipes" className="w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF6EE] shadow-2xs active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
+                    className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF5ED] shadow-[0_2px_6px_rgba(26,54,41,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
                     Browse Recipes
                   </button>
@@ -119,17 +131,35 @@ export default function Home() {
               <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 pt-6 border-t border-[#1A3629]/10 w-full">
                 
                 {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    {[1, 0.65, 0.85, 1, 0.5, 1, 1].map((opacity, i) => (
-                      <span 
-                        key={i} 
-                        className="h-3.5 w-3.5 rounded-xs bg-[#1A3629]" 
-                        style={{ opacity }} 
-                      />
-                    ))}
-                  </div>
+                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
                   <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                        7-Day Streak
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#10B981]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                        Active
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1.5 items-center mb-1">
+                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+                        <span key={i} className="text-[9px] font-mono font-bold text-center text-[#1A3629]/45 select-none">
+                          {day}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-7 gap-1.5">
+                      {[1, 0.7, 0.85, 1, 0.6, 1, 1].map((opacity, i) => (
+                        <span 
+                          key={i} 
+                          className={`h-3.5 rounded-xs transition-transform hover:scale-110 ${i === 6 ? 'bg-[#10B981]' : 'bg-[#1A3629]'}`}
+                          style={{ opacity: i === 6 ? 1 : opacity }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pt-2">
                     <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Streak Heatmaps
                     </div>
@@ -140,14 +170,30 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 2: Macro Fueling Preview */}
-                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] overflow-hidden shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
-                  <div 
-                    key={currentDish.id}
-                    className="font-mono font-black text-base tabular-nums tracking-tight mb-1 whitespace-nowrap animate-stat-flip text-[#1A3629]"
-                  >
-                    {currentDish.protein} PRO · {currentDish.calories} KCAL
-                  </div>
+                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] overflow-hidden shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
                   <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                        Macro Calibrated
+                      </span>
+                      <span className="text-[10px] font-mono font-bold text-[#1A3629]/70">
+                        16-Bit Fuel
+                      </span>
+                    </div>
+                    <div 
+                      key={currentDish.id}
+                      className="font-mono font-black text-base tabular-nums tracking-tight mb-2 whitespace-nowrap animate-stat-flip text-[#1A3629]"
+                    >
+                      {currentDish.protein} PRO · {currentDish.calories} KCAL
+                    </div>
+                    {/* Sleek Segmented Macro Indicator Bar */}
+                    <div className="h-2 w-full rounded-full bg-[#1A3629]/10 overflow-hidden flex gap-0.5 p-0.5" title="Macro balance ratio">
+                      <div className="h-full rounded-full bg-[#1A3629] transition-all duration-500" style={{ width: '48%' }} />
+                      <div className="h-full rounded-full bg-[#3A6B52] transition-all duration-500" style={{ width: '32%' }} />
+                      <div className="h-full rounded-full bg-[#A3B899] transition-all duration-500" style={{ width: '20%' }} />
+                    </div>
+                  </div>
+                  <div className="pt-2">
                     <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Whole-Food Fuel
                     </div>
@@ -158,11 +204,37 @@ export default function Home() {
                 </div>
 
                 {/* Micro-Card 3: Discovery Rating */}
-                <div className="border border-[#1A3629]/10 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[124px] shadow-[0_2px_8px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all">
-                  <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
-                    <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS LINK
-                  </div>
+                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
                   <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                        Biometric Link
+                      </span>
+                      <span className="text-[10px] font-mono font-bold text-[#10B981]">
+                        +18% Peak
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
+                        <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS
+                      </div>
+                      {/* Mini Correlation Sparkline */}
+                      <svg className="w-12 h-4 overflow-visible" viewBox="0 0 48 16" fill="none" aria-hidden="true">
+                        <path 
+                          d="M2 13 L12 11 L24 9 L34 5 L44 2" 
+                          stroke="#1A3629" 
+                          strokeWidth="1.75" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                        />
+                        <circle cx="44" cy="2" r="2.25" fill="#10B981" />
+                      </svg>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-[#1A3629]/10 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#10B981]" style={{ width: '87%' }} />
+                    </div>
+                  </div>
+                  <div className="pt-2">
                     <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
                       Energy Links
                     </div>

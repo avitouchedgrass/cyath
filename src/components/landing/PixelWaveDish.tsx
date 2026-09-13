@@ -98,14 +98,15 @@ export function PixelWaveDish({
       const prevSrc = prevIndex !== null && prevIndex !== undefined ? dishImages[prevIndex] : null;
       const prevImg = prevSrc ? imagesRef.current[prevSrc] : null;
 
-      // Draw stationary plate scaled to 84% and shifted upward so it never intersects with bottom inspect badge
+      // Stationary plate geometry scaled to 84% and shifted upward so it never intersects with bottom inspect badge
+      const scale = 0.84;
+      const dw = width * scale;
+      const dh = height * scale;
+      const dx = (width - dw) / 2;
+      const dy = (height - dh) / 2 - 22;
+
       const drawDish = (img: HTMLImageElement | undefined) => {
         if (!img) return;
-        const scale = 0.84;
-        const dw = width * scale;
-        const dh = height * scale;
-        const dx = (width - dw) / 2;
-        const dy = (height - dh) / 2 - 22;
         ctx.drawImage(img, dx, dy, dw, dh);
       };
 
@@ -135,11 +136,15 @@ export function PixelWaveDish({
             ctx.restore();
           }
 
-          // 3. Draw Laser Edge Scan Line along wipe boundary
-          if (splitX > 2 && splitX < width - 2) {
+          // 3. Draw Laser Edge Scan Line strictly along wipe boundary within dish bounds
+          if (splitX >= dx && splitX <= dx + dw) {
             ctx.save();
             ctx.fillStyle = '#1A3629';
-            ctx.fillRect(splitX - 1.5, 0, 3, height);
+            ctx.fillRect(splitX - 1, dy + 18, 2, dh - 36);
+            // Refined terminal pips on scan beam
+            ctx.fillStyle = '#10B981';
+            ctx.fillRect(splitX - 1.5, dy + 18, 3, 3);
+            ctx.fillRect(splitX - 1.5, dy + dh - 21, 3, 3);
             ctx.restore();
           }
         } else {
@@ -165,11 +170,15 @@ export function PixelWaveDish({
             ctx.restore();
           }
 
-          // 3. Draw Laser Edge Scan Line along wipe boundary
-          if (splitY > 2 && splitY < height - 2) {
+          // 3. Draw Laser Edge Scan Line strictly along wipe boundary within dish bounds
+          if (splitY >= dy && splitY <= dy + dh) {
             ctx.save();
             ctx.fillStyle = '#1A3629';
-            ctx.fillRect(0, splitY - 1.5, width, 3);
+            ctx.fillRect(dx + 18, splitY - 1, dw - 36, 2);
+            // Refined terminal pips on scan beam
+            ctx.fillStyle = '#10B981';
+            ctx.fillRect(dx + 18, splitY - 1.5, 3, 3);
+            ctx.fillRect(dx + dw - 21, splitY - 1.5, 3, 3);
             ctx.restore();
           }
         }

@@ -187,6 +187,18 @@ function OnboardingContent() {
 
   return (
     <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] flex flex-col items-center justify-center px-4 sm:px-6 py-10 relative overflow-hidden selection:bg-[#1A3629] selection:text-[#FFFDF9]">
+      {/* Subtle Archival Drafting Grid Pattern (Softly masked) */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 opacity-35 mix-blend-multiply"
+        style={{
+          backgroundImage: 'radial-gradient(#1A3629 0.75px, transparent 0.75px)',
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse at 50% 50%, black 40%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 40%, transparent 80%)'
+        }}
+        aria-hidden="true"
+      />
+
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Top Header & Progress */}
         <div className="flex items-center justify-between mb-6">

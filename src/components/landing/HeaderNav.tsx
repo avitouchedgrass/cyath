@@ -39,10 +39,10 @@ function FloatingPillNav({
     <nav 
       id="tour-navigation"
       aria-label="Main Navigation"
-      className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1.5 transition-all duration-300 bg-[#FFFDF9] border border-[#1A3629]/20 rounded-full p-1.5 h-12 ${
+      className={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1.5 transition-all duration-300 bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 rounded-full p-1.5 h-12 ${
         isScrolled 
           ? "shadow-[0_8px_30px_rgba(26,54,41,0.10)] border-[#1A3629]/25" 
-          : "shadow-[0_4px_16px_rgba(26,54,41,0.06)]"
+          : "shadow-[0_4px_18px_rgba(26,54,41,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]"
       }`}
     >
       {isLoggedIn ? (

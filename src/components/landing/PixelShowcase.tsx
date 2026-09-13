@@ -163,6 +163,8 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
   };
 
   useEffect(() => {
+    retroAudio.enableOnFirstInteraction();
+    setIsMuted(retroAudio.getMuted());
     onDishChange?.(DISH_ITEMS[0], 0);
 
     const interval = setInterval(() => {
@@ -235,11 +237,25 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
           }}
         />
 
+        {/* Tactile Concentric Drafting Stage Rings (Specimen Orbit) */}
+        <div className="absolute w-[80%] h-[80%] rounded-full border border-[#1A3629]/[0.07] pointer-events-none -translate-y-5" />
+        <div className="absolute w-[90%] h-[90%] rounded-full border border-dashed border-[#1A3629]/[0.05] pointer-events-none -translate-y-5" />
+
+        {/* Soft Organic Contact Shadow under the Plate */}
+        <div 
+          className="absolute w-[62%] h-[28px] rounded-full pointer-events-none opacity-40 group-hover:opacity-55 transition-opacity duration-300"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(26, 54, 41, 0.28) 0%, rgba(26, 54, 41, 0.08) 55%, transparent 75%)',
+            filter: 'blur(14px)',
+            transform: 'translateY(118px)'
+          }}
+        />
+
         {/* 16-Bit Ambient Pixel Steam Layer on Hot Dishes */}
         <PixelSteam active={isHotDish && !isScanning} intensity={1.2} />
 
-        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage */}
-        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[20px_20px_0px_rgba(26,54,41,0.14)]">
+        {/* 60fps Hardware-Accelerated Retro Pixel-Wipe Canvas Stage with Natural Soft Depth */}
+        <div className="relative w-full h-full z-10 [image-rendering:pixelated] drop-shadow-[0_18px_32px_rgba(26,54,41,0.12)]">
           <PixelWaveDish
             currentIndex={currentIndex}
             prevIndex={prevIndex}
@@ -252,7 +268,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         </div>
 
         {/* Refined Inspect Recipe Pill Badge */}
-        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-transform duration-300 group-hover:-translate-y-0.5 flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-xs text-[#1A3629] shadow-[0_4px_16px_rgba(26,54,41,0.08)] whitespace-nowrap">
+        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-all duration-300 group-hover:-translate-y-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md text-[#1A3629] shadow-[0_4px_16px_rgba(26,54,41,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] whitespace-nowrap">
           <span className="font-cabinet font-bold text-xs sm:text-sm">
             Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>

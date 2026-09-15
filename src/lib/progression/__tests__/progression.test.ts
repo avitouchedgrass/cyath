@@ -217,13 +217,13 @@ describe('Anti-Exploit & Leveling Hardness', () => {
   it('requires meaningful XP for early and higher levels (halved curve)', () => {
     // Level 1 starts at 0 XP
     expect(xpToReachLevel(1)).toBe(0);
-    // Level 2 requires 20 XP
-    expect(xpToReachLevel(2)).toBe(20);
-    // Level 3 (Tier 2 Timber Shanty) requires 87 XP (~1-2 days of discipline)
-    expect(xpToReachLevel(3)).toBe(87);
-    // Level 6 (Tier 3 Woodcutter Cabin) requires 607 XP (~3-4 days)
-    expect(xpToReachLevel(6)).toBe(607);
-    // Level 10 (Tier 4 Hearthside Cottage) requires 2,109 XP (~1.5-2 weeks)
-    expect(xpToReachLevel(10)).toBe(2109);
+    // Level 2 requires 100 XP
+    expect(xpToReachLevel(2)).toBe(100);
+    // Level 3 (Tier 2 Timber Shanty) requires 361 XP (~2-3 days of steady consistency)
+    expect(xpToReachLevel(3)).toBe(361);
+    // Level 6 (Tier 3 Woodcutter Cabin) requires 1,964 XP
+    expect(xpToReachLevel(6)).toBe(1964);
+    // Level 10 (Tier 4 Hearthside Cottage) requires 5,826 XP
+    expect(xpToReachLevel(10)).toBe(5826);
   });
 });

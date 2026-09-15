@@ -20,8 +20,8 @@ export const MAX_LEVEL = 50;
 
 export function xpToReachLevel(level: number): number {
   if (level <= 1) return 0;
-  // Calibrated exponential curve: balanced pacing, cutting progression time in half for responsive reward loop
-  return Math.round(20 * Math.pow(level - 1, 2.12));
+  // Calibrated exponential curve: requires consistent daily habit execution to advance through island tiers
+  return Math.round(100 * Math.pow(level - 1, 1.85));
 }
 
 export interface TitleRank {

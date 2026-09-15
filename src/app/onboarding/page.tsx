@@ -150,7 +150,7 @@ function OnboardingContent() {
     acceptDailyProtocol(currentDate);
 
     if (isFirstTimeOnboarding) {
-      gainXp(100, 'Completed Energy Leak Audit & Cockpit Calibration');
+      gainXp(25, 'Welcome Explorer Bonus');
     }
 
     try {
@@ -281,7 +281,7 @@ function OnboardingContent() {
                   {/* Biological Sex / Gender */}
                   <div className="relative" ref={sexDropdownRef}>
                     <label className="block text-xs font-mono uppercase font-bold mb-1.5 text-[#1A3629]">
-                      Biological Sex / Frame
+                      Biological Sex
                     </label>
                     <button
                       type="button"
@@ -464,9 +464,9 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Immediately on waking (&lt;30 min)</div>
+                      <div className="font-cabinet font-bold text-sm">Within 30 min of waking</div>
                       <div className="text-[11px] opacity-75 mt-0.5">
-                        Blocks adenosine prematurely; triggers 2:30 PM rebound drop
+                        Can trigger an afternoon energy dip
                       </div>
                     </button>
 
@@ -484,7 +484,7 @@ function OnboardingContent() {
                     >
                       <div className="font-cabinet font-bold text-sm">Delayed 90+ minutes</div>
                       <div className="text-[11px] opacity-75 mt-0.5">
-                        Allows natural adenosine clearance; steady afternoon vigor
+                        Allows natural morning energy to build; steady all day
                       </div>
                     </button>
                   </div>
@@ -493,7 +493,7 @@ function OnboardingContent() {
                 {/* 2. Midday Nutrition */}
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold mb-2 text-[#1A3629]">
-                    2. Typical Midday Fuel / Lunch
+                    2. Typical Midday Meal / Lunch
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
@@ -508,8 +508,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Heavy Carbs / Takeout</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Insulin spike &amp; crash</div>
+                      <div className="font-cabinet font-bold text-sm">Heavy Carbs or Takeout</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Quick spike and afternoon dip</div>
                     </button>
 
                     <button
@@ -524,8 +524,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">35g+ Whole Protein</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Stable amino curve</div>
+                      <div className="font-cabinet font-bold text-sm">High-Protein &amp; Balanced</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Steady, long-lasting focus</div>
                     </button>
 
                     <button
@@ -540,7 +540,7 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Fasted / Coffee Only</div>
+                      <div className="font-cabinet font-bold text-sm">Skip Lunch / Coffee Only</div>
                       <div className="text-[10px] opacity-75 mt-0.5">Late afternoon fog</div>
                     </button>
                   </div>
@@ -549,7 +549,7 @@ function OnboardingContent() {
                 {/* 3. Afternoon Slump */}
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold mb-2 text-[#1A3629]">
-                    3. Afternoon Slump Severity (2:00 - 4:00 PM)
+                    3. Afternoon Slump (2:00 - 4:00 PM)
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
@@ -564,8 +564,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Severe Fog (2h+)</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Exhausted, low output</div>
+                      <div className="font-cabinet font-bold text-sm">Heavy Slump (2h+)</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Sluggish, hard to focus</div>
                     </button>
 
                     <button
@@ -580,8 +580,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Moderate Dip</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Need caffeine/willpower</div>
+                      <div className="font-cabinet font-bold text-sm">Mild Dip</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Need caffeine or a push</div>
                     </button>
 
                     <button
@@ -596,8 +596,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Minimal / Steady</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">High stamina all day</div>
+                      <div className="font-cabinet font-bold text-sm">Minimal Dip</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Steady energy all afternoon</div>
                     </button>
                   </div>
                 </div>
@@ -605,7 +605,7 @@ function OnboardingContent() {
                 {/* 4. Evening Screen Exposure */}
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold mb-2 text-[#1A3629]">
-                    4. Nocturnal Screen Cutoff
+                    4. Screen Time Before Bed
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
@@ -621,7 +621,7 @@ function OnboardingContent() {
                       }`}
                     >
                       <div className="font-cabinet font-bold text-sm">Screens in Bed</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Suppresses melatonin</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Delays deep sleep</div>
                     </button>
 
                     <button
@@ -636,8 +636,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Blue-Light Filtered</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Moderate protection</div>
+                      <div className="font-cabinet font-bold text-sm">Night Mode / Filter</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Moderate screen filter</div>
                     </button>
 
                     <button
@@ -652,8 +652,8 @@ function OnboardingContent() {
                           : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/15 hover:border-[#1A3629]/40 hover:bg-[#FAF8F5] shadow-2xs'
                       }`}
                     >
-                      <div className="font-cabinet font-bold text-sm">Screen-Free 60m+</div>
-                      <div className="text-[10px] opacity-75 mt-0.5">Deep restorative sleep</div>
+                      <div className="font-cabinet font-bold text-sm">Screen-Free 1 Hour+</div>
+                      <div className="text-[10px] opacity-75 mt-0.5">Restorative, deep sleep</div>
                     </button>
                   </div>
                 </div>
@@ -786,7 +786,7 @@ function OnboardingContent() {
                     </div>
                   </div>
                   <span className="font-mono text-xs font-black px-2.5 py-1 rounded-full bg-[#1A3629] text-[#FFFDF9]">
-                    +100 XP
+                    +25 XP
                   </span>
                 </div>
               </div>

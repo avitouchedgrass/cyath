@@ -1,3 +1,22 @@
+export interface RecipeMicros {
+  fiberG: number;
+  potassiumMg: number;
+  magnesiumMg: number;
+  ironMg: number;
+  zincMg: number;
+  calciumMg: number;
+  vitaminB12Mcg?: number;
+  vitaminD_IU?: number;
+  omega3Mg?: number;
+  sodiumMg?: number;
+}
+
+export interface RecipeMacros {
+  proteinCalPct: number;
+  carbsCalPct: number;
+  fatsCalPct: number;
+}
+
 export interface Recipe {
   id: string;
   name: string;
@@ -19,1419 +38,3359 @@ export interface Recipe {
   isCustom?: boolean;
   rawImage?: string;
   reasoningSteps?: string[];
+  macros?: RecipeMacros;
+  micros?: RecipeMicros;
+}
+
+export interface NutritionBreakdown {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+  macros: {
+    proteinCalPct: number;
+    carbsCalPct: number;
+    fatsCalPct: number;
+  };
+  micros: {
+    fiberG: number;
+    fiberDvPct: number;
+    potassiumMg: number;
+    potassiumDvPct: number;
+    magnesiumMg: number;
+    magnesiumDvPct: number;
+    ironMg: number;
+    ironDvPct: number;
+    zincMg: number;
+    zincDvPct: number;
+    calciumMg: number;
+    calciumDvPct: number;
+    vitaminB12Mcg: number;
+    vitaminB12DvPct: number;
+    vitaminD_IU: number;
+    vitaminDDvPct: number;
+    omega3Mg: number;
+    omega3DvPct: number;
+  };
+}
+
+export function calculateRecipeNutrition(recipe: Recipe, multiplier: number = 1.0): NutritionBreakdown {
+  const m = Math.max(0.25, Math.min(4.0, multiplier));
+  const cals = Math.round(recipe.calories * m);
+  const pro = Math.round(recipe.protein * m);
+  const carb = Math.round(recipe.carbs * m);
+  const fat = Math.round(recipe.fats * m);
+
+  const proKcal = pro * 4;
+  const carbKcal = carb * 4;
+  const fatKcal = fat * 9;
+  const totalKcal = Math.max(1, proKcal + carbKcal + fatKcal);
+
+  const proteinCalPct = Math.round((proKcal / totalKcal) * 100);
+  const carbsCalPct = Math.round((carbKcal / totalKcal) * 100);
+  const fatsCalPct = Math.max(0, 100 - proteinCalPct - carbsCalPct);
+
+  // Reference Daily Values (FDA Standard Reference)
+  const DV = {
+    fiber: 28,
+    potassium: 3400,
+    magnesium: 420,
+    iron: 18,
+    zinc: 11,
+    calcium: 1000,
+    vitaminB12: 2.4,
+    vitaminD: 800,
+    omega3: 1000,
+  };
+
+  const baseMicros: RecipeMicros = recipe.micros || {
+    fiberG: Math.round(carb * 0.18 * 10) / 10,
+    potassiumMg: Math.round(pro * 14 + carb * 6),
+    magnesiumMg: Math.round(pro * 1.8 + carb * 1.5),
+    ironMg: Math.round((pro * 0.08 + carb * 0.06) * 10) / 10,
+    zincMg: Math.round((pro * 0.09) * 10) / 10,
+    calciumMg: Math.round(pro * 4.5 + carb * 2),
+    vitaminB12Mcg: recipe.dietType === 'vegan' ? 0 : Math.round((pro * 0.05) * 10) / 10,
+    vitaminD_IU: recipe.tags.includes('Fish') || recipe.tags.includes('Salmon') || recipe.tags.includes('Eggs') ? 160 : 30,
+    omega3Mg: recipe.tags.includes('Salmon') || recipe.tags.includes('Omega-3') ? 1400 : 150,
+  };
+
+  const fiberG = Number((baseMicros.fiberG * m).toFixed(1));
+  const potassiumMg = Math.round(baseMicros.potassiumMg * m);
+  const magnesiumMg = Math.round(baseMicros.magnesiumMg * m);
+  const ironMg = Number((baseMicros.ironMg * m).toFixed(1));
+  const zincMg = Number((baseMicros.zincMg * m).toFixed(1));
+  const calciumMg = Math.round(baseMicros.calciumMg * m);
+  const vitaminB12Mcg = Number(((baseMicros.vitaminB12Mcg || 0) * m).toFixed(1));
+  const vitaminD_IU = Math.round((baseMicros.vitaminD_IU || 0) * m);
+  const omega3Mg = Math.round((baseMicros.omega3Mg || 0) * m);
+
+  return {
+    calories: cals,
+    protein: pro,
+    carbs: carb,
+    fats: fat,
+    macros: {
+      proteinCalPct,
+      carbsCalPct,
+      fatsCalPct,
+    },
+    micros: {
+      fiberG,
+      fiberDvPct: Math.min(100, Math.round((fiberG / DV.fiber) * 100)),
+      potassiumMg,
+      potassiumDvPct: Math.min(100, Math.round((potassiumMg / DV.potassium) * 100)),
+      magnesiumMg,
+      magnesiumDvPct: Math.min(100, Math.round((magnesiumMg / DV.magnesium) * 100)),
+      ironMg,
+      ironDvPct: Math.min(100, Math.round((ironMg / DV.iron) * 100)),
+      zincMg,
+      zincDvPct: Math.min(100, Math.round((zincMg / DV.zinc) * 100)),
+      calciumMg,
+      calciumDvPct: Math.min(100, Math.round((calciumMg / DV.calcium) * 100)),
+      vitaminB12Mcg,
+      vitaminB12DvPct: Math.min(100, Math.round((vitaminB12Mcg / DV.vitaminB12) * 100)),
+      vitaminD_IU,
+      vitaminDDvPct: Math.min(100, Math.round((vitaminD_IU / DV.vitaminD) * 100)),
+      omega3Mg,
+      omega3DvPct: Math.min(100, Math.round((omega3Mg / DV.omega3) * 100)),
+    },
+  };
 }
 
 export const RECIPES: Recipe[] = [
   {
-    id: 'herb-grilled-chicken',
-    name: 'Herb Grilled Chicken & Crispy Greens',
-    subtitle: 'Lean pasture-raised breast with rosemary and wilted greens',
-    image: '/assets/food/grilled-chicken-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/grilled-chicken-0.5.webp',
-      1.0: '/assets/food/grilled-chicken-1.0.webp',
-      1.5: '/assets/food/grilled-chicken-1.5.webp',
-      2.0: '/assets/food/grilled-chicken-2.0.webp',
-    },
-    calories: 520,
-    protein: 48,
-    carbs: 16,
-    fats: 14,
-    prepTimeMinutes: 20,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Gluten-Free', 'Post Workout', 'Omnivore'],
-    focusScore: '9.4/10',
-    description:
-      'High-bioavailability protein paired with micro-nutrient dense dark greens. Calibrated to supply steady amino acids for physical recovery without post-meal fatigue.',
-    ingredients: [
-      { item: 'Free-Range Chicken Breast', amount: '250g' },
-      { item: 'Fresh Rosemary & Thyme', amount: '2 tbsp' },
-      { item: 'Cold-Pressed Olive Oil', amount: '1 tbsp' },
-      { item: 'Baby Spinach & Arugula', amount: '100g' },
-      { item: 'Sea Salt & Crushed Black Pepper', amount: 'To taste' },
-      { item: 'Lemon Juice', amount: '1/2 lemon' }
+    "id": "herb-grilled-chicken",
+    "name": "Herb Grilled Chicken & Crispy Greens",
+    "subtitle": "Lean pasture-raised breast with rosemary and wilted greens",
+    "image": "/assets/food/grilled-chicken-1.0.webp",
+    "calories": 520,
+    "protein": 48,
+    "carbs": 16,
+    "fats": 14,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Post Workout",
+      "Omnivore",
+      "Poultry"
     ],
-    instructions: [
-      'Pound chicken breast to uniform 1/2-inch thickness for even searing.',
-      'Rub chicken with olive oil, minced fresh herbs, sea salt, and black pepper.',
-      'Heat cast-iron pan to medium-high and sear chicken for 5–6 minutes per side until internal temp reaches 165°F.',
-      'In the residual pan juices, toss spinach and arugula for 45 seconds until wilted.',
-      'Slice chicken across the grain, serve atop greens with a fresh squeeze of lemon.'
-    ]
+    "focusScore": "9.4/10",
+    "description": "High-bioavailability protein paired with micro-nutrient dense dark greens. Calibrated to supply steady amino acids for physical recovery without post-meal fatigue.",
+    "ingredients": [
+      {
+        "item": "Free-Range Chicken Breast",
+        "amount": "250g"
+      },
+      {
+        "item": "Fresh Rosemary & Thyme",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Cold-Pressed Olive Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Baby Spinach & Arugula",
+        "amount": "100g"
+      },
+      {
+        "item": "Sea Salt & Crushed Black Pepper",
+        "amount": "To taste"
+      },
+      {
+        "item": "Lemon Juice",
+        "amount": "1/2 lemon"
+      }
+    ],
+    "instructions": [
+      "Pound chicken breast to uniform 1/2-inch thickness for even searing.",
+      "Rub chicken with olive oil, minced fresh herbs, sea salt, and black pepper.",
+      "Heat cast-iron pan to medium-high and sear chicken for 5–6 minutes per side until internal temp reaches 165°F.",
+      "In the residual pan juices, toss spinach and arugula for 45 seconds until wilted.",
+      "Slice chicken across the grain, serve atop greens with a fresh squeeze of lemon."
+    ],
+    "micros": {
+      "fiberG": 4.2,
+      "potassiumMg": 780,
+      "magnesiumMg": 88,
+      "ironMg": 3.4,
+      "zincMg": 2.8,
+      "calciumMg": 140,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 24,
+      "omega3Mg": 210
+    }
   },
   {
-    id: 'truffle-tagliatelle-pasta',
-    name: 'Truffle & Parmesan Tagliatelle',
-    subtitle: 'Slow-digesting durum wheat with aged parmesan and truffle oil',
-    image: '/assets/food/pasta-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/pasta-0.5.webp',
-      1.0: '/assets/food/pasta-1.0.webp',
-      1.5: '/assets/food/pasta-1.5.webp',
-      2.0: '/assets/food/pasta-2.0.webp',
-    },
-    calories: 610,
-    protein: 18,
-    carbs: 78,
-    fats: 19,
-    prepTimeMinutes: 18,
-    category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Glycogen Reload', 'Pre-Workout', 'Vegetarian', 'Complex Carbs'],
-    focusScore: '8.4/10',
-    description:
-      'Clean complex carbohydrates designed for pre-training glycogen storage and prolonged aerobic stamina. Balanced with aged parmesan for sustained release.',
-    ingredients: [
-      { item: 'Artisanal Tagliatelle or Fettuccine', amount: '110g dry' },
-      { item: 'Grass-Fed Butter', amount: '1.5 tbsp' },
-      { item: '24-Month Aged Parmigiano Reggiano', amount: '35g freshly grated' },
-      { item: 'White Truffle Infused Olive Oil', amount: '1 tsp' },
-      { item: 'Reserved Pasta Water', amount: '60ml' },
-      { item: 'Cracked Black Peppercorn', amount: '1/2 tsp' }
+    "id": "smoked-citrus-taco-bowl",
+    "name": "Smoked Citrus Fiesta Taco Bowl",
+    "subtitle": "Seasoned shredded chicken, cilantro cauliflower rice, black beans, and salsa",
+    "image": "/assets/food/taco-bowl-1.0.webp",
+    "calories": 540,
+    "protein": 44,
+    "carbs": 48,
+    "fats": 16,
+    "prepTimeMinutes": 20,
+    "category": "Steady Carbs",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Fiber Rich",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Boil pasta in salted water for 8 minutes until strictly al dente.',
-      'Melt grass-fed butter in a wide saucepan over low heat and crack black pepper.',
-      'Transfer pasta directly to pan with 60ml reserved starchy cooking water.',
-      'Remove from heat; vigorously emulsify with parmesan until a glossy, silk sauce forms.',
-      'Drizzle truffle oil and finish with additional shaved parmigiano.'
-    ]
+    "focusScore": "9.1/10",
+    "description": "Lean poultry and dietary fiber from slow-simmered black beans. Supplies sustained blood glucose stability with crisp fresh salsa.",
+    "ingredients": [
+      {
+        "item": "Shredded Chicken Breast",
+        "amount": "200g"
+      },
+      {
+        "item": "Simmered Black Beans",
+        "amount": "120g"
+      },
+      {
+        "item": "Riced Cauliflower & Cilantro",
+        "amount": "150g"
+      },
+      {
+        "item": "Fresh Pico de Gallo Salsa",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Hass Avocado",
+        "amount": "1/4 sliced"
+      },
+      {
+        "item": "Smoked Paprika & Cumin",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Warm shredded chicken in a skillet with cumin, smoked paprika, and 2 tbsp water.",
+      "Flash-steam cauliflower rice in a pan with chopped cilantro and lime zest for 3 minutes.",
+      "Assemble bowl with warm black beans, seasoned chicken, and cauliflower rice.",
+      "Top with fresh pico de gallo and ripe avocado slices."
+    ],
+    "micros": {
+      "fiberG": 9.8,
+      "potassiumMg": 920,
+      "magnesiumMg": 112,
+      "ironMg": 4.1,
+      "zincMg": 3.2,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 18,
+      "omega3Mg": 310
+    }
   },
   {
-    id: 'cast-iron-skillet-eggs',
-    name: 'Cast-Iron Skillet Eggs & Greens',
-    subtitle: 'Pasture-raised farm eggs sunny-side up with charred asparagus',
-    image: '/assets/food/skillet-eggs-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/skillet-eggs-0.5.webp',
-      1.0: '/assets/food/skillet-eggs-1.0.webp',
-      1.5: '/assets/food/skillet-eggs-1.5.webp',
-      2.0: '/assets/food/skillet-eggs-2.0.webp',
-    },
-    calories: 440,
-    protein: 34,
-    carbs: 12,
-    fats: 28,
-    prepTimeMinutes: 12,
-    category: 'Quick Fuel',
-    dietType: 'eggetarian',
-    tags: ['Choline Rich', 'Brain Fuel', 'Eggetarian', 'Morning Alert'],
-    focusScore: '9.1/10',
-    description:
-      'Loaded with dietary choline and healthy fats from pasture-raised yolks to stimulate morning acetylcholine production, alertness, and mental clarity.',
-    ingredients: [
-      { item: 'Pasture-Raised Large Eggs', amount: '4 whole' },
-      { item: 'Fresh Tender Asparagus Spears', amount: '120g' },
-      { item: 'Extra Virgin Olive Oil or Ghee', amount: '1 tbsp' },
-      { item: 'Himalayan Pink Salt & Smoked Paprika', amount: 'To taste' },
-      { item: 'Crumbled Feta or Goat Cheese', amount: '25g' }
+    "id": "garlic-prawn-linguine",
+    "name": "Garlic Butter Prawn Linguine",
+    "subtitle": "Wild tiger prawns, blistered cherry tomatoes, white wine reduction, and fresh parsley",
+    "image": "/assets/food/prawn-linguine-1.0.webp",
+    "calories": 590,
+    "protein": 44,
+    "carbs": 62,
+    "fats": 15,
+    "prepTimeMinutes": 18,
+    "category": "Post Workout",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Glycogen Reload",
+      "Seafood",
+      "Pescatarian"
     ],
-    instructions: [
-      'Preheat a small cast-iron skillet over medium heat with ghee or olive oil.',
-      'Snap woody ends off asparagus and lay across the skillet for 3 minutes until vibrant and tender.',
-      'Crack eggs directly into the spaces between asparagus spears.',
-      'Cover with lid for 2 minutes to gently set the whites while keeping yolks runny.',
-      'Season with smoked paprika, sea salt, and sprinkle crumbled feta before serving.'
-    ]
+    "focusScore": "9.0/10",
+    "description": "High-density marine protein paired with complex semolina pasta. Replenishes muscle glycogen stores while delivering essential iodine and astaxanthin.",
+    "ingredients": [
+      {
+        "item": "Wild Tiger Prawns (peeled)",
+        "amount": "220g"
+      },
+      {
+        "item": "Artisanal Durum Linguine",
+        "amount": "90g dry"
+      },
+      {
+        "item": "Blistered Cherry Tomatoes",
+        "amount": "100g"
+      },
+      {
+        "item": "Garlic Cloves (thinly sliced)",
+        "amount": "4 cloves"
+      },
+      {
+        "item": "Extra Virgin Olive Oil & Butter",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Flat-Leaf Italian Parsley",
+        "amount": "Handful chopped"
+      }
+    ],
+    "instructions": [
+      "Cook linguine in salted boiling water until firm to the bite (al dente).",
+      "Sear prawns with olive oil and sliced garlic in a hot pan for 90 seconds per side until pink.",
+      "Add cherry tomatoes; burst gently to release sweet juices.",
+      "Toss drained pasta into the skillet with a splash of pasta water, finish with parsley and fresh black pepper."
+    ],
+    "micros": {
+      "fiberG": 3.6,
+      "potassiumMg": 640,
+      "magnesiumMg": 74,
+      "ironMg": 3.8,
+      "zincMg": 2.5,
+      "calciumMg": 110,
+      "vitaminB12Mcg": 1.8,
+      "vitaminD_IU": 35,
+      "omega3Mg": 520
+    }
   },
   {
-    id: 'smoked-citrus-taco-bowl',
-    name: 'Smoked Citrus Fiesta Taco Bowl',
-    subtitle: 'Lean seasoned chicken breast, black beans, sweet corn, and lime pico',
-    image: '/assets/food/taco-bowl-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/taco-bowl-0.5.webp',
-      1.0: '/assets/food/taco-bowl-1.0.webp',
-      1.5: '/assets/food/taco-bowl-1.5.webp',
-      2.0: '/assets/food/taco-bowl-2.0.webp',
-    },
-    calories: 540,
-    protein: 44,
-    carbs: 48,
-    fats: 12,
-    prepTimeMinutes: 20,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Whole Food', 'Comfort Classic', 'Clean Energy'],
-    focusScore: '9.5/10',
-    description:
-      'Lean protein and complex carbohydrates to restore steady energy and support daily performance.',
-    ingredients: [
-      { item: 'Lean Seasoned Chicken Breast or Poultry', amount: '180g' },
-      { item: 'Simmered Black Beans', amount: '80g' },
-      { item: 'Fire-Roasted Sweet Corn', amount: '50g' },
-      { item: 'Charred Tomato Pico de Gallo', amount: '3 tbsp' },
-      { item: 'Cumin, Coriander & Chipotle Powder', amount: '1 tbsp' },
-      { item: 'Fresh Lime Wedges', amount: '2 slices' }
+    "id": "homestyle-tariwala-chicken",
+    "name": "Homestyle Tariwala Chicken & Phulkas",
+    "subtitle": "Slow-simmered onion-tomato gravy with whole-wheat roti and fresh coriander",
+    "image": "/assets/food/chicken-curry-1.0.webp",
+    "calories": 530,
+    "protein": 46,
+    "carbs": 45,
+    "fats": 14,
+    "prepTimeMinutes": 30,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Indian",
+      "Comfort Fuel",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Sear seasoned chicken in a hot skillet, slicing into bite-sized strips.',
-      'Add cumin, coriander, chipotle, and 2 tbsp water; simmer for 4 minutes.',
-      'Warm black beans and sweet corn with a pinch of sea salt.',
-      'Arrange chicken, beans, and corn in equal sections in a wide shallow bowl.',
-      'Top with fresh pico de gallo and squeeze fresh lime juice right before enjoying.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Traditional Punjabi-style thin gravy chicken rich in anti-inflammatory turmeric, ginger, and garlic, paired with whole-wheat phulkas.",
+    "ingredients": [
+      {
+        "item": "Skinless Bone-In Chicken Thighs & Breast",
+        "amount": "260g"
+      },
+      {
+        "item": "Whole Wheat Phulkas",
+        "amount": "2 flatbreads"
+      },
+      {
+        "item": "Onion-Tomato Puree Base",
+        "amount": "150g"
+      },
+      {
+        "item": "Ginger-Garlic Paste",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Turmeric & Coriander Powder",
+        "amount": "1 tsp each"
+      },
+      {
+        "item": "Fresh Cilantro",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Saute onions until golden brown, add ginger-garlic paste and ground spices.",
+      "Add chicken pieces; sear on high heat for 5 minutes until sealed.",
+      "Pour in hot water, cover and simmer on low for 18 minutes until tender and fragrant.",
+      "Garnish with fresh cilantro and serve hot alongside fresh puffed whole-wheat phulkas."
+    ],
+    "micros": {
+      "fiberG": 5.4,
+      "potassiumMg": 860,
+      "magnesiumMg": 96,
+      "ironMg": 4.2,
+      "zincMg": 3.4,
+      "calciumMg": 72,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 18,
+      "omega3Mg": 180
+    }
   },
   {
-    id: 'warm-ancient-grain-bowl',
-    name: 'Warm Ancient Grain & Avocado Bowl',
-    subtitle: 'Tri-color quinoa, roasted sweet potatoes, and avocado wedges',
-    image: '/assets/food/grain-bowl-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/grain-bowl-0.5.webp',
-      1.0: '/assets/food/grain-bowl-1.0.webp',
-      1.5: '/assets/food/grain-bowl-1.5.webp',
-      2.0: '/assets/food/grain-bowl-2.0.webp',
-    },
-    calories: 490,
-    protein: 22,
-    carbs: 62,
-    fats: 17,
-    prepTimeMinutes: 25,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['Plant Protein', 'Fiber Rich', 'Vegan', 'Vegetarian', 'Clean Balance'],
-    focusScore: '8.7/10',
-    description:
-      'High-fiber prebiotic complex with monosaturated lipids. Promotes healthy gut microbiome fermentation for sustained serotonin and steady dopamine levels.',
-    ingredients: [
-      { item: 'Organic Tri-Color Quinoa', amount: '90g dry' },
-      { item: 'Cubed Japanese Sweet Potato', amount: '120g' },
-      { item: 'Ripe Haas Avocado', amount: '1/2 sliced' },
-      { item: 'Shelled Edamame Beans', amount: '60g' },
-      { item: 'Toasted Pumpkin Seeds', amount: '15g' },
-      { item: 'Tahini-Lemon Dressing', amount: '1.5 tbsp' }
+    "id": "chettinad-pepper-chicken",
+    "name": "Chettinad Black Pepper Chicken Kadai Roast",
+    "subtitle": "Fiery South Indian black pepper chicken with curry leaves and steamed parboiled rice",
+    "image": "/assets/food/pepper-chicken-1.0.webp",
+    "calories": 540,
+    "protein": 47,
+    "carbs": 48,
+    "fats": 14,
+    "prepTimeMinutes": 25,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "South Indian",
+      "Metabolic Boost",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Roast cubed sweet potato with a drop of olive oil at 400°F for 20 minutes until caramelized.',
-      'Simmer quinoa in vegetable broth for 15 minutes, fluff with a fork.',
-      'Steam shelled edamame for 3 minutes.',
-      'Assemble warm quinoa base, roasted sweet potatoes, edamame, and sliced avocado.',
-      'Drizzle tahini-lemon dressing and scatter toasted pumpkin seeds for crunch.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Freshly cracked Tellicherry black peppercorns stimulate digestive piperine, accelerating nutrient uptake alongside lean pasture-raised chicken.",
+    "ingredients": [
+      {
+        "item": "Boneless Diced Chicken Breast",
+        "amount": "240g"
+      },
+      {
+        "item": "Coarsely Cracked Black Peppercorns",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Fresh Curry Leaves",
+        "amount": "15 leaves"
+      },
+      {
+        "item": "Shallots (Sambhar Onions)",
+        "amount": "80g sliced"
+      },
+      {
+        "item": "Steamed Parboiled Rice",
+        "amount": "120g"
+      },
+      {
+        "item": "Cold-Pressed Sesame Oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Heat sesame oil in a heavy-bottomed kadai, temper mustard seeds and fresh curry leaves.",
+      "Saute sliced shallots until translucent and caramelized.",
+      "Add chicken and roast with crushed black pepper, fennel seeds, and coriander powder on high heat.",
+      "Cover on low heat for 10 minutes until chicken is tender with a dry aromatic coating.",
+      "Serve alongside steamed parboiled rice."
+    ],
+    "micros": {
+      "fiberG": 3.8,
+      "potassiumMg": 810,
+      "magnesiumMg": 92,
+      "ironMg": 4.5,
+      "zincMg": 3.1,
+      "calciumMg": 68,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 16,
+      "omega3Mg": 190
+    }
   },
   {
-    id: 'avocado-sourdough-toast',
-    name: 'Poached Egg & Whipped Avocado Sourdough',
-    subtitle: 'Cold-fermented sourdough with chili flakes and microgreens',
-    image: '/assets/food/avocado-toast-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/avocado-toast-0.5.webp',
-      1.0: '/assets/food/avocado-toast-1.0.webp',
-      1.5: '/assets/food/avocado-toast-1.5.webp',
-      2.0: '/assets/food/avocado-toast-2.0.webp',
-    },
-    calories: 410,
-    protein: 24,
-    carbs: 38,
-    fats: 18,
-    prepTimeMinutes: 10,
-    category: 'Quick Fuel',
-    dietType: 'eggetarian',
-    tags: ['Fast Prep', 'Healthy Fats', 'Eggetarian', 'Breakfast'],
-    focusScore: '9.0/10',
-    description:
-      'Whole-grain sourdough toast paired with rich avocado and eggs for steady morning energy.',
-    ingredients: [
-      { item: 'Cold-Fermented Sourdough Bread', amount: '2 thick slices' },
-      { item: 'Haas Avocado', amount: '1 whole ripe' },
-      { item: 'Pasture-Raised Eggs', amount: '2 poached' },
-      { item: 'Flaky Maldon Sea Salt & Red Pepper Flakes', amount: '1 tsp' },
-      { item: 'Radish & Broccoli Microgreens', amount: 'Small handful' }
+    "id": "tawa-chicken-tikka",
+    "name": "Smoky Tawa Chicken Tikka Skewers",
+    "subtitle": "Yogurt-marinated chicken breast cubes with mint coriander chutney and pickled onions",
+    "image": "/assets/food/chicken-tikka-1.0.webp",
+    "calories": 460,
+    "protein": 49,
+    "carbs": 14,
+    "fats": 11,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Low Carb",
+      "Keto Clean",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Toast sourdough slices in pan with light ghee or dry toaster until crisp exterior.',
-      'Mash avocado with lemon juice, sea salt, and black pepper; spread generously across toast.',
-      'Poach eggs in simmering water with 1 tbsp vinegar for 3.5 minutes.',
-      'Top avocado toast with poached eggs, chili flakes, and fresh microgreens.'
-    ]
+    "focusScore": "9.5/10",
+    "description": "Hung-curd marinated chicken breast delivers pure bioavailable protein with zero sugar. Mint-coriander chutney supplies digestive enzymes.",
+    "ingredients": [
+      {
+        "item": "Chicken Breast (cut into 1-inch cubes)",
+        "amount": "260g"
+      },
+      {
+        "item": "Greek Yogurt (Hung Curd)",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Kashmiri Red Chili & Garam Masala",
+        "amount": "1 tsp each"
+      },
+      {
+        "item": "Kasuri Methi (Dried Fenugreek)",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Fresh Mint Coriander Chutney",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Lemon Juice & Chaat Masala",
+        "amount": "To taste"
+      }
+    ],
+    "instructions": [
+      "Marinate chicken cubes with greek yogurt, spices, ginger-garlic paste, and lemon juice for 15 minutes.",
+      "Thread onto skewers and sear on a scorching cast-iron tawa with a drizzle of oil for 4 minutes per side.",
+      "Allow char marks to develop for authentic tandoor smokiness.",
+      "Dust with chaat masala and serve with chilled mint chutney."
+    ],
+    "micros": {
+      "fiberG": 2.1,
+      "potassiumMg": 820,
+      "magnesiumMg": 78,
+      "ironMg": 2.9,
+      "zincMg": 3.3,
+      "calciumMg": 130,
+      "vitaminB12Mcg": 1.1,
+      "vitaminD_IU": 22,
+      "omega3Mg": 160
+    }
   },
   {
-    id: 'tamago-sesame-rice-bowl',
-    name: 'Tamago Sesame Soft Egg Rice Bowl',
-    subtitle: 'Steamed short-grain rice with furikake, soy glaze, and spring onions',
-    image: '/assets/food/egg-rice-bowl-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/egg-rice-bowl-0.5.webp',
-      1.0: '/assets/food/egg-rice-bowl-1.0.webp',
-      1.5: '/assets/food/egg-rice-bowl-1.5.webp',
-      2.0: '/assets/food/egg-rice-bowl-2.0.webp',
-    },
-    calories: 460,
-    protein: 26,
-    carbs: 56,
-    fats: 14,
-    prepTimeMinutes: 14,
-    category: 'Steady Carbs',
-    dietType: 'eggetarian',
-    tags: ['Clean Fuel', 'Japanese Minimalist', 'Eggetarian', 'Daily Staple'],
-    focusScore: '8.8/10',
-    description:
-      'Clean, hypoallergenic fuel with easily assimilated rice starches and high-quality egg albumen. Perfect pre-training fuel or recovery comfort bowl.',
-    ingredients: [
-      { item: 'Steamed Short-Grain White or Jasmine Rice', amount: '180g cooked' },
-      { item: 'Pasture-Raised Eggs', amount: '3 soft-boiled (6.5 min)' },
-      { item: 'Low-Sodium Tamari / Soy Glaze', amount: '1.5 tbsp' },
-      { item: 'Toasted Sesame Furikake & Nori', amount: '1 tbsp' },
-      { item: 'Finely Sliced Scallions', amount: '2 stalks' }
+    "id": "sizzling-chicken-fajita-platter",
+    "name": "Sizzling Mexican Chicken & Pepper Fajitas",
+    "subtitle": "Cast-iron seared chicken strips with tri-color bell peppers, guacamole, and warm corn tortillas",
+    "image": "/assets/food/chicken-fajitas-1.0.webp",
+    "calories": 520,
+    "protein": 44,
+    "carbs": 38,
+    "fats": 16,
+    "prepTimeMinutes": 20,
+    "category": "Steady Carbs",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Mexican",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Spoon steaming rice into a ceramic bowl.',
-      'Halve soft-boiled eggs to reveal gooey, jammy yolks.',
-      'Lay eggs on rice, drizzle with tamari and sesame oil.',
-      'Garnish generously with toasted furikake, nori ribbons, and sliced scallions.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Lean poultry breast tossed with vitamin-C rich sweet bell peppers. Supports collagen synthesis and immune cell resilience.",
+    "ingredients": [
+      {
+        "item": "Chicken Breast Strips",
+        "amount": "220g"
+      },
+      {
+        "item": "Tri-Color Bell Peppers (sliced)",
+        "amount": "150g"
+      },
+      {
+        "item": "Red Onion (sliced)",
+        "amount": "60g"
+      },
+      {
+        "item": "Stone-Ground Corn Tortillas",
+        "amount": "2 tortillas"
+      },
+      {
+        "item": "Fresh Guacamole",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Fajita Spice (Cumin, Smoked Paprika, Oregano)",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Toss chicken breast strips with fajita seasonings, lime juice, and olive oil.",
+      "Heat a seasoned cast-iron skillet until smoking; sear chicken strips for 5 minutes until browned.",
+      "Toss in sliced bell peppers and onions; flash-fry for 3 minutes retaining crisp-tender crunch.",
+      "Warm corn tortillas and serve directly from the sizzling skillet with fresh guacamole."
+    ],
+    "micros": {
+      "fiberG": 6.2,
+      "potassiumMg": 890,
+      "magnesiumMg": 84,
+      "ironMg": 3.6,
+      "zincMg": 2.9,
+      "calciumMg": 88,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 18,
+      "omega3Mg": 240
+    }
   },
   {
-    id: 'garlic-prawn-linguine',
-    name: 'Garlic Butter Prawn Linguine',
-    subtitle: 'Wild-caught tiger prawns tossed with garlic, chili, and parsley',
-    image: '/assets/food/prawn-linguine-1.0.webp',
-    portionImages: {
-      0.5: '/assets/food/prawn-linguine-0.5.webp',
-      1.0: '/assets/food/prawn-linguine-1.0.webp',
-      1.5: '/assets/food/prawn-linguine-1.5.webp',
-      2.0: '/assets/food/prawn-linguine-2.0.webp',
-    },
-    calories: 530,
-    protein: 44,
-    carbs: 54,
-    fats: 13,
-    prepTimeMinutes: 16,
-    category: 'Post Workout',
-    dietType: 'pescatarian',
-    tags: ['High Protein', 'Lean Seafood', 'Pescatarian', 'Post Workout'],
-    focusScore: '9.2/10',
-    description:
-      'High protein-to-calorie ratio from ocean-wild shrimp combined with light pasta to immediately restock muscular glycogen without sluggishness.',
-    ingredients: [
-      { item: 'Peeled Wild Tiger Prawns', amount: '220g' },
-      { item: 'Linguine Pasta', amount: '80g dry' },
-      { item: 'Garlic Cloves', amount: '4 thinly sliced' },
-      { item: 'Butter & Extra Virgin Olive Oil', amount: '1 tbsp each' },
-      { item: 'White Wine or Lemon Broth', amount: '3 tbsp' },
-      { item: 'Fresh Chopped Parsley', amount: '2 tbsp' }
+    "id": "greek-lemon-herb-salmon",
+    "name": "Greek Lemon Herb Salmon & Warm Orzo",
+    "subtitle": "Pan-crisped wild salmon fillet with garlic dill orzo, wilted spinach, and crumbled feta",
+    "image": "/assets/food/greek-salmon-1.0.webp",
+    "calories": 580,
+    "protein": 45,
+    "carbs": 42,
+    "fats": 22,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "pescatarian",
+    "tags": [
+      "Omega-3 Dense",
+      "Seafood",
+      "Anti-Inflammatory",
+      "Pescatarian",
+      "Salmon"
     ],
-    instructions: [
-      'Boil linguine in salted water until al dente.',
-      'Sauté garlic and chili in olive oil and butter for 60 seconds until fragrant.',
-      'Add prawns and sear 90 seconds per side until pink and curled.',
-      'Splash with white wine/lemon broth and toss cooked pasta into pan with fresh parsley.',
-      'Toss vigorously for 1 minute to coat every noodle in seafood garlic emulsion.'
-    ]
+    "focusScore": "9.6/10",
+    "description": "Rich in marine EPA and DHA omega-3 fatty acids for neural membrane fluidity and cardiovascular health. Paired with herbed orzo.",
+    "ingredients": [
+      {
+        "item": "Wild-Caught Salmon Fillet (skin-on)",
+        "amount": "220g"
+      },
+      {
+        "item": "Semolina Orzo Pasta",
+        "amount": "70g dry"
+      },
+      {
+        "item": "Baby Spinach",
+        "amount": "80g"
+      },
+      {
+        "item": "Authentic Sheep Milk Feta",
+        "amount": "25g"
+      },
+      {
+        "item": "Fresh Dill & Lemon Zest",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Cold-Pressed Olive Oil",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Boil orzo pasta in salted water for 9 minutes until al dente; stir in fresh dill and spinach.",
+      "Pat salmon skin dry; sear in hot skillet skin-side down for 5 minutes until golden and shatter-crisp.",
+      "Flip salmon and finish for 2 minutes on low heat.",
+      "Plate crispy salmon atop warm herbed orzo, crumble feta, and finish with lemon zest."
+    ],
+    "micros": {
+      "fiberG": 3.8,
+      "potassiumMg": 960,
+      "magnesiumMg": 110,
+      "ironMg": 3.5,
+      "zincMg": 2.4,
+      "calciumMg": 160,
+      "vitaminB12Mcg": 4.8,
+      "vitaminD_IU": 540,
+      "omega3Mg": 2100
+    }
   },
   {
-    id: 'rajma-chawal-bowl',
-    name: 'Slow-Simmered Rajma & Jeera Basmati',
-    subtitle: 'Kashmiri red kidney beans in spiced tomato gravy with fragrant cumin rice',
-    image: '/assets/food/rajma-chawal-1.0.webp',
-    calories: 510,
-    protein: 21,
-    carbs: 84,
-    fats: 9,
-    prepTimeMinutes: 35,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['High Fiber', 'Plant Protein', 'Vegan', 'Steady Energy'],
-    focusScore: '9.0/10',
-    description:
-      'Classic North Indian comfort food. Slow-simmered kidney beans and fragrant basmati rice deliver hearty plant protein and sustained, steady energy.',
-    ingredients: [
-      { item: 'Kashmiri Red Kidney Beans (Rajma)', amount: '180g cooked' },
-      { item: 'Aged Basmati Rice with Roasted Jeera', amount: '160g steamed' },
-      { item: 'San Marzano or Country Plum Tomatoes', amount: '2 pureed' },
-      { item: 'Red Onion & Fresh Ginger-Garlic Paste', amount: '2 tbsp' },
-      { item: 'Kashmiri Chili, Coriander & Garam Masala', amount: '1 tbsp blend' },
-      { item: 'Cold-Pressed Mustard or Coconut Oil', amount: '1 tsp' },
-      { item: 'Fresh Coriander & Lemon Wedge', amount: 'For garnish' }
+    "id": "thai-red-coconut-curry-prawns",
+    "name": "Creamy Thai Red Coconut Curry & Tiger Prawns",
+    "subtitle": "Succulent prawns in lemongrass red coconut broth with bamboo shoots and jasmine rice",
+    "image": "/assets/food/thai-curry-1.0.webp",
+    "calories": 520,
+    "protein": 38,
+    "carbs": 46,
+    "fats": 18,
+    "prepTimeMinutes": 22,
+    "category": "Steady Carbs",
+    "dietType": "pescatarian",
+    "tags": [
+      "Seafood",
+      "Thai",
+      "Anti-Inflammatory",
+      "Pescatarian"
     ],
-    instructions: [
-      'Soak red kidney beans overnight; pressure-cook with bay leaf and black cardamom until melt-in-mouth tender.',
-      'Sauté cumin seeds, finely diced onions, and ginger-garlic paste in cold-pressed oil until golden brown.',
-      'Stir in spiced tomato reduction and cook until natural oils release around edges.',
-      'Add simmered rajma along with its mineral-rich broth; lightly crush 20% of beans to thicken gravy.',
-      'Simmer on gentle heat for 12 minutes until velvety; serve alongside warm cumin-tempered basmati rice with a fresh lemon squeeze.'
-    ]
+    "focusScore": "9.0/10",
+    "description": "Light coconut milk supplies medium-chain triglycerides (MCTs) for rapid brain energy, while wild prawns provide iodine and selenium.",
+    "ingredients": [
+      {
+        "item": "Tiger Prawns (peeled & deveined)",
+        "amount": "220g"
+      },
+      {
+        "item": "Light Coconut Milk",
+        "amount": "160ml"
+      },
+      {
+        "item": "Authentic Thai Red Curry Paste",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Thai Basil & Kaffir Lime Leaves",
+        "amount": "Handful"
+      },
+      {
+        "item": "Bamboo Shoots & Snow Peas",
+        "amount": "80g"
+      },
+      {
+        "item": "Steamed Jasmine Rice",
+        "amount": "120g"
+      }
+    ],
+    "instructions": [
+      "Simmer red curry paste in 2 tbsp coconut cream until aromatic oils separate.",
+      "Pour in remaining coconut milk, bring to gentle boil, add bamboo shoots and snow peas.",
+      "Add tiger prawns and simmer gently for 3 minutes until tender and opaque.",
+      "Stir in fresh Thai basil leaves off the heat; serve alongside jasmine rice."
+    ],
+    "micros": {
+      "fiberG": 3.2,
+      "potassiumMg": 680,
+      "magnesiumMg": 78,
+      "ironMg": 3.9,
+      "zincMg": 2.7,
+      "calciumMg": 125,
+      "vitaminB12Mcg": 1.6,
+      "vitaminD_IU": 40,
+      "omega3Mg": 480
+    }
   },
   {
-    id: 'homestyle-tariwala-chicken',
-    name: 'Homestyle Tariwala Chicken & Phulkas',
-    subtitle: 'Tender chicken simmered in ginger-coriander spiced broth with puffed tawa rotis',
-    image: '/assets/food/chicken-curry-1.0.webp',
-    calories: 540,
-    protein: 46,
-    carbs: 42,
-    fats: 18,
-    prepTimeMinutes: 30,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Lean Poultry', 'Omnivore', 'Post Workout'],
-    focusScore: '9.3/10',
-    description:
-      'The quintessential Indian home-cooked poultry meal. Clean chicken cuts simmered in a light, unrefined whole-spice broth (tari) rich in carnosine, curcumin, and gingerols for systemic inflammation control and accelerated myofibrillar recovery.',
-    ingredients: [
-      { item: 'Free-Range Chicken Cuts (Bone-In / Thigh & Breast)', amount: '240g' },
-      { item: 'Stone-Ground 100% Whole Wheat Phulkas', amount: '2 rotis' },
-      { item: 'Sliced Red Onion & Ripe Tomato Puree', amount: '1 cup' },
-      { item: 'Fresh Ginger, Garlic & Green Chili Crush', amount: '1.5 tbsp' },
-      { item: 'Whole Spices (Cinnamon Stick, Cloves, Cardamom)', amount: '1 tsp' },
-      { item: 'Turmeric, Roasted Cumin & Coriander Powder', amount: '1 tbsp' },
-      { item: 'Cold-Pressed Mustard Oil or Ghee', amount: '1 tbsp' }
+    "id": "spanish-saffron-chicken-paella",
+    "name": "Spanish Saffron & Smoked Paprika Chicken Skillet",
+    "subtitle": "Bomba rice simmered in saffron broth with chicken breast, green beans, and sweet peas",
+    "image": "/assets/food/spanish-paella-1.0.webp",
+    "calories": 560,
+    "protein": 44,
+    "carbs": 58,
+    "fats": 14,
+    "prepTimeMinutes": 30,
+    "category": "Steady Carbs",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Spanish",
+      "Glycogen Reload",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Bloom whole cinnamon, cardamom, and cloves in hot mustard oil until crackling and aromatic.',
-      'Caramelize sliced onions slowly until deep golden brown, then incorporate crushed ginger-garlic paste.',
-      'Add bone-in chicken cuts and sear on high heat for 4 minutes to seal juices and bloom spices.',
-      'Pour in hot water, cover, and gently simmer for 18 minutes until chicken is tender and fragrant broth forms.',
-      'Garnish with freshly chopped cilantro and serve piping hot with soft, puffed whole-wheat phulkas and raw onion rings.'
-    ]
+    "focusScore": "9.1/10",
+    "description": "Saffron is clinically proven to support healthy neurotransmitter regulation and mood stamina. Paired with lean chicken in slow-simmered paella rice.",
+    "ingredients": [
+      {
+        "item": "Chicken Breast Cubes",
+        "amount": "220g"
+      },
+      {
+        "item": "Spanish Bomba Rice",
+        "amount": "75g dry"
+      },
+      {
+        "item": "Spanish Saffron Strands",
+        "amount": "Pinch infused in warm stock"
+      },
+      {
+        "item": "Flat Green Beans & Sweet Peas",
+        "amount": "100g"
+      },
+      {
+        "item": "Smoked Spanish Paprika (Pimentón)",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Chicken Bone Broth",
+        "amount": "250ml"
+      }
+    ],
+    "instructions": [
+      "Brown chicken cubes in olive oil in a wide paella skillet.",
+      "Add sweet paprika, green beans, and toast the Bomba rice for 2 minutes.",
+      "Pour in hot saffron-infused bone broth; do not stir, allowing the rice to absorb evenly.",
+      "Simmer on medium-low for 16 minutes until stock is absorbed and a golden socarrat forms on the bottom.",
+      "Rest for 5 minutes with a clean towel before serving."
+    ],
+    "micros": {
+      "fiberG": 4.8,
+      "potassiumMg": 760,
+      "magnesiumMg": 82,
+      "ironMg": 3.8,
+      "zincMg": 3,
+      "calciumMg": 65,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 20,
+      "omega3Mg": 220
+    }
   },
   {
-    id: 'paneer-bhurji-tiffin',
-    name: 'Tawa Paneer Bhurji & Crisp Bell Peppers',
-    subtitle: 'Fresh crumbled dairy paneer sauteed with turmeric, green chillies, and cumin',
-    image: '/assets/food/paneer-bhurji-1.0.webp',
-    calories: 480,
-    protein: 32,
-    carbs: 18,
-    fats: 32,
-    prepTimeMinutes: 15,
-    category: 'High Protein',
-    dietType: 'vegetarian',
-    tags: ['High Protein', 'Vegetarian', 'Quick Fuel', 'Brain Fats'],
-    focusScore: '9.1/10',
-    description:
-      'High-bioavailability dairy casein and essential fatty acids paired with capsanthin from crisp bell peppers. Digests steadily over 4 to 6 hours, delivering continuous amino acid trickle to prevent mental fatigue and mid-day hunger crashes.',
-    ingredients: [
-      { item: 'Fresh Malai Paneer (Crumbled by hand)', amount: '180g' },
-      { item: 'Stone-Ground Whole Wheat Roti', amount: '1 roti' },
-      { item: 'Diced Crunchy Green Bell Pepper (Capsicum)', amount: '60g' },
-      { item: 'Finely Chopped Red Onion & Roma Tomato', amount: '1/2 cup each' },
-      { item: 'Slit Green Chili & Minced Ginger', amount: '1 tbsp' },
-      { item: 'Pure A2 Desi Ghee or Cold-Pressed Oil', amount: '1 tbsp' },
-      { item: 'Turmeric, Pav Bhaji Spices & Kasuri Methi', amount: '1 tsp each' }
+    "id": "japanese-teriyaki-chicken-donburi",
+    "name": "Glazed Teriyaki Chicken Donburi with Edamame",
+    "subtitle": "Mirin-glazed chicken breast, steamed short-grain rice, edamame, and pickled red ginger",
+    "image": "/assets/food/teriyaki-chicken-1.0.webp",
+    "calories": 550,
+    "protein": 46,
+    "carbs": 56,
+    "fats": 12,
+    "prepTimeMinutes": 20,
+    "category": "Steady Carbs",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Japanese",
+      "Post Workout",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Heat desi ghee in a heavy cast-iron tawa or skillet; crackle cumin seeds and sauté ginger and green chili.',
-      'Toss in onions and sauté until translucent, followed by diced tomatoes and turmeric until soft.',
-      'Fold in diced bell peppers for 90 seconds to preserve crunch and vitamin C content.',
-      'Gently fold in fresh crumbled paneer and crushed fragrant kasuri methi (fenugreek leaves); stir for only 2 minutes to keep paneer tender and moist.',
-      'Serve warm with hot whole-wheat roti or alongside sprouted salads.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Traditional teriyaki glaze prepared with low-sodium tamari and mirin. Delivers an ideal post-workout carbohydrate-to-protein replenishment ratio.",
+    "ingredients": [
+      {
+        "item": "Diced Chicken Breast",
+        "amount": "240g"
+      },
+      {
+        "item": "Shelled Edamame Beans",
+        "amount": "60g"
+      },
+      {
+        "item": "Steamed Short-Grain Japanese Rice",
+        "amount": "130g"
+      },
+      {
+        "item": "Low-Sodium Tamari & Mirin Glaze",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Beni Shoga (Pickled Ginger)",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Toasted White Sesame Seeds",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Sear chicken breast cubes in a hot wok until edges are lightly browned.",
+      "Pour in tamari, mirin, and grated ginger reduction; let bubble until glossy and coats chicken.",
+      "Steam shelled edamame beans for 2 minutes.",
+      "Spoon warm rice into a bowl, arrange glazed chicken and edamame, finish with toasted sesame seeds."
+    ],
+    "micros": {
+      "fiberG": 4.5,
+      "potassiumMg": 820,
+      "magnesiumMg": 95,
+      "ironMg": 3.7,
+      "zincMg": 3.3,
+      "calciumMg": 85,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 18,
+      "omega3Mg": 260
+    }
   },
   {
-    id: 'healing-moong-khichdi',
-    name: 'Healing Moong Khichdi & Golden Ghee',
-    subtitle: 'Slow-cooked yellow lentils and rice tempered with roasted cumin, hing, and ginger',
-    image: '/assets/food/moong-khichdi-1.0.webp',
-    calories: 420,
-    protein: 18,
-    carbs: 64,
-    fats: 11,
-    prepTimeMinutes: 20,
-    category: 'Quick Fuel',
-    dietType: 'vegetarian',
-    tags: ['Ayurvedic Cleanse', 'Gut Soothing', 'Vegetarian', 'Quick Fuel'],
-    focusScore: '8.9/10',
-    description:
-      'Celebrated for millennia as the quintessential restorative Indian comfort meal. The gentle starch-protein matrix of split yellow mung lentils and polished rice places virtually zero enzymatic load on the gastrointestinal tract, promoting rapid parasympathetic activation and gut healing.',
-    ingredients: [
-      { item: 'Split Yellow Moong Lentils (Dhuli Moong)', amount: '70g dry' },
-      { item: 'Small-Grain Rice', amount: '50g dry' },
-      { item: 'Pure Desi A2 Cow Ghee', amount: '1.5 tbsp' },
-      { item: 'Whole Cumin Seeds & Asafoetida (Hing)', amount: '1/2 tsp each' },
-      { item: 'Freshly Grated Ginger & Black Peppercorns', amount: '1 tsp' },
-      { item: 'Fresh Probiotic Set Curd (Dahi)', amount: '80g' },
-      { item: 'Himalayan Pink Salt & Wild Turmeric', amount: 'To taste' }
+    "id": "moroccan-chermoula-fish-fillet",
+    "name": "Moroccan Chermoula Seared White Fish & Couscous",
+    "subtitle": "Herb-marinated white fish fillet with warm whole-wheat couscous, roasted peppers, and mint",
+    "image": "/assets/food/chermoula-fish-1.0.webp",
+    "calories": 480,
+    "protein": 43,
+    "carbs": 45,
+    "fats": 12,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Seafood",
+      "Mediterranean",
+      "Pescatarian"
     ],
-    instructions: [
-      'Wash yellow moong dal and rice together; cook with 4x water, turmeric, salt, and grated ginger until soft and porridge-like.',
-      'In a small tadka pan, heat pure A2 cow ghee until warm.',
-      'Add cumin seeds, cracked black pepper, and a pinch of hing; let seeds sputter and release fragrant aromas.',
-      'Pour the sizzling golden ghee tadka directly over the steaming khichdi.',
-      'Swirl gently and serve hot alongside a bowl of cool probiotic curd.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Fresh chermoula (cilantro, parsley, cumin, lemon, garlic) provides polyphenol defense and enhances bioavailable lean marine protein.",
+    "ingredients": [
+      {
+        "item": "White Fish Fillet (Cod or Halibut)",
+        "amount": "240g"
+      },
+      {
+        "item": "Whole-Wheat Couscous",
+        "amount": "70g dry"
+      },
+      {
+        "item": "Fresh Chermoula Herb Rub",
+        "amount": "2.5 tbsp"
+      },
+      {
+        "item": "Roasted Red Bell Pepper Strips",
+        "amount": "80g"
+      },
+      {
+        "item": "Fresh Lemon Juice",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Toasted Almond Slivers",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Coat white fish fillet with fresh chermoula marinade for 10 minutes.",
+      "Steam couscous in hot broth for 5 minutes, fluff with a fork and toss with toasted almonds.",
+      "Pan-sear fish in a hot skillet for 4 minutes per side until flaky, golden, and opaque.",
+      "Serve atop couscous with roasted peppers and a squeeze of fresh lemon."
+    ],
+    "micros": {
+      "fiberG": 5.6,
+      "potassiumMg": 780,
+      "magnesiumMg": 86,
+      "ironMg": 3.2,
+      "zincMg": 2.1,
+      "calciumMg": 90,
+      "vitaminB12Mcg": 2.4,
+      "vitaminD_IU": 110,
+      "omega3Mg": 680
+    }
   },
   {
-    id: 'dhabawala-egg-curry',
-    name: 'Dhabawala Spiced Egg Curry & Basmati',
-    subtitle: 'Golden pan-crisped farm eggs in a spiced onion-tomato masala and steamed rice',
-    image: '/assets/food/egg-curry-1.0.webp',
-    calories: 490,
-    protein: 30,
-    carbs: 52,
-    fats: 18,
-    prepTimeMinutes: 20,
-    category: 'High Protein',
-    dietType: 'eggetarian',
-    tags: ['High Protein', 'Choline Rich', 'Eggetarian', 'Post Workout'],
-    focusScore: '9.2/10',
-    description:
-      'A beloved roadside dhaba staple featuring farm eggs lightly pan-seared in turmeric and chili until blistered, then simmered in a reduced tomato, onion, and roasted garam masala gravy. High in natural choline and leucine for muscle protein synthesis and neural resilience.',
-    ingredients: [
-      { item: 'Farm-Fresh Large Eggs (Hard-Boiled)', amount: '3 whole' },
-      { item: 'Steamed Long-Grain Basmati Rice', amount: '150g' },
-      { item: 'Finely Chopped Red Onion & Ginger-Garlic', amount: '1/2 cup' },
-      { item: 'Fresh Tomato Puree', amount: '3/4 cup' },
-      { item: 'Cold-Pressed Mustard Oil or Ghee', amount: '1 tbsp' },
-      { item: 'Turmeric, Kashmiri Chili & Roasted Garam Masala', amount: '1 tbsp blend' },
-      { item: 'Kasuri Methi & Fresh Cilantro', amount: '1 tsp' }
+    "id": "greek-lemon-chicken-souvlaki",
+    "name": "Greek Lemon Chicken Souvlaki & Tzatziki Plate",
+    "subtitle": "Oregano skewers with cucumber-mint tzatziki, kalamata olives, and warm pita wedges",
+    "image": "/assets/food/chicken-souvlaki-1.0.webp",
+    "calories": 510,
+    "protein": 47,
+    "carbs": 34,
+    "fats": 17,
+    "prepTimeMinutes": 22,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Mediterranean",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Prick boiled eggs lightly with a fork and shallow-fry in 1 tsp oil with turmeric and chili powder until blistered and golden.',
-      'In the same pan, temper whole cumin seeds and sauté finely chopped onions until caramelized brown.',
-      'Add ginger-garlic paste and cook tomato puree until fragrant and oil begins to separate.',
-      'Pour in 1/2 cup warm water, drop in the halved blistered eggs, and simmer for 5 minutes to infuse flavor.',
-      'Finish with crushed kasuri methi and fresh cilantro; serve over steaming basmati rice with pickled onion rings.'
-    ]
+    "focusScore": "9.4/10",
+    "description": "Rich in clean amino acids and probiotic Greek yogurt tzatziki for gut microbiome integrity and muscular rebuild.",
+    "ingredients": [
+      {
+        "item": "Chicken Breast (skewered & cubed)",
+        "amount": "250g"
+      },
+      {
+        "item": "Greek Yogurt Tzatziki with Mint",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Whole-Wheat Greek Pita",
+        "amount": "1 pita"
+      },
+      {
+        "item": "Kalamata Olives (pitted)",
+        "amount": "6 olives"
+      },
+      {
+        "item": "Fresh Oregano & Garlic Marinade",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Sliced Persian Cucumbers",
+        "amount": "60g"
+      }
+    ],
+    "instructions": [
+      "Marinate chicken cubes with lemon juice, minced garlic, extra virgin olive oil, and Greek oregano.",
+      "Grill skewers over high heat for 8–10 minutes, rotating until charred and juicy.",
+      "Warm pita on the grill for 30 seconds.",
+      "Serve skewers alongside cold tzatziki, kalamata olives, and fresh cucumber slices."
+    ],
+    "micros": {
+      "fiberG": 3.9,
+      "potassiumMg": 840,
+      "magnesiumMg": 82,
+      "ironMg": 3.5,
+      "zincMg": 3.2,
+      "calciumMg": 145,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 22,
+      "omega3Mg": 210
+    }
   },
   {
-    id: 'soya-matar-pulao',
-    name: 'High-Protein Soya Chunk & Matar Pulao',
-    subtitle: 'Spiced basmati rice with golden seared soya chunks, sweet green peas, and fresh mint',
-    image: '/assets/food/soya-pulao-1.0.webp',
-    calories: 480,
-    protein: 36,
-    carbs: 68,
-    fats: 8,
-    prepTimeMinutes: 20,
-    category: 'High Protein',
-    dietType: 'vegan',
-    tags: ['Plant Protein', 'Soya Nugget', 'Vegan', 'Post Workout', 'Easy One-Pot'],
-    focusScore: '9.3/10',
-    description:
-      'Soya chunks deliver over 52% protein density by dry weight. Tempered with fragrant cumin, cloves, cardamom, and fresh mint, this one-pot meal restocks glycogen and supplies complete amino acids.',
-    ingredients: [
-      { item: 'Soya Chunks (Nutrela / Soy Nuggets)', amount: '60g dry' },
-      { item: 'Aged Basmati Rice', amount: '80g dry' },
-      { item: 'Green Sweet Peas (Matar)', amount: '50g' },
-      { item: 'Onion & Ginger-Garlic Paste', amount: '1 medium sliced + 1 tbsp' },
-      { item: 'Whole Spices (Cloves, Cinnamon, Cardamom, Jeera)', amount: '1 tsp' },
-      { item: 'Cold-Pressed Mustard Oil or Ghee', amount: '1 tbsp' },
-      { item: 'Fresh Mint & Coriander Leaves', amount: 'Small handful' }
+    "id": "rosemary-turkey-skillet",
+    "name": "Rosemary Roasted Turkey Skillet",
+    "subtitle": "Lean sliced pasture turkey breast with sweet potatoes and tender steamed asparagus",
+    "image": "/assets/food/turkey-skillet-1.0.webp",
+    "calories": 490,
+    "protein": 46,
+    "carbs": 38,
+    "fats": 12,
+    "prepTimeMinutes": 22,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Poultry",
+      "Clean Fuel",
+      "Omnivore"
     ],
-    instructions: [
-      'Boil soya chunks in salted water for 5 minutes, rinse under cold water, and squeeze out excess moisture thoroughly.',
-      'Heat ghee or mustard oil in a cooker or pot; bloom cumin, cinnamon, cloves, and sliced onions until golden brown.',
-      'Add ginger-garlic paste, turmeric, garam masala, and squeeze-dried soya chunks; pan-sear for 3 minutes until lightly blistered.',
-      'Add washed basmati rice, green peas, chopped mint, and 1.75 cups water; season with salt.',
-      'Pressure-cook for 1 whistle on high (or cover and simmer for 12 minutes on low); let rest 5 minutes before fluffing with a fork.'
-    ]
+    "focusScore": "9.5/10",
+    "description": "Ultra-lean turkey breast loaded with l-tryptophan and B-vitamins, paired with slow-release beta-carotene from roasted sweet potato.",
+    "ingredients": [
+      {
+        "item": "Pasture-Raised Turkey Breast",
+        "amount": "240g"
+      },
+      {
+        "item": "Cubed Sweet Potato",
+        "amount": "140g"
+      },
+      {
+        "item": "Fresh Tender Asparagus",
+        "amount": "100g"
+      },
+      {
+        "item": "Fresh Rosemary & Thyme",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Cold-Pressed Olive Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Sea Salt & Black Pepper",
+        "amount": "To taste"
+      }
+    ],
+    "instructions": [
+      "Roast sweet potato cubes in olive oil at 400°F for 18 minutes until tender and caramelized.",
+      "Season turkey breast with fresh rosemary, garlic, and sea salt.",
+      "Pan-sear turkey for 5 minutes per side until golden and internal temperature reaches 165°F.",
+      "Flash-steam asparagus spears in the pan juices for 2 minutes.",
+      "Slice turkey across grain and serve atop sweet potatoes and asparagus."
+    ],
+    "micros": {
+      "fiberG": 5.8,
+      "potassiumMg": 940,
+      "magnesiumMg": 92,
+      "ironMg": 3.6,
+      "zincMg": 3.8,
+      "calciumMg": 85,
+      "vitaminB12Mcg": 1.2,
+      "vitaminD_IU": 24,
+      "omega3Mg": 230
+    }
   },
   {
-    id: 'paneer-kathi-roll',
-    name: 'Tawa Paneer Tikka Kathi Roll',
-    subtitle: 'Spiced charred paneer batons wrapped in whole-wheat flatbread with mint chutney and crisp onions',
-    image: '/assets/food/paneer-kathi-roll-1.0.webp',
-    calories: 520,
-    protein: 30,
-    carbs: 46,
-    fats: 24,
-    prepTimeMinutes: 18,
-    category: 'High Protein',
-    dietType: 'vegetarian',
-    tags: ['High Protein', 'Vegetarian', 'Balanced Macros', 'Street Classic'],
-    focusScore: '9.1/10',
-    description:
-      'Iconic Kolkata-style street roll redesigned for clean home preparation. Provides sustained-release dairy casein, complex carbs from stone-ground wheat, and digestive capsanthin from grilled capsicum.',
-    ingredients: [
-      { item: 'Fresh Dairy Paneer', amount: '160g cut into thick batons' },
-      { item: 'Stone-Ground 100% Whole Wheat Rotis / Parathas', amount: '2 rotis' },
-      { item: 'Crunchy Green Capsicum & Red Onion', amount: '1/2 cup thinly sliced' },
-      { item: 'Thick Hung Curd (Dahi) Marinade', amount: '2 tbsp' },
-      { item: 'Kashmiri Chili, Kasuri Methi & Chaat Masala', amount: '1.5 tsp' },
-      { item: 'Fresh Mint-Coriander Chutney', amount: '2 tbsp' },
-      { item: 'Ghee or Cold-Pressed Mustard Oil', amount: '1 tsp for searing' }
+    "id": "lemon-garlic-cod",
+    "name": "Pan-Seared Lemon Garlic Cod",
+    "subtitle": "Flaky Pacific cod fillet with salty capers, blistered cherry tomatoes, and green beans",
+    "image": "/assets/food/lemon-garlic-cod-1.0.webp",
+    "calories": 410,
+    "protein": 42,
+    "carbs": 14,
+    "fats": 18,
+    "prepTimeMinutes": 15,
+    "category": "Keto Clean",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Keto Clean",
+      "Seafood",
+      "Low Carb",
+      "Pescatarian"
     ],
-    instructions: [
-      'Coat paneer batons in hung curd, Kashmiri chili, turmeric, kasuri methi, and salt.',
-      'Sear paneer and sliced bell peppers on a smoking-hot tawa for 2–3 minutes until charred around edges.',
-      'Warm whole-wheat roti on the tawa until soft and lightly crisp.',
-      'Spread a generous layer of mint-coriander yogurt chutney down the center of each roti.',
-      'Layer charred paneer, peppers, raw sliced red onions, a pinch of chaat masala, squeeze lemon, and tightly roll.'
-    ]
+    "focusScore": "9.4/10",
+    "description": "Lean wild white fish offering high protein efficiency per calorie. Rich in bioavailable iodine and selenium to support thyroid and metabolic rate.",
+    "ingredients": [
+      {
+        "item": "Wild Pacific Cod Fillet",
+        "amount": "250g"
+      },
+      {
+        "item": "Baby Green Beans (haricots verts)",
+        "amount": "110g"
+      },
+      {
+        "item": "Halved Cherry Tomatoes",
+        "amount": "80g"
+      },
+      {
+        "item": "Capers in Brine",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Garlic & Extra Virgin Olive Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Lemon Wedges",
+        "amount": "1 lemon"
+      }
+    ],
+    "instructions": [
+      "Pat cod fillet dry with a towel and season with sea salt and cracked pepper.",
+      "Heat olive oil in a stainless steel skillet over medium-high heat.",
+      "Sear cod for 3.5 minutes without moving until a golden crust forms; flip gently for 2 minutes.",
+      "Add capers, tomatoes, and green beans to the skillet; sauté until tomatoes blister.",
+      "Spoon pan juices over cod and finish with fresh lemon."
+    ],
+    "micros": {
+      "fiberG": 3.9,
+      "potassiumMg": 790,
+      "magnesiumMg": 78,
+      "ironMg": 2.4,
+      "zincMg": 1.8,
+      "calciumMg": 72,
+      "vitaminB12Mcg": 2.1,
+      "vitaminD_IU": 65,
+      "omega3Mg": 420
+    }
   },
   {
-    id: 'garlic-chili-egg-fried-rice',
-    name: 'Street-Style Garlic Chili Egg Fried Rice',
-    subtitle: 'Fluffy rice tossed on high flame with scrambled egg ribbons, crispy garlic bits, and scallions',
-    image: '/assets/food/egg-fried-rice-1.0.webp',
-    calories: 470,
-    protein: 24,
-    carbs: 62,
-    fats: 14,
-    prepTimeMinutes: 12,
-    category: 'Steady Carbs',
-    dietType: 'eggetarian',
-    tags: ['Quick Fuel', 'Fast Prep', 'Eggetarian', 'Comfort Food'],
-    focusScore: '8.9/10',
-    description:
-      'A quick pantry meal using leftover rice and eggs. Fast-absorbing carbs combine with protein and toasted garlic for an easy, energizing meal.',
-    ingredients: [
-      { item: 'Chilled Steamed Rice (Basmati or Jasmine)', amount: '180g cooked' },
-      { item: 'Farm-Fresh Large Eggs', amount: '3 whisked' },
-      { item: 'Garlic Cloves', amount: '5 cloves finely minced' },
-      { item: 'Spring Onions (Scallions)', amount: '3 stalks separated' },
-      { item: 'Soy Sauce & Vinegar', amount: '1 tbsp soy + 1/2 tsp white vinegar' },
-      { item: 'Crushed Black Pepper & Red Chili Flakes', amount: '1 tsp' },
-      { item: 'Toasted Sesame Oil or Neutral Oil', amount: '1 tbsp' }
+    "id": "blackened-cajun-salmon",
+    "name": "Blackened Cajun Wild Salmon",
+    "subtitle": "Crispy-crusted salmon fillet with fluffy herb quinoa and charred lime",
+    "image": "/assets/food/blackened-salmon-1.0.webp",
+    "calories": 560,
+    "protein": 44,
+    "carbs": 34,
+    "fats": 24,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "pescatarian",
+    "tags": [
+      "Omega-3 Dense",
+      "High Protein",
+      "Seafood",
+      "Salmon",
+      "Pescatarian"
     ],
-    instructions: [
-      'Heat a wok or deep kadai on highest flame until lightly smoking.',
-      'Add oil and scramble whisked eggs for 30 seconds into tender curds; push to side of wok.',
-      'Toss in minced garlic and scallion whites; sizzle for 45 seconds until golden and fragrant.',
-      'Dump cold cooked rice into wok, breaking lumps with spatula on high heat.',
-      'Drizzle soy sauce, vinegar, black pepper, and chili flakes around rim; toss vigorously for 2 minutes and finish with spring onion greens.'
-    ]
+    "focusScore": "9.6/10",
+    "description": "Potent marine astaxanthin and long-chain omega-3s combat systemic inflammation while complete-protein quinoa provides steady glycogen recharge.",
+    "ingredients": [
+      {
+        "item": "Wild Alaskan Sockeye Salmon",
+        "amount": "220g"
+      },
+      {
+        "item": "Cajun Blackening Spice Blend",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Cooked Tricolor Quinoa with Parsley",
+        "amount": "130g"
+      },
+      {
+        "item": "Avocado Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Lime Wedges",
+        "amount": "1 lime"
+      },
+      {
+        "item": "Minced Red Onion & Cilantro",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Press Cajun spice blend firmly onto the flesh side of the salmon fillet.",
+      "Heat avocado oil in cast-iron skillet over high heat until shimmering.",
+      "Sear spiced side down for 3 minutes until charred and deeply aromatic.",
+      "Flip to skin side, lower heat to medium, cook for 3 minutes until medium-rare to medium.",
+      "Serve immediately atop fluffy quinoa salad with charred lime."
+    ],
+    "micros": {
+      "fiberG": 4.8,
+      "potassiumMg": 980,
+      "magnesiumMg": 120,
+      "ironMg": 3.8,
+      "zincMg": 2.6,
+      "calciumMg": 80,
+      "vitaminB12Mcg": 5.2,
+      "vitaminD_IU": 580,
+      "omega3Mg": 2200
+    }
   },
   {
-    id: 'tempered-curd-rice',
-    name: 'South Indian Tempered Curd Rice & Roasted Cashews',
-    subtitle: 'Cool probiotic dahi chawal with crackling mustard seeds, curry leaves, ginger, and pomegranate',
-    image: '/assets/food/curd-rice-1.0.webp',
-    calories: 410,
-    protein: 16,
-    carbs: 58,
-    fats: 13,
-    prepTimeMinutes: 10,
-    category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Gut Friendly', 'Comfort Food', 'Vegetarian', 'Cooling Fuel'],
-    focusScore: '9.0/10',
-    description:
-      'A classic soothing South Indian comfort meal. Fresh yogurt and fragrant spices aid gentle digestion, keeping your stomach calm and energized.',
-    ingredients: [
-      { item: 'Soft Over-Cooked Rice (Sona Masoori / Basmati)', amount: '160g cooked warm' },
-      { item: 'Fresh Whole Milk Set Curd (Dahi)', amount: '150g whisked smooth' },
-      { item: 'A2 Desi Ghee or Coconut Oil', amount: '1 tsp' },
-      { item: 'Mustard Seeds & Urad Dal', amount: '1/2 tsp each' },
-      { item: 'Fresh Curry Leaves & Slit Green Chili', amount: '8-10 leaves + 1 chili' },
-      { item: 'Finely Minced Ginger', amount: '1 tsp' },
-      { item: 'Roasted Cashews & Pomegranate Pearls', amount: '1 tbsp each for garnish' }
+    "id": "cilantro-garlic-shrimp",
+    "name": "Cilantro Lime Garlic Butter Shrimp",
+    "subtitle": "Tail-on sautéed prawns over riced cauliflower and fresh lemon",
+    "image": "/assets/food/garlic-butter-shrimp-1.0.webp",
+    "calories": 380,
+    "protein": 38,
+    "carbs": 12,
+    "fats": 16,
+    "prepTimeMinutes": 15,
+    "category": "Keto Clean",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Keto Clean",
+      "Seafood",
+      "Low Carb",
+      "Pescatarian"
     ],
-    instructions: [
-      'Lightly mash warm cooked rice in a bowl using the back of a ladle.',
-      'Fold in fresh whisked curd and a splash of milk; season with sea salt until creamy and soothing.',
-      'Heat ghee or coconut oil in a small tadka pan; sputter mustard seeds, urad dal, and golden cashews.',
-      'Add curry leaves, minced ginger, and green chilies; fry for 20 seconds until leaves are crackling crisp.',
-      'Pour the aromatic sizzling tadka over the curd rice; fold gently and top with ruby pomegranate pearls.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Fast-digesting shellfish protein packed with selenium, copper, and choline over vitamin-dense riced cauliflower.",
+    "ingredients": [
+      {
+        "item": "Large Tiger Prawns (peeled, tail-on)",
+        "amount": "240g"
+      },
+      {
+        "item": "Riced Cauliflower",
+        "amount": "180g"
+      },
+      {
+        "item": "Grass-Fed Butter & Olive Oil",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Minced Garlic Cloves",
+        "amount": "4 cloves"
+      },
+      {
+        "item": "Fresh Cilantro & Lime Juice",
+        "amount": "Handful"
+      },
+      {
+        "item": "Crushed Red Pepper Flakes",
+        "amount": "1/2 tsp"
+      }
+    ],
+    "instructions": [
+      "Melt butter and olive oil in skillet with minced garlic and red pepper flakes.",
+      "Add prawns in a single layer; cook for 90 seconds per side until opaque and pink.",
+      "Steam cauliflower rice in a separate hot dry skillet for 3 minutes until tender.",
+      "Pour garlic butter shrimp and juices directly over cauliflower rice, finish with cilantro."
+    ],
+    "micros": {
+      "fiberG": 3.6,
+      "potassiumMg": 620,
+      "magnesiumMg": 68,
+      "ironMg": 3.4,
+      "zincMg": 2.2,
+      "calciumMg": 115,
+      "vitaminB12Mcg": 1.7,
+      "vitaminD_IU": 32,
+      "omega3Mg": 490
+    }
   },
   {
-    id: 'savory-masala-oats',
-    name: 'Savory Masala Oats with Soft Jammy Egg',
-    subtitle: 'Toasted rolled oats simmered with turmeric, diced veggies, cumin, and a molten-yolk egg',
-    image: '/assets/food/masala-oats-1.0.webp',
-    calories: 390,
-    protein: 22,
-    carbs: 48,
-    fats: 12,
-    prepTimeMinutes: 12,
-    category: 'Quick Fuel',
-    dietType: 'eggetarian',
-    tags: ['High Fiber', 'Fast Prep', 'Eggetarian', 'Morning Fuel', 'Steady Energy'],
-    focusScore: '9.1/10',
-    description:
-      'Rolled oats simmered with golden turmeric, cumin, and vegetables, topped with a soft-boiled egg for clean, satisfying morning fuel.',
-    ingredients: [
-      { item: 'Whole Rolled Oats', amount: '55g' },
-      { item: 'Pasture-Raised Egg', amount: '1 soft-boiled (6.5 min)' },
-      { item: 'Finely Diced Carrot, Peas & Onion', amount: '1/2 cup total' },
-      { item: 'Chopped Tomato', amount: '1/2 medium' },
-      { item: 'Cumin Seeds, Turmeric & Garam Masala', amount: '1 tsp total' },
-      { item: 'Desi Ghee or Olive Oil', amount: '1 tsp' },
-      { item: 'Fresh Coriander & Lemon Juice', amount: 'To finish' }
+    "id": "seared-tuna-nicoise",
+    "name": "Seared Yellowfin Tuna Niçoise",
+    "subtitle": "Crusted ahi tuna with soft jammy egg, green beans, and kalamata olives",
+    "image": "/assets/food/tuna-nicoise-1.0.webp",
+    "calories": 520,
+    "protein": 50,
+    "carbs": 18,
+    "fats": 22,
+    "prepTimeMinutes": 18,
+    "category": "High Protein",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Seafood",
+      "Keto Clean",
+      "Pescatarian"
     ],
-    instructions: [
-      'Heat ghee in a saucepan; crackle cumin seeds and sauté onions, carrots, and peas for 2 minutes.',
-      'Add diced tomatoes, turmeric, garam masala, and salt; cook until soft and fragrant.',
-      'Add rolled oats and roast lightly with spices for 1 minute.',
-      'Pour in 1.5 cups hot water, stir well, and simmer on medium-low for 4–5 minutes until thick and creamy.',
-      'Ladle into bowl, halve the soft-boiled jammy egg on top, squeeze fresh lemon, and scatter cilantro.'
-    ]
+    "focusScore": "9.6/10",
+    "description": "Elite athlete recovery meal delivering 50g complete marine protein, whole-egg choline for neurotransmitter synthesis, and polyphenol-packed olives.",
+    "ingredients": [
+      {
+        "item": "Sashimi-Grade Yellowfin Tuna Steak",
+        "amount": "220g"
+      },
+      {
+        "item": "Pasture-Raised Egg (soft-boiled)",
+        "amount": "1 egg"
+      },
+      {
+        "item": "Steamed French Green Beans",
+        "amount": "100g"
+      },
+      {
+        "item": "Kalamata Olives",
+        "amount": "8 olives"
+      },
+      {
+        "item": "Dijon Mustard & Red Wine Vinegar Dressing",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Cracked Peppercorn Crust",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Coat tuna steak in coarse cracked black pepper and sea salt.",
+      "Sear in a smoking cast-iron pan for exactly 60 seconds per side for rare center.",
+      "Boil egg for 6.5 minutes, plunge into ice bath, peel, and halve for jammy center.",
+      "Slice tuna into thick pieces; arrange on plate with green beans, egg, and olives.",
+      "Drizzle with light Dijon red wine vinaigrette."
+    ],
+    "micros": {
+      "fiberG": 4.1,
+      "potassiumMg": 890,
+      "magnesiumMg": 98,
+      "ironMg": 3.9,
+      "zincMg": 2.8,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 5.4,
+      "vitaminD_IU": 120,
+      "omega3Mg": 1100
+    }
   },
   {
-    id: 'chettinad-pepper-chicken',
-    name: 'Chettinad Black Pepper Chicken Kadai Roast',
-    subtitle: 'Boneless chicken bites seared with freshly crushed black peppercorns, curry leaves, and fennel',
-    image: '/assets/food/pepper-chicken-1.0.webp',
-    calories: 490,
-    protein: 48,
-    carbs: 10,
-    fats: 18,
-    prepTimeMinutes: 16,
-    category: 'Keto Clean',
-    dietType: 'omnivore',
-    tags: ['Ultra High Protein', 'Keto Clean', 'Omnivore', 'Post Workout', 'Thermogenic'],
-    focusScore: '9.4/10',
-    description:
-      'A classic South Indian pepper chicken recipe seasoned with freshly ground black pepper, curry leaves, and tender poultry for a high-protein meal.',
-    ingredients: [
-      { item: 'Boneless Chicken Thigh or Breast (cubed)', amount: '250g' },
-      { item: 'Coarsely Crushed Black Peppercorns', amount: '1.5 tbsp freshly ground' },
-      { item: 'Fennel Seeds (Saunf) & Cumin Seeds', amount: '1/2 tsp each' },
-      { item: 'Fresh Curry Leaves', amount: '15 leaves' },
-      { item: 'Sliced Shallots or Red Onion', amount: '1 medium sliced' },
-      { item: 'Ginger-Garlic Paste', amount: '1 tbsp' },
-      { item: 'Cold-Pressed Coconut Oil or Ghee', amount: '1 tbsp' }
+    "id": "honey-dijon-chicken-thigh",
+    "name": "Honey Dijon Roasted Chicken Thigh",
+    "subtitle": "Crispy pan-roasted chicken with glazed baby carrots and fresh rosemary",
+    "image": "/assets/food/honey-dijon-chicken-1.0.webp",
+    "calories": 540,
+    "protein": 42,
+    "carbs": 28,
+    "fats": 24,
+    "prepTimeMinutes": 25,
+    "category": "Post Workout",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Dry roast whole black peppercorns and fennel seeds in a hot pan for 60 seconds; crush coarsely in a mortar-pestle.',
-      'Heat coconut oil or ghee in a heavy kadai; crackle cumin seeds, curry leaves, and sliced onions until caramelized.',
-      'Add ginger-garlic paste and turmeric; sauté 1 minute until fragrant.',
-      'Toss in cubed chicken bites on high heat; sear for 5 minutes until sealed and lightly browned.',
-      'Lower flame, fold in the freshly crushed black pepper spice blend and a pinch of salt; roast dry for 4 minutes until dark, glossy, and fragrant. Serve with lime wedge.'
-    ]
+    "focusScore": "9.1/10",
+    "description": "Tender chicken thigh provides beneficial zinc and iron with a gentle glaze of unprocessed honey and stoneground mustard.",
+    "ingredients": [
+      {
+        "item": "Skin-On Chicken Thigh (bone-in)",
+        "amount": "260g"
+      },
+      {
+        "item": "Dutch Baby Carrots (trimmed)",
+        "amount": "130g"
+      },
+      {
+        "item": "Raw Honey & Dijon Mustard",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Fresh Rosemary Sprigs",
+        "amount": "3 sprigs"
+      },
+      {
+        "item": "Avocado Oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Flaky Sea Salt",
+        "amount": "Pinch"
+      }
+    ],
+    "instructions": [
+      "Score chicken skin, season with sea salt, and sear skin-down in an oven-safe skillet for 8 minutes.",
+      "Flip chicken, add carrots and rosemary sprigs around the pan.",
+      "Brush chicken and carrots with honey Dijon whisked glaze.",
+      "Transfer skillet to 400°F oven for 14 minutes until chicken registers 175°F and carrots are glazed."
+    ],
+    "micros": {
+      "fiberG": 4.2,
+      "potassiumMg": 780,
+      "magnesiumMg": 74,
+      "ironMg": 3.1,
+      "zincMg": 3.6,
+      "calciumMg": 68,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 22,
+      "omega3Mg": 280
+    }
   },
   {
-    id: 'besan-paneer-chilla',
-    name: 'Crispy Besan Chilla with Spiced Paneer',
-    subtitle: 'Golden spiced gram-flour crepes stuffed with grated dairy paneer, green chilies, and mint chutney',
-    image: '/assets/food/besan-chilla-1.0.webp',
-    calories: 460,
-    protein: 28,
-    carbs: 36,
-    fats: 22,
-    prepTimeMinutes: 14,
-    category: 'High Protein',
-    dietType: 'vegetarian',
-    tags: ['Plant & Dairy Protein', 'Gluten-Free', 'Vegetarian', 'Quick Fuel'],
-    focusScore: '9.1/10',
-    description:
-      'Crispy chickpea flour crepe stuffed with seasoned paneer. High in plant protein and calcium, keeping you full and focused for hours.',
-    ingredients: [
-      { item: 'Gram Flour (Besan / Chickpea Flour)', amount: '70g' },
-      { item: 'Fresh Grated Paneer', amount: '90g' },
-      { item: 'Ajwain (Carom Seeds) & Hing', amount: '1/4 tsp each' },
-      { item: 'Finely Chopped Green Chili & Coriander', amount: '1 tbsp' },
-      { item: 'Turmeric & Red Chili Powder', amount: '1/2 tsp each' },
-      { item: 'Desi Ghee or Cold-Pressed Oil', amount: '1 tsp for tawa' },
-      { item: 'Homemade Mint Chutney', amount: '2 tbsp' }
+    "id": "coconut-lime-poached-prawns",
+    "name": "Coconut Lime Poached Tiger Prawns",
+    "subtitle": "Juicy prawns in fragrant coconut lemongrass broth with tender snap peas",
+    "image": "/assets/food/coconut-lime-shrimp-1.0.webp",
+    "calories": 460,
+    "protein": 36,
+    "carbs": 20,
+    "fats": 22,
+    "prepTimeMinutes": 18,
+    "category": "Quick Fuel",
+    "dietType": "pescatarian",
+    "tags": [
+      "Seafood",
+      "Dairy Free",
+      "Anti-Inflammatory",
+      "Pescatarian"
     ],
-    instructions: [
-      'Whisk besan with ajwain, turmeric, chili powder, salt, and water into a smooth, pourable pancake batter.',
-      'Heat a non-stick or well-seasoned iron tawa; pour a ladle of batter and spread into a thin round crepe.',
-      'Drizzle drops of ghee along perimeter; cook on medium-high until underside turns crisp and golden.',
-      'Scatter freshly grated spiced paneer and chopped coriander evenly across one half of the crepe.',
-      'Fold over into a semi-circle, press lightly for 30 seconds until paneer warms through, and serve with mint chutney.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Light coconut broth infused with fresh ginger and lemongrass provides lauric acid for immune vitality, paired with lean marine shellfish.",
+    "ingredients": [
+      {
+        "item": "Fresh Tiger Prawns (peeled)",
+        "amount": "220g"
+      },
+      {
+        "item": "Light Coconut Milk",
+        "amount": "180ml"
+      },
+      {
+        "item": "Sugar Snap Peas",
+        "amount": "90g"
+      },
+      {
+        "item": "Lemongrass & Minced Ginger",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Fresh Lime Juice & Zest",
+        "amount": "1 lime"
+      },
+      {
+        "item": "Fresh Cilantro & Scallions",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Bruise lemongrass and simmer in coconut milk with ginger and lime zest for 6 minutes.",
+      "Add sugar snap peas and prawns to the fragrant poaching liquid.",
+      "Gently simmer on low for 3 minutes until prawns turn pink and tender.",
+      "Remove lemongrass stalk, stir in lime juice, and serve garnished with cilantro."
+    ],
+    "micros": {
+      "fiberG": 3.1,
+      "potassiumMg": 690,
+      "magnesiumMg": 82,
+      "ironMg": 3.6,
+      "zincMg": 2.4,
+      "calciumMg": 110,
+      "vitaminB12Mcg": 1.5,
+      "vitaminD_IU": 35,
+      "omega3Mg": 460
+    }
   },
   {
-    id: 'kala-chana-sundal',
-    name: 'Warm Kala Chana Sundal & Fresh Coconut Bowl',
-    subtitle: 'Tender black chickpeas tempered with mustard, crisp curry leaves, fresh grated coconut, and lemon',
-    image: '/assets/food/kala-chana-1.0.webp',
-    calories: 380,
-    protein: 20,
-    carbs: 54,
-    fats: 10,
-    prepTimeMinutes: 12,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['High Fiber', 'High Iron', 'Vegan', 'Steady Energy'],
-    focusScore: '9.0/10',
-    description:
-      'Tender black chickpeas tossed with crackling mustard seeds, curry leaves, and fresh coconut for hearty fiber and clean energy.',
-    ingredients: [
-      { item: 'Boiled Black Chickpeas (Kala Chana)', amount: '200g cooked tender' },
-      { item: 'Fresh Grated Coconut', amount: '2 tbsp' },
-      { item: 'Cold-Pressed Coconut Oil', amount: '1 tsp' },
-      { item: 'Black Mustard Seeds, Urad Dal & Hing', amount: '1/2 tsp each' },
-      { item: 'Fresh Curry Leaves & Slit Green Chili', amount: '8 leaves + 1 chili' },
-      { item: 'Fresh Lemon Juice & Rock Salt', amount: '1/2 lemon + to taste' }
+    "id": "cantonese-ginger-tilapia",
+    "name": "Cantonese Ginger Steamed Tilapia",
+    "subtitle": "Delicate white fish with julienned ginger, scallions, and light tamari",
+    "image": "/assets/food/ginger-steamed-tilapia-1.0.webp",
+    "calories": 360,
+    "protein": 40,
+    "carbs": 8,
+    "fats": 14,
+    "prepTimeMinutes": 16,
+    "category": "Keto Clean",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Keto Clean",
+      "Seafood",
+      "Clean Fuel",
+      "Pescatarian"
     ],
-    instructions: [
-      'Drain tender boiled black chickpeas (cooked in pressure cooker with salt until soft).',
-      'Heat coconut oil in a kadai or skillet; sputter mustard seeds, urad dal, and hing until dal is golden.',
-      'Toss in green chili and curry leaves for 15 seconds until aromatic.',
-      'Add the warm boiled black chickpeas, season with pink rock salt, and toss for 2 minutes to absorb flavors.',
-      'Turn off heat, fold in freshly grated coconut and fresh lemon juice; enjoy warm as a high-protein snack or lunch bowl.'
-    ]
+    "focusScore": "9.5/10",
+    "description": "Pure, easily assimilable protein cooked using traditional steam preservation. Gingerol compounds improve gastric motility and lower markers of muscle soreness.",
+    "ingredients": [
+      {
+        "item": "Fresh Tilapia Fillets",
+        "amount": "240g"
+      },
+      {
+        "item": "Julienned Fresh Ginger",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Green Scallions (sliced lengthwise)",
+        "amount": "3 stalks"
+      },
+      {
+        "item": "Light Tamari Soy Sauce",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Toasted Sesame Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Cilantro Sprigs",
+        "amount": "Handful"
+      }
+    ],
+    "instructions": [
+      "Place tilapia on a heatproof plate, top with julienned ginger and scallion whites.",
+      "Steam over boiling water for 8 minutes until fish flakes effortlessly with a fork.",
+      "Discard steaming liquid, drizzle with light tamari and arrange fresh cilantro.",
+      "Heat sesame oil in a small pan until smoking; pour over herbs to release deep aromatics."
+    ],
+    "micros": {
+      "fiberG": 1.5,
+      "potassiumMg": 620,
+      "magnesiumMg": 64,
+      "ironMg": 2.1,
+      "zincMg": 1.9,
+      "calciumMg": 45,
+      "vitaminB12Mcg": 2.2,
+      "vitaminD_IU": 120,
+      "omega3Mg": 380
+    }
   },
   {
-    id: 'peanut-butter-banana-oats',
-    name: 'Creamy Peanut Butter & Banana Power Oatmeal',
-    subtitle: 'Rolled oats soaked in milk with 100% roasted peanut butter, fresh banana slices, and chia seeds',
-    image: '/assets/food/peanut-butter-oats-1.0.webp',
-    calories: 460,
-    protein: 20,
-    carbs: 64,
-    fats: 16,
-    prepTimeMinutes: 5,
-    category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Fast Prep', 'Omega-3', 'Vegetarian', 'Pre-Workout', 'Breakfast'],
-    focusScore: '9.0/10',
-    description:
-      'A 5-minute staple made with ordinary kitchen staples. Slow-burning oat carbs meet monounsaturated fats and arginine from natural peanut butter, potassium from banana, and ALA omega-3s from chia seeds.',
-    ingredients: [
-      { item: 'Rolled Oats (Jumbo Oats)', amount: '60g' },
-      { item: '100% Pure Roasted Peanut Butter', amount: '2 tbsp (32g)' },
-      { item: 'Chilled Milk or Soy Milk', amount: '180ml' },
-      { item: 'Ripe Robusta / Elaichi Banana', amount: '1 sliced' },
-      { item: 'Chia Seeds', amount: '1 tsp' },
-      { item: 'Ground Cinnamon & Pinch of Sea Salt', amount: '1/4 tsp' }
+    "id": "smoked-paprika-chicken-skewers",
+    "name": "Smoked Paprika Chicken Skewers",
+    "subtitle": "Grilled marinated chicken cubes with bell peppers and roasted pepper dip",
+    "image": "/assets/food/paprika-chicken-skewers-1.0.webp",
+    "calories": 480,
+    "protein": 46,
+    "carbs": 16,
+    "fats": 18,
+    "prepTimeMinutes": 22,
+    "category": "High Protein",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Keto Clean",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Combine rolled oats, chia seeds, cinnamon, and a pinch of salt in a bowl or mason jar.',
-      'Pour in milk and stir thoroughly; refrigerate overnight (or rest for 15 minutes if making warm on the stove).',
-      'Swirl a generous dollop of natural roasted peanut butter into the center.',
-      'Top with freshly sliced ripe banana rounds and a light dusting of cinnamon before digging in.'
-    ]
+    "focusScore": "9.4/10",
+    "description": "Skewered chicken breast marinated in Spanish smoked pimentón and garlic. Served with a roasted red pepper and walnut romesco dip.",
+    "ingredients": [
+      {
+        "item": "Chicken Breast (diced into cubes)",
+        "amount": "250g"
+      },
+      {
+        "item": "Zucchini & Red Bell Pepper (sliced)",
+        "amount": "120g"
+      },
+      {
+        "item": "Smoked Sweet Paprika",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Roasted Red Pepper Romesco Dip",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Extra Virgin Olive Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Garlic Powder & Sea Salt",
+        "amount": "1 tsp each"
+      }
+    ],
+    "instructions": [
+      "Toss chicken cubes, zucchini, and peppers in olive oil, paprika, garlic, and sea salt.",
+      "Thread onto skewers alternating chicken and vegetables.",
+      "Grill or pan-sear on medium-high heat for 9 minutes, turning occasionally until charred.",
+      "Serve hot alongside warm roasted pepper dip."
+    ],
+    "micros": {
+      "fiberG": 3.4,
+      "potassiumMg": 820,
+      "magnesiumMg": 80,
+      "ironMg": 3.2,
+      "zincMg": 3.1,
+      "calciumMg": 62,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 20,
+      "omega3Mg": 190
+    }
   },
   {
-    id: 'masala-french-toast',
-    name: 'Mumbai Street Masala Egg French Toast',
-    subtitle: 'Whole-wheat bread slices coated in spiced onion-chili egg batter and pan-toasted golden on tawa',
-    image: '/assets/food/masala-french-toast-1.0.webp',
-    calories: 430,
-    protein: 24,
-    carbs: 38,
-    fats: 18,
-    prepTimeMinutes: 8,
-    category: 'Quick Fuel',
-    dietType: 'eggetarian',
-    tags: ['Fast Prep', 'Choline Rich', 'Eggetarian', 'Street Classic', 'Breakfast'],
-    focusScore: '9.1/10',
-    description:
-      'The beloved Indian roadside upgrade to European French toast. Whisked eggs infused with finely minced red onions, fiery green chilies, cilantro, and turmeric, crisped in a skillet for an instant 8-minute protein breakfast.',
-    ingredients: [
-      { item: '100% Whole Wheat Bread Slices', amount: '2 thick slices' },
-      { item: 'Farm-Fresh Large Eggs', amount: '3 whole' },
-      { item: 'Finely Minced Red Onion & Green Chili', amount: '2 tbsp onion + 1 chili' },
-      { item: 'Finely Chopped Fresh Coriander', amount: '1 tbsp' },
-      { item: 'Turmeric, Red Chili Powder & Salt', amount: '1/2 tsp each' },
-      { item: 'Butter or Desi Ghee', amount: '1 tsp for pan' }
+    "id": "spiced-turkey-stuffed-pepper",
+    "name": "Spiced Turkey & Black Bean Stuffed Pepper",
+    "subtitle": "Oven-roasted bell pepper filled with seasoned ground turkey and corn",
+    "image": "/assets/food/turkey-stuffed-pepper-1.0.webp",
+    "calories": 470,
+    "protein": 40,
+    "carbs": 36,
+    "fats": 14,
+    "prepTimeMinutes": 28,
+    "category": "Steady Carbs",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Fiber Rich",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Crack eggs into a wide shallow bowl; add minced onion, green chili, cilantro, turmeric, chili powder, and salt. Whisk vigorously.',
-      'Heat butter or ghee on a flat tawa or skillet over medium heat.',
-      'Dip bread slices into the egg mixture for 5 seconds per side, ensuring herbs adhere to bread surface.',
-      'Place onto the hot tawa and pour any leftover egg-onion mixture directly over the bread.',
-      'Cook for 2–3 minutes per side until golden brown and crisped at the edges; slice into triangles and serve hot with pickled onions.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Capsaicin and vitamin C from roasted peppers enhance non-heme iron absorption from black beans, paired with lean ground turkey.",
+    "ingredients": [
+      {
+        "item": "Extra-Lean Ground Turkey (93/7)",
+        "amount": "200g"
+      },
+      {
+        "item": "Large Red Bell Pepper (halved)",
+        "amount": "1 pepper"
+      },
+      {
+        "item": "Black Beans & Sweet Corn",
+        "amount": "80g"
+      },
+      {
+        "item": "Part-Skim Mozzarella",
+        "amount": "25g"
+      },
+      {
+        "item": "Cumin, Chili Powder, Oregano",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Cilantro",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Brown ground turkey in a skillet with cumin, chili powder, and black beans.",
+      "Stuff hollowed bell pepper halves with the savory turkey mixture.",
+      "Top with a sprinkle of part-skim mozzarella.",
+      "Bake at 375°F for 20 minutes until the pepper is tender and cheese is bubbling."
+    ],
+    "micros": {
+      "fiberG": 7.8,
+      "potassiumMg": 880,
+      "magnesiumMg": 96,
+      "ironMg": 3.9,
+      "zincMg": 3.5,
+      "calciumMg": 140,
+      "vitaminB12Mcg": 1.1,
+      "vitaminD_IU": 18,
+      "omega3Mg": 220
+    }
   },
   {
-    id: 'mediterranean-chickpea-salad',
-    name: 'Mediterranean Chickpea & Feta Crisp Salad',
-    subtitle: 'Tender kabuli chana tossed with crisp cucumber, cherry tomatoes, crumbled paneer/feta, and oregano',
-    image: '/assets/food/chickpea-salad-1.0.webp',
-    calories: 440,
-    protein: 24,
-    carbs: 52,
-    fats: 16,
-    prepTimeMinutes: 8,
-    category: 'Steady Carbs',
-    dietType: 'vegetarian',
-    tags: ['Zero Cook', 'Plant Protein', 'Vegetarian', 'Clean Balance', 'Fiber Rich'],
-    focusScore: '9.2/10',
-    description:
-      'No stove required if using cooked chickpeas. Combines legumes with crisp hydrating vegetables, crumbled cheese, and extra virgin olive oil for healthy digestion.',
-    ingredients: [
-      { item: 'Boiled Kabuli Chana (Chickpeas)', amount: '180g' },
-      { item: 'Diced English Cucumber & Cherry Tomatoes', amount: '1/2 cup each' },
-      { item: 'Crumbled Feta or Firm Dairy Paneer', amount: '40g' },
-      { item: 'Thinly Sliced Red Onion & Parsley/Mint', amount: '2 tbsp each' },
-      { item: 'Extra Virgin Olive Oil', amount: '1.5 tbsp' },
-      { item: 'Fresh Lemon Juice & Dried Oregano', amount: '1 tbsp lemon + 1/2 tsp oregano' },
-      { item: 'Sea Salt & Cracked Black Pepper', amount: 'To taste' }
+    "id": "sesame-ginger-chicken-lettuce-cups",
+    "name": "Sesame Ginger Chicken Lettuce Cups",
+    "subtitle": "Diced chicken breast with water chestnuts in crisp butterhead lettuce",
+    "image": "/assets/food/chicken-lettuce-cups-1.0.webp",
+    "calories": 420,
+    "protein": 44,
+    "carbs": 14,
+    "fats": 16,
+    "prepTimeMinutes": 15,
+    "category": "Quick Fuel",
+    "dietType": "omnivore",
+    "tags": [
+      "High Protein",
+      "Low Carb",
+      "Keto Clean",
+      "Poultry",
+      "Omnivore"
     ],
-    instructions: [
-      'Add boiled drained chickpeas to a wide serving bowl.',
-      'Add diced cucumbers, ripe cherry tomato halves, and thinly sliced red onions.',
-      'Whisk extra virgin olive oil, fresh lemon juice, dried oregano, salt, and black pepper in a small cup.',
-      'Drizzle dressing over the salad and toss gently to coat every chickpea.',
-      'Scatter crumbled feta or fresh paneer cubes and chopped parsley over the top; serve cool.'
-    ]
+    "focusScore": "9.5/10",
+    "description": "Crisp, refreshing hand-held cups providing 44g protein with negligible carbohydrates for zero afternoon brain slump.",
+    "ingredients": [
+      {
+        "item": "Finely Minced Chicken Breast",
+        "amount": "240g"
+      },
+      {
+        "item": "Butterhead Lettuce Leaves",
+        "amount": "4 large cups"
+      },
+      {
+        "item": "Diced Water Chestnuts",
+        "amount": "50g"
+      },
+      {
+        "item": "Sliced Scallions & Ginger",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Toasted Sesame Oil & Tamari",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Toasted Sesame Seeds",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Heat sesame oil in wok, sear chicken with minced ginger and garlic for 4 minutes.",
+      "Stir in water chestnuts, scallions, and tamari; toss for 2 minutes until glossy.",
+      "Spoon savory chicken mixture into crisp washed lettuce cups.",
+      "Garnish with toasted sesame seeds and chili flakes."
+    ],
+    "micros": {
+      "fiberG": 3.2,
+      "potassiumMg": 760,
+      "magnesiumMg": 78,
+      "ironMg": 2.8,
+      "zincMg": 2.9,
+      "calciumMg": 65,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 18,
+      "omega3Mg": 210
+    }
   },
   {
-    id: 'tawa-chicken-tikka',
-    name: 'Smoky Tawa Chicken Tikka Skewers',
-    subtitle: 'Lean chicken breast cubes marinated in hung curd, Kashmiri chili, and kasuri methi, charred on skewers',
-    image: '/assets/food/chicken-tikka-1.0.webp',
-    calories: 510,
-    protein: 54,
-    carbs: 8,
-    fats: 16,
-    prepTimeMinutes: 20,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['Ultra High Protein', 'Keto Clean', 'Omnivore', 'Post Workout', 'Gym Staple'],
-    focusScore: '9.5/10',
-    description:
-      'The holy grail of clean Indian fitness nutrition. Massive 54g protein payload with virtually zero simple carbohydrates. Charred with tandoori spices and served with fresh mint and lemon for peak anabolic recovery.',
-    ingredients: [
-      { item: 'Boneless Chicken Breast (Cubed)', amount: '280g' },
-      { item: 'Thick Hung Curd (Greek Yogurt or Strained Dahi)', amount: '3 tbsp' },
-      { item: 'Ginger-Garlic Paste', amount: '1.5 tbsp' },
-      { item: 'Kashmiri Red Chili, Garam Masala & Kasuri Methi', amount: '1 tbsp total' },
-      { item: 'Diced Red Onion & Capsicum Squares', amount: '1/2 cup' },
-      { item: 'Mustard Oil or Ghee', amount: '1 tsp' },
-      { item: 'Lemon Wedges & Chaat Masala', amount: 'For finishing' }
+    "id": "chilean-sea-bass-spinach",
+    "name": "Seared Chilean Sea Bass & Sautéed Greens",
+    "subtitle": "Golden crust sea bass fillet with garlic wilted spinach and lemon butter",
+    "image": "/assets/food/seared-sea-bass-1.0.webp",
+    "calories": 490,
+    "protein": 42,
+    "carbs": 10,
+    "fats": 26,
+    "prepTimeMinutes": 18,
+    "category": "Keto Clean",
+    "dietType": "pescatarian",
+    "tags": [
+      "High Protein",
+      "Keto Clean",
+      "Seafood",
+      "Pescatarian"
     ],
-    instructions: [
-      'Whisk hung curd, ginger-garlic paste, mustard oil, Kashmiri chili, garam masala, crushed kasuri methi, and salt.',
-      'Coat chicken cubes thoroughly in the marinade and let rest for 15 minutes (or overnight in fridge).',
-      'Thread marinated chicken cubes onto skewers alternating with crunchy onion and capsicum squares.',
-      'Heat a grill pan or cast-iron tawa on high heat with a brush of oil; sear skewers for 4 minutes per side until charred.',
-      'Dust with tangy chaat masala, squeeze fresh lemon juice, and serve alongside fresh mint sprigs.'
-    ]
+    "focusScore": "9.6/10",
+    "description": "Melt-in-your-mouth white fish rich in healthy monounsaturated fats and omega-3s, paired with lutein and folate from fresh spinach.",
+    "ingredients": [
+      {
+        "item": "Chilean Sea Bass Fillet",
+        "amount": "220g"
+      },
+      {
+        "item": "Baby Spinach",
+        "amount": "150g"
+      },
+      {
+        "item": "Clarified Butter (Ghee)",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Garlic Cloves (sliced)",
+        "amount": "3 cloves"
+      },
+      {
+        "item": "Lemon Juice & Zest",
+        "amount": "1 lemon"
+      },
+      {
+        "item": "Flaky Maldon Sea Salt",
+        "amount": "Pinch"
+      }
+    ],
+    "instructions": [
+      "Dry sea bass skin thoroughly with paper towels.",
+      "Sear skin-down in foaming clarified butter for 5 minutes until crispy and golden.",
+      "Flip gently and finish cooking on low heat for 3 minutes.",
+      "In residual butter, flash-sauté garlic and spinach for 60 seconds.",
+      "Plate fish atop greens, squeeze lemon, and finish with flaky sea salt."
+    ],
+    "micros": {
+      "fiberG": 3.4,
+      "potassiumMg": 820,
+      "magnesiumMg": 115,
+      "ironMg": 3.5,
+      "zincMg": 2.2,
+      "calciumMg": 135,
+      "vitaminB12Mcg": 3.2,
+      "vitaminD_IU": 240,
+      "omega3Mg": 1650
+    }
   },
   {
-    id: 'mediterranean-hummus-platter',
-    name: 'Loaded Mediterranean Hummus & Spiced Chana Plate',
-    subtitle: 'Silky whipped kabuli chana hummus with spiced roasted chickpeas, crisp cucumbers, and toasted roti triangles',
-    image: '/assets/food/mediterranean-hummus-1.0.webp',
-    calories: 460,
-    protein: 22,
-    carbs: 58,
-    fats: 16,
-    prepTimeMinutes: 15,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['Plant Protein', 'Prebiotic Fiber', 'Vegan', 'Mediterranean', 'Slow Glycemic'],
-    focusScore: '9.2/10',
-    description:
-      'Classic Levantine mezze made entirely with accessible kitchen staples. Kabuli chana blended with toasted white sesame (til) paste, garlic, and fresh lemon. Provides resilient prebiotic fiber and slow-burning carbs for steady mental clarity.',
-    ingredients: [
-      { item: 'Boiled Kabuli Chana (Chickpeas)', amount: '220g tender' },
-      { item: 'Toasted White Sesame Paste (Homemade Tahini) or Cold-Pressed Til Oil', amount: '2 tbsp' },
-      { item: 'Garlic Cloves & Fresh Lemon Juice', amount: '2 cloves + 2 tbsp lemon' },
-      { item: 'Extra Virgin Olive Oil', amount: '1 tbsp' },
-      { item: 'Roasted Cumin & Paprika', amount: '1/2 tsp each' },
-      { item: 'Diced Cucumber, Tomato & Fresh Coriander', amount: '1/2 cup' },
-      { item: 'Warm Whole Wheat Roti or Pita Triangles', amount: '1 bread' }
+    "id": "truffle-tagliatelle-pasta",
+    "name": "Truffle & Parmesan Tagliatelle",
+    "subtitle": "Slow-digesting durum wheat with aged parmesan and truffle oil",
+    "image": "/assets/food/pasta-1.0.webp",
+    "calories": 610,
+    "protein": 18,
+    "carbs": 78,
+    "fats": 19,
+    "prepTimeMinutes": 18,
+    "category": "Steady Carbs",
+    "dietType": "vegetarian",
+    "tags": [
+      "Glycogen Reload",
+      "Pre-Workout",
+      "Vegetarian",
+      "Complex Carbs"
     ],
-    instructions: [
-      'Blend 180g boiled chickpeas with toasted sesame paste, garlic cloves, fresh lemon juice, cold water, and salt in a mixer until completely velvety and smooth.',
-      'Toss remaining 40g chickpeas in a dry pan with a drop of oil, roasted cumin, paprika, and salt until lightly crispy.',
-      'Spoon smooth hummus onto a wide plate, creating a swirl well with the back of a spoon.',
-      'Drizzle extra virgin olive oil into the well, and scatter the warm spiced chickpeas, diced cucumber, tomatoes, and chopped coriander.',
-      'Serve with warm whole wheat roti or toasted pita triangles for scooping.'
-    ]
+    "focusScore": "8.4/10",
+    "description": "Clean complex carbohydrates designed for pre-training glycogen storage and prolonged aerobic stamina. Balanced with aged parmesan for sustained release.",
+    "ingredients": [
+      {
+        "item": "Artisanal Tagliatelle or Fettuccine",
+        "amount": "110g dry"
+      },
+      {
+        "item": "Grass-Fed Butter",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "24-Month Aged Parmigiano Reggiano",
+        "amount": "35g freshly grated"
+      },
+      {
+        "item": "White Truffle Infused Olive Oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Reserved Pasta Water",
+        "amount": "60ml"
+      },
+      {
+        "item": "Cracked Black Peppercorn",
+        "amount": "1/2 tsp"
+      }
+    ],
+    "instructions": [
+      "Boil pasta in salted water for 8 minutes until strictly al dente.",
+      "Melt grass-fed butter in a wide saucepan over low heat and crack black pepper.",
+      "Transfer pasta directly to pan with 60ml reserved starchy cooking water.",
+      "Remove from heat; vigorously emulsify with parmesan until a glossy, silk sauce forms.",
+      "Drizzle truffle oil and finish with additional shaved parmigiano."
+    ],
+    "micros": {
+      "fiberG": 4.8,
+      "potassiumMg": 380,
+      "magnesiumMg": 62,
+      "ironMg": 2.6,
+      "zincMg": 2.4,
+      "calciumMg": 380,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 28,
+      "omega3Mg": 140
+    }
   },
   {
-    id: 'japanese-sesame-tofu-stirfry',
-    name: 'Crispy Sesame-Glazed Tofu & Broccoli Rice Bowl',
-    subtitle: 'Golden pan-crisped soya tofu cubes and tender broccoli florets in a savory ginger-soy sesame glaze',
-    image: '/assets/food/sesame-tofu-1.0.webp',
-    calories: 480,
-    protein: 32,
-    carbs: 46,
-    fats: 18,
-    prepTimeMinutes: 18,
-    category: 'High Protein',
-    dietType: 'vegan',
-    tags: ['High Plant Protein', 'Isoflavone Rich', 'Vegan', 'Japanese Style', 'Post Workout'],
-    focusScore: '9.4/10',
-    description:
-      'A high-protein plant-based meal. Firm tofu cubes are pressed and pan-seared until crispy, then coated in a reduction of dark soy sauce, grated ginger, and toasted sesame seeds.',
-    ingredients: [
-      { item: 'Firm Soya Tofu (Pressed & Cubed)', amount: '240g' },
-      { item: 'Fresh Broccoli Florets', amount: '150g' },
-      { item: 'Dark Soy Sauce & Jaggery / Honey', amount: '2 tbsp soy + 1 tsp jaggery' },
-      { item: 'Fresh Grated Ginger & Garlic', amount: '1 tbsp each' },
-      { item: 'Cornstarch (Ararot)', amount: '1 tbsp' },
-      { item: 'Til (Toasted White Sesame Seeds) & Sesame Oil', amount: '1 tbsp seeds + 1 tsp oil' },
-      { item: 'Steamed Rice or Millets', amount: '100g cooked' }
+    "id": "cast-iron-skillet-eggs",
+    "name": "Cast-Iron Skillet Eggs & Greens",
+    "subtitle": "Three pasture eggs gently basted over garlic sautéed kale and avocado",
+    "image": "/assets/food/skillet-eggs-1.0.webp",
+    "calories": 420,
+    "protein": 26,
+    "carbs": 12,
+    "fats": 28,
+    "prepTimeMinutes": 12,
+    "category": "High Protein",
+    "dietType": "eggetarian",
+    "tags": [
+      "Choline Rich",
+      "Keto Clean",
+      "Bioavailable",
+      "Eggetarian",
+      "Eggs"
     ],
-    instructions: [
-      'Pat tofu cubes dry with a towel, dust with 1 tbsp cornstarch and a pinch of salt for a crunchy crust.',
-      'Heat 1 tsp oil in a tawa or wok; sear tofu cubes on medium-high until golden and crisp on all sides (about 6 minutes). Remove and set aside.',
-      'In the same pan, flash-sear broccoli florets with a splash of water for 3 minutes until tender-crisp.',
-      'Whisk dark soy sauce, grated ginger, minced garlic, 1 tsp jaggery powder, and 3 tbsp water; pour into pan and simmer for 1 minute until glossy.',
-      'Toss crispy tofu back into the sauce, sprinkle generously with toasted white sesame seeds, and spoon over warm steamed rice.'
-    ]
+    "focusScore": "9.6/10",
+    "description": "Whole pasture-raised eggs supply bioavailable dietary choline to support acetylcholine synthesis for deep, uninterrupted mental focus.",
+    "ingredients": [
+      {
+        "item": "Pasture-Raised Eggs",
+        "amount": "3 whole eggs"
+      },
+      {
+        "item": "Lacinato Kale (ribs removed)",
+        "amount": "120g"
+      },
+      {
+        "item": "Ghee or Grass-Fed Butter",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Hass Avocado",
+        "amount": "1/2 sliced"
+      },
+      {
+        "item": "Thinly Sliced Garlic",
+        "amount": "2 cloves"
+      },
+      {
+        "item": "Flaky Sea Salt & Chili Flakes",
+        "amount": "To taste"
+      }
+    ],
+    "instructions": [
+      "Melt ghee in a 10-inch cast-iron skillet over medium heat, saute garlic for 30 seconds.",
+      "Add chopped kale, season with sea salt, and saute for 3 minutes until tender.",
+      "Create 3 small wells in the greens; crack eggs directly into each well.",
+      "Cover skillet for 2.5 minutes until whites set while yolks stay warm and runny.",
+      "Serve directly from the skillet topped with sliced avocado and red chili flakes."
+    ],
+    "micros": {
+      "fiberG": 5.2,
+      "potassiumMg": 740,
+      "magnesiumMg": 92,
+      "ironMg": 4.2,
+      "zincMg": 3.1,
+      "calciumMg": 195,
+      "vitaminB12Mcg": 1.8,
+      "vitaminD_IU": 180,
+      "omega3Mg": 480
+    }
   },
   {
-    id: 'mexican-chipotle-black-bean-bowl',
-    name: 'Fiesta Black Bean & Sweet Corn Burrito Bowl',
-    subtitle: 'Tender black beans (or rajma), charred sweet corn, fresh tomato salsa pico de gallo, and zesty lime',
-    image: '/assets/food/mexican-black-bean-1.0.webp',
-    calories: 490,
-    protein: 24,
-    carbs: 76,
-    fats: 10,
-    prepTimeMinutes: 15,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['High Fiber', 'Glycogen Storage', 'Vegan', 'Mexican Style', 'Clean Fuel'],
-    focusScore: '9.1/10',
-    description:
-      'A nutrient-dense Latin American meal made with simple pantry staples. Black beans (or tender small Kashmiri rajma) provide fiber, resistant starch, and sustained energy. Fresh coriander, tomatoes, and lime juice bring bright acidity.',
-    ingredients: [
-      { item: 'Boiled Black Beans or Small Kashmiri Rajma', amount: '200g tender' },
-      { item: 'Sweet Corn Kernels (Steamed or Charred)', amount: '80g' },
-      { item: 'Cooked Basmati Rice or Brown Rice', amount: '120g' },
-      { item: 'Fresh Diced Tomatoes, Onion & Green Chili (Pico de Gallo)', amount: '1 cup' },
-      { item: 'Ground Cumin (Jeera Powder) & Oregano', amount: '1/2 tsp each' },
-      { item: 'Fresh Lemon / Lime Juice & Rock Salt', amount: '1 whole lime + to taste' },
-      { item: 'Fresh Coriander (Cilantro)', amount: 'Handful chopped' }
+    "id": "warm-ancient-grain-bowl",
+    "name": "Warm Ancient Grain & Avocado Bowl",
+    "subtitle": "Warm sprouted farro, golden quinoa, massaged kale, roasted almonds, and tahini",
+    "image": "/assets/food/grain-bowl-1.0.webp",
+    "calories": 540,
+    "protein": 19,
+    "carbs": 64,
+    "fats": 22,
+    "prepTimeMinutes": 15,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Plant Protein",
+      "Slow Carbs",
+      "Vegan",
+      "Complex Carbs"
     ],
-    instructions: [
-      'In a warm skillet, toss boiled beans with cumin powder, red chili powder, oregano, and salt for 3 minutes until fragrant.',
-      'Make quick pico de gallo salsa: toss diced tomatoes, finely chopped red onion, green chilies, coriander, salt, and fresh lime juice in a bowl.',
-      'Layer warm cooked rice into a wide bowl as the base.',
-      'Arrange seasoned black beans, golden sweet corn, and fresh tomato salsa in colorful distinct sections across the bowl.',
-      'Finish with a generous squeeze of fresh lime juice and freshly cracked black pepper.'
-    ]
+    "focusScore": "8.8/10",
+    "description": "Unrefined ancient grains provide sustained, gradual glucose release alongside magnesium and B-complex vitamins for nervous system calm.",
+    "ingredients": [
+      {
+        "item": "Cooked Sprouted Farro & Quinoa Mix",
+        "amount": "180g"
+      },
+      {
+        "item": "Baby Kale (massaged in olive oil)",
+        "amount": "80g"
+      },
+      {
+        "item": "Toasted Almond Slivers",
+        "amount": "25g"
+      },
+      {
+        "item": "Hass Avocado",
+        "amount": "1/2 diced"
+      },
+      {
+        "item": "Raw Sesame Tahini Dressing",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Pomegranate Arils",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Warm cooked farro and quinoa in a saucepan with a tablespoon of water.",
+      "Massage kale in a bowl with a pinch of salt until dark green and tender.",
+      "Layer warm grains over kale; top with diced avocado and toasted almonds.",
+      "Drizzle with lemon-tahini dressing and finish with fresh pomegranate arils."
+    ],
+    "micros": {
+      "fiberG": 11.4,
+      "potassiumMg": 820,
+      "magnesiumMg": 145,
+      "ironMg": 4.8,
+      "zincMg": 3.4,
+      "calciumMg": 160,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 280
+    }
   },
   {
-    id: 'moroccan-spiced-lentil-tagine',
-    name: 'Moroccan Spiced Red Lentil & Chickpea Tagine',
-    subtitle: 'Rich masoor dal and kabuli chana simmered with warm cumin, cinnamon, carrots, and garden mint',
-    image: '/assets/food/moroccan-lentil-1.0.webp',
-    calories: 430,
-    protein: 24,
-    carbs: 68,
-    fats: 8,
-    prepTimeMinutes: 20,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['High Iron', 'Gut Health', 'Vegan', 'North African', 'Comfort Food'],
-    focusScore: '9.3/10',
-    description:
-      'Hearty spiced lentil and chickpea stew with cumin, cinnamon, and ginger for warming, slow-burning fuel.',
-    ingredients: [
-      { item: 'Whole Red Lentils (Sabut Masoor Dal)', amount: '80g dry' },
-      { item: 'Boiled Kabuli Chana', amount: '100g' },
-      { item: 'Diced Carrots & Tomato Puree', amount: '1 carrot + 1/2 cup puree' },
-      { item: 'Cinnamon Stick (Dalchini) & Roasted Jeera Powder', amount: '1 small stick + 1 tsp jeera' },
-      { item: 'Grated Ginger & Garlic', amount: '1 tbsp' },
-      { item: 'Fresh Mint Leaves & Lemon Wedge', amount: 'Handful mint + 1 wedge' },
-      { item: 'Cold-Pressed Olive Oil or Mustard Oil', amount: '1 tsp' }
+    "id": "avocado-sourdough-toast",
+    "name": "Poached Egg & Whipped Avocado Sourdough",
+    "subtitle": "Fermented sourdough bread with ripe avocado, soft poached eggs, and seeds",
+    "image": "/assets/food/avocado-toast-1.0.webp",
+    "calories": 480,
+    "protein": 24,
+    "carbs": 46,
+    "fats": 21,
+    "prepTimeMinutes": 14,
+    "category": "Quick Fuel",
+    "dietType": "eggetarian",
+    "tags": [
+      "Brain Fats",
+      "Choline Rich",
+      "Eggetarian",
+      "Fermented"
     ],
-    instructions: [
-      'Rinse masoor dal; boil in 2 cups of water with a pinch of turmeric and salt until tender (about 12 minutes).',
-      'In a saucepan, heat 1 tsp oil; temper cinnamon stick, minced garlic, and grated ginger until fragrant.',
-      'Add tomato puree, roasted jeera powder, coriander powder, and diced carrots; cook 4 minutes until oil releases.',
-      'Fold in the cooked lentils, boiled chickpeas, and 1/2 cup water; simmer on low heat for 6 minutes until thick and aromatic.',
-      'Garnish with fresh mint leaves and a bright squeeze of lemon juice before serving warm.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Slow-fermented artisan sourdough is gentle on digestion and blunts glycemic response. Paired with healthy monounsaturated fats from avocado.",
+    "ingredients": [
+      {
+        "item": "Slow-Fermented Artisan Sourdough",
+        "amount": "2 thick slices"
+      },
+      {
+        "item": "Ripe Hass Avocado",
+        "amount": "1 whole"
+      },
+      {
+        "item": "Pasture-Raised Eggs",
+        "amount": "2 poached"
+      },
+      {
+        "item": "Pumpkin & Hemp Seeds",
+        "amount": "1 tbsp each"
+      },
+      {
+        "item": "Aleppo Pepper Flakes & Lemon",
+        "amount": "Pinch"
+      }
+    ],
+    "instructions": [
+      "Toast sourdough slices in a pan with olive oil until golden and crisp.",
+      "Mash avocado with lemon juice, sea salt, and black pepper.",
+      "Poach eggs in simmering water with a drop of vinegar for 3 minutes.",
+      "Spread avocado generously on sourdough, top with poached eggs, seeds, and chili flakes."
+    ],
+    "micros": {
+      "fiberG": 8.5,
+      "potassiumMg": 840,
+      "magnesiumMg": 110,
+      "ironMg": 3.8,
+      "zincMg": 3.2,
+      "calciumMg": 75,
+      "vitaminB12Mcg": 1.2,
+      "vitaminD_IU": 120,
+      "omega3Mg": 410
+    }
   },
   {
-    id: 'thai-peanut-sesame-noodles',
-    name: 'Thai Spicy Peanut & Sesame Noodle Bowl',
-    subtitle: 'Rice noodles coated in a spicy roasted peanut-lime dressing with crisp purple cabbage, cucumber, and roasted peanuts',
-    image: '/assets/food/thai-peanut-noodles-1.0.webp',
-    calories: 470,
-    protein: 19,
-    carbs: 64,
-    fats: 17,
-    prepTimeMinutes: 12,
-    category: 'Steady Carbs',
-    dietType: 'vegan',
-    tags: ['Plant Fats', 'Prebiotic Fiber', 'Vegan', 'Thai Style', 'Quick Fuel'],
-    focusScore: '8.9/10',
-    description:
-      'Silky rice noodles tossed in a sauce of natural roasted ground peanuts, dark soy sauce, green chilies, and lime juice. Loaded with crunchy raw cabbage and cucumbers for digestion and sustained daytime energy.',
-    ingredients: [
-      { item: 'Rice Noodles or Whole Wheat Hakka Noodles', amount: '80g dry' },
-      { item: '100% Roasted Peanut Butter (Unsweetened)', amount: '2 tbsp (32g)' },
-      { item: 'Dark Soy Sauce & Fresh Lime Juice', amount: '1 tbsp each' },
-      { item: 'Finely Minced Green Chili & Ginger', amount: '1 tsp each' },
-      { item: 'Shredded Cabbage, Carrot & Cucumber Sticks', amount: '1.5 cups total' },
-      { item: 'Crushed Roasted Peanuts & Coriander', amount: '1 tbsp for garnish' }
+    "id": "tamago-sesame-rice-bowl",
+    "name": "Tamago Sesame Soft Egg Rice Bowl",
+    "subtitle": "Soy-marinated soft boiled eggs over warm short grain rice, furikake, and scallions",
+    "image": "/assets/food/egg-rice-bowl-1.0.webp",
+    "calories": 460,
+    "protein": 22,
+    "carbs": 58,
+    "fats": 14,
+    "prepTimeMinutes": 10,
+    "category": "Quick Fuel",
+    "dietType": "eggetarian",
+    "tags": [
+      "Fast Carbs",
+      "Comfort Fuel",
+      "Eggetarian",
+      "Japanese"
     ],
-    instructions: [
-      'Boil rice noodles in salted water for 4–5 minutes until al dente; rinse with cold water to halt cooking.',
-      'In a small bowl, whisk peanut butter, soy sauce, lime juice, minced ginger, green chili, and 3 tbsp warm water into a glossy, pourable dressing.',
-      'Place cooled noodles into a wide bowl; toss with shredded cabbage, carrot matchsticks, and cucumber ribbons.',
-      'Pour the peanut sauce over the bowl and toss thoroughly until every noodle strand is coated.',
-      'Garnish with crushed roasted peanuts and coriander sprigs; serve chilled or room temperature.'
-    ]
+    "focusScore": "8.8/10",
+    "description": "Traditional Japanese egg-and-rice breakfast delivering fast, clean fuel for morning work without heavy digestive overhead.",
+    "ingredients": [
+      {
+        "item": "Steamed Japanese Short-Grain Rice",
+        "amount": "160g warm"
+      },
+      {
+        "item": "Soy-Mirin Marinated Eggs (Ajitsuke Tamago)",
+        "amount": "2 jammy eggs"
+      },
+      {
+        "item": "Toasted Sesame Furikake & Nori",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Sliced Scallions",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Toasted Sesame Oil",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Spoon steaming rice into an earthenware bowl.",
+      "Halve marinated jammy eggs and arrange over rice.",
+      "Drizzle with toasted sesame oil and sprinkle with furikake and scallions."
+    ],
+    "micros": {
+      "fiberG": 2.2,
+      "potassiumMg": 420,
+      "magnesiumMg": 52,
+      "ironMg": 2.6,
+      "zincMg": 2.1,
+      "calciumMg": 65,
+      "vitaminB12Mcg": 1.3,
+      "vitaminD_IU": 110,
+      "omega3Mg": 240
+    }
   },
   {
-    id: 'vietnamese-crispy-tofu-spring-rolls',
-    name: 'Vietnamese Crispy Tofu Fresh Summer Rolls',
-    subtitle: 'Translucent rice paper rolls filled with golden tofu batons, fresh mint, cucumber, and roasted peanut dipping sauce',
-    image: '/assets/food/vietnamese-rolls-1.0.webp',
-    calories: 420,
-    protein: 26,
-    carbs: 48,
-    fats: 14,
-    prepTimeMinutes: 16,
-    category: 'High Protein',
-    dietType: 'vegan',
-    tags: ['Light & Refreshing', 'Gut Friendly', 'Vegan', 'Vietnamese', 'Hydrating'],
-    focusScore: '9.2/10',
-    description:
-      'A fresh Vietnamese street staple. Crispy pan-seared tofu wrapped with fresh mint and hydrating cucumber in delicate rice paper. Paired with a warm peanut dipping sauce, offering high bioavailability protein with clean digestion and zero gut heaviness.',
-    ingredients: [
-      { item: 'Firm Soya Tofu (Sliced into Batons)', amount: '200g' },
-      { item: 'Rice Paper Sheets (Easily Available Online / Supermarket)', amount: '4 sheets' },
-      { item: 'Fresh Mint Leaves & Coriander', amount: 'Generous handful' },
-      { item: 'Cucumber & Carrot Matchsticks', amount: '1 cup' },
-      { item: 'Soy Sauce, Lemon Juice & Roasted Peanut Butter (for Dip)', amount: '2 tbsp peanut butter + 1 tbsp soy + lemon' },
-      { item: 'Cold-Pressed Til Oil or Mustard Oil', amount: '1 tsp for pan' }
+    "id": "rajma-chawal-bowl",
+    "name": "Slow-Simmered Rajma & Jeera Basmati",
+    "subtitle": "Rich dark kidney beans slow cooked with whole spices, aged basmati, and pickled onions",
+    "image": "/assets/food/rajma-chawal-1.0.webp",
+    "calories": 520,
+    "protein": 22,
+    "carbs": 84,
+    "fats": 8,
+    "prepTimeMinutes": 25,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "High Fiber",
+      "Indian",
+      "Plant Protein",
+      "Slow Carbs",
+      "Vegan"
     ],
-    instructions: [
-      'Pan-sear tofu batons in 1 tsp oil with a splash of soy sauce on high heat until crisp and golden on all sides.',
-      'Dip a rice paper sheet in a shallow bowl of warm water for 5 seconds until pliable, then lay flat on a clean board.',
-      'Place fresh mint leaves, cucumber matchsticks, carrots, and 2 crispy tofu batons in the center.',
-      'Fold bottom over fillings, tuck sides in, and roll tightly into a neat spring roll. Repeat for all 4 rolls.',
-      'Whisk peanut butter, soy sauce, lime juice, a pinch of chili flakes, and warm water for the dipping sauce; serve fresh.'
-    ]
+    "focusScore": "9.0/10",
+    "description": "Slow-cooked kidney beans paired with basmati form a complete amino acid chain. Delivers 16g dietary prebiotic fiber for gut microbiome diversity.",
+    "ingredients": [
+      {
+        "item": "Soaked & Pressure Cooked Red Kidney Beans (Rajma)",
+        "amount": "200g cooked"
+      },
+      {
+        "item": "Aged Basmati Rice cooked with Cumin Seeds",
+        "amount": "150g"
+      },
+      {
+        "item": "Onion, Tomato & Ginger Masala Gravy",
+        "amount": "120g"
+      },
+      {
+        "item": "Cold-Pressed Mustard or Ghee",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Pickled Red Onions & Lime",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Simmer cooked kidney beans in roasted onion-tomato masala for 20 minutes until thick and gravy-rich.",
+      "Mash a small ladle of beans against the pot wall to create rich natural body.",
+      "Serve over fragrant cumin basmati rice with crunchy pickled onions."
+    ],
+    "micros": {
+      "fiberG": 14.2,
+      "potassiumMg": 960,
+      "magnesiumMg": 125,
+      "ironMg": 5.4,
+      "zincMg": 3.1,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 160
+    }
   },
   {
-    id: 'sizzling-chicken-fajita-platter',
-    name: 'Sizzling Mexican Chicken & Pepper Fajitas',
-    subtitle: 'Smoky spiced chicken breast strips seared on cast iron with crisp bell peppers, onions, and warm rotis',
-    image: '/assets/food/chicken-fajitas-1.0.webp',
-    calories: 520,
-    protein: 52,
-    carbs: 34,
-    fats: 16,
-    prepTimeMinutes: 18,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['Massive Protein', 'Post Workout', 'Omnivore', 'Mexican Style', 'Gym Classic'],
-    focusScore: '9.5/10',
-    description:
-      'High-protein Mexican staple using common Indian pantry spices. Lean chicken strips charred with ground cumin, coriander, red chili, and capsicum. High in vitamin C from bell peppers to aid iron absorption, providing an immense 52g protein payload for anabolic recovery.',
-    ingredients: [
-      { item: 'Boneless Chicken Breast (Cut into Strips)', amount: '260g' },
-      { item: 'Sliced Bell Peppers (Green, Yellow, or Red)', amount: '1 large capsicum' },
-      { item: 'Thinly Sliced Red Onion', amount: '1 medium onion' },
-      { item: 'Ground Jeera, Coriander & Kashmiri Red Chili', amount: '1 tsp each' },
-      { item: 'Minced Garlic & Fresh Lime Juice', amount: '1 tbsp garlic + 1 lime' },
-      { item: 'Cooking Oil', amount: '1 tbsp' },
-      { item: 'Warm Whole Wheat Rotis or Tortillas', amount: '2 rotis' }
+    "id": "paneer-bhurji-tiffin",
+    "name": "Tawa Paneer Bhurji & Crisp Bell Peppers",
+    "subtitle": "Crumbled whole milk paneer scrambled with turmeric, green peas, and warm roti",
+    "image": "/assets/food/paneer-bhurji-1.0.webp",
+    "calories": 560,
+    "protein": 34,
+    "carbs": 36,
+    "fats": 28,
+    "prepTimeMinutes": 15,
+    "category": "High Protein",
+    "dietType": "vegetarian",
+    "tags": [
+      "High Protein",
+      "Indian",
+      "Calcium Rich",
+      "Vegetarian",
+      "Paneer"
     ],
-    instructions: [
-      'Toss chicken breast strips with jeera powder, coriander powder, Kashmiri chili, minced garlic, 1 tsp oil, and salt.',
-      'Heat a cast-iron skillet or tawa on high heat until smoking hot; add chicken strips in a single layer and sear undisturbed for 3 minutes.',
-      'Flip chicken, toss in sliced onions and bell peppers; stir-fry vigorously on high heat for 3–4 minutes until peppers blister and chicken is fully cooked.',
-      'Squeeze fresh lime juice over the smoking skillet and remove from heat.',
-      'Serve sizzling chicken and peppers wrapped inside warm whole wheat rotis.'
-    ]
+    "focusScore": "9.4/10",
+    "description": "Whole milk paneer provides high-density slow-release casein protein to feed lean muscle for hours, paired with fresh peppers and spices.",
+    "ingredients": [
+      {
+        "item": "Fresh Artisanal Paneer (crumbled)",
+        "amount": "220g"
+      },
+      {
+        "item": "Whole Wheat Phulkas",
+        "amount": "2 rotis"
+      },
+      {
+        "item": "Green Bell Pepper & Green Peas",
+        "amount": "80g"
+      },
+      {
+        "item": "Diced Red Onions & Tomatoes",
+        "amount": "100g"
+      },
+      {
+        "item": "Ghee & Cumin Seeds",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Turmeric, Garam Masala & Kasuri Methi",
+        "amount": "1 tsp each"
+      }
+    ],
+    "instructions": [
+      "Heat ghee in a pan, crackle cumin seeds, and saute onions until golden.",
+      "Add bell peppers, peas, and tomatoes; cook for 4 minutes.",
+      "Toss in crumbled paneer, spices, and fresh cilantro; stir-fry gently for 3 minutes.",
+      "Serve warm with fresh whole-wheat rotis."
+    ],
+    "micros": {
+      "fiberG": 5.6,
+      "potassiumMg": 680,
+      "magnesiumMg": 84,
+      "ironMg": 3.6,
+      "zincMg": 3.4,
+      "calciumMg": 560,
+      "vitaminB12Mcg": 1.4,
+      "vitaminD_IU": 45,
+      "omega3Mg": 180
+    }
   },
   {
-    id: 'greek-lemon-herb-salmon',
-    name: 'Greek Lemon Herb Salmon & Warm Orzo',
-    subtitle: 'Pan-seared crispy skin salmon fillet with fresh dill, lemon-herb orzo, and cool cucumber tzatziki',
-    image: '/assets/food/greek-salmon-1.0.webp',
-    calories: 540,
-    protein: 46,
-    carbs: 38,
-    fats: 20,
-    prepTimeMinutes: 16,
-    category: 'High Protein',
-    dietType: 'pescatarian',
-    tags: ['Omega-3 Rich', 'High Protein', 'Pescatarian', 'Mediterranean', 'Post Workout'],
-    focusScore: '9.5/10',
-    description:
-      'Restaurant-quality Mediterranean salmon dinner ready in under 20 minutes. High in EPA/DHA omega-3 fatty acids to lower neuroinflammation and boost afternoon cognitive stamina, paired with light orzo and cooling tzatziki.',
-    ingredients: [
-      { item: 'Wild-Caught Salmon Fillet (Skin-On)', amount: '220g' },
-      { item: 'Orzo Pasta', amount: '60g dry' },
-      { item: 'Greek Yogurt (0% or 2%)', amount: '3 tbsp' },
-      { item: 'Grated English Cucumber & Garlic', amount: '1/4 cup + 1 clove minced' },
-      { item: 'Fresh Dill & Lemon Juice', amount: '1 tbsp dill + 1/2 lemon' },
-      { item: 'Extra Virgin Olive Oil & Sea Salt', amount: '1 tbsp + to taste' }
+    "id": "healing-moong-khichdi",
+    "name": "Healing Moong Khichdi & Golden Ghee",
+    "subtitle": "Split yellow moong dal and aged rice stewed with cumin, ginger, and a drizzle of ghee",
+    "image": "/assets/food/moong-khichdi-1.0.webp",
+    "calories": 440,
+    "protein": 20,
+    "carbs": 68,
+    "fats": 9,
+    "prepTimeMinutes": 20,
+    "category": "Steady Carbs",
+    "dietType": "vegetarian",
+    "tags": [
+      "Gut Reset",
+      "Easy Digest",
+      "Comfort Fuel",
+      "Ayurvedic",
+      "Vegetarian"
     ],
-    instructions: [
-      'Boil orzo in salted water for 8 minutes until al dente; drain and toss with 1 tsp olive oil, fresh dill, and lemon zest.',
-      'Mix Greek yogurt, grated squeezed cucumber, minced garlic, lemon juice, and a pinch of salt for a quick tzatziki.',
-      'Pat salmon skin dry with a paper towel and season flesh with sea salt and black pepper.',
-      'Heat a skillet over medium-high with 1 tsp olive oil; place salmon skin-side down and press gently with a spatula for 4 minutes until skin is crackling crisp.',
-      'Flip and cook for 2 more minutes until medium-rare to medium; serve hot over herb orzo with a dollop of tzatziki.'
-    ]
+    "focusScore": "9.1/10",
+    "description": "Ayurvedic gold-standard recovery meal. Zero gastrointestinal strain; ideal when cognitive energy needs to be directed to work rather than digestion.",
+    "ingredients": [
+      {
+        "item": "Split Yellow Moong Dal & Rice (equal parts)",
+        "amount": "140g dry"
+      },
+      {
+        "item": "Grass-Fed Cow Ghee (A2)",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Grated Ginger & Asafoetida (Hing)",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Cumin Seeds & Black Peppercorns",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Turmeric & Rock Salt",
+        "amount": "1 tsp"
+      }
+    ],
+    "instructions": [
+      "Rinse dal and rice together thoroughly.",
+      "Pressure cook or pot-simmer with 4x water, ginger, turmeric, and salt until creamy and soft.",
+      "In a small tadka pan, heat ghee, crackle cumin seeds and hing.",
+      "Pour sizzling golden ghee over the hot khichdi and stir gently."
+    ],
+    "micros": {
+      "fiberG": 7.2,
+      "potassiumMg": 710,
+      "magnesiumMg": 96,
+      "ironMg": 3.9,
+      "zincMg": 2.6,
+      "calciumMg": 90,
+      "vitaminB12Mcg": 0.3,
+      "vitaminD_IU": 15,
+      "omega3Mg": 120
+    }
   },
   {
-    id: 'thai-red-coconut-curry-prawns',
-    name: 'Creamy Thai Red Coconut Curry & Tiger Prawns',
-    subtitle: 'Wild tiger prawns and tender bok choy simmered in aromatic lemongrass-coconut broth with jasmine rice',
-    image: '/assets/food/thai-curry-1.0.webp',
-    calories: 490,
-    protein: 42,
-    carbs: 44,
-    fats: 16,
-    prepTimeMinutes: 15,
-    category: 'High Protein',
-    dietType: 'pescatarian',
-    tags: ['Lean Protein', 'Fast Prep', 'Pescatarian', 'Thai Bistro', 'Clean Fuel'],
-    focusScore: '9.3/10',
-    description:
-      'Deceptively simple 15-minute bistro curry. Sautéing red curry paste in light coconut milk creates an intensely fragrant, velvety broth that gently poaches tiger prawns and bok choy for complete protein and zero heaviness.',
-    ingredients: [
-      { item: 'Peeled Wild Tiger Prawns', amount: '240g' },
-      { item: 'Light Coconut Milk', amount: '180ml' },
-      { item: 'Authentic Thai Red Curry Paste', amount: '1.5 tbsp' },
-      { item: 'Baby Bok Choy (Halved)', amount: '2 heads' },
-      { item: 'Steamed Jasmine Rice', amount: '120g cooked' },
-      { item: 'Fish Sauce (or Tamari) & Lime Juice', amount: '1 tsp each' },
-      { item: 'Fresh Cilantro & Red Chili Slices', amount: 'For garnish' }
+    "id": "dhabawala-egg-curry",
+    "name": "Dhabawala Spiced Egg Curry & Basmati",
+    "subtitle": "Pan-blistered hard boiled eggs simmered in a robust highway-style onion tomato gravy",
+    "image": "/assets/food/egg-curry-1.0.webp",
+    "calories": 490,
+    "protein": 28,
+    "carbs": 48,
+    "fats": 19,
+    "prepTimeMinutes": 22,
+    "category": "High Protein",
+    "dietType": "eggetarian",
+    "tags": [
+      "High Protein",
+      "Indian",
+      "Choline Rich",
+      "Eggetarian",
+      "Eggs"
     ],
-    instructions: [
-      'Heat 1 tbsp coconut milk in a pan over medium heat; fry red curry paste for 60 seconds until fragrant and oils split.',
-      'Pour in remaining coconut milk, 1/4 cup water, and 1 tsp fish sauce; bring to a gentle simmer.',
-      'Add halved baby bok choy and tiger prawns directly into the bubbling broth.',
-      'Simmer gently for 3.5 to 4 minutes until prawns curl pink and bok choy stems turn tender.',
-      'Remove from heat, stir in fresh lime juice, and ladle over steaming jasmine rice with fresh cilantro.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Whole eggs provide the complete amino acid spectrum alongside carotenoids lutein and zeaxanthin for blue-light screen defense.",
+    "ingredients": [
+      {
+        "item": "Hard-Boiled Pasture Eggs",
+        "amount": "3 eggs"
+      },
+      {
+        "item": "Steamed Basmati Rice",
+        "amount": "130g"
+      },
+      {
+        "item": "Slow-Browned Onion Tomato Masala",
+        "amount": "120g"
+      },
+      {
+        "item": "Mustard Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Turmeric, Cumin, Garam Masala",
+        "amount": "1 tsp each"
+      },
+      {
+        "item": "Coriander Leaves",
+        "amount": "Handful"
+      }
+    ],
+    "instructions": [
+      "Score boiled eggs and fry in hot turmeric-oil for 2 minutes until blistered and golden.",
+      "Add onion-tomato masala base and simmer with a splash of water for 8 minutes.",
+      "Drop fried eggs into bubbling gravy and let flavors absorb for 4 minutes.",
+      "Serve hot with steamed basmati rice and fresh coriander."
+    ],
+    "micros": {
+      "fiberG": 4.1,
+      "potassiumMg": 640,
+      "magnesiumMg": 68,
+      "ironMg": 3.8,
+      "zincMg": 2.9,
+      "calciumMg": 110,
+      "vitaminB12Mcg": 1.9,
+      "vitaminD_IU": 190,
+      "omega3Mg": 360
+    }
   },
   {
-    id: 'spanish-saffron-chicken-paella',
-    name: 'Spanish Saffron & Smoked Paprika Chicken Skillet',
-    subtitle: 'One-pan caramelized chicken and bomba rice infused with saffron, sweet peas, and smoked paprika',
-    image: '/assets/food/spanish-paella-1.0.webp',
-    calories: 530,
-    protein: 44,
-    carbs: 56,
-    fats: 14,
-    prepTimeMinutes: 24,
-    category: 'Steady Carbs',
-    dietType: 'omnivore',
-    tags: ['One-Pan Wonder', 'High Protein', 'Omnivore', 'Spanish Style', 'Glycogen Reload'],
-    focusScore: '9.2/10',
-    description:
-      'A simplified Spanish paella skillet delivering rich restaurant flavors in one pan. Saffron threads and smoked pimentón infuse the rice with deep aromatic compounds while pasture-raised chicken supplies dense amino acids.',
-    ingredients: [
-      { item: 'Boneless Skinless Chicken Thighs (Cubed)', amount: '240g' },
-      { item: 'Short-Grain Paella / Bomba Rice', amount: '70g dry' },
-      { item: 'Sweet Green Peas & Red Bell Pepper Strips', amount: '1/2 cup' },
-      { item: 'Chicken Broth & Saffron Threads', amount: '1.5 cups broth + pinch saffron' },
-      { item: 'Smoked Spanish Paprika & Garlic', amount: '1 tsp paprika + 2 cloves minced' },
-      { item: 'Olive Oil & Fresh Lemon Wedges', amount: '1 tbsp + 2 wedges' }
+    "id": "soya-matar-pulao",
+    "name": "High-Protein Soya Chunk & Matar Pulao",
+    "subtitle": "Juicy spiced soya chunks with fragrant basmati, green peas, and whole spices",
+    "image": "/assets/food/soya-pulao-1.0.webp",
+    "calories": 510,
+    "protein": 38,
+    "carbs": 64,
+    "fats": 10,
+    "prepTimeMinutes": 20,
+    "category": "High Protein",
+    "dietType": "vegan",
+    "tags": [
+      "High Protein",
+      "Vegan",
+      "Indian",
+      "Meal Prep Friendly"
     ],
-    instructions: [
-      'Heat olive oil in a wide heavy skillet; sear chicken cubes with smoked paprika and salt for 4 minutes until golden.',
-      'Push chicken aside, add minced garlic and bell pepper strips; sauté for 1 minute.',
-      'Stir in dry rice, coating the grains in flavorful pan oils for 60 seconds.',
-      'Pour in warm chicken broth with saffron threads; stir once, distribute chicken and sweet peas evenly.',
-      'Simmer on medium-low undisturbed for 14 minutes until liquid is absorbed and a light crispy crust (socarrat) forms at bottom. Rest 3 mins and serve with lemon.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "De-fatted soya chunks deliver over 52g protein per 100g dry weight. One of the densest plant-based protein sources available on earth.",
+    "ingredients": [
+      {
+        "item": "Textured Soya Chunks (rehydrated & squeezed)",
+        "amount": "70g dry (160g rehydrated)"
+      },
+      {
+        "item": "Aged Basmati Rice",
+        "amount": "80g dry"
+      },
+      {
+        "item": "Sweet Green Peas (Matar)",
+        "amount": "60g"
+      },
+      {
+        "item": "Whole Spices (Cardamom, Cloves, Bay Leaf)",
+        "amount": "Standard tempering"
+      },
+      {
+        "item": "Cold-Pressed Peanut Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Mint & Mint-Garlic Paste",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Boil soya chunks in salted water for 5 minutes, rinse in cold water and squeeze dry.",
+      "Saute whole spices and onions in oil until fragrant, add ginger-mint paste.",
+      "Toss in soya chunks and green peas; fry for 3 minutes.",
+      "Add soaked basmati rice and water; simmer covered for 12 minutes until fluffy."
+    ],
+    "micros": {
+      "fiberG": 9.2,
+      "potassiumMg": 920,
+      "magnesiumMg": 140,
+      "ironMg": 6.8,
+      "zincMg": 3.8,
+      "calciumMg": 180,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 190
+    }
   },
   {
-    id: 'mediterranean-halloumi-shakshuka',
-    name: 'Skillet Shakshuka with Golden Halloumi & Runny Yolks',
-    subtitle: 'Pasture-raised eggs poached in rich tomato-bell pepper reduction with seared halloumi cheese cubes',
-    image: '/assets/food/halloumi-shakshuka-1.0.webp',
-    calories: 470,
-    protein: 30,
-    carbs: 24,
-    fats: 28,
-    prepTimeMinutes: 14,
-    category: 'Quick Fuel',
-    dietType: 'eggetarian',
-    tags: ['Choline Rich', 'High Calcium', 'Eggetarian', 'Fast Prep', 'Mediterranean'],
-    focusScore: '9.4/10',
-    description:
-      'A Middle Eastern shakshuka topped with seared halloumi cheese. Rich in dietary choline and calcium. The runny egg yolks blend with roasted tomato juices for a satisfying meal.',
-    ingredients: [
-      { item: 'Farm-Fresh Large Eggs', amount: '3 whole' },
-      { item: 'Halloumi Cheese or Firm Paneer (Cubed)', amount: '80g' },
-      { item: 'Crushed San Marzano Tomatoes / Tomato Puree', amount: '1 cup' },
-      { item: 'Sweet Red Bell Pepper & Onion', amount: '1/2 cup finely diced' },
-      { item: 'Ground Cumin, Smoked Paprika & Garlic', amount: '1 tbsp spice blend' },
-      { item: 'Olive Oil & Fresh Cilantro / Parsley', amount: '1 tbsp + handful herbs' }
+    "id": "paneer-kathi-roll",
+    "name": "Tawa Paneer Tikka Kathi Roll",
+    "subtitle": "Charred spiced paneer cubes, crunchy peppers, and mint chutney wrapped in a flaky paratha",
+    "image": "/assets/food/paneer-kathi-roll-1.0.webp",
+    "calories": 520,
+    "protein": 26,
+    "carbs": 48,
+    "fats": 22,
+    "prepTimeMinutes": 16,
+    "category": "Quick Fuel",
+    "dietType": "vegetarian",
+    "tags": [
+      "High Protein",
+      "Street Fuel",
+      "Vegetarian",
+      "Paneer"
     ],
-    instructions: [
-      'Heat 1 tsp olive oil in a skillet; sear halloumi cubes for 2 minutes per side until golden brown and crispy; set aside.',
-      'In the same pan, sauté diced onion, bell pepper, and garlic with cumin and smoked paprika for 3 minutes.',
-      'Pour in crushed tomatoes and simmer on medium heat for 4 minutes until thickened.',
-      'Make 3 wells in sauce, crack in eggs, and scatter golden halloumi cubes around the pan.',
-      'Cover and cook on low heat for 3–4 minutes until whites are set and yolks remain molten. Garnish with fresh herbs.'
-    ]
+    "focusScore": "9.0/10",
+    "description": "High-protein portable wrap featuring grilled paneer cubes, crunchy bell peppers, and antioxidant-rich mint-coriander chutney.",
+    "ingredients": [
+      {
+        "item": "Paneer Cubes (marinated & charred)",
+        "amount": "160g"
+      },
+      {
+        "item": "Whole-Wheat Paratha or Roti",
+        "amount": "1 large"
+      },
+      {
+        "item": "Julienned Onions & Bell Peppers",
+        "amount": "60g"
+      },
+      {
+        "item": "Mint Coriander Green Chutney",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Chaat Masala & Lemon Juice",
+        "amount": "Pinch"
+      }
+    ],
+    "instructions": [
+      "Sear spiced paneer cubes and peppers on high heat on a cast-iron tawa.",
+      "Warm the whole-wheat paratha on the tawa until crisp and pliable.",
+      "Spread mint chutney down the center of the paratha.",
+      "Lay charred paneer and peppers, dust with chaat masala, roll tightly and slice."
+    ],
+    "micros": {
+      "fiberG": 4.8,
+      "potassiumMg": 560,
+      "magnesiumMg": 72,
+      "ironMg": 3.2,
+      "zincMg": 2.8,
+      "calciumMg": 480,
+      "vitaminB12Mcg": 1.1,
+      "vitaminD_IU": 35,
+      "omega3Mg": 160
+    }
   },
   {
-    id: 'japanese-teriyaki-chicken-donburi',
-    name: 'Glazed Teriyaki Chicken Donburi with Edamame',
-    subtitle: 'Pan-caramelized chicken thigh slices in sweet ginger-soy glaze over steamed rice with sweet edamame',
-    image: '/assets/food/teriyaki-chicken-1.0.webp',
-    calories: 540,
-    protein: 48,
-    carbs: 52,
-    fats: 14,
-    prepTimeMinutes: 16,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Japanese Bistro', 'Omnivore', 'Post Workout', 'Gym Favorite'],
-    focusScore: '9.5/10',
-    description:
-      'Japanese izakaya favorite made in 15 minutes. High-protein chicken thighs seared crisp and glazed in a simple 3-ingredient soy, ginger, and honey reduction over short-grain rice with steamed edamame.',
-    ingredients: [
-      { item: 'Boneless Skinless Chicken Thighs', amount: '260g' },
-      { item: 'Steamed Short-Grain White or Brown Rice', amount: '140g cooked' },
-      { item: 'Shelled Edamame Beans', amount: '60g steamed' },
-      { item: 'Tamari / Soy Sauce & Honey', amount: '2 tbsp soy + 1 tbsp honey' },
-      { item: 'Freshly Grated Ginger & Garlic', amount: '1 tsp each' },
-      { item: 'Toasted White Sesame Seeds & Sliced Scallions', amount: '1 tbsp each' }
+    "id": "garlic-chili-egg-fried-rice",
+    "name": "Street-Style Garlic Chili Egg Fried Rice",
+    "subtitle": "Wok-tossed chilled rice with scrambled eggs, scallions, and toasted sesame oil",
+    "image": "/assets/food/egg-fried-rice-1.0.webp",
+    "calories": 520,
+    "protein": 26,
+    "carbs": 65,
+    "fats": 16,
+    "prepTimeMinutes": 12,
+    "category": "Quick Fuel",
+    "dietType": "eggetarian",
+    "tags": [
+      "Quick Energy",
+      "Post Workout",
+      "Eggetarian",
+      "Eggs"
     ],
-    instructions: [
-      'Season chicken thighs with a pinch of sea salt and sear in a hot skillet for 4–5 minutes per side until deeply browned and cooked through.',
-      'Whisk soy sauce, honey, grated ginger, and minced garlic with 2 tbsp water.',
-      'Pour sauce directly into the hot pan around chicken; simmer vigorously for 90 seconds until sauce reduces to a glossy, bubbling lacquer.',
-      'Transfer chicken to a cutting board and slice into neat strips.',
-      'Ladle warm rice into a bowl, arrange sliced glazed chicken and bright green edamame side-by-side, drizzle residual pan glaze, and scatter sesame and scallions.'
-    ]
+    "focusScore": "8.9/10",
+    "description": "Chilled cooked rice forms resistant starch, lowering insulin spikes. Wok-scrambled pasture eggs provide quick-absorbing amino acids.",
+    "ingredients": [
+      {
+        "item": "Day-Old Chilled Jasmine or Sona Masoori Rice",
+        "amount": "180g"
+      },
+      {
+        "item": "Pasture-Raised Eggs",
+        "amount": "3 eggs"
+      },
+      {
+        "item": "Minced Garlic & Green Chilies",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Sliced Spring Onions",
+        "amount": "3 stalks"
+      },
+      {
+        "item": "Tamari & Sesame Oil",
+        "amount": "1 tbsp each"
+      }
+    ],
+    "instructions": [
+      "Scramble eggs in smoking-hot wok with oil until 80% set, remove to plate.",
+      "Add garlic and green chilies; flash-fry for 20 seconds.",
+      "Toss in chilled rice, breaking clumps over high heat.",
+      "Return scrambled eggs, drizzle tamari and sesame oil, and finish with scallions."
+    ],
+    "micros": {
+      "fiberG": 2.4,
+      "potassiumMg": 460,
+      "magnesiumMg": 58,
+      "ironMg": 3.1,
+      "zincMg": 2.4,
+      "calciumMg": 85,
+      "vitaminB12Mcg": 1.8,
+      "vitaminD_IU": 160,
+      "omega3Mg": 340
+    }
   },
   {
-    id: 'moroccan-chermoula-fish-fillet',
-    name: 'Moroccan Chermoula Seared White Fish & Couscous',
-    subtitle: 'Tender golden sea bass fillet drizzled with zesty cilantro-garlic chermoula over lemon herb couscous',
-    image: '/assets/food/chermoula-fish-1.0.webp',
-    calories: 430,
-    protein: 40,
-    carbs: 42,
-    fats: 10,
-    prepTimeMinutes: 12,
-    category: 'Quick Fuel',
-    dietType: 'pescatarian',
-    tags: ['Ultra Fast Prep', 'Clean Protein', 'Pescatarian', 'Mediterranean', 'Polyphenol Rich'],
-    focusScore: '9.3/10',
-    description:
-      'The fastest gourmet fish dinner in modern cooking. Fluffy couscous steams in 5 minutes with boiling water while tender white fish pan-sears in 5 minutes and is blanketed in fresh Moroccan herb chermoula.',
-    ingredients: [
-      { item: 'White Fish Fillet (Sea Bass, Cod, or Tilapia)', amount: '220g' },
-      { item: 'Instant Semolina Couscous', amount: '60g dry' },
-      { item: 'Fresh Cilantro & Parsley (Finely Chopped)', amount: '1/2 cup total' },
-      { item: 'Garlic Cloves, Ground Cumin & Paprika', amount: '2 cloves + 1/2 tsp each' },
-      { item: 'Extra Virgin Olive Oil & Fresh Lemon Juice', amount: '1.5 tbsp oil + 1 tbsp lemon' },
-      { item: 'Sea Salt & Cracked Pepper', amount: 'To taste' }
+    "id": "tempered-curd-rice",
+    "name": "South Indian Tempered Curd Rice & Roasted Cashews",
+    "subtitle": "Creamy probiotic yogurt rice with mustard seeds, curry leaves, ginger, and cashews",
+    "image": "/assets/food/curd-rice-1.0.webp",
+    "calories": 460,
+    "protein": 18,
+    "carbs": 62,
+    "fats": 14,
+    "prepTimeMinutes": 10,
+    "category": "Quick Fuel",
+    "dietType": "vegetarian",
+    "tags": [
+      "Probiotic Gut Health",
+      "South Indian",
+      "Cooling Fuel",
+      "Vegetarian"
     ],
-    instructions: [
-      'Place couscous in a bowl with a pinch of salt; pour 90ml boiling water, cover with a plate, and let steam for 5 minutes. Fluff with a fork and lemon zest.',
-      'Make quick chermoula: stir chopped cilantro, parsley, minced garlic, cumin, paprika, olive oil, lemon juice, and sea salt in a small cup.',
-      'Season fish fillet with salt and pepper; sear in a hot skillet with 1 tsp oil for 2.5 minutes per side until golden and flaky.',
-      'Spoon warm couscous onto a plate and set seared fish fillet on top.',
-      'Spoon generous spoonfuls of vibrant green chermoula over the warm fish and serve with lemon wedges.'
-    ]
+    "focusScore": "9.2/10",
+    "description": "Living lactobacillus cultures replenish the intestinal barrier, blunting exercise-induced inflammation and calming systemic cortisol.",
+    "ingredients": [
+      {
+        "item": "Soft-Cooked Rice (mashed)",
+        "amount": "160g"
+      },
+      {
+        "item": "Fresh Artisanal Yogurt (Curd)",
+        "amount": "180g"
+      },
+      {
+        "item": "Mustard Seeds, Urad Dal, Curry Leaves",
+        "amount": "Tadka mix"
+      },
+      {
+        "item": "Roasted Cashew Nuts",
+        "amount": "15g"
+      },
+      {
+        "item": "Finely Minced Ginger & Green Chili",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Pomegranate Seeds",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Mash soft warm rice with fresh curd, a splash of milk, and sea salt.",
+      "In a tadka ladle, heat oil, crackle mustard seeds, urad dal, curry leaves, and cashews.",
+      "Pour fragrant tempering over the curd rice and mix gently.",
+      "Garnish with pomegranate seeds and grated ginger."
+    ],
+    "micros": {
+      "fiberG": 2.6,
+      "potassiumMg": 580,
+      "magnesiumMg": 78,
+      "ironMg": 2.2,
+      "zincMg": 2.5,
+      "calciumMg": 320,
+      "vitaminB12Mcg": 1.1,
+      "vitaminD_IU": 25,
+      "omega3Mg": 110
+    }
   },
   {
-    id: 'greek-lemon-chicken-souvlaki',
-    name: 'Greek Lemon Chicken Souvlaki & Tzatziki Plate',
-    subtitle: 'Charred lemon-oregano chicken skewers with warm toasted pita triangles, tomato cucumber salad, and tzatziki',
-    image: '/assets/food/chicken-souvlaki-1.0.webp',
-    calories: 510,
-    protein: 48,
-    carbs: 36,
-    fats: 18,
-    prepTimeMinutes: 16,
-    category: 'High Protein',
-    dietType: 'omnivore',
-    tags: ['High Protein', 'Mediterranean', 'Omnivore', 'Clean Energy', 'Post Workout'],
-    focusScore: '9.4/10',
-    description:
-      'Classic Greek street food optimized for high protein and anti-inflammatory balance. Lean chicken breast cubes marinated in lemon, oregano, and garlic, seared on skewers and served with cool tzatziki and crisp salad.',
-    ingredients: [
-      { item: 'Boneless Chicken Breast (Cubed)', amount: '250g' },
-      { item: 'Dried Greek Oregano, Garlic & Lemon Juice', amount: '1 tbsp oregano + 2 cloves + 1 lemon' },
-      { item: 'Greek Yogurt Cucumber Tzatziki', amount: '3 tbsp' },
-      { item: 'Diced Cucumber, Tomato & Kalamata Olives', amount: '1 cup' },
-      { item: 'Whole Wheat Pita Bread', amount: '1 pita cut into triangles' },
-      { item: 'Olive Oil & Sea Salt', amount: '1 tbsp + to taste' }
+    "id": "savory-masala-oats",
+    "name": "Savory Masala Oats with Soft Jammy Egg",
+    "subtitle": "Rolled oats cooked with turmeric, carrots, peas, and a soft-boiled egg",
+    "image": "/assets/food/masala-oats-1.0.webp",
+    "calories": 420,
+    "protein": 22,
+    "carbs": 52,
+    "fats": 14,
+    "prepTimeMinutes": 12,
+    "category": "Steady Carbs",
+    "dietType": "eggetarian",
+    "tags": [
+      "Beta Glucan",
+      "High Fiber",
+      "Eggetarian",
+      "Morning Fuel"
     ],
-    instructions: [
-      'Toss chicken cubes in olive oil, lemon juice, dried oregano, minced garlic, and sea salt.',
-      'Thread chicken onto 2 skewers and sear in a screaming-hot grill pan or cast iron for 3.5 minutes per side until charred.',
-      'Toast pita triangles in the pan for 60 seconds until warm and pliable.',
-      'Toss cucumber, tomato, and olives with a drop of olive oil and pinch of oregano.',
-      'Arrange skewers on a wide plate alongside warm pita triangles, crisp salad, and a ramekin of chilled tzatziki.'
-    ]
+    "focusScore": "9.1/10",
+    "description": "Oat beta-glucan soluble fiber stabilizes post-meal glucose and sustains energy for up to 4 hours, complemented by whole-egg protein.",
+    "ingredients": [
+      {
+        "item": "Whole Rolled Oats",
+        "amount": "70g dry"
+      },
+      {
+        "item": "Pasture-Raised Egg",
+        "amount": "1 soft-boiled"
+      },
+      {
+        "item": "Finely Chopped Carrots, Peas, Beans",
+        "amount": "80g"
+      },
+      {
+        "item": "Turmeric, Cumin, Garam Masala",
+        "amount": "1 tsp each"
+      },
+      {
+        "item": "Ghee",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Fresh Lemon & Coriander",
+        "amount": "To taste"
+      }
+    ],
+    "instructions": [
+      "Heat ghee in a pot, saute cumin seeds and vegetables for 3 minutes.",
+      "Add rolled oats, turmeric, and 250ml water; simmer for 5 minutes until creamy.",
+      "Pour savory oats into bowl, top with a halved 6-minute jammy egg and cilantro."
+    ],
+    "micros": {
+      "fiberG": 7.8,
+      "potassiumMg": 610,
+      "magnesiumMg": 92,
+      "ironMg": 3.8,
+      "zincMg": 2.7,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 0.8,
+      "vitaminD_IU": 65,
+      "omega3Mg": 280
+    }
   },
   {
-    id: 'korean-crispy-tofu-bibimbap',
-    name: 'Korean Crispy Tofu & Sesame Bibimbap',
-    subtitle: 'Steamed short-grain rice topped with golden tofu cubes, seasoned spinach, kimchi, and a sunny egg',
-    image: '/assets/food/korean-bibimbap-1.0.webp',
-    calories: 510,
-    protein: 28,
-    carbs: 62,
-    fats: 16,
-    prepTimeMinutes: 14,
-    category: 'Steady Carbs',
-    dietType: 'eggetarian',
-    tags: ['Probiotic Kimchi', 'Plant & Egg Protein', 'Eggetarian', 'Korean Style', 'Gut Health'],
-    focusScore: '9.2/10',
-    description:
-      'A classic Korean rice bowl with probiotic kimchi, pan-crisped tofu, and an egg for balanced protein, fiber, and sustained energy.',
-    ingredients: [
-      { item: 'Firm Soya Tofu (Cubed & Pressed)', amount: '180g' },
-      { item: 'Steamed Short-Grain Rice', amount: '150g cooked' },
-      { item: 'Farm-Fresh Egg', amount: '1 sunny-side up' },
-      { item: 'Traditional Fermented Kimchi', amount: '60g' },
-      { item: 'Blanched Sesame Spinach & Grated Carrots', amount: '1 cup total' },
-      { item: 'Gochujang / Tamari & Toasted Sesame Oil', amount: '1 tbsp each' }
+    "id": "besan-paneer-chilla",
+    "name": "Crispy Besan Chilla with Spiced Paneer",
+    "subtitle": "Spiced chickpea flour crepes stuffed with grated paneer, onions, and green chutney",
+    "image": "/assets/food/besan-chilla-1.0.webp",
+    "calories": 470,
+    "protein": 28,
+    "carbs": 38,
+    "fats": 22,
+    "prepTimeMinutes": 15,
+    "category": "High Protein",
+    "dietType": "vegetarian",
+    "tags": [
+      "High Protein",
+      "Gluten-Free",
+      "Indian",
+      "Vegetarian"
     ],
-    instructions: [
-      'Pan-sear tofu cubes in 1 tsp sesame oil on medium-high for 5 minutes until crispy on all edges.',
-      'Quickly flash-fry an egg sunny-side up until white is set but yolk remains liquid.',
-      'Layer warm steamed rice into the bottom of a wide ceramic bowl.',
-      'Arrange crispy tofu, fermented kimchi, blanched sesame spinach, and carrots in distinct colorful sections over rice.',
-      'Place the sunny-side-up egg in the center, drizzle with sesame oil and gochujang, and mix thoroughly before eating.'
-    ]
+    "focusScore": "9.3/10",
+    "description": "Chickpea flour (besan) is naturally gluten-free and low-glycemic. Grated paneer stuffing elevates the complete protein payload to 28g.",
+    "ingredients": [
+      {
+        "item": "Gram Flour (Besan)",
+        "amount": "70g"
+      },
+      {
+        "item": "Grated Fresh Paneer",
+        "amount": "120g"
+      },
+      {
+        "item": "Ajwain (Carom Seeds)",
+        "amount": "1/2 tsp"
+      },
+      {
+        "item": "Finely Chopped Onions & Chilies",
+        "amount": "40g"
+      },
+      {
+        "item": "Cold-Pressed Mustard Oil or Ghee",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Mint Coriander Chutney",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Whisk besan with water, ajwain, turmeric, and sea salt into smooth pouring batter.",
+      "Pour ladleful onto hot skillet, spreading in circular motion into a thin crepe.",
+      "Drizzle ghee along edges; once golden and crisp, sprinkle grated paneer and onions on top.",
+      "Fold chilla and serve crisp with spicy green chutney."
+    ],
+    "micros": {
+      "fiberG": 6.8,
+      "potassiumMg": 690,
+      "magnesiumMg": 98,
+      "ironMg": 3.9,
+      "zincMg": 3,
+      "calciumMg": 420,
+      "vitaminB12Mcg": 0.9,
+      "vitaminD_IU": 28,
+      "omega3Mg": 150
+    }
+  },
+  {
+    "id": "kala-chana-sundal",
+    "name": "Warm Kala Chana Sundal & Fresh Coconut Bowl",
+    "subtitle": "Protein-packed black chickpeas tempered with mustard, curry leaves, and grated coconut",
+    "image": "/assets/food/kala-chana-1.0.webp",
+    "calories": 430,
+    "protein": 22,
+    "carbs": 58,
+    "fats": 11,
+    "prepTimeMinutes": 12,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Ancient Grains",
+      "High Fiber",
+      "Vegan",
+      "South Indian"
+    ],
+    "focusScore": "9.2/10",
+    "description": "Desi black chickpeas are exceptionally rich in resistant starch and iron. Fresh grated coconut provides healthy fats for sustained cellular energy.",
+    "ingredients": [
+      {
+        "item": "Boiled Black Chickpeas (Kala Chana)",
+        "amount": "220g"
+      },
+      {
+        "item": "Freshly Grated Coconut",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Mustard Seeds, Urad Dal, Curry Leaves",
+        "amount": "Tempering mix"
+      },
+      {
+        "item": "Asafoetida & Dry Red Chili",
+        "amount": "Pinch"
+      },
+      {
+        "item": "Coconut Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Lemon Juice & Rock Salt",
+        "amount": "To taste"
+      }
+    ],
+    "instructions": [
+      "Heat coconut oil, splutter mustard seeds, urad dal, curry leaves, and red chilies.",
+      "Add boiled black chickpeas and rock salt; toss on medium-high heat for 3 minutes.",
+      "Turn off heat, fold in freshly grated coconut and fresh lemon juice."
+    ],
+    "micros": {
+      "fiberG": 13.5,
+      "potassiumMg": 820,
+      "magnesiumMg": 115,
+      "ironMg": 5.8,
+      "zincMg": 2.9,
+      "calciumMg": 110,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 130
+    }
+  },
+  {
+    "id": "peanut-butter-banana-oats",
+    "name": "Creamy Peanut Butter & Banana Power Oatmeal",
+    "subtitle": "Warm oats cooked in almond milk with natural peanut butter, banana slices, and chia seeds",
+    "image": "/assets/food/peanut-butter-oats-1.0.webp",
+    "calories": 520,
+    "protein": 20,
+    "carbs": 68,
+    "fats": 18,
+    "prepTimeMinutes": 8,
+    "category": "Steady Carbs",
+    "dietType": "vegetarian",
+    "tags": [
+      "High Fiber",
+      "Clean Energy",
+      "Vegetarian",
+      "Quick Fuel"
+    ],
+    "focusScore": "9.0/10",
+    "description": "Classic high-satiety breakfast pairing soluble oat fiber with potassium-dense banana and monounsaturated healthy fats from peanut butter.",
+    "ingredients": [
+      {
+        "item": "Rolled Whole Oats",
+        "amount": "80g"
+      },
+      {
+        "item": "Pure 100% Roasted Peanut Butter",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Ripe Banana (sliced)",
+        "amount": "1 medium"
+      },
+      {
+        "item": "Black Chia Seeds",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Unsweetened Almond Milk",
+        "amount": "220ml"
+      },
+      {
+        "item": "Ground Ceylon Cinnamon",
+        "amount": "1/2 tsp"
+      }
+    ],
+    "instructions": [
+      "Simmer oats in almond milk with cinnamon for 5 minutes until thick and creamy.",
+      "Transfer to a bowl, swirl in creamy peanut butter.",
+      "Top with banana slices and chia seeds."
+    ],
+    "micros": {
+      "fiberG": 9.6,
+      "potassiumMg": 780,
+      "magnesiumMg": 135,
+      "ironMg": 3.4,
+      "zincMg": 2.8,
+      "calciumMg": 180,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 40,
+      "omega3Mg": 1800
+    }
+  },
+  {
+    "id": "masala-french-toast",
+    "name": "Mumbai Street Masala Egg French Toast",
+    "subtitle": "Sourdough soaked in spiced beaten eggs with onions, tomatoes, green chilies, and cilantro",
+    "image": "/assets/food/masala-french-toast-1.0.webp",
+    "calories": 460,
+    "protein": 25,
+    "carbs": 46,
+    "fats": 18,
+    "prepTimeMinutes": 12,
+    "category": "Quick Fuel",
+    "dietType": "eggetarian",
+    "tags": [
+      "High Protein",
+      "Indian",
+      "Eggetarian",
+      "Eggs"
+    ],
+    "focusScore": "9.1/10",
+    "description": "Mumbai street food reinvented with artisan sourdough and pasture eggs. Delivers quick morning choline and sustained energy.",
+    "ingredients": [
+      {
+        "item": "Artisanal Sourdough Bread",
+        "amount": "2 thick slices"
+      },
+      {
+        "item": "Pasture-Raised Eggs",
+        "amount": "3 eggs"
+      },
+      {
+        "item": "Finely Minced Onions & Tomatoes",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Green Chilies & Fresh Cilantro",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Turmeric, Chaat Masala & Salt",
+        "amount": "Pinch each"
+      },
+      {
+        "item": "Ghee or Grass-Fed Butter",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Whisk eggs vigorously with minced vegetables, turmeric, chaat masala, and cilantro.",
+      "Dip sourdough slices into spiced egg mixture until soaked.",
+      "Melt ghee in skillet; toast bread for 3 minutes per side until golden and fluffy.",
+      "Serve warm with homemade green mint chutney."
+    ],
+    "micros": {
+      "fiberG": 4.2,
+      "potassiumMg": 520,
+      "magnesiumMg": 68,
+      "ironMg": 3.6,
+      "zincMg": 2.6,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 1.7,
+      "vitaminD_IU": 155,
+      "omega3Mg": 320
+    }
+  },
+  {
+    "id": "mediterranean-chickpea-salad",
+    "name": "Mediterranean Chickpea & Feta Crisp Salad",
+    "subtitle": "Chickpeas, diced cucumbers, kalamata olives, cherry tomatoes, and sheep feta",
+    "image": "/assets/food/chickpea-salad-1.0.webp",
+    "calories": 460,
+    "protein": 21,
+    "carbs": 52,
+    "fats": 18,
+    "prepTimeMinutes": 10,
+    "category": "Steady Carbs",
+    "dietType": "vegetarian",
+    "tags": [
+      "No Cook",
+      "Gut Health",
+      "Vegetarian",
+      "Mediterranean"
+    ],
+    "focusScore": "9.2/10",
+    "description": "Zero-cooking high-fiber power bowl. Delivers prebiotic fiber from chickpeas and polyphenols from extra virgin olive oil.",
+    "ingredients": [
+      {
+        "item": "Cooked Chickpeas (Kabuli Chana)",
+        "amount": "220g"
+      },
+      {
+        "item": "Authentic Greek Sheep Milk Feta",
+        "amount": "40g crumbled"
+      },
+      {
+        "item": "Persian Cucumbers & Cherry Tomatoes",
+        "amount": "120g"
+      },
+      {
+        "item": "Kalamata Olives (halved)",
+        "amount": "8 olives"
+      },
+      {
+        "item": "Cold-Pressed Extra Virgin Olive Oil",
+        "amount": "1.5 tbsp"
+      },
+      {
+        "item": "Fresh Oregano & Lemon Juice",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Combine rinsed chickpeas, diced cucumbers, tomatoes, and kalamata olives in a bowl.",
+      "Whisk olive oil, lemon juice, dried oregano, and sea salt in a small cup.",
+      "Pour dressing over chickpeas, toss well, and top with crumbled feta."
+    ],
+    "micros": {
+      "fiberG": 10.8,
+      "potassiumMg": 780,
+      "magnesiumMg": 110,
+      "ironMg": 4.2,
+      "zincMg": 2.9,
+      "calciumMg": 260,
+      "vitaminB12Mcg": 0.6,
+      "vitaminD_IU": 18,
+      "omega3Mg": 240
+    }
+  },
+  {
+    "id": "mediterranean-hummus-platter",
+    "name": "Loaded Mediterranean Hummus & Spiced Chana Plate",
+    "subtitle": "Creamy velvet tahini hummus topped with warm cumin-roasted chickpeas, olive oil, and warm pita",
+    "image": "/assets/food/mediterranean-hummus-1.0.webp",
+    "calories": 530,
+    "protein": 20,
+    "carbs": 64,
+    "fats": 22,
+    "prepTimeMinutes": 12,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Plant Protein",
+      "Prebiotic Fiber",
+      "Vegan",
+      "Mediterranean"
+    ],
+    "focusScore": "9.1/10",
+    "description": "Sesame tahini provides calcium, copper, and sesamin lignans, while warm roasted chickpeas supply long-chain prebiotic fiber.",
+    "ingredients": [
+      {
+        "item": "Creamy Velvet Hummus (Chickpeas & Tahini)",
+        "amount": "160g"
+      },
+      {
+        "item": "Warm Cumin-Roasted Chickpeas",
+        "amount": "80g"
+      },
+      {
+        "item": "Whole-Wheat Greek Pita",
+        "amount": "1 large flatbread"
+      },
+      {
+        "item": "Extra Virgin Olive Oil & Zaatar",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Cucumber Ribbons & Cherry Tomatoes",
+        "amount": "80g"
+      }
+    ],
+    "instructions": [
+      "Swirl smooth hummus onto a wide earthenware plate creating a well.",
+      "Spoon warm cumin-roasted chickpeas into the center.",
+      "Drizzle generously with extra virgin olive oil and dust with zaatar spice.",
+      "Serve alongside warm sliced pita and crunchy cucumber ribbons."
+    ],
+    "micros": {
+      "fiberG": 12.2,
+      "potassiumMg": 790,
+      "magnesiumMg": 128,
+      "ironMg": 4.6,
+      "zincMg": 3.2,
+      "calciumMg": 190,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 210
+    }
+  },
+  {
+    "id": "japanese-sesame-tofu-stirfry",
+    "name": "Crispy Sesame-Glazed Tofu & Broccoli Rice Bowl",
+    "subtitle": "Extra-firm pressed tofu seared in tamari sesame glaze with tender broccoli florets and brown rice",
+    "image": "/assets/food/sesame-tofu-1.0.webp",
+    "calories": 490,
+    "protein": 30,
+    "carbs": 52,
+    "fats": 18,
+    "prepTimeMinutes": 18,
+    "category": "High Protein",
+    "dietType": "vegan",
+    "tags": [
+      "High Protein",
+      "Plant Protein",
+      "Vegan",
+      "Clean Fuel"
+    ],
+    "focusScore": "9.3/10",
+    "description": "Non-GMO pressed tofu delivers complete plant protein and calcium. Paired with sulforaphane-rich steamed broccoli.",
+    "ingredients": [
+      {
+        "item": "Extra-Firm Organic Tofu (pressed & cubed)",
+        "amount": "220g"
+      },
+      {
+        "item": "Fresh Broccoli Florets",
+        "amount": "140g"
+      },
+      {
+        "item": "Steamed Short-Grain Brown Rice",
+        "amount": "130g"
+      },
+      {
+        "item": "Tamari, Mirin & Ginger Reduction",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Toasted Sesame Oil & White Seeds",
+        "amount": "1 tbsp"
+      }
+    ],
+    "instructions": [
+      "Pan-sear pressed tofu cubes in sesame oil on high heat until crispy and golden on all sides.",
+      "Steam broccoli florets for 3 minutes until vibrant emerald green and crisp-tender.",
+      "Toss tofu and broccoli in savory tamari-ginger glaze until glossy.",
+      "Serve over warm brown rice, finished with toasted sesame seeds."
+    ],
+    "micros": {
+      "fiberG": 7.4,
+      "potassiumMg": 820,
+      "magnesiumMg": 135,
+      "ironMg": 5.2,
+      "zincMg": 3.1,
+      "calciumMg": 410,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 380
+    }
+  },
+  {
+    "id": "mexican-chipotle-black-bean-bowl",
+    "name": "Fiesta Black Bean & Sweet Corn Burrito Bowl",
+    "subtitle": "Seasoned black beans, golden sweet corn, brown rice, fresh guacamole, and cilantro lime salsa",
+    "image": "/assets/food/mexican-black-bean-1.0.webp",
+    "calories": 510,
+    "protein": 21,
+    "carbs": 76,
+    "fats": 15,
+    "prepTimeMinutes": 15,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Fiber Dense",
+      "Mexican",
+      "Vegan",
+      "Slow Carbs"
+    ],
+    "focusScore": "9.0/10",
+    "description": "Dense dietary fiber from black beans and whole brown rice feeds butyrate-producing gut microbes, promoting steady mental stamina.",
+    "ingredients": [
+      {
+        "item": "Slow-Simmered Black Beans",
+        "amount": "180g"
+      },
+      {
+        "item": "Fire-Roasted Sweet Corn",
+        "amount": "80g"
+      },
+      {
+        "item": "Steamed Brown Rice with Cilantro",
+        "amount": "140g"
+      },
+      {
+        "item": "Fresh Guacamole (Hass Avocado & Lime)",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Pico de Gallo & Shredded Romaine",
+        "amount": "80g"
+      }
+    ],
+    "instructions": [
+      "Warm black beans with cumin, chili powder, and sea salt.",
+      "Spoon brown rice into a bowl as the base.",
+      "Arrange black beans, sweet corn, fresh pico de gallo, and crisp romaine.",
+      "Top with a generous scoop of guacamole and a lime wedge."
+    ],
+    "micros": {
+      "fiberG": 13.8,
+      "potassiumMg": 910,
+      "magnesiumMg": 140,
+      "ironMg": 4.8,
+      "zincMg": 2.8,
+      "calciumMg": 85,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 290
+    }
+  },
+  {
+    "id": "moroccan-spiced-lentil-tagine",
+    "name": "Moroccan Spiced Red Lentil & Chickpea Tagine",
+    "subtitle": "Red lentils and chickpeas slow-simmered with cumin, cinnamon, apricots, and fluffy couscous",
+    "image": "/assets/food/moroccan-lentil-1.0.webp",
+    "calories": 520,
+    "protein": 24,
+    "carbs": 82,
+    "fats": 10,
+    "prepTimeMinutes": 25,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Iron Rich",
+      "Vegan",
+      "Mediterranean",
+      "Slow Carbs"
+    ],
+    "focusScore": "9.1/10",
+    "description": "Polyphenol-dense warming spices (cinnamon, ginger, coriander) improve insulin sensitivity while red lentils provide bioavailable non-heme iron.",
+    "ingredients": [
+      {
+        "item": "Red Lentils & Cooked Chickpeas",
+        "amount": "180g combined"
+      },
+      {
+        "item": "Whole-Wheat Steamed Couscous",
+        "amount": "140g"
+      },
+      {
+        "item": "Moroccan Spice Blend (Cinnamon, Cumin, Turmeric)",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Diced Dried Apricots",
+        "amount": "20g"
+      },
+      {
+        "item": "Extra Virgin Olive Oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Fresh Mint & Toasted Almonds",
+        "amount": "Handful"
+      }
+    ],
+    "instructions": [
+      "Saute onions and Moroccan spices in olive oil until aromatic.",
+      "Add red lentils, chickpeas, diced apricots, and vegetable broth; simmer for 18 minutes.",
+      "Steam couscous in boiling water with a pinch of salt for 5 minutes, then fluff with a fork.",
+      "Ladle aromatic lentil stew over couscous, garnish with toasted almonds and fresh mint."
+    ],
+    "micros": {
+      "fiberG": 14.5,
+      "potassiumMg": 890,
+      "magnesiumMg": 130,
+      "ironMg": 5.6,
+      "zincMg": 3.2,
+      "calciumMg": 95,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 170
+    }
+  },
+  {
+    "id": "thai-peanut-sesame-noodles",
+    "name": "Thai Spicy Peanut & Sesame Noodle Bowl",
+    "subtitle": "Buckwheat soba noodles in creamy ginger peanut sauce with crisp edamame and red peppers",
+    "image": "/assets/food/thai-peanut-noodles-1.0.webp",
+    "calories": 540,
+    "protein": 23,
+    "carbs": 68,
+    "fats": 20,
+    "prepTimeMinutes": 14,
+    "category": "Steady Carbs",
+    "dietType": "vegan",
+    "tags": [
+      "Plant Protein",
+      "Buckwheat Soba",
+      "Vegan",
+      "Quick Fuel"
+    ],
+    "focusScore": "8.9/10",
+    "description": "Pure 100% buckwheat soba noodles deliver rutin, a potent bioflavonoid supporting vascular health, tossed in nutrient-dense natural peanut sauce.",
+    "ingredients": [
+      {
+        "item": "Buckwheat Soba Noodles",
+        "amount": "90g dry"
+      },
+      {
+        "item": "Creamy Peanut Butter & Tamari Sauce",
+        "amount": "2.5 tbsp"
+      },
+      {
+        "item": "Shelled Edamame Beans",
+        "amount": "60g"
+      },
+      {
+        "item": "Red Bell Pepper & Cucumber Matchsticks",
+        "amount": "80g"
+      },
+      {
+        "item": "Lime Juice & Sriracha",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Toasted Crushed Peanuts & Scallions",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Boil soba noodles for 4.5 minutes, rinse immediately under icy cold water to remove starch.",
+      "Whisk peanut butter, warm water, tamari, lime juice, ginger, and sriracha into a smooth sauce.",
+      "Toss cold soba noodles with peanut sauce, edamame, and crunchy peppers.",
+      "Garnish with crushed peanuts and scallions."
+    ],
+    "micros": {
+      "fiberG": 8.4,
+      "potassiumMg": 780,
+      "magnesiumMg": 140,
+      "ironMg": 4.2,
+      "zincMg": 3.1,
+      "calciumMg": 80,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 310
+    }
+  },
+  {
+    "id": "glazed-tempeh-edamame-bowl",
+    "name": "Glazed Tempeh & Edamame Power Bowl",
+    "subtitle": "Marinated seared tempeh strips, steamed edamame, purple cabbage, and nutty brown rice",
+    "image": "/assets/food/edamame-tempeh-bowl-1.0.webp",
+    "calories": 530,
+    "protein": 34,
+    "carbs": 56,
+    "fats": 18,
+    "prepTimeMinutes": 18,
+    "category": "High Protein",
+    "dietType": "vegan",
+    "tags": [
+      "High Protein",
+      "Fermented Plant",
+      "Vegan",
+      "Clean Fuel"
+    ],
+    "focusScore": "9.4/10",
+    "description": "Fermented organic tempeh is exceptionally gentle on digestion while providing complete plant amino acids, paired with folate-dense edamame and purple anthocyanins.",
+    "ingredients": [
+      {
+        "item": "Organic Whole Bean Tempeh (sliced)",
+        "amount": "180g"
+      },
+      {
+        "item": "Shelled Edamame Beans",
+        "amount": "80g"
+      },
+      {
+        "item": "Steamed Short-Grain Brown Rice",
+        "amount": "130g"
+      },
+      {
+        "item": "Shredded Purple Cabbage",
+        "amount": "70g"
+      },
+      {
+        "item": "Ripe Avocado Slices",
+        "amount": "1/4 avocado"
+      },
+      {
+        "item": "Tamari Maple Sesame Glaze",
+        "amount": "2 tbsp"
+      }
+    ],
+    "instructions": [
+      "Steam tempeh slices for 5 minutes, then pan-sear in sesame oil until golden on both sides.",
+      "Brush with tamari-maple glaze and let caramelize for 1 minute.",
+      "Assemble warm bowl with brown rice base, glazed tempeh strips, and steamed edamame.",
+      "Add crisp purple cabbage, avocado slices, and sprinkle with sesame seeds."
+    ],
+    "micros": {
+      "fiberG": 11.2,
+      "potassiumMg": 920,
+      "magnesiumMg": 155,
+      "ironMg": 5.4,
+      "zincMg": 3.8,
+      "calciumMg": 210,
+      "vitaminB12Mcg": 0,
+      "vitaminD_IU": 0,
+      "omega3Mg": 450
+    }
   }
 ];
 
-export function findClosestRecipe(customDish: {
-  name?: string;
-  subtitle?: string;
-  category?: string;
-  dietType?: string;
-  ingredients?: { item: string; amount?: string }[];
-  tags?: string[];
-  calories?: number;
-  protein?: number;
-}): { recipe: Recipe; spriteUrl: string; score: number } {
-  const normName = (customDish.name || '').toLowerCase();
-  const normSubtitle = (customDish.subtitle || '').toLowerCase();
-  const normCat = (customDish.category || '').toLowerCase();
-  const normDiet = (customDish.dietType || 'omnivore').toLowerCase();
-  const normIngredients = (customDish.ingredients || [])
-    .map((i) => (typeof i === 'string' ? i : i.item || '').toLowerCase())
-    .join(' ');
-  const normTags = (customDish.tags || []).join(' ').toLowerCase();
-  const allText = [normName, normSubtitle, normCat, normIngredients, normTags].join(' ');
-
+export function findClosestRecipe(customDish: Partial<Recipe>): { recipe: Recipe; spriteUrl: string; score: number } {
   let bestRecipe = RECIPES[0];
-  let bestScore = -9999;
+  let bestScore = -999;
 
-  const keyAnchorMap: { keys: string[]; ids: string[] }[] = [
-    { keys: ['tofu'], ids: ['japanese-sesame-tofu-stirfry', 'vietnamese-crispy-tofu-spring-rolls', 'korean-crispy-tofu-bibimbap'] },
-    { keys: ['salmon', 'white fish', 'cod', 'trout', 'fish'], ids: ['greek-lemon-herb-salmon', 'moroccan-chermoula-fish-fillet'] },
-    { keys: ['prawn', 'shrimp', 'seafood'], ids: ['garlic-prawn-linguine', 'thai-red-coconut-curry-prawns'] },
-    { keys: ['paneer', 'cottage cheese'], ids: ['paneer-bhurji-tiffin', 'paneer-kathi-roll', 'besan-paneer-chilla'] },
-    { keys: ['egg', 'eggs', 'omelet', 'scramble', 'frittata'], ids: ['cast-iron-skillet-eggs', 'tamago-sesame-rice-bowl', 'dhabawala-egg-curry', 'garlic-chili-egg-fried-rice', 'masala-french-toast', 'mediterranean-halloumi-shakshuka'] },
-    { keys: ['pasta', 'tagliatelle', 'fettuccine', 'spaghetti', 'linguine', 'noodle', 'noodles'], ids: ['truffle-tagliatelle-pasta', 'thai-peanut-sesame-noodles', 'garlic-prawn-linguine'] },
-    { keys: ['oat', 'oats', 'oatmeal', 'porridge'], ids: ['savory-masala-oats', 'peanut-butter-banana-oats'] },
+  const normName = (customDish.name || '').toLowerCase();
+  const normDesc = (customDish.description || '').toLowerCase();
+  const normCat = (customDish.category || '').toLowerCase();
+  const normDiet = (customDish.dietType || '').toLowerCase();
+
+  const allText = (normName + ' ' + normDesc).toLowerCase();
+
+  const keyAnchorMap = [
+    { keys: ['egg', 'shakshuka', 'omelette', 'bhurji', 'french toast', 'tamago'], ids: ['cast-iron-skillet-eggs', 'dhabawala-egg-curry', 'tamago-sesame-rice-bowl', 'masala-french-toast', 'garlic-chili-egg-fried-rice'] },
+    { keys: ['paneer', 'cottage cheese'], ids: ['paneer-bhurji-tiffin', 'besan-paneer-chilla', 'paneer-kathi-roll'] },
+    { keys: ['tofu', 'tempeh'], ids: ['japanese-sesame-tofu-stirfry', 'glazed-tempeh-edamame-bowl'] },
+    { keys: ['prawn', 'shrimp'], ids: ['garlic-prawn-linguine', 'thai-red-coconut-curry-prawns', 'cilantro-garlic-shrimp', 'coconut-lime-poached-prawns'] },
+    { keys: ['salmon', 'tuna', 'fish', 'cod', 'tilapia', 'sea bass'], ids: ['greek-lemon-herb-salmon', 'moroccan-chermoula-fish-fillet', 'lemon-garlic-cod', 'blackened-cajun-salmon', 'seared-tuna-nicoise', 'cantonese-ginger-tilapia', 'chilean-sea-bass-spinach'] },
+    { keys: ['oat', 'oatmeal'], ids: ['savory-masala-oats', 'peanut-butter-banana-oats'] },
     { keys: ['khichdi', 'lentil', 'dal', 'dhal'], ids: ['healing-moong-khichdi', 'moroccan-spiced-lentil-tagine'] },
     { keys: ['chana', 'chickpea', 'hummus'], ids: ['kala-chana-sundal', 'mediterranean-chickpea-salad', 'mediterranean-hummus-platter'] },
-    { keys: ['black bean', 'burrito', 'fajita', 'taco', 'mexican'], ids: ['mexican-chipotle-black-bean-bowl', 'sizzling-chicken-fajita-platter', 'smoked-citrus-taco-bowl'] },
+    { keys: ['black bean', 'burrito', 'fajita', 'taco', 'mexican'], ids: ['mexican-chipotle-black-bean-bowl', 'sizzling-chicken-fajita-platter', 'smoked-citrus-taco-bowl', 'spiced-turkey-stuffed-pepper'] },
     { keys: ['soya', 'soy chunk', 'nutrela'], ids: ['soya-matar-pulao'] },
     { keys: ['avocado', 'sourdough', 'toast'], ids: ['avocado-sourdough-toast'] },
-    { keys: ['curd rice', 'dahi rice', 'thayir sadam'], ids: ['tempered-curd-rice'] },
+    { keys: ['curd rice', 'dahi rice'], ids: ['tempered-curd-rice'] },
     { keys: ['rajma', 'kidney bean'], ids: ['rajma-chawal-bowl'] },
-    { keys: ['shakshuka'], ids: ['mediterranean-halloumi-shakshuka'] },
-    { keys: ['paella'], ids: ['spanish-saffron-chicken-paella'] },
-    { keys: ['teriyaki', 'donburi'], ids: ['japanese-teriyaki-chicken-donburi'] },
-    { keys: ['souvlaki', 'gyro', 'tzatziki'], ids: ['greek-lemon-chicken-souvlaki'] },
-    { keys: ['tikka', 'kebab'], ids: ['tawa-chicken-tikka'] },
-    { keys: ['curry', 'tariwala'], ids: ['homestyle-tariwala-chicken', 'dhabawala-egg-curry', 'thai-red-coconut-curry-prawns'] },
-    { keys: ['pepper chicken', 'chettinad'], ids: ['chettinad-pepper-chicken'] },
-    { keys: ['grain', 'quinoa', 'bowl'], ids: ['warm-ancient-grain-bowl'] },
-    { keys: ['chicken', 'turkey', 'poultry'], ids: ['herb-grilled-chicken', 'homestyle-tariwala-chicken', 'sizzling-chicken-fajita-platter', 'tawa-chicken-tikka', 'japanese-teriyaki-chicken-donburi', 'greek-lemon-chicken-souvlaki'] }
+    { keys: ['chicken', 'turkey', 'poultry'], ids: ['herb-grilled-chicken', 'homestyle-tariwala-chicken', 'sizzling-chicken-fajita-platter', 'tawa-chicken-tikka', 'japanese-teriyaki-chicken-donburi', 'greek-lemon-chicken-souvlaki', 'rosemary-turkey-skillet', 'honey-dijon-chicken-thigh', 'smoked-paprika-chicken-skewers', 'spiced-turkey-stuffed-pepper', 'sesame-ginger-chicken-lettuce-cups'] }
   ];
 
   for (const recipe of RECIPES) {
     let score = 0;
 
-    // Diet type penalty
     if (normDiet === 'vegan' && recipe.dietType !== 'vegan') score -= 100;
     else if (normDiet === 'vegetarian' && recipe.dietType !== 'vegan' && recipe.dietType !== 'vegetarian') score -= 100;
     else if (normDiet === 'eggetarian' && recipe.dietType === 'omnivore') score -= 80;
     else if (normDiet === 'pescatarian' && recipe.dietType === 'omnivore') score -= 50;
 
-    // Key culinary anchor match
     for (const anchor of keyAnchorMap) {
       if (anchor.keys.some((k) => allText.includes(k))) {
         if (anchor.ids.includes(recipe.id)) score += 30;
       }
     }
 
-    // Direct token matches with recipe name & ingredients
     const rName = recipe.name.toLowerCase();
     const rIngs = recipe.ingredients.map((i) => i.item.toLowerCase()).join(' ');
     const tokens = normName.split(/\s+/).filter((w) => w.length > 3);
@@ -1440,12 +3399,9 @@ export function findClosestRecipe(customDish: {
       if (rIngs.includes(token)) score += 4;
     }
 
-    // Category match
     if (normCat && recipe.category.toLowerCase() === normCat) score += 5;
-    // Diet match
     if (normDiet && recipe.dietType.toLowerCase() === normDiet) score += 5;
 
-    // Macro proximity
     if (customDish.protein && recipe.protein) {
       const pDiff = Math.abs(customDish.protein - recipe.protein);
       score += Math.max(0, 5 - pDiff / 10);

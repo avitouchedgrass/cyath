@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { MorningBootModal } from '@/components/dashboard/MorningBootModal';
 import { EveningWrapModal } from '@/components/dashboard/EveningWrapModal';
 import { Check, Sun, Moon, ChevronDown, Plus } from 'lucide-react';
@@ -34,8 +35,22 @@ export function CoreHabitsCard() {
     return coreHabits.filter((h) => currentLog.habitsCompleted[h.id]).length;
   }, [coreHabits, currentLog.habitsCompleted]);
 
-  const handleToggle = (habitId: string) => {
-    retroAudio.playBlip();
+  const handleToggle = (habitId: string, event?: React.MouseEvent) => {
+    const isDone = !!currentLog.habitsCompleted[habitId];
+    if (!isDone) {
+      retroAudio.playInspectConfirm();
+      if (typeof window !== 'undefined' && event) {
+        xpParticleEmitter.emit(event.clientX, event.clientY, 10);
+      }
+      if (completedCoreCount === 2) {
+        retroAudio.playTierUpgrade();
+        if (typeof window !== 'undefined') {
+          xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 25);
+        }
+      }
+    } else {
+      retroAudio.playBlip();
+    }
     toggleHabit(habitId, currentDate);
   };
 
@@ -48,7 +63,7 @@ export function CoreHabitsCard() {
     setShowAddForm(false);
   };
 
-  const getBiologicalLever = (title: string, category: string) => {
+  const getHabitBenefit = (title: string, category: string) => {
     const lower = title.toLowerCase();
     if (lower.includes('sunlight') || lower.includes('light')) return '15m natural morning light & hydration';
     if (lower.includes('protein') || lower.includes('fuel')) return 'Target: 140g whole-food protein floor';
@@ -60,14 +75,14 @@ export function CoreHabitsCard() {
   return (
     <div
       id="tour-core-habits"
-      className="w-full h-full min-h-[350px] sm:min-h-[370px] rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-5 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all duration-300 flex flex-col justify-between gap-5"
+      className="w-full h-full min-h-0 sm:min-h-[350px] rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-4 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:border-[#1A3629]/20 transition-all duration-300 flex flex-col justify-between gap-4 sm:gap-5"
     >
       {/* Header: Title + Completion Counter */}
       <div>
         <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#1A3629]/8">
           <div>
             <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629] tracking-tight">
-              Focus Non-Negotiables
+              Focus Essentials
             </h2>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
               3 baseline habits calibrated for sustained daytime stamina.
@@ -79,7 +94,15 @@ export function CoreHabitsCard() {
           </span>
         </div>
 
-        {/* Clean, Non-Nested Habit List */}
+        {/* Flawless Completion Ribbon */}
+        {completedCoreCount === coreHabits.length && (
+          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs mt-2 animate-in fade-in">
+            <span>✨ All Core Habits Complete</span>
+            <span className="font-mono text-[10px]">+45 XP Earned</span>
+          </div>
+        )}
+
+        {/* Clean, Tactile Habit List */}
         <div className="flex flex-col divide-y divide-[#1A3629]/8 pt-1">
           {coreHabits.map((habit) => {
             const isDone = !!currentLog.habitsCompleted[habit.id];
@@ -88,8 +111,8 @@ export function CoreHabitsCard() {
               <button
                 key={habit.id}
                 type="button"
-                onClick={() => handleToggle(habit.id)}
-                className="w-full py-3 px-2 rounded-xl text-left transition-colors duration-150 cursor-pointer select-none group flex items-center justify-between gap-3.5 hover:bg-[#FAF8F5]"
+                onClick={(e) => handleToggle(habit.id, e)}
+                className="w-full py-3 px-2 rounded-xl text-left transition-all duration-150 cursor-pointer select-none group flex items-center justify-between gap-3.5 hover:bg-[#FAF8F5] active:scale-[0.98]"
               >
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
                   {/* Refined Tactile Checkbox */}
@@ -113,18 +136,18 @@ export function CoreHabitsCard() {
                       {habit.title}
                     </span>
                     <span className="font-sans text-xs text-[#4A5D4E] mt-0.5 leading-tight">
-                      {getBiologicalLever(habit.title, habit.category)}
+                      {getHabitBenefit(habit.title, habit.category)}
                     </span>
                   </div>
                 </div>
 
                 {/* Quiet Reward */}
                 <span
-                  className={`font-mono text-xs font-medium shrink-0 transition-colors ${
+                  className={`font-mono text-xs font-semibold shrink-0 transition-colors ${
                     isDone ? 'text-[#1A3629]/40' : 'text-[#C9A84C]'
                   }`}
                 >
-                  +15 XP
+                  {isDone ? '✓' : '+15 XP'}
                 </span>
               </button>
             );

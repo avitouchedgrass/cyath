@@ -1,14 +1,19 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
+import { IslandBiomeGalleryModal } from '@/components/progression/IslandBiomeGalleryModal';
+import { retroAudio } from '@/lib/retroAudio';
+import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 export function LivingIslandHero() {
   const { totalXp } = useHabitStore();
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
 
   const progress = useMemo(() => calculateLevel(totalXp), [totalXp]);
   const currentIsland = useMemo(() => getIslandTier(progress.level), [progress.level]);
@@ -29,6 +34,31 @@ export function LivingIslandHero() {
     }
   }, []);
 
+  const handleShare = async () => {
+    retroAudio.playInspectConfirm();
+    if (typeof window !== 'undefined') {
+      xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 3, 24);
+    }
+    const shareText = `🌲 I'm at Level ${progress.level} (${currentIsland.name}) in Cyath! Building daily habits and steady focus. Explore your floating sanctuary at https://cyath.space`;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `My Cyath Sanctuary — Level ${progress.level}`,
+          text: shareText,
+          url: 'https://cyath.space',
+        });
+        return;
+      } catch {}
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setShareNotice('Sanctuary share link copied to clipboard! ✨');
+        setTimeout(() => setShareNotice(null), 3000);
+      } catch {}
+    }
+  };
+
   return (
     <div
       id="tour-living-sky"
@@ -47,26 +77,54 @@ export function LivingIslandHero() {
         <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#1A3629] tracking-tight">
           {currentIsland.name}
         </h2>
+
+        {/* Action Pills: Inspect Biomes & Share Sanctuary */}
+        <div className="flex items-center gap-2 mt-1">
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playInspectConfirm();
+              setIsGalleryOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer shadow-2xs"
+          >
+            <span>🏛️ Biomes</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-2xs active:scale-95"
+          >
+            <span>Share Sanctuary ↗</span>
+          </button>
+        </div>
+
+        {shareNotice && (
+          <div className="text-[11px] font-cabinet font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-3 py-1 rounded-full animate-in fade-in mt-1">
+            {shareNotice}
+          </div>
+        )}
       </div>
 
-      {/* Center Stage: Monumental Cardless Floating Island */}
+      {/* Center Stage: Cardless Floating Island with Responsive Mobile Sizing */}
       <div className="relative z-10 flex flex-col items-center justify-center">
         <div
-          className="relative z-10 w-[320px] h-[320px] sm:w-[460px] sm:h-[460px] md:w-[560px] md:h-[560px] lg:w-[620px] lg:h-[620px] xl:w-[720px] xl:h-[720px] 2xl:w-[800px] 2xl:h-[800px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-transform duration-300"
+          className="relative z-10 w-[220px] h-[220px] sm:w-[360px] sm:h-[360px] md:w-[480px] md:h-[480px] lg:w-[560px] lg:h-[560px] xl:w-[660px] xl:h-[660px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-transform duration-300"
         >
           <Image
             src={currentIsland.image}
             alt={currentIsland.name}
             fill
             priority
-            sizes="(max-width: 640px) 320px, (max-width: 1024px) 560px, (max-width: 1536px) 720px, 800px"
+            sizes="(max-width: 640px) 220px, (max-width: 1024px) 480px, 660px"
             className="object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)] select-none"
             style={{ imageRendering: 'pixelated' }}
           />
         </div>
 
         {/* Natural Floating Ground Shadow */}
-        <div className="w-[240px] sm:w-[340px] md:w-[440px] lg:w-[480px] xl:w-[560px] 2xl:w-[640px] h-3.5 sm:h-4.5 rounded-full bg-[#1A3629]/15 blur-[4px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
+        <div className="w-[180px] sm:w-[280px] md:w-[380px] lg:w-[440px] xl:w-[520px] h-3 sm:h-4.5 rounded-full bg-[#1A3629]/15 blur-[4px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
       </div>
 
       {/* Flavor Narrative & Tactile Progression Rail */}
@@ -89,6 +147,14 @@ export function LivingIslandHero() {
           </div>
         </div>
       </div>
+
+      {/* 10-Tier Island Biome Gallery Modal */}
+      <IslandBiomeGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        currentLevel={progress.level}
+        totalXp={totalXp}
+      />
     </div>
   );
 }

@@ -31,6 +31,8 @@ function DashboardContent() {
     setDate,
     userSession,
     userProfile,
+    streakCount,
+    streakFreezeStock,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -53,6 +55,11 @@ function DashboardContent() {
   const isViewingToday = currentDate === todayDateStr;
   const todayLog = getDailyLog(currentDate);
 
+  const habitsDoneToday = useMemo(() => {
+    return todayLog?.habitsCompleted ? Object.values(todayLog.habitsCompleted).filter(Boolean).length : 0;
+  }, [todayLog]);
+  const isStreakSecured = habitsDoneToday > 0;
+
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const currentProtein = todayLog.totalProteinLogged || 0;
 
@@ -69,16 +76,41 @@ function DashboardContent() {
       <HeaderNav />
 
       {/* Main Member Workspace Container — Panoramic Cockpit Breadth */}
-      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-24 pb-20 flex flex-col gap-6">
+      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-24 pb-32 flex flex-col gap-6">
         
         {/* Cockpit Status Header Row: Clean, Editorial, Quiet */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1A3629]/8 pb-4">
-          <div>
-            <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
-              {activeTab === 'today' && 'Daily Cockpit'}
-              {(activeTab === 'log' || activeTab === 'fuel') && 'Daily Nutrition Log'}
-              {activeTab === 'dossier' && 'Weekly Intelligence Dossier'}
-            </h1>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
+                {activeTab === 'today' && 'Daily Cockpit'}
+                {(activeTab === 'log' || activeTab === 'fuel') && 'Daily Nutrition Log'}
+                {activeTab === 'dossier' && 'Weekly Intelligence Dossier'}
+              </h1>
+
+              {/* Subtle Streak Preservation Reminder */}
+              {streakCount > 0 && activeTab === 'today' && isViewingToday && (
+                isStreakSecured ? (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs shadow-2xs">
+                    <span>🔥</span>
+                    <span>{streakCount}-day streak</span>
+                    <span className="text-[10px] font-mono opacity-75">&middot; secured today</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF7ED] border border-[#FDBA74]/60 text-[#9A3412] font-cabinet font-bold text-xs shadow-2xs">
+                    <span>🔥</span>
+                    <span>{streakCount}-day streak at stake</span>
+                    <span className="text-[10px] font-mono opacity-80">&middot; check 1 habit</span>
+                    {streakFreezeStock > 0 && (
+                      <span className="text-[10px] font-mono text-[#065F46] bg-[#FFFDF9] px-1.5 py-0.2 rounded-full border border-[#10B981]/20">
+                        🛡️ {streakFreezeStock}
+                      </span>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+
             <p className="text-xs text-[#4A5D4E] font-sans mt-0.5">
               {activeTab === 'today' && (isViewingToday ? 'Full-screen living sanctuary diorama, daily habit ledger, and circadian rhythm.' : `Archived daily log for ${currentDate}.`)}
               {(activeTab === 'log' || activeTab === 'fuel') && 'Log daily whole foods with AI, verify portions, and calibrate protein.'}

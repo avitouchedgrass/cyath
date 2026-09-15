@@ -8,6 +8,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SingleRecipeJsonLd } from '@/components/seo/JsonLd';
 import { RECIPES, Recipe } from '@/lib/recipes';
+import { RecipeNutritionDetail } from '@/components/recipes/RecipeNutritionDetail';
 import { Clock, Flame, Dumbbell, ArrowRight, CheckCircle2, ChevronRight } from 'lucide-react';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
@@ -101,7 +102,7 @@ export default async function RecipeDetailPage({
       <HeaderNav />
 
       <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 lg:px-12 pt-28 pb-20">
-        
+
         {/* Breadcrumb Navigation */}
         <div className="mb-6">
           <Breadcrumbs
@@ -114,7 +115,7 @@ export default async function RecipeDetailPage({
 
         {/* Recipe Article Container */}
         <article className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-10 mb-12">
-          
+
           {/* Header Area */}
           <header className="border-b border-[#1A3629]/10 pb-8 mb-8">
             <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -163,7 +164,7 @@ export default async function RecipeDetailPage({
 
           {/* Body Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
+
             {/* Left Column: Visual & Interactive Scaler CTA */}
             <div className="lg:col-span-5 flex flex-col space-y-6">
               <div className="relative aspect-square w-full rounded-3xl border border-[#1A3629]/15 bg-[#FAF6EE] overflow-hidden flex items-center justify-center p-6 shadow-2xs">
@@ -224,15 +225,18 @@ export default async function RecipeDetailPage({
 
             {/* Right Column: Ingredients & Step-by-Step Instructions */}
             <div className="lg:col-span-7 space-y-8">
-              
+
               {/* Metabolic Philosophy Description */}
               <div>
                 <h2 className="font-cabinet font-bold text-xl text-[#1A3629] mb-2.5">
                   Metabolic Calibration
                 </h2>
-                <p className="text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B]">
+                <p className="text-sm font-cabinet font-medium leading-relaxed text-[#2C4A3B] mb-6">
                   {recipe.description}
                 </p>
+
+                {/* Macro & Micro Nutrient Analysis */}
+                <RecipeNutritionDetail recipe={recipe} portionMultiplier={1.0} />
               </div>
 
               {/* Ingredients List */}

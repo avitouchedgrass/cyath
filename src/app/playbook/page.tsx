@@ -12,6 +12,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { PixelSteam } from '@/components/landing/PixelSteam';
+import { RecipeNutritionDetail } from '@/components/recipes/RecipeNutritionDetail';
 import { Search, Plus, Check, Clock, Zap, Bot, X, Utensils, Activity } from 'lucide-react';
 
 const CATEGORIES = ['All', 'High Protein', 'Steady Carbs', 'Quick Fuel', 'Keto Clean'] as const;
@@ -637,6 +638,12 @@ function PlaybookContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Accurate Macro & Micro Nutritional Breakdown */}
+              <RecipeNutritionDetail
+                recipe={selectedRecipe}
+                portionMultiplier={portionMultiplier}
+              />
 
               {/* Ingredients & Instructions Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1">

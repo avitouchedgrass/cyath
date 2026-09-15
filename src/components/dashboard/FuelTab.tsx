@@ -6,19 +6,17 @@ import { RECIPES, Recipe } from '@/lib/recipes';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { retroAudio } from '@/lib/retroAudio';
+import { RecipeNutritionDetail } from '@/components/recipes/RecipeNutritionDetail';
+import { PixelSteam } from '@/components/landing/PixelSteam';
 import {
   Utensils,
   Plus,
   Check,
   Camera,
   Trash2,
-  Droplet,
   Search,
   Award,
-  Sparkles,
   Loader2,
-  BookmarkPlus,
-  AlertCircle,
 } from 'lucide-react';
 
 interface MissingPortionItem {
@@ -66,6 +64,10 @@ export function FuelTab() {
   const [initialRecipeToSave, setInitialRecipeToSave] = useState<Recipe | null>(null);
   const [savingMealId, setSavingMealId] = useState<string | null>(null);
 
+  // Recipe nutrition inspection modal state
+  const [inspectedRecipe, setInspectedRecipe] = useState<Recipe | null>(null);
+  const [inspectedPortion, setInspectedPortion] = useState<number>(1.0);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleAiParseAndLog = async (overrideClarifications?: Record<string, string>) => {
@@ -111,7 +113,7 @@ export function FuelTab() {
         retroAudio.playInspectConfirm();
 
         const dietBadge = data.dietType ? data.dietType.charAt(0).toUpperCase() + data.dietType.slice(1) : 'Logged';
-        setFeedback(`✓ Logged "${data.mealName}" (+${data.protein}g Protein · ${dietBadge} · +20 XP)`);
+        setFeedback(`Logged "${data.mealName}" (+${data.protein}g Protein · ${dietBadge} · +20 XP)`);
         setMealText('');
         setMissingItems(null);
         setClarifications({});
@@ -131,7 +133,7 @@ export function FuelTab() {
       }, currentDate);
 
       retroAudio.playInspectConfirm();
-      setFeedback(`✓ Logged "${fallbackName}" (+30g Protein)`);
+      setFeedback(`Logged "${fallbackName}" (+30g Protein)`);
       setMealText('');
       setMissingItems(null);
       setClarifications({});
@@ -347,7 +349,7 @@ export function FuelTab() {
           {missingItems && missingItems.length > 0 && (
             <div className="bg-[#FAF8F5] rounded-2xl p-4 border border-[#C9A84C]/40 flex flex-col gap-3 animate-in fade-in duration-150 shadow-2xs">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-[#C9A84C] shrink-0 mt-0.5" />
+                <span className="font-mono text-[10px] font-bold text-[#C9A84C] shrink-0 mt-0.5 w-4 h-4 rounded-full border border-[#C9A84C] flex items-center justify-center">!</span>
                 <div>
                   <h4 className="font-cabinet font-bold text-xs sm:text-sm text-[#1A3629]">
                     Specify Serving Sizes for All Items
@@ -459,7 +461,7 @@ export function FuelTab() {
           <div className="flex items-center justify-between text-xs font-sans text-[#4A5D4E] pt-0.5">
             <span>Threshold floor: {Math.round(targetProtein * 0.75)}g</span>
             <span className="font-mono font-semibold text-[#1A3629]">
-              {proteinPct >= 100 ? 'Target Met ✓' : `${targetProtein - currentProtein}g remaining`}
+              {proteinPct >= 100 ? 'Target Met' : `${targetProtein - currentProtein}g remaining`}
             </span>
           </div>
         </div>
@@ -468,7 +470,7 @@ export function FuelTab() {
         <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-5 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Droplet className="w-3.5 h-3.5 text-[#1A3629]" />
+              <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
               <span className="font-cabinet font-bold text-sm text-[#1A3629]">Cellular Hydration</span>
             </div>
             <span className="font-mono text-xs font-semibold text-[#1A3629] tabular-nums bg-[#FAF8F5] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
@@ -597,7 +599,7 @@ export function FuelTab() {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-cabinet text-xs font-bold transition-all cursor-pointer shadow-2xs"
                       title="Save as permanent recipe in catalog"
                     >
-                      <BookmarkPlus className="w-3.5 h-3.5" />
+                      <Plus className="w-3.5 h-3.5" />
                       <span>Save as Recipe</span>
                     </button>
                   ) : (
@@ -720,12 +722,32 @@ export function FuelTab() {
                   <p className="font-sans text-xs text-[#4A5D4E] line-clamp-2 leading-relaxed">
                     {recipe.subtitle}
                   </p>
+
+                  {/* Proportional Segmented Macro Caloric Mini-Bar */}
+                  {recipe.macros && (
+                    <div
+                      className="w-full h-1.5 rounded-full bg-[#EAE3D2] overflow-hidden flex border border-[#1A3629]/10 mt-1 cursor-help"
+                      title={`Protein: ${recipe.macros.proteinCalPct}%, Carbs: ${recipe.macros.carbsCalPct}%, Fats: ${recipe.macros.fatsCalPct}%`}
+                    >
+                      <div className="h-full bg-[#065F46]" style={{ width: `${recipe.macros.proteinCalPct}%` }} />
+                      <div className="h-full bg-[#D97706]" style={{ width: `${recipe.macros.carbsCalPct}%` }} />
+                      <div className="h-full bg-[#E11D48]" style={{ width: `${recipe.macros.fatsCalPct}%` }} />
+                    </div>
+                  )}
                 </div>
 
-                <div className="p-3 border-t border-[#1A3629]/8 bg-[#FFFDF9] flex items-center justify-between">
-                  <span className="font-mono text-[11px] text-[#4A5D4E]">
-                    {recipe.calories} kcal · {recipe.prepTimeMinutes}m
-                  </span>
+                <div className="p-3 border-t border-[#1A3629]/8 bg-[#FFFDF9] flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playInspectConfirm();
+                      setInspectedPortion(1.0);
+                      setInspectedRecipe(recipe);
+                    }}
+                    className="text-[11px] font-mono font-bold text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <span>{recipe.calories} kcal · Macros &amp; Micros</span>
+                  </button>
 
                   <button
                     type="button"
@@ -763,6 +785,90 @@ export function FuelTab() {
           setIsScanModalOpen(false);
         }}
       />
+
+      {/* 7. Recipe Nutritional Inspection Modal */}
+      {inspectedRecipe && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/40 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setInspectedRecipe(null)}
+        >
+          <div
+            className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-[0_16px_36px_rgba(26,54,41,0.16)] p-6 sm:p-7 flex flex-col gap-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]">
+                    {inspectedRecipe.category}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border border-[#10B981]/30 bg-[#ECFDF5] text-[#065F46]">
+                    {inspectedRecipe.dietType}
+                  </span>
+                </div>
+                <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] mt-1">
+                  {inspectedRecipe.name}
+                </h3>
+                <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+                  {inspectedRecipe.subtitle}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setInspectedRecipe(null)}
+                className="text-xs font-mono font-bold w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-[#FAF8F5]/80 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Food Plate Presentation with Pixel Steam & Shadow */}
+            <div className="w-full flex items-center justify-center py-3 relative bg-[#FAF8F5] rounded-2xl border border-[#1A3629]/10">
+              <div className="w-36 h-36 relative flex items-center justify-center">
+                <PixelSteam active={true} intensity={1.0} />
+                <img
+                  src={inspectedRecipe.image}
+                  alt={inspectedRecipe.name}
+                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.18)] select-none pointer-events-none"
+                />
+              </div>
+            </div>
+
+            {/* Live Accurate Macros & Micros Breakdown */}
+            <RecipeNutritionDetail
+              recipe={inspectedRecipe}
+              portionMultiplier={inspectedPortion}
+            />
+
+            {/* Action Strip */}
+            <div className="flex items-center justify-between pt-3 border-t border-[#1A3629]/10">
+              <button
+                type="button"
+                onClick={() => setInspectedRecipe(null)}
+                className="px-4 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleLogCatalogRecipe(inspectedRecipe);
+                  setInspectedRecipe(null);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Log to Daily Journal (+25 XP)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

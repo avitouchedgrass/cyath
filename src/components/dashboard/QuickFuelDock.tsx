@@ -46,10 +46,10 @@ export function QuickFuelDock() {
       <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/15">
         <div className="min-w-0">
           <h2 className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629] truncate">
-            Quick Fuel Telemetry
+            Quick Nutrition Presets
           </h2>
           <p className="font-cabinet text-xs text-[#4A5D4E] truncate">
-            Amino acid anchor & cell volume calibration.
+            One-tap protein and hydration logging.
           </p>
         </div>
 

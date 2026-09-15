@@ -31,7 +31,7 @@ export function TacticalStatusDock() {
   return (
     <>
       <section 
-        aria-label="Daily Telemetry and Desk Rituals"
+        aria-label="Daily Routines and Desk Check-ins"
         className="w-full border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4 transition-all"
       >
         {/* Progression & Sanctuary Block */}

@@ -98,7 +98,7 @@ export function BiologicalReflectionMatrix() {
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
             <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#1A3629]/70">
-              LIVE BIOME TELEMETRY · OBSERVATORY
+              LIVE SANCTUARY STATUS · OBSERVATORY
             </span>
           </div>
           <h2 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] mt-2 tracking-tight">
@@ -140,7 +140,7 @@ export function BiologicalReflectionMatrix() {
             <span className="w-2 h-2 rounded-full bg-[#1A3629] animate-pulse" />
             {actionNotice}
           </span>
-          <span className="text-[10px] opacity-70">TELEMETRY UPDATED</span>
+          <span className="text-[10px] opacity-70">SANCTUARY UPDATED</span>
         </div>
       )}
 

@@ -374,7 +374,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h3 className="font-cabinet font-bold text-lg text-[#991B1B]">
-                  Danger Zone · Account Telemetry &amp; Reset
+                  Danger Zone · Account Data &amp; Reset
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#7F1D1D] mt-0.5 max-w-xl leading-relaxed">
                   Reset your account progression back to Level 1 (0 XP) with fresh daily habits, or permanently purge all database records.

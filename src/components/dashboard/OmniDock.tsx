@@ -354,7 +354,7 @@ export function OmniDock() {
         {feedback && (
           <div className="text-xs font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-lg flex items-center justify-between animate-in fade-in">
             <span>{feedback}</span>
-            <span className="text-[10px] text-[#065F46]/60">Telemetry Synced</span>
+            <span className="text-[10px] text-[#065F46]/60">Logged &amp; Saved</span>
           </div>
         )}
       </form>

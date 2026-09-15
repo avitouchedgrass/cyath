@@ -186,7 +186,7 @@ export function CommandPalette() {
     items.push({
       id: 'metric-pro-25',
       category: 'METRIC',
-      categoryLabel: 'RAPID TELEMETRY',
+      categoryLabel: 'QUICK ACTIONS',
       glyph: '+',
       title: 'Quick Add +25g Protein',
       description: `Current total: ${currentLog.totalProteinLogged}g -> ${currentLog.totalProteinLogged + 25}g`,
@@ -203,7 +203,7 @@ export function CommandPalette() {
     items.push({
       id: 'metric-water-0.5',
       category: 'METRIC',
-      categoryLabel: 'RAPID TELEMETRY',
+      categoryLabel: 'QUICK ACTIONS',
       glyph: '+',
       title: 'Quick Add +0.5L Water',
       description: `Current total: ${currentLog.hydrationLiters}L -> ${(currentLog.hydrationLiters + 0.5).toFixed(1)}L`,
@@ -220,7 +220,7 @@ export function CommandPalette() {
     items.push({
       id: 'metric-sleep-8',
       category: 'METRIC',
-      categoryLabel: 'RAPID TELEMETRY',
+      categoryLabel: 'QUICK ACTIONS',
       glyph: '◷',
       title: 'Record 8.0h Sleep Duration',
       description: 'Set previous night recovery duration',
@@ -237,7 +237,7 @@ export function CommandPalette() {
     items.push({
       id: 'metric-energy-8',
       category: 'METRIC',
-      categoryLabel: 'RAPID TELEMETRY',
+      categoryLabel: 'QUICK ACTIONS',
       glyph: '▲',
       title: 'Rate Daily Energy: Level 8 / 10',
       description: 'Record high vigor and steady alertness',
@@ -258,7 +258,7 @@ export function CommandPalette() {
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: '↗',
       title: 'Go to Dashboard Cockpit',
-      description: 'Daily directives, telemetry dock, and habit checklist',
+      description: 'Daily goals, habit checklist, and fuel tracking',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
@@ -342,7 +342,7 @@ export function CommandPalette() {
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: '✦',
       title: 'Launch Interactive Pioneer Walkthrough',
-      description: 'Step-by-step spotlight tour across cockpit, habits, fuel telemetry & AI coach',
+      description: 'Step-by-step spotlight tour across cockpit, habits, food log & AI coach',
       badge: 'TOUR',
       action: () => {
         setIsOpen(false);

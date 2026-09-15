@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { useHabitStore, LoggedMealEntry } from '@/store/useHabitStore';
 import { RECIPES, Recipe } from '@/lib/recipes';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
+import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { retroAudio } from '@/lib/retroAudio';
 import {
   Utensils,
@@ -61,6 +62,7 @@ export function FuelTab() {
 
   // Permanent recipe conversion modal state
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [initialRecipeToSave, setInitialRecipeToSave] = useState<Recipe | null>(null);
   const [savingMealId, setSavingMealId] = useState<string | null>(null);
 
@@ -281,9 +283,12 @@ export function FuelTab() {
 
           <button
             type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent('open-ai-coach'))}
+            onClick={() => {
+              retroAudio.playInspectConfirm();
+              setIsScanModalOpen(true);
+            }}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer self-start sm:self-auto shadow-2xs"
-            title="Scan meal photo with AI Coach"
+            title="Scan meal photo or upload plate image"
           >
             <Camera className="w-3.5 h-3.5" />
             <span>AI Photo Scan</span>
@@ -680,8 +685,29 @@ export function FuelTab() {
             {allAvailableRecipes.slice(0, 9).map((recipe) => (
               <div
                 key={recipe.id}
-                className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] overflow-hidden flex flex-col justify-between hover:border-[#1A3629]/25 transition-all group"
+                className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] overflow-hidden flex flex-col justify-between hover:border-[#1A3629]/25 transition-all group shadow-2xs"
               >
+                {/* Pixel Art Food Sprite Presentation */}
+                <div className="w-full flex items-center justify-center py-3 bg-[#FFFDF9]/60 border-b border-[#1A3629]/6">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 relative flex items-center justify-center">
+                    <img
+                      src={recipe.image}
+                      alt={recipe.name}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.src.includes('.webp')) {
+                          target.src = target.src.replace('.webp', '.png');
+                        } else if (!target.src.endsWith('generic-plate.webp')) {
+                          target.src = '/assets/food/generic-plate.webp';
+                        }
+                      }}
+                      className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[4px_4px_0px_rgba(26,54,41,0.08)] group-hover:scale-105 transition-transform duration-200 select-none"
+                    />
+                  </div>
+                </div>
+
                 <div className="p-4 flex flex-col gap-2">
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-tight">
@@ -726,6 +752,16 @@ export function FuelTab() {
         }}
         onSaveRecipe={handleSaveRecipeConfirm}
         initialRecipe={initialRecipeToSave}
+      />
+
+      {/* 6. AI Photo Scan Modal */}
+      <ScanRecipeModal
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
+        onSaveRecipe={(recipe) => {
+          handleSaveRecipeConfirm(recipe);
+          setIsScanModalOpen(false);
+        }}
       />
 
     </div>

@@ -92,18 +92,18 @@ function DashboardContent() {
               {streakCount > 0 && activeTab === 'today' && isViewingToday && (
                 isStreakSecured ? (
                   <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs shadow-2xs">
-                    <span>🔥</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
                     <span>{streakCount}-day streak</span>
                     <span className="text-[10px] font-mono opacity-75">&middot; secured today</span>
                   </div>
                 ) : (
                   <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF7ED] border border-[#FDBA74]/60 text-[#9A3412] font-cabinet font-bold text-xs shadow-2xs">
-                    <span>🔥</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C] animate-pulse" />
                     <span>{streakCount}-day streak at stake</span>
                     <span className="text-[10px] font-mono opacity-80">&middot; check 1 habit</span>
                     {streakFreezeStock > 0 && (
-                      <span className="text-[10px] font-mono text-[#065F46] bg-[#FFFDF9] px-1.5 py-0.2 rounded-full border border-[#10B981]/20">
-                        🛡️ {streakFreezeStock}
+                      <span className="text-[10px] font-mono text-[#065F46] bg-[#FFFDF9] px-1.5 py-0.5 rounded-full border border-[#10B981]/20">
+                        {streakFreezeStock} freeze saved
                       </span>
                     )}
                   </div>

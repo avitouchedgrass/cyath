@@ -118,7 +118,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                     : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                No Caffeine ✨
+                No Caffeine
               </button>
               <button
                 type="button"
@@ -132,7 +132,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                     : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                Before 2 PM ✓
+                Before 2 PM
               </button>
               <button
                 type="button"
@@ -146,7 +146,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                     : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                Late Caffeine ⚠️
+                Late Caffeine
               </button>
             </div>
           </div>
@@ -176,7 +176,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
                       : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                   }`}
                 >
-                  {rating}★
+                  {rating}
                 </button>
               ))}
             </div>

@@ -39,7 +39,7 @@ export function LivingIslandHero() {
     if (typeof window !== 'undefined') {
       xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 3, 24);
     }
-    const shareText = `🌲 I'm at Level ${progress.level} (${currentIsland.name}) in Cyath! Building daily habits and steady focus. Explore your floating sanctuary at https://cyath.space`;
+    const shareText = `I'm at Level ${progress.level} (${currentIsland.name}) in Cyath. Building daily habits and steady focus. Explore your floating sanctuary at https://cyath.space`;
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
@@ -53,7 +53,7 @@ export function LivingIslandHero() {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(shareText);
-        setShareNotice('Sanctuary share link copied to clipboard! ✨');
+        setShareNotice('Sanctuary share link copied to clipboard.');
         setTimeout(() => setShareNotice(null), 3000);
       } catch {}
     }
@@ -88,7 +88,7 @@ export function LivingIslandHero() {
             }}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer shadow-2xs"
           >
-            <span>🏛️ Biomes</span>
+            <span>Biome Gallery</span>
           </button>
 
           <button
@@ -96,7 +96,7 @@ export function LivingIslandHero() {
             onClick={handleShare}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#1A3629]/15 bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-2xs active:scale-95"
           >
-            <span>Share Sanctuary ↗</span>
+            <span>Share Sanctuary</span>
           </button>
         </div>
 

@@ -97,7 +97,7 @@ export function CoreHabitsCard() {
         {/* Flawless Completion Ribbon */}
         {completedCoreCount === coreHabits.length && (
           <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs mt-2 animate-in fade-in">
-            <span>✨ All Core Habits Complete</span>
+            <span>All Core Habits Complete</span>
             <span className="font-mono text-[10px]">+45 XP Earned</span>
           </div>
         )}
@@ -177,7 +177,7 @@ export function CoreHabitsCard() {
               </div>
             </div>
             <span className="font-mono text-[11px] font-semibold text-[#1A3629]/80 bg-[#FFFDF9] border border-[#1A3629]/10 px-2.5 py-0.5 rounded-full shrink-0">
-              {ritual.morningBootCompleted ? 'Done ✓' : 'Start →'}
+              {ritual.morningBootCompleted ? 'Done' : 'Start →'}
             </span>
           </button>
 
@@ -196,11 +196,11 @@ export function CoreHabitsCard() {
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-cabinet font-bold text-xs text-[#1A3629]">Evening Wrap</span>
-                <span className="font-sans text-[11px] text-[#4A5D4E]">Wind-Down Protocol</span>
+                <span className="font-sans text-[11px] text-[#4A5D4E]">Caffeine & Screen Cutoff</span>
               </div>
             </div>
             <span className="font-mono text-[11px] font-semibold text-[#1A3629]/80 bg-[#FFFDF9] border border-[#1A3629]/10 px-2.5 py-0.5 rounded-full shrink-0">
-              {ritual.eveningWrapCompleted ? 'Done ✓' : 'Start →'}
+              {ritual.eveningWrapCompleted ? 'Done' : 'Start →'}
             </span>
           </button>
         </div>

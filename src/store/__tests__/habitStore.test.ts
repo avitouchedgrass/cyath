@@ -273,7 +273,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(extractReferralCode(null)).toBe('');
   });
 
-  it('completes pioneer walkthrough and awards +50 XP calibration quest bonus', () => {
+  it('completes pioneer walkthrough and awards +25 XP calibration quest bonus', () => {
     const userId = 'user_pioneer_1';
     useHabitStore.getState().setUserSession({ id: userId, email: 'pioneer@gmail.com' });
     useHabitStore.getState().updateUserProfile({ fullName: 'Pioneer Scout' });
@@ -285,16 +285,16 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     useHabitStore.getState().completeWalkthrough();
 
     expect(useHabitStore.getState().userProfile?.walkthroughCompleted).toBe(true);
-    expect(useHabitStore.getState().totalXp).toBe(50);
+    expect(useHabitStore.getState().totalXp).toBe(25);
     expect(useHabitStore.getState().xpHistory[0].reason).toBe('Pioneer Calibration Complete');
 
     // Recompleting walkthrough should NOT award additional XP
     useHabitStore.getState().completeWalkthrough();
-    expect(useHabitStore.getState().totalXp).toBe(50);
+    expect(useHabitStore.getState().totalXp).toBe(25);
     expect(useHabitStore.getState().xpHistory.length).toBe(1);
   });
 
-  it('manages daily command protocol commitments, rewards +50 XP, and executes desk rituals', () => {
+  it('manages daily command protocol commitments, rewards calibrated XP, and executes desk rituals', () => {
     const today = formatLocalDate();
     useHabitStore.getState().setDate(today);
 
@@ -334,24 +334,24 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(briefing.greeting).toContain('John');
     expect(briefing.yesterdayHighlights.length).toBeGreaterThan(0);
 
-    // 3. Store actions: Accept Protocol
+    // 3. Store actions: Accept Protocol (+15 XP)
     expect(useHabitStore.getState().dailyProtocolsAcceptedByDate[today]).toBeUndefined();
     const initialXp = useHabitStore.getState().totalXp;
 
     useHabitStore.getState().acceptDailyProtocol(today);
     expect(useHabitStore.getState().dailyProtocolsAcceptedByDate[today]).toBe(true);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
 
     // Second accept should be idempotent
     useHabitStore.getState().acceptDailyProtocol(today);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
 
-    // 4. Store actions: Complete Protocol
+    // 4. Store actions: Complete Protocol (+25 XP)
     useHabitStore.getState().completeDailyProtocol(today);
     expect(useHabitStore.getState().dailyProtocolsCompletedByDate[today]).toBe(true);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 40);
 
-    // 5. Store actions: Morning Boot
+    // 5. Store actions: Morning Boot (+15 XP ritual + 15 XP sunlight habit = +30 XP)
     useHabitStore.getState().completeMorningBoot({
       sleepHours: 8.0,
       restedRating: 9,
@@ -364,21 +364,21 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(rituals.morningRestedRating).toBe(9);
     expect(rituals.targetFocusHours).toBe(5);
     expect(useHabitStore.getState().getDailyLog(today).sleepHours).toBe(8.0);
-    // Morning Boot awards +50 XP ritual + 15 XP for checking the sunlight habit
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 165);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 70);
 
-    // 6. Store actions: Evening Wrap
+    // 6. Store actions: Evening Wrap with zero caffeine (+20 XP for none + 15 XP digital sunset = +35 XP)
     useHabitStore.getState().completeEveningWrap({
       caffeineCutoffRespected: true,
+      caffeineStatus: 'none',
       wholeFoodRating: 5,
       afternoonSlumpScore: 2,
     }, today);
 
     const updatedRituals = useHabitStore.getState().deskRitualsByDate[today];
     expect(updatedRituals.eveningWrapCompleted).toBe(true);
+    expect(updatedRituals.caffeineStatus).toBe('none');
     expect(updatedRituals.afternoonSlumpScore).toBe(2);
-    // Evening Wrap awards +50 XP ritual + 15 XP for checking digital sunset habit
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 230);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 105);
   });
 
   it('deduplicates custom recipes on addition and successfully logs custom recipes to daily log', () => {

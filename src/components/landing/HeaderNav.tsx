@@ -55,6 +55,7 @@ function FloatingPillNav({
           return (
             <Link 
               key={item.name} 
+              id={`tour-nav-${item.id}`}
               href={item.href}
               className={`font-cabinet font-bold text-xs sm:text-[13px] transition-all px-4 py-2 rounded-full cursor-pointer flex items-center gap-1.5 select-none ${
                 isActive
@@ -251,6 +252,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
             {/* Profile / App Entry Button */}
             {isLoggedIn ? (
               <Link
+                id="tour-nav-profile"
                 href="/profile"
                 className="border border-[#1A3629]/25 bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer h-9"
               >

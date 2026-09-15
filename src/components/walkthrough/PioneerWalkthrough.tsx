@@ -13,7 +13,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     element: '#tour-navigation',
     popover: {
       title: 'Navigation Hub',
-      description: 'Switch between your Cockpit, daily food ledger, science Playbook, and Dossier.',
+      description: 'Quickly switch between your Cockpit, Food Log, Playbook, and 7-Day Dossier.',
       side: 'bottom',
       align: 'center',
     },
@@ -22,7 +22,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     element: '#tour-living-sky',
     popover: {
       title: 'Living Sanctuary',
-      description: 'Watch your floating island evolve and level up as you complete daily routines.',
+      description: 'Your floating island grows and evolves as you stay consistent. Tap to view past biomes or share your sanctuary.',
       side: 'bottom',
       align: 'center',
     },
@@ -30,8 +30,8 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-core-habits',
     popover: {
-      title: 'Daily Routines',
-      description: 'Check off focus habits in seconds to earn XP towards island tier upgrades.',
+      title: 'Focus Habits',
+      description: 'Check off your 3 daily habits in seconds, plus quick morning and evening check-ins.',
       side: 'top',
       align: 'start',
     },
@@ -39,8 +39,8 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-fuel-anchor',
     popover: {
-      title: 'Protein & Fuel',
-      description: 'Tap quick presets or enter grams to hit your daily whole-food protein floor.',
+      title: 'Daily Fuel Targets',
+      description: 'Tap quick presets or enter grams to ensure you hit your daily protein and water goals.',
       side: 'top',
       align: 'center',
     },
@@ -48,8 +48,8 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#cockpit-log-button',
     popover: {
-      title: 'Meal Logging',
-      description: 'Log any meal with AI or pick science-calibrated dishes from the recipe catalog.',
+      title: 'Daily Nutrition Log',
+      description: 'Log whole-food dishes with natural text or camera photo scans with instant macro breakdowns.',
       side: 'bottom',
       align: 'center',
     },
@@ -58,17 +58,35 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     element: '#tour-dossier-button',
     popover: {
       title: 'Weekly Dossier',
-      description: 'Review 7-day focus hours, recovery markers, and slump reduction patterns.',
+      description: 'Track 7-day focus trends, afternoon slump reduction, and overall recovery scores.',
       side: 'bottom',
       align: 'end',
+    },
+  },
+  {
+    element: '#tour-nav-playbook',
+    popover: {
+      title: 'Science Playbook',
+      description: 'Explore whole-food recipes, interactive portion scalers, and proven daily energy protocols.',
+      side: 'bottom',
+      align: 'center',
     },
   },
   {
     element: '#tour-ai-coach',
     popover: {
       title: 'StoveSage AI Coach',
-      description: 'Get tailored recipe ideas, macro calibrations, and energy troubleshooting anytime.',
+      description: 'Ask for personalized whole-food recipes, portion advice, or energy tips anytime.',
       side: 'top',
+      align: 'end',
+    },
+  },
+  {
+    element: '#tour-nav-profile',
+    popover: {
+      title: 'Sanctuary & Shields',
+      description: 'Check your streak freeze shields, invite friends to earn bonuses, and adjust account settings.',
+      side: 'bottom',
       align: 'end',
     },
   },
@@ -104,7 +122,7 @@ export function PioneerWalkthrough() {
       popoverClass: 'cyath-driver-popover',
       nextBtnText: 'Next →',
       prevBtnText: '← Back',
-      doneBtnText: 'Complete (+50 XP)',
+      doneBtnText: 'Complete (+25 XP)',
       progressText: '{{current}} of {{total}}',
       steps: validSteps,
       onHighlightStarted: () => {
@@ -115,14 +133,20 @@ export function PioneerWalkthrough() {
         completeWalkthrough();
         retroAudio.playInspectConfirm();
         if (typeof window !== 'undefined') {
-          xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 28);
+          try {
+            const uId = userSession?.id || 'guest';
+            localStorage.setItem(`cyath_walkthrough_completed_${uId}`, 'true');
+            localStorage.setItem('cyath_walkthrough_global_completed', 'true');
+            localStorage.setItem('cyath_walkthrough_completed', 'true');
+            xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 28);
+          } catch {}
         }
       },
     });
 
     driverInstanceRef.current = driverObj;
     driverObj.drive();
-  }, [completeWalkthrough]);
+  }, [completeWalkthrough, userSession]);
 
   const handleLaunchRequest = useCallback(() => {
     if (pathname !== '/dashboard') {
@@ -177,7 +201,11 @@ export function PioneerWalkthrough() {
 
     const userId = userSession?.id || 'guest';
     const localKey = `cyath_walkthrough_completed_${userId}`;
-    const localDone = typeof window !== 'undefined' && localStorage.getItem(localKey) === 'true';
+    const localDone = typeof window !== 'undefined' && (
+      localStorage.getItem(localKey) === 'true' ||
+      localStorage.getItem('cyath_walkthrough_global_completed') === 'true' ||
+      localStorage.getItem('cyath_walkthrough_completed') === 'true'
+    );
 
     if (isMember && hasFinishedProfile && !hasFinishedTour && !localDone) {
       const timer = setTimeout(() => {

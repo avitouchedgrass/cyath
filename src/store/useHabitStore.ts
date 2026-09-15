@@ -60,6 +60,9 @@ export interface DeskRitualData {
   morningRestedRating?: number;
   afternoonSlumpScore?: number;
   targetFocusHours?: number;
+  caffeineCutoffRespected?: boolean;
+  caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff';
+  wholeFoodRating?: number;
 }
 
 export interface PendingUserAction {
@@ -177,7 +180,7 @@ export interface HabitStoreState {
   acceptDailyProtocol: (date?: string) => void;
   completeDailyProtocol: (date?: string) => void;
   completeMorningBoot: (data: { sleepHours: number; restedRating: number; sunlightDone: boolean; targetFocusHours: number }, date?: string) => void;
-  completeEveningWrap: (data: { caffeineCutoffRespected: boolean; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
+  completeEveningWrap: (data: { caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
 }
 
 const getTodayString = () => formatLocalDate();
@@ -367,7 +370,7 @@ export const useHabitStore = create<HabitStoreState>()(
           // 1. Fetch remote user profile
           const { data: profile, error: profileErr } = await supabase
             .from('user_profiles')
-            .select('total_xp, streak_count, streak_freeze_stock, full_name, age, sex, height_cm, weight_kg, primary_goal, allergies, dietary_restrictions, onboarding_completed')
+            .select('total_xp, streak_count, streak_freeze_stock, full_name, age, sex, height_cm, weight_kg, primary_goal, allergies, dietary_restrictions, onboarding_completed, walkthrough_completed')
             .eq('user_id', session.id)
             .maybeSingle();
 
@@ -1004,7 +1007,7 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        get().gainXp(50, 'Committed to Daily Protocol', 'protocol');
+        get().gainXp(15, 'Committed to Daily Protocol', 'protocol');
         retroAudio.playTierUpgrade();
       },
 
@@ -1019,7 +1022,7 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        get().gainXp(50, 'Mastered Daily Protocol', 'protocol');
+        get().gainXp(25, 'Mastered Daily Protocol', 'protocol');
         retroAudio.playTierUpgrade();
       },
 
@@ -1055,7 +1058,7 @@ export const useHabitStore = create<HabitStoreState>()(
         }));
 
         if (!currentRituals.morningBootCompleted) {
-          get().gainXp(50, 'Morning Boot Primed', 'ritual');
+          get().gainXp(15, 'Morning Boot Primed', 'ritual');
           retroAudio.playTierUpgrade();
         }
       },
@@ -1064,7 +1067,10 @@ export const useHabitStore = create<HabitStoreState>()(
         const targetDate = date || get().currentDate;
         const currentRituals = get().deskRitualsByDate[targetDate] || {};
 
-        if (data.caffeineCutoffRespected) {
+        const caffeineStatus = data.caffeineStatus || (data.caffeineCutoffRespected ? 'before_cutoff' : 'after_cutoff');
+        const cutoffRespected = caffeineStatus === 'none' || caffeineStatus === 'before_cutoff';
+
+        if (cutoffRespected) {
           const habits = get().habits;
           const sunsetHabit = habits.find((h) => h.id === 'digital_sunset' || h.title.toLowerCase().includes('sunset'));
           if (sunsetHabit) {
@@ -1082,12 +1088,17 @@ export const useHabitStore = create<HabitStoreState>()(
               ...currentRituals,
               eveningWrapCompleted: true,
               afternoonSlumpScore: data.afternoonSlumpScore,
+              caffeineCutoffRespected: cutoffRespected,
+              caffeineStatus,
+              wholeFoodRating: data.wholeFoodRating,
             },
           },
         }));
 
         if (!currentRituals.eveningWrapCompleted) {
-          get().gainXp(50, 'Evening Wrap Sealed', 'ritual');
+          const xpAward = caffeineStatus === 'none' ? 20 : cutoffRespected ? 15 : 5;
+          const label = caffeineStatus === 'none' ? 'Evening Wrap Sealed (Zero Caffeine Bonus)' : 'Evening Wrap Sealed';
+          get().gainXp(xpAward, label, 'ritual');
           retroAudio.playTierUpgrade();
         }
       },
@@ -1819,6 +1830,17 @@ export const useHabitStore = create<HabitStoreState>()(
 
       completeWalkthrough: () => {
         const profile = get().userProfile;
+        const userId = get().userSession?.id || 'guest';
+        
+        // Save persistent multi-layered local flag
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`cyath_walkthrough_completed_${userId}`, 'true');
+            localStorage.setItem('cyath_walkthrough_global_completed', 'true');
+            localStorage.setItem('cyath_walkthrough_completed', 'true');
+          } catch {}
+        }
+
         // Strictly prevent multiple XP exploits: only award calibration quest bonus once
         if (profile?.walkthroughCompleted) {
           return;
@@ -1838,7 +1860,7 @@ export const useHabitStore = create<HabitStoreState>()(
           walkthroughCompleted: true,
         };
         get().updateUserProfile(updated);
-        get().gainXp(50, 'Pioneer Calibration Complete');
+        get().gainXp(25, 'Pioneer Calibration Complete');
       },
 
       resetUserProgress: async () => {

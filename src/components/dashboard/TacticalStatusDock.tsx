@@ -8,15 +8,26 @@ import { getIslandTier } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 import { MorningBootModal } from './MorningBootModal';
 import { EveningWrapModal } from './EveningWrapModal';
+import { WeightTrackerModal } from './WeightTrackerModal';
+import { SocialQuestsModal } from '@/components/progression/SocialQuestsModal';
 
 export function TacticalStatusDock() {
-  const { currentDate, deskRitualsByDate, totalXp, streakCount } = useHabitStore();
+  const { currentDate, deskRitualsByDate, totalXp, streakCount, userProfile, weightHistory, socialQuests } = useHabitStore();
   const [isMorningModalOpen, setIsMorningModalOpen] = useState(false);
   const [isEveningModalOpen, setIsEveningModalOpen] = useState(false);
+  const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
 
   const ritualData = deskRitualsByDate[currentDate] || {};
   const morningDone = !!ritualData.morningBootCompleted;
   const eveningDone = !!ritualData.eveningWrapCompleted;
+
+  const latestEntry = weightHistory && weightHistory.length > 0 ? weightHistory[0] : null;
+  const currentWeightKg = userProfile?.weightKg || (latestEntry ? latestEntry.weightKg : 70);
+  const latestDelta = latestEntry?.deltaKg ?? 0;
+  const latestTrend = latestEntry?.trend;
+
+  const socialClaimedCount = (socialQuests?.linkedin?.status === 'verified' ? 1 : 0) + (socialQuests?.instagram?.status === 'verified' ? 1 : 0);
 
   const progress = calculateLevel(totalXp);
   const islandTier = getIslandTier(progress.level);
@@ -83,6 +94,54 @@ export function TacticalStatusDock() {
             <span className="text-[10px] font-mono text-[#4A5D4E]">
               {progress.progressPercent}% to next level
             </span>
+          </div>
+        </div>
+
+        {/* Biometric Weight Check-in & Social Quests Strip */}
+        <div className="flex flex-col gap-2 pt-1 pb-1 border-b border-[#1A3629]/15">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-mono text-xs text-[#1A3629]">
+              <span className="text-[#4A5D4E]">Weight:</span>
+              <span className="font-bold">{currentWeightKg} kg</span>
+              {latestTrend && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
+                  latestTrend === 'down'
+                    ? 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/30'
+                    : latestTrend === 'up'
+                    ? 'bg-[#EFF6FF] text-[#1E40AF] border-[#3B82F6]/30'
+                    : 'bg-[#FAF8F5] text-[#1A3629]/70 border-[#1A3629]/15'
+                }`}>
+                  {latestTrend === 'down' ? '↓' : latestTrend === 'up' ? '↑' : '→'} {latestDelta > 0 ? `+${latestDelta}` : latestDelta}kg
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                setIsWeightModalOpen(true);
+              }}
+              className="text-[11px] font-mono font-bold text-[#1A3629] hover:bg-[#FAF6EE] cursor-pointer bg-[#FFFDF9] px-2.5 py-1 rounded-lg border border-[#1A3629]/20 transition-all shadow-2xs"
+            >
+              Weight Log (+15 XP)
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] font-mono">
+            <span className="text-[#4A5D4E]">
+              Community Vanguard ({socialClaimedCount}/2)
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                setIsSocialModalOpen(true);
+              }}
+              className="font-bold text-[#065F46] hover:underline cursor-pointer"
+            >
+              {socialClaimedCount === 2 ? '✓ Social Followed' : 'Follow Cyath (+100 XP) →'}
+            </button>
           </div>
         </div>
 
@@ -186,6 +245,14 @@ export function TacticalStatusDock() {
       <EveningWrapModal
         isOpen={isEveningModalOpen}
         onClose={() => setIsEveningModalOpen(false)}
+      />
+      <WeightTrackerModal
+        isOpen={isWeightModalOpen}
+        onClose={() => setIsWeightModalOpen(false)}
+      />
+      <SocialQuestsModal
+        isOpen={isSocialModalOpen}
+        onClose={() => setIsSocialModalOpen(false)}
       />
     </>
   );

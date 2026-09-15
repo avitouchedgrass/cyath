@@ -462,5 +462,68 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(afterReconcile.loggedMeals?.length).toBeGreaterThan(0);
     expect(afterReconcile.totalProteinLogged).toBeGreaterThanOrEqual(42);
   });
+
+  it('logs weight check-in, calculates trend direction and delta, and awards +15 XP', () => {
+    const today = useHabitStore.getState().currentDate;
+    useHabitStore.getState().updateUserProfile({ weightKg: 75 });
+    const initialXp = useHabitStore.getState().totalXp;
+
+    // First weigh-in: weight goes down to 74.4 (-0.6 kg)
+    const result1 = useHabitStore.getState().logWeight(74.4, 'morning weigh-in', today);
+    expect(result1.success).toBe(true);
+    expect(result1.deltaKg).toBe(-0.6);
+    expect(result1.trend).toBe('down');
+    expect(result1.xpAwarded).toBe(15);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
+    expect(useHabitStore.getState().userProfile?.weightKg).toBe(74.4);
+
+    // Second weigh-in on same day: weight update to 74.8 (+0.4 kg)
+    const result2 = useHabitStore.getState().logWeight(74.8, 'evening weigh-in', today);
+    expect(result2.success).toBe(true);
+    expect(result2.deltaKg).toBe(0.4);
+    expect(result2.trend).toBe('up');
+    // Already weighed today, so no duplicate XP
+    expect(result2.xpAwarded).toBe(0);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
+    expect(useHabitStore.getState().userProfile?.weightKg).toBe(74.8);
+  });
+
+  it('claims social follow rewards for LinkedIn and Instagram with foolproof non-repeatable anti-duplication', () => {
+    const testUserId = 'test_user_social_vanguard';
+    useHabitStore.getState().setUserSession({ id: testUserId, email: 'vanguard@cyath.space' });
+    const initialXp = useHabitStore.getState().totalXp;
+
+    // 1. Invalid handle should fail
+    const invalid = useHabitStore.getState().claimSocialFollow('linkedin', '   ');
+    expect(invalid.success).toBe(false);
+    expect(invalid.xpAwarded).toBe(0);
+
+    // 2. Claim LinkedIn follow
+    const liResult = useHabitStore.getState().claimSocialFollow('linkedin', 'in/alex-cyath');
+    expect(liResult.success).toBe(true);
+    expect(liResult.xpAwarded).toBe(50);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+    expect(useHabitStore.getState().socialQuests.linkedin.status).toBe('verified');
+    expect(useHabitStore.getState().socialQuests.linkedin.handle).toBe('alex-cyath');
+
+    // 3. Repeat claim on same platform should be rejected
+    const repeatLi = useHabitStore.getState().claimSocialFollow('linkedin', 'in/alex-cyath');
+    expect(repeatLi.success).toBe(false);
+    expect(repeatLi.xpAwarded).toBe(0);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+
+    // 4. Claim Instagram follow
+    const igResult = useHabitStore.getState().claimSocialFollow('instagram', '@alex_cyath_ig');
+    expect(igResult.success).toBe(true);
+    expect(igResult.xpAwarded).toBe(50);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
+    expect(useHabitStore.getState().socialQuests.instagram.status).toBe('verified');
+    expect(useHabitStore.getState().socialQuests.instagram.handle).toBe('alex_cyath_ig');
+
+    // 5. Repeat claim on Instagram should also be rejected
+    const repeatIg = useHabitStore.getState().claimSocialFollow('instagram', 'alex_cyath_ig');
+    expect(repeatIg.success).toBe(false);
+    expect(repeatIg.xpAwarded).toBe(0);
+  });
 });
 

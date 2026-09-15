@@ -10,7 +10,9 @@ import { retroAudio } from '@/lib/retroAudio';
 import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass } from 'lucide-react';
+import { WeightTrackerModal } from '@/components/dashboard/WeightTrackerModal';
+import { SocialQuestsModal } from '@/components/progression/SocialQuestsModal';
+import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Share2, Scale } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -39,6 +41,8 @@ export default function ProfilePage() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -265,6 +269,24 @@ export default function ProfilePage() {
               </h2>
               <div className="space-y-3 font-mono text-xs">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                  <span className="text-[#4A5D4E]">Current Body Weight:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#1A3629]">
+                      {userProfile?.weightKg || 70} kg
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        retroAudio.playInspectConfirm();
+                        setIsWeightModalOpen(true);
+                      }}
+                      className="text-[10px] font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded hover:bg-[#D1FAE5] transition-colors cursor-pointer"
+                    >
+                      Update (+15 XP)
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Daily Protein:</span>
                   <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
@@ -287,12 +309,24 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <Link
-              href="/onboarding"
-              className="mt-6 w-full py-3 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs text-center transition-colors block"
-            >
-              Re-Calibrate Daily Targets →
-            </Link>
+            <div className="mt-6 flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playInspectConfirm();
+                  setIsWeightModalOpen(true);
+                }}
+                className="flex-1 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-semibold text-xs text-center transition-colors cursor-pointer"
+              >
+                Log Weight &amp; Trend (+15 XP)
+              </button>
+              <Link
+                href="/onboarding"
+                className="flex-1 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs text-center transition-colors block"
+              >
+                Re-Calibrate Targets →
+              </Link>
+            </div>
           </div>
 
           <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
@@ -334,6 +368,39 @@ export default function ProfilePage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Sanctuary Community Quests Card */}
+        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#10B981]/25 flex items-center justify-center shrink-0">
+              <Share2 className="w-5 h-5 text-[#065F46]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
+                  Community Quests · Follow Cyath
+                </h3>
+                <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded-full">
+                  +100 XP Total
+                </span>
+              </div>
+              <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
+                Connect on LinkedIn and Instagram to support the project and claim non-repeatable calibration bonuses.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playInspectConfirm();
+              setIsSocialModalOpen(true);
+            }}
+            className="px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
+          >
+            <span>Open Social Quests (+100 XP)</span>
+          </button>
         </div>
 
         {/* Getting Started Walkthrough Launcher Card */}
@@ -520,6 +587,16 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      <WeightTrackerModal
+        isOpen={isWeightModalOpen}
+        onClose={() => setIsWeightModalOpen(false)}
+      />
+
+      <SocialQuestsModal
+        isOpen={isSocialModalOpen}
+        onClose={() => setIsSocialModalOpen(false)}
+      />
 
     </div>
   );

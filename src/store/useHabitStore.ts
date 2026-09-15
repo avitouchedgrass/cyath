@@ -120,6 +120,28 @@ export const DEFAULT_HABITS: HabitItem[] = [
   { id: 'mobility', title: 'Thoracic Mobility & Cold Shower', category: 'recovery', targetDaysPerWeek: 6 },
 ];
 
+export interface WeightEntry {
+  id: string;
+  date: string;
+  timestamp: number;
+  weightKg: number;
+  trend: 'down' | 'up' | 'stable';
+  deltaKg: number;
+  note?: string;
+}
+
+export interface SocialQuestPlatformState {
+  status: 'unclaimed' | 'pending_verification' | 'verified';
+  handle?: string;
+  claimedAt?: number;
+  verificationCode?: string;
+}
+
+export interface SocialQuestsState {
+  linkedin: SocialQuestPlatformState;
+  instagram: SocialQuestPlatformState;
+}
+
 export interface HabitStoreState {
   currentDate: string;
   habits: HabitItem[];
@@ -140,6 +162,8 @@ export interface HabitStoreState {
   dailyProtocolsCompletedByDate: Record<string, boolean>;
   deskRitualsByDate: Record<string, DeskRitualData>;
   claimedDossiersByWeek: Record<string, boolean>;
+  weightHistory: WeightEntry[];
+  socialQuests: SocialQuestsState;
 
   setDate: (date: string) => void;
   setUserSession: (session: { id: string; email?: string } | null) => void;
@@ -181,6 +205,8 @@ export interface HabitStoreState {
   completeDailyProtocol: (date?: string) => void;
   completeMorningBoot: (data: { sleepHours: number; restedRating: number; sunlightDone: boolean; targetFocusHours: number }, date?: string) => void;
   completeEveningWrap: (data: { caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
+  logWeight: (weightKg: number, note?: string, date?: string) => { success: boolean; deltaKg: number; trend: 'down' | 'up' | 'stable'; xpAwarded: number };
+  claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => { success: boolean; message: string; xpAwarded: number };
 }
 
 const getTodayString = () => formatLocalDate();
@@ -210,7 +236,14 @@ interface UserLocalProgressData {
   userProfile?: UserProfile | null;
   habits?: HabitItem[];
   claimedDossiersByWeek?: Record<string, boolean>;
+  weightHistory?: WeightEntry[];
+  socialQuests?: SocialQuestsState;
 }
+
+const DEFAULT_SOCIAL_QUESTS: SocialQuestsState = {
+  linkedin: { status: 'unclaimed' },
+  instagram: { status: 'unclaimed' },
+};
 
 const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressData>) => {
   if (typeof window === 'undefined' || !userId || userId.startsWith('guest_')) return;
@@ -239,6 +272,8 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       userProfile: data.userProfile !== undefined ? data.userProfile : (existing.userProfile ?? null),
       habits: Array.isArray(data.habits) && data.habits.length > 0 ? data.habits : (existing.habits ?? DEFAULT_HABITS),
       claimedDossiersByWeek: data.claimedDossiersByWeek && typeof data.claimedDossiersByWeek === 'object' ? data.claimedDossiersByWeek : (existing.claimedDossiersByWeek ?? {}),
+      weightHistory: Array.isArray(data.weightHistory) ? data.weightHistory : (existing.weightHistory ?? []),
+      socialQuests: data.socialQuests && typeof data.socialQuests === 'object' ? data.socialQuests : (existing.socialQuests ?? DEFAULT_SOCIAL_QUESTS),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -281,6 +316,8 @@ export const useHabitStore = create<HabitStoreState>()(
       dailyProtocolsCompletedByDate: {},
       deskRitualsByDate: {},
       claimedDossiersByWeek: {},
+      weightHistory: [],
+      socialQuests: DEFAULT_SOCIAL_QUESTS,
 
       setDate: (date) => set({ currentDate: date }),
 
@@ -298,6 +335,8 @@ export const useHabitStore = create<HabitStoreState>()(
             customRecipes: get().customRecipes,
             userProfile: get().userProfile,
             habits: get().habits,
+            weightHistory: get().weightHistory,
+            socialQuests: get().socialQuests,
           });
         }
 
@@ -323,6 +362,8 @@ export const useHabitStore = create<HabitStoreState>()(
               habits: cached.habits && cached.habits.length > 0 ? cached.habits : DEFAULT_HABITS,
               logsByDate: cached.logsByDate ?? { [getTodayString()]: createEmptyDailyLog() },
               userProfile: cached.userProfile ?? null,
+              weightHistory: cached.weightHistory ?? [],
+              socialQuests: cached.socialQuests ?? DEFAULT_SOCIAL_QUESTS,
             });
           } else {
             // Completely fresh session for this user ID on this browser
@@ -337,6 +378,8 @@ export const useHabitStore = create<HabitStoreState>()(
               habits: DEFAULT_HABITS,
               logsByDate: { [getTodayString()]: createEmptyDailyLog() },
               userProfile: null,
+              weightHistory: [],
+              socialQuests: DEFAULT_SOCIAL_QUESTS,
             });
           }
           get().reconcileUserSession(session);
@@ -1863,6 +1906,137 @@ export const useHabitStore = create<HabitStoreState>()(
         get().gainXp(25, 'Pioneer Calibration Complete');
       },
 
+      logWeight: (weightKg: number, note?: string, date?: string) => {
+        const targetDate = date || get().currentDate;
+        const currentHistory = get().weightHistory || [];
+        const prevEntry = currentHistory.length > 0 ? currentHistory[0] : null;
+        const prevWeight = prevEntry ? prevEntry.weightKg : (get().userProfile?.weightKg || weightKg);
+        const deltaKg = Math.round((weightKg - prevWeight) * 10) / 10;
+
+        let trend: 'down' | 'up' | 'stable' = 'stable';
+        if (deltaKg < -0.1) {
+          trend = 'down';
+        } else if (deltaKg > 0.1) {
+          trend = 'up';
+        }
+
+        const newEntry: WeightEntry = {
+          id: `weight_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          date: targetDate,
+          timestamp: Date.now(),
+          weightKg: Math.round(weightKg * 10) / 10,
+          trend,
+          deltaKg,
+          note: note?.trim() || undefined,
+        };
+
+        const updatedHistory = [newEntry, ...currentHistory.filter((e) => e.date !== targetDate || Math.abs(e.timestamp - newEntry.timestamp) > 3600000)].slice(0, 60);
+
+        // Update profile weightKg
+        const currentProfile = get().userProfile;
+        if (currentProfile) {
+          get().updateUserProfile({ weightKg: newEntry.weightKg });
+        }
+
+        // Award XP if first weigh-in of the day
+        const alreadyWeighedToday = currentHistory.some((e) => e.date === targetDate);
+        let xpAwarded = 0;
+        if (!alreadyWeighedToday) {
+          get().gainXp(15, 'Biometric Calibration: Daily Weight Checked', 'weight_log');
+          xpAwarded = 15;
+          retroAudio.playTierUpgrade();
+        } else {
+          retroAudio.playInspectConfirm();
+        }
+
+        set({ weightHistory: updatedHistory });
+
+        const session = get().userSession;
+        if (session && !session.id.startsWith('guest_')) {
+          saveUserLocalProgress(session.id, {
+            weightHistory: updatedHistory,
+            userProfile: get().userProfile,
+          });
+        }
+
+        return { success: true, deltaKg, trend, xpAwarded };
+      },
+
+      claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => {
+        const cleanHandle = handle.trim()
+          .replace(/^@/, '')
+          .replace(/^(https?:\/\/)?(www\.)?(linkedin\.com\/(in\/|company\/)?|instagram\.com\/)/i, '')
+          .replace(/^in\//i, '')
+          .replace(/\/$/, '');
+        if (!cleanHandle) {
+          return { success: false, message: 'Please provide a valid account handle or profile link.', xpAwarded: 0 };
+        }
+
+        const currentSocial = get().socialQuests || DEFAULT_SOCIAL_QUESTS;
+        const existingStatus = currentSocial[platform]?.status;
+        const userId = get().userSession?.id || 'guest';
+
+        // 1. Check in-memory store state
+        if (existingStatus === 'verified') {
+          return { success: false, message: `You have already claimed the ${platform === 'linkedin' ? 'LinkedIn' : 'Instagram'} follow bonus.`, xpAwarded: 0 };
+        }
+
+        // 2. Multi-layer anti-repeat check in localStorage
+        if (typeof window !== 'undefined') {
+          try {
+            // User-level key
+            const userClaimed = localStorage.getItem(`cyath_social_${platform}_claimed_${userId}`);
+            if (userClaimed === 'true') {
+              return { success: false, message: `Reward already claimed for this account.`, xpAwarded: 0 };
+            }
+
+            // Global device-level registry of handles
+            const rawClaims = localStorage.getItem('cyath_global_social_claims');
+            const claimsMap: Record<string, string> = rawClaims ? JSON.parse(rawClaims) : {};
+            const claimKey = `${platform}:${cleanHandle.toLowerCase()}`;
+            if (claimsMap[claimKey]) {
+              return { success: false, message: `This account handle has already claimed the reward on this device.`, xpAwarded: 0 };
+            }
+
+            // Record into device claims map
+            claimsMap[claimKey] = userId;
+            localStorage.setItem('cyath_global_social_claims', JSON.stringify(claimsMap));
+            localStorage.setItem(`cyath_social_${platform}_claimed_${userId}`, 'true');
+            localStorage.setItem(`cyath_social_${platform}_claimed_global`, 'true');
+          } catch {}
+        }
+
+        const verificationToken = `CYATH-${platform.toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+        const updatedSocial: SocialQuestsState = {
+          ...currentSocial,
+          [platform]: {
+            status: 'verified',
+            handle: cleanHandle,
+            claimedAt: Date.now(),
+            verificationCode: verificationToken,
+          },
+        };
+
+        set({ socialQuests: updatedSocial });
+
+        // Award +50 XP
+        get().gainXp(50, `Vanguard Follower: Connected Cyath on ${platform === 'linkedin' ? 'LinkedIn' : 'Instagram'}`, 'social_quest');
+        retroAudio.playTierUpgrade();
+
+        // Persist to user local progress
+        if (userId && !userId.startsWith('guest_')) {
+          saveUserLocalProgress(userId, {
+            socialQuests: updatedSocial,
+          });
+        }
+
+        return {
+          success: true,
+          message: `Verified successfully! +50 XP awarded.`,
+          xpAwarded: 50,
+        };
+      },
+
       resetUserProgress: async () => {
         const userId = get().userSession?.id;
         if (userId && !userId.startsWith('guest_')) {
@@ -1891,6 +2065,8 @@ export const useHabitStore = create<HabitStoreState>()(
               habits: DEFAULT_HABITS,
               logsByDate: { [getTodayString()]: createEmptyDailyLog() },
               userProfile: null,
+              weightHistory: [],
+              socialQuests: DEFAULT_SOCIAL_QUESTS,
             });
           } catch (err) {
             console.error('Failed to reset user progress:', err);
@@ -1917,6 +2093,8 @@ export const useHabitStore = create<HabitStoreState>()(
           pendingAction: null,
           customRecipes: [],
           userProfile: null,
+          weightHistory: [],
+          socialQuests: DEFAULT_SOCIAL_QUESTS,
         });
       },
     }),
@@ -1939,6 +2117,8 @@ export const useHabitStore = create<HabitStoreState>()(
             pendingAction: state.pendingAction,
             currentDate: state.currentDate,
             customRecipes: state.customRecipes,
+            weightHistory: state.weightHistory,
+            socialQuests: state.socialQuests,
           };
         }
         return state;

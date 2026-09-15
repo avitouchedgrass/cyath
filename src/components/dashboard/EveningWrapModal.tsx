@@ -16,8 +16,12 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
   const [mounted, setMounted] = useState(false);
 
   const existingRitual = deskRitualsByDate[currentDate];
-  const [caffeineCutoffRespected, setCaffeineCutoffRespected] = useState<boolean>(true);
-  const [wholeFoodRating, setWholeFoodRating] = useState<number>(4);
+  const [caffeineStatus, setCaffeineStatus] = useState<'none' | 'before_cutoff' | 'after_cutoff'>(
+    existingRitual?.caffeineStatus || (existingRitual?.caffeineCutoffRespected === false ? 'after_cutoff' : 'before_cutoff')
+  );
+  const [wholeFoodRating, setWholeFoodRating] = useState<number>(
+    existingRitual?.wholeFoodRating ?? 4
+  );
   const [afternoonSlumpScore, setAfternoonSlumpScore] = useState<number>(
     existingRitual?.afternoonSlumpScore ?? 3
   );
@@ -40,7 +44,8 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
     e.preventDefault();
     retroAudio.playTierUpgrade();
     completeEveningWrap({
-      caffeineCutoffRespected,
+      caffeineStatus,
+      caffeineCutoffRespected: caffeineStatus === 'none' || caffeineStatus === 'before_cutoff',
       wholeFoodRating,
       afternoonSlumpScore,
     }, currentDate);
@@ -63,10 +68,10 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E]">
-                Desk Evening Shutdown
+                Evening Desk Check-In
               </span>
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
-                +50 XP
+                {caffeineStatus === 'none' ? '+20 XP' : '+15 XP'}
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
@@ -90,39 +95,58 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           
-          {/* 1. Caffeine Cutoff */}
+          {/* 1. Caffeine Intake & Cutoff */}
           <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
-            <span className="text-xs font-cabinet font-bold text-[#1A3629]">
-              Caffeine Cutoff (Prior to 2:00 PM)
-            </span>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-cabinet font-bold text-[#1A3629]">
+                Caffeine Intake &amp; Timing
+              </span>
+              <span className="font-mono text-[10px] text-[#4A5D4E]">
+                {caffeineStatus === 'none' ? '+20 XP (Optimal)' : caffeineStatus === 'before_cutoff' ? '+15 XP' : '+5 XP'}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => {
                   retroAudio.playBlip();
-                  setCaffeineCutoffRespected(true);
+                  setCaffeineStatus('none');
                 }}
-                className={`py-2 rounded-xl border text-xs font-cabinet font-bold transition-all cursor-pointer ${
-                  caffeineCutoffRespected
+                className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
+                  caffeineStatus === 'none'
                     ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
                     : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                Honored ✓
+                No Caffeine ✨
               </button>
               <button
                 type="button"
                 onClick={() => {
                   retroAudio.playBlip();
-                  setCaffeineCutoffRespected(false);
+                  setCaffeineStatus('before_cutoff');
                 }}
-                className={`py-2 rounded-xl border text-xs font-cabinet font-bold transition-all cursor-pointer ${
-                  !caffeineCutoffRespected
+                className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
+                  caffeineStatus === 'before_cutoff'
                     ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
                     : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
                 }`}
               >
-                Late Caffeine
+                Before 2 PM ✓
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playBlip();
+                  setCaffeineStatus('after_cutoff');
+                }}
+                className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
+                  caffeineStatus === 'after_cutoff'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] border-[#1A3629] shadow-2xs'
+                    : 'bg-[#FFFDF9] text-[#1A3629] border-[#1A3629]/10 hover:border-[#1A3629]/30'
+                }`}
+              >
+                Late Caffeine ⚠️
               </button>
             </div>
           </div>

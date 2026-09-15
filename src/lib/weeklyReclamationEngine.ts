@@ -141,12 +141,23 @@ export function calculateWeeklyReclamation(params: {
 
   if (slumpReductionPercent > 0) {
     insights.push(
-      `Afternoon energy dip moderated by ~${slumpReductionPercent}% (averaging ${avgCompliant}/10 vs ${avgBaseline}/10 unmitigated baseline).`
+      `Afternoon energy dip moderated by ~${slumpReductionPercent}% (averaging ${avgCompliant}/10 vs ${avgBaseline}/10 baseline).`
+    );
+  }
+
+  const zeroCaffeineDays = dailyBreakdown.filter((d) => {
+    const r = deskRitualsByDate[d.date];
+    return r?.caffeineStatus === 'none';
+  }).length;
+
+  if (zeroCaffeineDays > 0) {
+    insights.push(
+      `${zeroCaffeineDays} zero-caffeine day${zeroCaffeineDays > 1 ? 's' : ''} logged, providing deep restorative reset for your nervous system.`
     );
   }
 
   insights.push(
-    `Morning bookends and protein anchors stabilized glycemic swings past 2:00 PM.`
+    `Daily habit consistency and protein targets stabilized steady focus past 2:00 PM.`
   );
 
   const nextWeekAction =

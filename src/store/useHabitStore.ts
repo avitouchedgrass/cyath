@@ -16,6 +16,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { Recipe, RECIPES } from '@/lib/recipes';
 import { validateReferralCodeInput, KNOWN_SEED_CODES, extractReferralCode } from '@/lib/referralUtils';
 import { formatLocalDate, getLocalWeekKey } from '@/lib/dateUtils';
+import { XP_MATRIX } from '@/lib/constants/xpMatrix';
 
 export interface HabitItem {
   id: string;
@@ -52,12 +53,16 @@ export interface DailyLogData {
   notes: string;
   loggedRecipeIds: string[];
   loggedMeals?: LoggedMealEntry[];
+  isDownscaled?: boolean;
+  quickPlateType?: string | null;
+  retentionCohortDay?: number;
 }
 
 export interface DeskRitualData {
   morningBootCompleted?: boolean;
   eveningWrapCompleted?: boolean;
   morningRestedRating?: number;
+  wakeTime?: string;
   afternoonSlumpScore?: number;
   targetFocusHours?: number;
   caffeineCutoffRespected?: boolean;
@@ -86,6 +91,8 @@ export interface UserProfile {
   referredBy?: string;
   referralCount?: number;
   claimedReferral?: boolean;
+  unlockedDecorations?: string[];
+  keystoneProtocolId?: string;
   energyAudit?: {
     hoursLostPerDay: number;
     daysLostPerYear: number;
@@ -207,6 +214,9 @@ export interface HabitStoreState {
   completeEveningWrap: (data: { caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
   logWeight: (weightKg: number, note?: string, date?: string) => { success: boolean; deltaKg: number; trend: 'down' | 'up' | 'stable'; xpAwarded: number };
   claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => { success: boolean; message: string; xpAwarded: number };
+  setIsDownscaled: (date: string, isDownscaled: boolean) => void;
+  unlockDecoration: (decorationId: string) => void;
+  setKeystoneProtocol: (protocolId: string) => void;
 }
 
 const getTodayString = () => formatLocalDate();
@@ -222,7 +232,11 @@ const createEmptyDailyLog = (): DailyLogData => ({
   notes: '',
   loggedRecipeIds: [],
   loggedMeals: [],
+  isDownscaled: false,
+  quickPlateType: null,
+  retentionCohortDay: 0,
 });
+
 
 interface UserLocalProgressData {
   totalXp: number;
@@ -781,8 +795,12 @@ export const useHabitStore = create<HabitStoreState>()(
           notes: typeof rawLog.notes === 'string' ? rawLog.notes : '',
           loggedRecipeIds: Array.isArray(rawLog.loggedRecipeIds) ? rawLog.loggedRecipeIds : [],
           loggedMeals: Array.isArray(rawLog.loggedMeals) ? rawLog.loggedMeals : [],
+          isDownscaled: !!rawLog.isDownscaled,
+          quickPlateType: rawLog.quickPlateType || null,
+          retentionCohortDay: typeof rawLog.retentionCohortDay === 'number' ? rawLog.retentionCohortDay : 0,
         };
       },
+
 
       gainXp: (amount, reason, source = 'app') => {
         const safeAmount = typeof amount === 'number' && Number.isFinite(amount) ? amount : 0;
@@ -979,9 +997,12 @@ export const useHabitStore = create<HabitStoreState>()(
           };
         }
 
-        // 5. Award +250 XP to the new recruit
-        get().gainXp(250, `Guild Recruit Bonus (${cleanCode})`, 'referral');
+        // 5. Award +50 XP to the new recruit + unlock exclusive Vanguard Lantern decoration
+        get().gainXp(XP_MATRIX.GUILD_REFERRAL_REWARD, `Guild Recruit Bonus (${cleanCode})`, 'referral');
         retroAudio.playTierUpgrade();
+
+        const currentDecorations = currentProfile?.unlockedDecorations || [];
+        const updatedDecorations = Array.from(new Set([...currentDecorations, 'vanguard_lantern']));
 
         const updatedProfile: UserProfile = {
           ...(currentProfile || {
@@ -997,6 +1018,7 @@ export const useHabitStore = create<HabitStoreState>()(
           }),
           claimedReferral: true,
           referredBy: cleanCode,
+          unlockedDecorations: updatedDecorations,
           referralCode:
             currentProfile?.referralCode ||
             generateReferralCode(currentProfile?.fullName || get().userSession?.email),
@@ -1007,9 +1029,10 @@ export const useHabitStore = create<HabitStoreState>()(
         return {
           success: true,
           message: serverMessage,
-          xpAwarded: 250,
+          xpAwarded: XP_MATRIX.GUILD_REFERRAL_REWARD,
         };
       },
+
 
       claimWeeklyDossier: (weekKey) => {
         const targetKey = weekKey || getLocalWeekKey(get().currentDate);
@@ -1101,10 +1124,14 @@ export const useHabitStore = create<HabitStoreState>()(
         }));
 
         if (!currentRituals.morningBootCompleted) {
-          get().gainXp(15, 'Morning Boot Primed', 'ritual');
+          const award = data.sunlightDone
+            ? XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED
+            : XP_MATRIX.MORNING_BOOT_BASE;
+          get().gainXp(award, data.sunlightDone ? 'Morning Boot & Sunlight Primed' : 'Morning Boot Primed', 'ritual');
           retroAudio.playTierUpgrade();
         }
       },
+
 
       completeEveningWrap: (data, date) => {
         const targetDate = date || get().currentDate;
@@ -2019,9 +2046,19 @@ export const useHabitStore = create<HabitStoreState>()(
 
         set({ socialQuests: updatedSocial });
 
-        // Award +50 XP
-        get().gainXp(50, `Vanguard Follower: Connected Cyath on ${platform === 'linkedin' ? 'LinkedIn' : 'Instagram'}`, 'social_quest');
+        // Award +15 XP + Vanguard Badge
+        get().gainXp(XP_MATRIX.SOCIAL_QUEST_FOLLOW, `Vanguard Follower: Connected Cyath on ${platform === 'linkedin' ? 'LinkedIn' : 'Instagram'}`, 'social_quest');
         retroAudio.playTierUpgrade();
+
+        const currentProfile = get().userProfile;
+        const currentDecorations = currentProfile?.unlockedDecorations || [];
+        const updatedDecorations = Array.from(new Set([...currentDecorations, 'vanguard_follower_badge']));
+        if (currentProfile) {
+          get().updateUserProfile({
+            ...currentProfile,
+            unlockedDecorations: updatedDecorations,
+          });
+        }
 
         // Persist to user local progress
         if (userId && !userId.startsWith('guest_')) {
@@ -2032,12 +2069,49 @@ export const useHabitStore = create<HabitStoreState>()(
 
         return {
           success: true,
-          message: `Verified successfully! +50 XP awarded.`,
-          xpAwarded: 50,
+          message: `Verified successfully! +${XP_MATRIX.SOCIAL_QUEST_FOLLOW} XP awarded & Vanguard Badge unlocked.`,
+          xpAwarded: XP_MATRIX.SOCIAL_QUEST_FOLLOW,
         };
       },
 
+      setIsDownscaled: (date: string, isDownscaled: boolean) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              isDownscaled,
+            },
+          },
+        }));
+      },
+
+      unlockDecoration: (decorationId: string) => {
+        const currentProfile = get().userProfile;
+        if (!currentProfile) return;
+        const current = currentProfile.unlockedDecorations || [];
+        if (!current.includes(decorationId)) {
+          get().updateUserProfile({
+            ...currentProfile,
+            unlockedDecorations: [...current, decorationId],
+          });
+          retroAudio.playTierUpgrade();
+        }
+      },
+
+      setKeystoneProtocol: (protocolId: string) => {
+        const currentProfile = get().userProfile;
+        if (!currentProfile) return;
+        get().updateUserProfile({
+          ...currentProfile,
+          keystoneProtocolId: protocolId,
+        });
+      },
+
       resetUserProgress: async () => {
+
         const userId = get().userSession?.id;
         if (userId && !userId.startsWith('guest_')) {
           try {

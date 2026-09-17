@@ -8,6 +8,7 @@ import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { retroAudio } from '@/lib/retroAudio';
 import { RecipeNutritionDetail } from '@/components/recipes/RecipeNutritionDetail';
 import { PixelSteam } from '@/components/landing/PixelSteam';
+import { QuickPlateFallback } from '@/components/fuel/QuickPlateFallback';
 import {
   Utensils,
   Plus,
@@ -434,9 +435,16 @@ export function FuelTab() {
             </div>
           )}
         </form>
+
+        {/* 1-Tap Quick Plate Quality Fallback */}
+        <QuickPlateFallback onLogged={(msg) => {
+          setFeedback(msg);
+          setTimeout(() => setFeedback(null), 4000);
+        }} />
       </div>
 
       {/* 2. Today's Fuel Gauges (Protein & Hydration) */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         
         {/* Protein Target Bar */}

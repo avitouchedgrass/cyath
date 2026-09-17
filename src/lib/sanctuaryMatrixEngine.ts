@@ -24,7 +24,9 @@ export interface SanctuaryMatrixInput {
   sunlightDone: boolean;
   caffeineCutoffRespected?: boolean;
   slumpScore?: number;
+  wholeFoodScore?: number;
 }
+
 
 export interface SanctuaryMatrixResult {
   hearth: PillarTelemetry;
@@ -95,9 +97,14 @@ export function calculateSanctuaryMatrix(input: SanctuaryMatrixInput): Sanctuary
   const proteinPct = Math.min(1.15, input.totalProteinLogged / targetProtein);
   const hydrationPct = Math.min(1.15, input.hydrationLiters / targetHydration);
 
+  const wholeFoodMultiplier = typeof input.wholeFoodScore === 'number'
+    ? 0.85 + 0.15 * (Math.max(0, Math.min(100, input.wholeFoodScore)) / 100)
+    : 1.0;
+
   const canopyScore = Math.round(
-    Math.min(100, Math.max(10, (proteinPct * 0.55 + hydrationPct * 0.45) * 100))
+    Math.min(100, Math.max(10, (proteinPct * 0.55 + hydrationPct * 0.45) * 100 * wholeFoodMultiplier))
   );
+
 
   let canopyStatusTier: string;
   let canopyColor: 'emerald' | 'amber' | 'rust';

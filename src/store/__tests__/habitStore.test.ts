@@ -250,14 +250,15 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(ownClaim.success).toBe(false);
     expect(ownClaim.message).toMatch(/cannot claim your own/i);
 
-    // Claiming friend's valid code should succeed and grant +250 XP
+    // Claiming friend's valid code should succeed and grant +50 XP and Vanguard Lantern
     const friendCode = 'CYATH-7K9P';
     const validClaim = await useHabitStore.getState().claimReferralCode(friendCode);
     expect(validClaim.success).toBe(true);
-    expect(validClaim.xpAwarded).toBe(250);
-    expect(useHabitStore.getState().totalXp).toBe(250);
+    expect(validClaim.xpAwarded).toBe(50);
+    expect(useHabitStore.getState().totalXp).toBe(50);
     expect(useHabitStore.getState().userProfile?.claimedReferral).toBe(true);
     expect(useHabitStore.getState().userProfile?.referredBy).toBe(friendCode);
+    expect(useHabitStore.getState().userProfile?.unlockedDecorations).toContain('vanguard_lantern');
 
     // Claiming second time should fail
     const duplicateClaim = await useHabitStore.getState().claimReferralCode('CYATH-DIFF');
@@ -351,7 +352,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(useHabitStore.getState().dailyProtocolsCompletedByDate[today]).toBe(true);
     expect(useHabitStore.getState().totalXp).toBe(initialXp + 40);
 
-    // 5. Store actions: Morning Boot (+15 XP ritual + 15 XP sunlight habit = +30 XP)
+    // 5. Store actions: Morning Boot (+45 XP biological anchor + 15 XP sunlight habit = +60 XP)
     useHabitStore.getState().completeMorningBoot({
       sleepHours: 8.0,
       restedRating: 9,
@@ -364,7 +365,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(rituals.morningRestedRating).toBe(9);
     expect(rituals.targetFocusHours).toBe(5);
     expect(useHabitStore.getState().getDailyLog(today).sleepHours).toBe(8.0);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 70);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
 
     // 6. Store actions: Evening Wrap with zero caffeine (+20 XP for none + 15 XP digital sunset = +35 XP)
     useHabitStore.getState().completeEveningWrap({
@@ -378,7 +379,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(updatedRituals.eveningWrapCompleted).toBe(true);
     expect(updatedRituals.caffeineStatus).toBe('none');
     expect(updatedRituals.afternoonSlumpScore).toBe(2);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 105);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 135);
   });
 
   it('deduplicates custom recipes on addition and successfully logs custom recipes to daily log', () => {
@@ -498,11 +499,11 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(invalid.success).toBe(false);
     expect(invalid.xpAwarded).toBe(0);
 
-    // 2. Claim LinkedIn follow
+    // 2. Claim LinkedIn follow (now 15 XP per XP_MATRIX)
     const liResult = useHabitStore.getState().claimSocialFollow('linkedin', 'in/alex-cyath');
     expect(liResult.success).toBe(true);
-    expect(liResult.xpAwarded).toBe(50);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+    expect(liResult.xpAwarded).toBe(15);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
     expect(useHabitStore.getState().socialQuests.linkedin.status).toBe('verified');
     expect(useHabitStore.getState().socialQuests.linkedin.handle).toBe('alex-cyath');
 
@@ -510,13 +511,13 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     const repeatLi = useHabitStore.getState().claimSocialFollow('linkedin', 'in/alex-cyath');
     expect(repeatLi.success).toBe(false);
     expect(repeatLi.xpAwarded).toBe(0);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 50);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
 
-    // 4. Claim Instagram follow
+    // 4. Claim Instagram follow (now 15 XP per XP_MATRIX)
     const igResult = useHabitStore.getState().claimSocialFollow('instagram', '@alex_cyath_ig');
     expect(igResult.success).toBe(true);
-    expect(igResult.xpAwarded).toBe(50);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
+    expect(igResult.xpAwarded).toBe(15);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 30);
     expect(useHabitStore.getState().socialQuests.instagram.status).toBe('verified');
     expect(useHabitStore.getState().socialQuests.instagram.handle).toBe('alex_cyath_ig');
 

@@ -6,6 +6,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { getDailyCommandProtocol } from '@/lib/dailyProtocolEngine';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
+import { shouldTriggerRecoveryDownscale, DOWNSCALED_FOCUS_PROTOCOL } from '@/lib/engines/reentryEngine';
 
 export function CommandProtocolCard() {
   const {
@@ -14,16 +15,43 @@ export function CommandProtocolCard() {
     getDailyLog,
     dailyProtocolsAcceptedByDate,
     dailyProtocolsCompletedByDate,
+    deskRitualsByDate,
     acceptDailyProtocol,
     completeDailyProtocol,
   } = useHabitStore();
 
+  const currentLog = getDailyLog(currentDate);
+  const ritual = deskRitualsByDate[currentDate] || {};
+
+  const isDownscaled = useMemo(() => {
+    if (currentLog.isDownscaled) return true;
+    return shouldTriggerRecoveryDownscale({
+      sleepHours: currentLog.sleepHours,
+      morningRestedRating: ritual.morningRestedRating,
+    });
+  }, [currentLog.isDownscaled, currentLog.sleepHours, ritual.morningRestedRating]);
+
   const yesterdayDate = useMemo(() => getRelativeLocalDate(-1, parseLocalDate(currentDate)), [currentDate]);
   const yesterdayLog = useMemo(() => getDailyLog(yesterdayDate), [getDailyLog, yesterdayDate]);
 
-  const protocol = useMemo(() => {
+  const rawProtocol = useMemo(() => {
     return getDailyCommandProtocol(currentDate, userProfile?.primaryGoal, yesterdayLog);
   }, [currentDate, userProfile?.primaryGoal, yesterdayLog]);
+
+  const protocol = useMemo(() => {
+    if (isDownscaled) {
+      return {
+        ...rawProtocol,
+        title: DOWNSCALED_FOCUS_PROTOCOL.title,
+        directive: DOWNSCALED_FOCUS_PROTOCOL.directive,
+        mechanism: DOWNSCALED_FOCUS_PROTOCOL.mechanism,
+        expectedGain: '15m Micro-Sprint · Zero Burnout',
+        category: 'recovery' as const,
+      };
+    }
+    return rawProtocol;
+  }, [isDownscaled, rawProtocol]);
+
 
   const isAccepted = !!dailyProtocolsAcceptedByDate[currentDate];
   const isCompleted = !!dailyProtocolsCompletedByDate[currentDate];
@@ -48,10 +76,16 @@ export function CommandProtocolCard() {
           <span className="px-2.5 py-0.5 rounded-md border border-[#1A3629] bg-[#FAF6EE] text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]">
             Daily Focus Protocol · {protocol.category}
           </span>
+          {isDownscaled && (
+            <span className="px-2.5 py-0.5 rounded-md border border-[#D97706]/40 bg-[#FEF3C7] text-[10px] font-mono font-bold text-[#92400E]">
+              [MINIMUM VIABLE RE-ENTRY ACTIVE]
+            </span>
+          )}
           <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
             {protocol.expectedGain}
           </span>
         </div>
+
 
         <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#4A5D4E]">
           <span>Reward:</span>

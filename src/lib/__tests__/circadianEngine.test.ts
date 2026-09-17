@@ -60,6 +60,60 @@ describe('circadianEngine', () => {
     expect(status.alertnessScore).toBeLessThanOrEqual(40);
   });
 
+  it('calculates dynamic milestones derived from custom wake time', () => {
+    // Custom wake time 06:30 AM, Bedtime 22:00 (10:00 PM)
+    const wakeDate = new Date(2026, 8, 8, 6, 30);
+    const status = calculateCircadianStatus({
+      now: wakeDate,
+      wakeTimeStr: '06:30',
+      bedtimeTargetStr: '22:00',
+    });
+
+    const m = status.milestones;
+    expect(m.wakeTimeStr).toBe('6:30 AM');
+    // Light exposure window [06:30, 07:30]
+    expect(m.lightExposureWindow.start).toBe('6:30 AM');
+    expect(m.lightExposureWindow.end).toBe('7:30 AM');
+    expect(m.isLightWindowActive).toBe(true);
+
+    // Caffeine buffer: 06:30 + 90m = 08:00 AM
+    expect(m.adenosineCaffeineBuffer.end).toBe('8:00 AM');
+    expect(m.isCaffeinePermissible).toBe(false); // at 06:30, only 0m post wake, not permissible yet
+
+    // Caffeine hard cutoff: 06:30 + 9.5h = 16:00 (4:00 PM)
+    expect(m.caffeineHardCutoff.cutoff).toBe('4:00 PM');
+    expect(m.isPastCaffeineCutoff).toBe(false);
+
+    // Digital sunset: 22:00 - 120m = 20:00 (8:00 PM)
+    expect(m.digitalSunsetWindow.start).toBe('8:00 PM');
+    expect(m.dockPhase).toBe('morning');
+  });
+
+  it('correctly shifts dock phase to midday and evening dynamically', () => {
+    // Wake at 06:00 AM.
+    // At 10:00 AM (4h post-wake), dock phase should be midday sprint and caffeine is permissible
+    const middayDate = new Date(2026, 8, 8, 10, 0);
+    const middayStatus = calculateCircadianStatus({
+      now: middayDate,
+      wakeTimeStr: '06:00',
+      bedtimeTargetStr: '22:00',
+    });
+    expect(middayStatus.milestones.dockPhase).toBe('midday');
+    expect(middayStatus.milestones.isCaffeinePermissible).toBe(true);
+    expect(middayStatus.milestones.isPastCaffeineCutoff).toBe(false);
+
+    // At 16:00 PM (10h post-wake), past 9.5h cutoff (15:30) -> dockPhase is evening
+    const eveningDate = new Date(2026, 8, 8, 16, 0);
+    const eveningStatus = calculateCircadianStatus({
+      now: eveningDate,
+      wakeTimeStr: '06:00',
+      bedtimeTargetStr: '22:00',
+    });
+    expect(eveningStatus.milestones.dockPhase).toBe('evening');
+    expect(eveningStatus.milestones.isPastCaffeineCutoff).toBe(true);
+    expect(eveningStatus.milestones.isCaffeinePermissible).toBe(false);
+  });
+
   it('generates a full 17-point waking curve spanning the 16-hour workday', () => {
     const status = calculateCircadianStatus();
     expect(status.curvePoints.length).toBe(17);

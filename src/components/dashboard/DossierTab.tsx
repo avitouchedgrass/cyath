@@ -6,11 +6,13 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { formatLocalDate, getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
+import { exportClinicalDossierSummary } from '@/lib/exporters/dossierPdfExport';
 import {
   FileText,
   ArrowRight,
   Activity,
   CheckCircle2,
+  Printer,
 } from 'lucide-react';
 
 export function DossierTab() {
@@ -24,8 +26,10 @@ export function DossierTab() {
     getDailyLog,
     setDate,
     userProfile,
+    weightHistory,
     claimedDossiersByWeek,
   } = useHabitStore();
+
 
   const todayDateStr = useMemo(() => formatLocalDate(), []);
   const todayLog = getDailyLog(currentDate);
@@ -141,18 +145,38 @@ export function DossierTab() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              retroAudio.playInspectConfirm();
-              setIsDossierOpen(true);
-            }}
-            className="px-4 py-2 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 self-start sm:self-auto shadow-2xs"
-          >
-            <span>Open Clinical Dossier</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                exportClinicalDossierSummary({
+                  userProfile,
+                  weightHistory: weightHistory || [],
+                  logsByDate,
+                  currentDate,
+                });
+              }}
+              className="px-3.5 py-2 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+            >
+              <Printer className="w-3.5 h-3.5 text-[#1A3629]" />
+              <span>Export Clinical Summary</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                setIsDossierOpen(true);
+              }}
+              className="px-4 py-2 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <span>Open Clinical Dossier</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
+
 
         {/* 3 Metric High-Impact Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">

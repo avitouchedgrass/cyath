@@ -94,7 +94,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
                 Friend Referral Program
               </span>
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
-                +250 XP Dual Reward
+                +50 XP + Vanguard Lantern
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
@@ -113,8 +113,9 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
         </div>
 
         <p className="text-xs sm:text-sm font-sans text-[#4A5D4E] leading-relaxed">
-          Share your unique invite link. When your friend joins, they receive <strong>+250 Starter XP</strong> and you earn <strong>+250 Bonus XP</strong>!
+          Share your unique invite link. When your friend joins, you both receive <strong>+50 XP</strong> and unlock the exclusive 16-bit <strong>Vanguard Lantern</strong> decorative sprite on your island stage!
         </p>
+
 
         {/* Your Referral Code Ribbon */}
         <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

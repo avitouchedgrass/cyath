@@ -5,7 +5,8 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { calculateWeeklyReclamation } from '@/lib/weeklyReclamationEngine';
 import { retroAudio } from '@/lib/retroAudio';
 import { getLocalWeekKey } from '@/lib/dateUtils';
-import { X, Check } from 'lucide-react';
+import { exportClinicalDossierSummary } from '@/lib/exporters/dossierPdfExport';
+import { X, Check, Printer } from 'lucide-react';
 
 interface WeeklyDossierModalProps {
   isOpen: boolean;
@@ -20,7 +21,10 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
     dailyProtocolsAcceptedByDate,
     claimedDossiersByWeek,
     claimWeeklyDossier,
+    userProfile,
+    weightHistory,
   } = useHabitStore();
+
 
   const currentWeekKey = useMemo(() => getLocalWeekKey(currentDate), [currentDate]);
   const isAlreadyClaimed = !!claimedDossiersByWeek[currentWeekKey];
@@ -193,14 +197,34 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] font-cabinet text-xs font-bold text-[#1A3629] hover:bg-[#F5F1EA] cursor-pointer"
-          >
-            Close
-          </button>
+        <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10 gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] font-cabinet text-xs font-bold text-[#1A3629] hover:bg-[#F5F1EA] cursor-pointer"
+            >
+              Close
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                exportClinicalDossierSummary({
+                  userProfile,
+                  weightHistory: weightHistory || [],
+                  logsByDate,
+                  currentDate,
+                });
+              }}
+              className="px-3.5 py-2 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <Printer className="w-3.5 h-3.5 text-[#1A3629]" />
+              <span>Export Summary</span>
+            </button>
+          </div>
+
 
           {isAlreadyClaimed ? (
             <div className="px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold flex items-center gap-1.5">

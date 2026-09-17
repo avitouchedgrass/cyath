@@ -13,7 +13,11 @@ import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
 import { FuelTab } from '@/components/dashboard/FuelTab';
 import { DossierTab } from '@/components/dashboard/DossierTab';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
+import { WeeklyDossierCard } from '@/components/dashboard/WeeklyDossierCard';
+import { FirstHabitCelebration } from '@/components/onboarding/FirstHabitCelebration';
+import { evaluateUserActivity } from '@/lib/notifications/reengagementEngine';
 import { FileText, Plus, Utensils } from 'lucide-react';
+
 
 function DashboardContent() {
   const router = useRouter();
@@ -33,7 +37,11 @@ function DashboardContent() {
     userProfile,
     streakCount,
     streakFreezeStock,
+    logsByDate,
+    setIsDownscaled,
   } = useHabitStore();
+
+  const [isCelebrationOpen, setIsCelebrationOpen] = useState(false);
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
 
@@ -60,8 +68,22 @@ function DashboardContent() {
   }, [todayLog]);
   const isStreakSecured = habitsDoneToday > 0;
 
+  // Day 0-3 First Habit Celebration detection
+  const hasSproutingMoss = userProfile?.unlockedDecorations?.includes('sprouting_moss');
+  useEffect(() => {
+    if (!hasSproutingMoss && habitsDoneToday > 0) {
+      setIsCelebrationOpen(true);
+    }
+  }, [hasSproutingMoss, habitsDoneToday]);
+
+  // Day 4-21 Non-Punitive Inactivity Detection
+  const inactivityResult = useMemo(() => {
+    return evaluateUserActivity(logsByDate, currentDate);
+  }, [logsByDate, currentDate]);
+
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const currentProtein = todayLog.totalProteinLogged || 0;
+
 
   if (!mounted) {
     return (
@@ -163,6 +185,34 @@ function DashboardContent() {
         {/* TAB 1: TODAY (Full-Screen Flanked Panoramic Cockpit) */}
         {activeTab === 'today' && (
           <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">
+            
+            {/* Non-Punitive Re-engagement Re-entry Prompt */}
+            {inactivityResult.isInactivityDetected && (
+              <div className="w-full p-4 rounded-2xl border-2 border-[#1A2E26] bg-[#FFFBEB] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[3px_3px_0px_#1A2E26] animate-in fade-in">
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#92400E]">
+                    [RECOVERY RE-ENTRY MODE] · Momentum Safeguard
+                  </span>
+                  <p className="font-cabinet font-bold text-xs sm:text-sm text-[#78350F]">
+                    {inactivityResult.reentryPrompt}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playInspectConfirm();
+                    setIsDownscaled(currentDate, true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#1A2E26] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-2xs hover:bg-[#2C4A3B] transition-all cursor-pointer shrink-0"
+                >
+                  Activate 5-Min Baseline →
+                </button>
+              </div>
+            )}
+
+            {/* Sunday 6:00 PM Milestone Biological Dossier Drop */}
+            <WeeklyDossierCard onOpenDossier={() => setIsDossierOpen(true)} />
+
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-8 items-start">
               
               {/* LEFT FLANK: Daily Focus Non-Negotiables & Desk Rituals */}
@@ -189,6 +239,7 @@ function DashboardContent() {
           </div>
         )}
 
+
         {/* TAB 2: LOG */}
         {(activeTab === 'log' || activeTab === 'fuel') && (
           <div className="w-full max-w-5xl mx-auto">
@@ -211,7 +262,15 @@ function DashboardContent() {
         isOpen={isDossierOpen}
         onClose={() => setIsDossierOpen(false)}
       />
+
+      {/* Day 0–3 First Habit Celebration & Keystone Lock */}
+      <FirstHabitCelebration
+        isOpen={isCelebrationOpen}
+        onClose={() => setIsCelebrationOpen(false)}
+        habitTitle={Object.keys(todayLog?.habitsCompleted || {}).find((k) => todayLog?.habitsCompleted?.[k])}
+      />
     </div>
+
   );
 }
 

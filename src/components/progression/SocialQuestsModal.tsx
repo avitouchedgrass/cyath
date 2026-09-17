@@ -82,14 +82,14 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
                 Sanctuary Community Quests
               </span>
               <span className="font-mono text-[10px] font-bold text-[#1A3629] bg-[#E8F5E9] border border-[#10B981]/30 px-2 py-0.5 rounded-md">
-                +100 XP Total
+                +15 XP + Vanguard Badge
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] mt-1">
               Connect With Cyath
             </h2>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              Follow our official channels for human biology updates and protocols. Each channel awards +50 non-repeatable XP.
+              Follow our official channels for human biology updates. Each verified channel awards +15 XP and unlocks the permanent Vanguard Follower profile badge.
             </p>
           </div>
 
@@ -116,9 +116,10 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
                 </span>
               </div>
               <span className="font-mono text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#10B981]/30">
-                +50 XP
+                +15 XP &amp; Badge
               </span>
             </div>
+
 
             {isLinkedinVerified ? (
               <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/40 flex items-center justify-between">
@@ -180,9 +181,10 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
                 </span>
               </div>
               <span className="font-mono text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#10B981]/30">
-                +50 XP
+                +15 XP &amp; Badge
               </span>
             </div>
+
 
             {isInstagramVerified ? (
               <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/40 flex items-center justify-between">

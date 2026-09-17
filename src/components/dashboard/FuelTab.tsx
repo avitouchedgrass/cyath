@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
+import Link from 'next/link';
 import { useHabitStore, LoggedMealEntry } from '@/store/useHabitStore';
 import { RECIPES, Recipe } from '@/lib/recipes';
 import { CustomRecipeModal } from '@/components/recipes/CustomRecipeModal';
 import { ScanRecipeModal } from '@/components/recipes/ScanRecipeModal';
 import { retroAudio } from '@/lib/retroAudio';
-import { RecipeNutritionDetail } from '@/components/recipes/RecipeNutritionDetail';
-import { PixelSteam } from '@/components/landing/PixelSteam';
 import { QuickPlateFallback } from '@/components/fuel/QuickPlateFallback';
 import {
   Utensils,
@@ -15,8 +14,7 @@ import {
   Check,
   Camera,
   Trash2,
-  Search,
-  Award,
+  ArrowRight,
   Loader2,
 } from 'lucide-react';
 
@@ -56,7 +54,6 @@ export function FuelTab() {
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [missingItems, setMissingItems] = useState<MissingPortionItem[] | null>(null);
   const [clarifications, setClarifications] = useState<Record<string, string>>({});
-  const [searchFilter, setSearchFilter] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
 
   // Permanent recipe conversion modal state
@@ -64,10 +61,6 @@ export function FuelTab() {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [initialRecipeToSave, setInitialRecipeToSave] = useState<Recipe | null>(null);
   const [savingMealId, setSavingMealId] = useState<string | null>(null);
-
-  // Recipe nutrition inspection modal state
-  const [inspectedRecipe, setInspectedRecipe] = useState<Recipe | null>(null);
-  const [inspectedPortion, setInspectedPortion] = useState<number>(1.0);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -161,13 +154,6 @@ export function FuelTab() {
     setHydration(newTotal, currentDate);
   };
 
-  const handleLogCatalogRecipe = (recipe: Recipe) => {
-    retroAudio.playInspectConfirm();
-    logRecipeToDay(recipe.id, recipe.protein, recipe.calories, currentDate);
-    setFeedback(`Prepared "${recipe.name}" (+${recipe.protein}g Protein · +25 XP Bonus)`);
-    setTimeout(() => setFeedback(null), 3500);
-  };
-
   // Open CustomRecipeModal prefilled with the AI-parsed meal data
   const handleOpenSaveAsRecipe = (meal: LoggedMealEntry) => {
     retroAudio.playBlip();
@@ -257,15 +243,6 @@ export function FuelTab() {
 
     return [...directMeals, ...syntheticMeals];
   }, [currentLog.loggedMeals, currentLog.loggedRecipeIds, customRecipes]);
-
-  const allAvailableRecipes = useMemo(() => {
-    const combined = [...customRecipes, ...RECIPES];
-    return combined.filter((r) => {
-      const matchesSearch = r.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        r.tags.some((t) => t.toLowerCase().includes(searchFilter.toLowerCase()));
-      return matchesSearch;
-    });
-  }, [customRecipes, searchFilter]);
 
   return (
     <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">
@@ -640,136 +617,29 @@ export function FuelTab() {
         </div>
       )}
 
-      {/* 4. Curated Whole-Food Recipe Catalog */}
-      <div className="w-full rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-5 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] flex flex-col gap-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/8">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-cabinet font-extrabold text-lg text-[#1A3629]">
-                Whole-Food Recipe Catalog
-              </h3>
-              <span className="font-mono text-[10px] font-semibold text-[#1A3629] bg-[#FAF8F5] border border-[#1A3629]/12 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <Award className="w-3 h-3 text-[#C9A84C]" />
-                <span>+25 XP Bonus</span>
-              </span>
-            </div>
-            <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              Science-calibrated recipes designed for sustained metabolic endurance.
-            </p>
+      {/* 4. Playbook Invitation Banner */}
+      <div className="w-full rounded-3xl border border-[#1A2E26]/15 bg-[#FAF8F5] p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[2px_2px_0px_rgba(26,46,38,0.06)]">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-2xl bg-[#FFFDF9] border border-[#1A2E26]/12 flex items-center justify-center text-[#1A2E26] shrink-0 shadow-2xs">
+            <Utensils className="w-5 h-5 text-[#C9A84C]" />
           </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full px-3 py-1.5">
-              <Search className="w-3.5 h-3.5 text-[#1A3629]/40" />
-              <input
-                type="text"
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Filter dishes..."
-                className="bg-transparent text-xs font-cabinet text-[#1A3629] placeholder:text-[#1A3629]/40 outline-none w-28 sm:w-36"
-              />
-            </div>
+          <div>
+            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A2E26]">
+              Looking for Science-Backed Meals?
+            </h3>
+            <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+              Explore our curated 50+ recipe library with 1-tap macro scaling in the Playbook.
+            </p>
           </div>
         </div>
 
-        {/* Recipe Cards Grid */}
-        {allAvailableRecipes.length === 0 ? (
-          <div className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] p-6 text-center flex flex-col items-center justify-center gap-2">
-            <Utensils className="w-6 h-6 text-[#1A3629]/30" />
-            <h4 className="font-cabinet font-bold text-sm text-[#1A3629]">
-              No dishes found matching &quot;{searchFilter}&quot;
-            </h4>
-            <p className="font-sans text-xs text-[#4A5D4E]">
-              Try a different keyword or reset your filter to browse the catalog.
-            </p>
-            <button
-              type="button"
-              onClick={() => setSearchFilter('')}
-              className="mt-1 px-3 py-1 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
-            >
-              Clear Filter
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {allAvailableRecipes.slice(0, 9).map((recipe) => (
-              <div
-                key={recipe.id}
-                className="rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] overflow-hidden flex flex-col justify-between hover:border-[#1A3629]/25 transition-all group shadow-2xs"
-              >
-                {/* Pixel Art Food Sprite Presentation */}
-                <div className="w-full flex items-center justify-center py-3 bg-[#FFFDF9]/60 border-b border-[#1A3629]/6">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 relative flex items-center justify-center">
-                    <img
-                      src={recipe.image}
-                      alt={recipe.name}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (target.src.includes('.webp')) {
-                          target.src = target.src.replace('.webp', '.png');
-                        } else if (!target.src.endsWith('generic-plate.webp')) {
-                          target.src = '/assets/food/generic-plate.webp';
-                        }
-                      }}
-                      className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[4px_4px_0px_rgba(26,54,41,0.08)] group-hover:scale-105 transition-transform duration-200 select-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-4 flex flex-col gap-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-tight">
-                      {recipe.name}
-                    </h4>
-                    <span className="font-mono text-xs font-semibold text-[#1A3629] shrink-0 bg-[#FFFDF9] px-2 py-0.5 rounded-full border border-[#1A3629]/10">
-                      {recipe.protein}g
-                    </span>
-                  </div>
-                  <p className="font-sans text-xs text-[#4A5D4E] line-clamp-2 leading-relaxed">
-                    {recipe.subtitle}
-                  </p>
-
-                  {/* Proportional Segmented Macro Caloric Mini-Bar */}
-                  {recipe.macros && (
-                    <div
-                      className="w-full h-1.5 rounded-full bg-[#EAE3D2] overflow-hidden flex border border-[#1A3629]/10 mt-1 cursor-help"
-                      title={`Protein: ${recipe.macros.proteinCalPct}%, Carbs: ${recipe.macros.carbsCalPct}%, Fats: ${recipe.macros.fatsCalPct}%`}
-                    >
-                      <div className="h-full bg-[#065F46]" style={{ width: `${recipe.macros.proteinCalPct}%` }} />
-                      <div className="h-full bg-[#D97706]" style={{ width: `${recipe.macros.carbsCalPct}%` }} />
-                      <div className="h-full bg-[#E11D48]" style={{ width: `${recipe.macros.fatsCalPct}%` }} />
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-3 border-t border-[#1A3629]/8 bg-[#FFFDF9] flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      retroAudio.playInspectConfirm();
-                      setInspectedPortion(1.0);
-                      setInspectedRecipe(recipe);
-                    }}
-                    className="text-[11px] font-mono font-bold text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
-                  >
-                    <span>{recipe.calories} kcal · Macros &amp; Micros</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleLogCatalogRecipe(recipe)}
-                    className="px-3.5 py-1.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                  >
-                    <Plus className="w-3 h-3" />
-                    <span>Log (+25 XP)</span>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <Link
+          href="/playbook?tab=fuel"
+          className="px-5 py-2.5 rounded-full bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-2xs group"
+        >
+          <span>Open Recipe Playbook</span>
+          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </div>
 
       {/* 5. Custom Recipe Creation / Permanent Save Modal */}
@@ -793,90 +663,6 @@ export function FuelTab() {
           setIsScanModalOpen(false);
         }}
       />
-
-      {/* 7. Recipe Nutritional Inspection Modal */}
-      {inspectedRecipe && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/40 backdrop-blur-xs animate-in fade-in duration-200"
-          onClick={() => setInspectedRecipe(null)}
-        >
-          <div
-            className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-[#1A3629]/20 bg-[#FFFDF9] shadow-[0_16px_36px_rgba(26,54,41,0.16)] p-6 sm:p-7 flex flex-col gap-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]">
-                    {inspectedRecipe.category}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border border-[#10B981]/30 bg-[#ECFDF5] text-[#065F46]">
-                    {inspectedRecipe.dietType}
-                  </span>
-                </div>
-                <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] mt-1">
-                  {inspectedRecipe.name}
-                </h3>
-                <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-                  {inspectedRecipe.subtitle}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setInspectedRecipe(null)}
-                className="text-xs font-mono font-bold w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-[#FAF8F5]/80 flex items-center justify-center cursor-pointer transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Food Plate Presentation with Pixel Steam & Shadow */}
-            <div className="w-full flex items-center justify-center py-3 relative bg-[#FAF8F5] rounded-2xl border border-[#1A3629]/10">
-              <div className="w-36 h-36 relative flex items-center justify-center">
-                <PixelSteam active={true} intensity={1.0} />
-                <img
-                  src={inspectedRecipe.image}
-                  alt={inspectedRecipe.name}
-                  className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.18)] select-none pointer-events-none"
-                />
-              </div>
-            </div>
-
-            {/* Live Accurate Macros & Micros Breakdown */}
-            <RecipeNutritionDetail
-              recipe={inspectedRecipe}
-              portionMultiplier={inspectedPortion}
-            />
-
-            {/* Action Strip */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#1A3629]/10">
-              <button
-                type="button"
-                onClick={() => setInspectedRecipe(null)}
-                className="px-4 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  handleLogCatalogRecipe(inspectedRecipe);
-                  setInspectedRecipe(null);
-                }}
-                className="px-5 py-2.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Log to Daily Journal (+25 XP)</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

@@ -555,157 +555,189 @@ function PlaybookContent() {
           </button>
         </div>
 
-        {/* Recipe Detail Modal */}
+        {/* Recipe Detail Modal — Spacious Editorial Culinary Spread */}
         {selectedRecipe && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.14)] flex flex-col gap-5 max-h-[92vh] overflow-y-auto">
-              {/* Modal Header */}
-              <div className="flex items-start justify-between gap-4 pb-3 border-b border-[#1A3629]/10">
-                <div>
-                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#1A3629] bg-[#FAF8F5] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
-                    {Math.round(selectedRecipe.protein * portionMultiplier)}g Protein · {Math.round(selectedRecipe.calories * portionMultiplier)} kcal
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#1A2E26]/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={() => setSelectedRecipe(null)}
+          >
+            <div 
+              className="w-full max-w-5xl bg-[#FFFDF9] border-2 border-[#1A2E26] rounded-3xl shadow-[8px_8px_0px_#1A2E26] flex flex-col max-h-[92vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Top Bar */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A2E26]/12 bg-[#FAF8F5]/80 shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26] bg-[#FFFDF9] px-3 py-1 rounded-full border border-[#1A2E26]/15 shadow-2xs">
+                    {selectedRecipe.category}
                   </span>
-                  <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mt-1.5 tracking-tight">
-                    {selectedRecipe.name}
-                  </h3>
-                  <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-                    {selectedRecipe.subtitle}
-                  </p>
+                  <span className="font-mono text-xs text-[#4A5D4E]">·</span>
+                  <span className="font-mono text-xs font-semibold text-[#4A5D4E]">
+                    {selectedRecipe.prepTimeMinutes}m prep
+                  </span>
                 </div>
+
                 <button
                   type="button"
                   onClick={() => setSelectedRecipe(null)}
-                  className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
+                  className="w-8 h-8 rounded-full border border-[#1A2E26]/20 bg-[#FFFDF9] text-[#1A2E26] hover:bg-[#1A2E26] hover:text-[#FFFDF9] transition-all flex items-center justify-center cursor-pointer shadow-2xs"
                   aria-label="Close modal"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Pixel Art Plate Display with Live Pixel Steam Particles */}
-              <div className="w-full flex flex-col items-center justify-center py-2 relative bg-[#FAF8F5] rounded-2xl border border-[#1A3629]/15">
-                <div className="w-48 h-48 sm:w-56 sm:h-56 relative flex items-center justify-center">
-                  <PixelSteam active={true} intensity={1.2} />
-                  <img
-                    src={selectedRecipe.portionImages?.[portionMultiplier] || selectedRecipe.image}
-                    alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
-                    style={{
-                      transform: !selectedRecipe.portionImages?.[portionMultiplier]
-                        ? portionMultiplier === 0.5
-                          ? 'scale(0.86)'
-                          : portionMultiplier === 1.5
-                          ? 'scale(1.12)'
-                          : portionMultiplier === 2.0
-                          ? 'scale(1.22)'
-                          : 'scale(1)'
-                        : 'scale(1)',
-                    }}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (target.src.includes('.webp')) {
-                        target.src = target.src.replace('.webp', '.png');
-                      } else if (!target.src.endsWith('generic-plate.webp')) {
-                        target.src = '/assets/food/generic-plate.webp';
-                      }
-                    }}
-                    className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[10px_10px_0px_rgba(26,54,41,0.18)] transition-transform duration-300 select-none"
-                  />
-                </div>
-              </div>
-
-              {/* Portion Multiplier Selector */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15">
-                <span className="font-mono text-xs font-bold text-[#1A3629]">
-                  Portion Multiplier:
-                </span>
-                <div className="inline-flex items-center p-0.5 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9]">
-                  {PORTION_MULTIPLIERS.map((mult) => (
-                    <button
-                      key={mult}
-                      type="button"
-                      onClick={() => {
-                        retroAudio.playBlip();
-                        setPortionMultiplier(mult);
+              {/* 2-Column Culinary Magazine Spread */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 divide-y lg:divide-y-0 lg:divide-x divide-[#1A2E26]/12">
+                
+                {/* LEFT COLUMN: Food Diorama, Macros & Primary CTA */}
+                <div className="lg:col-span-5 p-6 sm:p-7 flex flex-col gap-4 bg-[#FAF8F5]/50 overflow-y-auto">
+                  
+                  {/* Food Plate Showcase */}
+                  <div className="w-full aspect-square max-w-[260px] mx-auto relative flex items-center justify-center bg-[#FAF8F5] rounded-2xl border border-[#1A2E26]/15 p-4 shadow-[inset_0_2px_8px_rgba(26,46,38,0.06)]">
+                    <PixelSteam active={true} intensity={0.9} />
+                    <img
+                      src={selectedRecipe.portionImages?.[portionMultiplier] || selectedRecipe.image}
+                      alt={`${selectedRecipe.name} (${portionMultiplier}x portion)`}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.src.includes('.webp')) {
+                          target.src = target.src.replace('.webp', '.png');
+                        } else if (!target.src.endsWith('generic-plate.webp')) {
+                          target.src = '/assets/food/generic-plate.webp';
+                        }
                       }}
-                      className={`px-3 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
-                        portionMultiplier === mult
-                          ? 'bg-[#1A3629] text-[#FFFDF9]'
-                          : 'text-[#1A3629]/70 hover:text-[#1A3629]'
-                      }`}
+                      className="w-full h-full object-contain [image-rendering:pixelated] drop-shadow-[8px_8px_0px_rgba(26,54,41,0.16)] select-none pointer-events-none"
+                    />
+                  </div>
+
+                  {/* Portion Multiplier Pills */}
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A2E26]/12">
+                    <span className="font-mono text-xs font-bold text-[#1A2E26]">
+                      Portion:
+                    </span>
+                    <div className="inline-flex items-center gap-1 p-0.5 rounded-lg border border-[#1A2E26]/20 bg-[#FAF8F5]">
+                      {PORTION_MULTIPLIERS.map((mult) => (
+                        <button
+                          key={mult}
+                          type="button"
+                          onClick={() => {
+                            retroAudio.playBlip();
+                            setPortionMultiplier(mult);
+                          }}
+                          className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                            portionMultiplier === mult
+                              ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
+                              : 'text-[#1A2E26]/70 hover:text-[#1A2E26]'
+                          }`}
+                        >
+                          {mult}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Nutrition Breakdown Component */}
+                  <RecipeNutritionDetail
+                    recipe={selectedRecipe}
+                    portionMultiplier={portionMultiplier}
+                  />
+
+                  {/* Direct Log CTA */}
+                  <div className="flex items-center gap-2 pt-1">
+                    {selectedRecipe.isCustom && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete custom recipe "${selectedRecipe.name}"?`)) {
+                            deleteCustomRecipe(selectedRecipe.id);
+                            setSelectedRecipe(null);
+                            setToastMessage(`Deleted "${selectedRecipe.name}"`);
+                            setTimeout(() => setToastMessage(null), 3000);
+                          }
+                        }}
+                        className="p-3 rounded-xl border border-red-300 bg-red-50 text-red-700 font-cabinet font-bold text-xs hover:bg-red-100 transition-all cursor-pointer shrink-0"
+                        title="Delete custom recipe"
+                      >
+                        Delete
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleLogRecipe(selectedRecipe, portionMultiplier, e)}
+                      className="flex-1 py-3 px-5 rounded-xl border-2 border-[#1A2E26] bg-[#1A2E26] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm hover:bg-[#2C4A3B] shadow-[2px_2px_0px_#3A6B52] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      {mult}x
+                      <span>+ Log Meal to Today</span>
+                      <span className="font-mono text-xs opacity-80">
+                        (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO)
+                      </span>
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Accurate Macro & Micro Nutritional Breakdown */}
-              <RecipeNutritionDetail
-                recipe={selectedRecipe}
-                portionMultiplier={portionMultiplier}
-              />
-
-              {/* Ingredients & Instructions Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1">
-                {/* Ingredients */}
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs font-bold uppercase text-[#1A3629] pb-1 border-b border-[#1A3629]/15">
-                    Ingredients:
-                  </span>
-                  <ul className="space-y-1.5 text-xs font-mono text-[#1A3629]/80">
-                    {selectedRecipe.ingredients.map((ing, i) => (
-                      <li key={i} className="flex items-center justify-between gap-2 border-b border-[#1A3629]/10 pb-1">
-                        <span>{ing.item}</span>
-                        <span className="font-bold shrink-0">{ing.amount}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  </div>
                 </div>
 
-                {/* Instructions */}
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs font-bold uppercase text-[#1A3629] pb-1 border-b border-[#1A3629]/15">
-                    Preparation:
-                  </span>
-                  <ol className="space-y-1.5 text-xs font-cabinet text-[#1A3629]/85">
-                    {selectedRecipe.instructions.map((step, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="font-mono text-[10px] font-bold text-[#1A3629]/60 shrink-0 mt-0.5">
-                          {i + 1}.
-                        </span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ol>
+                {/* RIGHT COLUMN: Recipe Header, Ingredients & Preparation */}
+                <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col gap-6 bg-[#FFFDF9] overflow-y-auto">
+                  
+                  {/* Title & Description */}
+                  <div className="flex flex-col gap-2">
+                    <h3 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A2E26] tracking-tight leading-snug">
+                      {selectedRecipe.name}
+                    </h3>
+                    <p className="font-cabinet text-sm text-[#4A5D4E] leading-relaxed">
+                      {selectedRecipe.subtitle || selectedRecipe.description}
+                    </p>
+                  </div>
+
+                  {/* Ingredients Section */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-[#1A2E26]/15">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26]">
+                        Ingredients ({selectedRecipe.ingredients.length})
+                      </span>
+                      <span className="font-mono text-[11px] text-[#4A5D4E]">
+                        Scaled to {portionMultiplier}x
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {selectedRecipe.ingredients.map((ing, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF8F5] border border-[#1A2E26]/10 text-xs font-mono text-[#1A2E26]"
+                        >
+                          <span className="truncate pr-2 font-medium">{ing.item}</span>
+                          <span className="font-bold shrink-0 text-[#065F46] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A2E26]/10">
+                            {ing.amount}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Preparation Steps Section */}
+                  <div className="flex flex-col gap-3 pt-1">
+                    <div className="pb-1.5 border-b border-[#1A2E26]/15">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26]">
+                        Preparation Steps
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-2.5">
+                      {selectedRecipe.instructions.map((step, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#FAF8F5]/60 border border-[#1A2E26]/8">
+                          <span className="w-6 h-6 rounded-lg bg-[#1A2E26] text-[#FFFDF9] font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            {i + 1}
+                          </span>
+                          <p className="font-cabinet text-xs sm:text-sm text-[#1A2E26] leading-relaxed pt-0.5">
+                            {step}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-3 border-t-2 border-[#1A3629]/15 flex items-center gap-3">
-                {selectedRecipe.isCustom && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (confirm(`Delete custom recipe "${selectedRecipe.name}"?`)) {
-                        deleteCustomRecipe(selectedRecipe.id);
-                        setSelectedRecipe(null);
-                        setToastMessage(`Deleted custom recipe "${selectedRecipe.name}"`);
-                        setTimeout(() => setToastMessage(null), 3000);
-                      }
-                    }}
-                    className="px-4 py-3 rounded-xl border border-red-400 bg-red-50 text-red-700 font-cabinet font-bold text-xs hover:bg-red-100 transition-all cursor-pointer"
-                  >
-                    Delete
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={(e) => handleLogRecipe(selectedRecipe, portionMultiplier, e)}
-                  className="flex-1 py-3 px-6 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-semibold text-xs sm:text-sm hover:bg-[#234535] transition-colors cursor-pointer text-center"
-                >
-                  + Log Meal to Today (+{Math.round(selectedRecipe.protein * portionMultiplier)}g PRO · {portionMultiplier}x)
-                </button>
               </div>
             </div>
           </div>

@@ -240,12 +240,12 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               <button
                 type="button"
                 onClick={() => setIsInviteModalOpen(true)}
-                className="hidden sm:flex border border-[#065F46]/30 bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all items-center justify-center gap-1.5 cursor-pointer h-9 select-none shrink-0"
-                title="Invite Friends for +250 XP"
-                aria-label="Invite friends to Cyath for +250 XP"
+                className="hidden sm:flex border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all items-center justify-center gap-1.5 cursor-pointer h-9 select-none shrink-0"
+                title="Invite Friends to Cyath"
+                aria-label="Invite friends to Cyath"
               >
-                <Gift className="w-3.5 h-3.5 text-[#059669] shrink-0" />
-                <span>Invite (+250 XP)</span>
+                <Gift className="w-3.5 h-3.5 text-[#1A3629]/70 shrink-0" />
+                <span>Invite</span>
               </button>
             )}
 

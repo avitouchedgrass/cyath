@@ -112,18 +112,18 @@ export function CoreHabitsCard() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A2E26] tracking-tight">
-                {isDownscaled ? 'Recovery Re-entry Routine' : 'Focus Essentials'}
+                {isDownscaled ? 'Restorative Essentials' : 'Focus Essentials'}
               </h2>
               {isDownscaled && (
-                <span className="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#D97706]/30 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-[#D97706]" />
-                  <span>[MINIMUM VIABLE RE-ENTRY ACTIVE]</span>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#ECFDF5] text-[#065F46] border border-[#10B981]/30 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-[#10B981]" />
+                  <span>Gentle Baseline</span>
                 </span>
               )}
             </div>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
               {isDownscaled
-                ? 'Cockpit downscaled to 3 micro-habits. Completing preserves full streak integrity.'
+                ? 'Calibrated to 3 micro-habits. Protects your streak on demanding days.'
                 : '3 baseline habits calibrated for sustained daytime stamina.'}
             </p>
           </div>

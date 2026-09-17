@@ -6,49 +6,17 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { calculateLevel } from '@/lib/progression/engine';
 import { getIslandTier } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
-import { calculateCircadianStatus, formatCountdownMs } from '@/lib/engines/circadianEngine';
-import {
-  isNotificationSupported,
-  getNotificationPermission,
-  getNotificationOptIn,
-  requestNotificationAccess,
-  setNotificationOptIn,
-  scheduleCircadianNotifications,
-  sendTestCircadianNotification,
-} from '@/lib/notifications/circadianWorker';
+import { calculateCircadianStatus } from '@/lib/engines/circadianEngine';
 import { MorningBootModal } from './MorningBootModal';
 import { EveningWrapModal } from './EveningWrapModal';
 import { WeightTrackerModal } from './WeightTrackerModal';
-import { SocialQuestsModal } from '@/components/progression/SocialQuestsModal';
 import { XP_MATRIX } from '@/lib/constants/xpMatrix';
-import { Bell, BellOff } from 'lucide-react';
 
 export function TacticalStatusDock() {
-  const { currentDate, deskRitualsByDate, totalXp, streakCount, userProfile, weightHistory, socialQuests } = useHabitStore();
+  const { currentDate, deskRitualsByDate, totalXp, streakCount, userProfile, weightHistory } = useHabitStore();
   const [isMorningModalOpen, setIsMorningModalOpen] = useState(false);
   const [isEveningModalOpen, setIsEveningModalOpen] = useState(false);
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
-  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(false);
-  const [notificationFeedback, setNotificationFeedback] = useState<string | null>(null);
-
-  // Dynamic 1-second clock ticker for crisp countdown timers
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Sync notification opt-in status on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const optIn = getNotificationOptIn();
-      const permission = getNotificationPermission();
-      setNotificationsEnabled(optIn && permission === 'granted');
-    }
-  }, []);
 
   const ritualData = deskRitualsByDate[currentDate] || {};
   const morningDone = !!ritualData.morningBootCompleted;
@@ -59,51 +27,18 @@ export function TacticalStatusDock() {
   const latestDelta = latestEntry?.deltaKg ?? 0;
   const latestTrend = latestEntry?.trend;
 
-  const socialClaimedCount = (socialQuests?.linkedin?.status === 'verified' ? 1 : 0) + (socialQuests?.instagram?.status === 'verified' ? 1 : 0);
-
   const progress = calculateLevel(totalXp);
   const islandTier = getIslandTier(progress.level);
 
   // Dynamic Circadian Status derived from logged wake time
   const circadian = useMemo(() => {
     return calculateCircadianStatus({
-      now: currentTime,
       wakeTimeStr: ritualData.wakeTime || '07:00',
       bedtimeTargetStr: '22:30',
     });
-  }, [currentTime, ritualData.wakeTime]);
+  }, [ritualData.wakeTime]);
 
   const dynamicPhase = circadian.milestones.dockPhase;
-
-  // Toggle Circadian Push Notifications
-  const handleToggleNotifications = async () => {
-    retroAudio.playInspectConfirm();
-    if (!isNotificationSupported()) {
-      setNotificationFeedback('Web Notifications not supported in this browser.');
-      setTimeout(() => setNotificationFeedback(null), 3000);
-      return;
-    }
-
-    if (notificationsEnabled) {
-      setNotificationOptIn(false);
-      setNotificationsEnabled(false);
-      setNotificationFeedback('Circadian notifications muted.');
-      setTimeout(() => setNotificationFeedback(null), 2500);
-    } else {
-      const granted = await requestNotificationAccess();
-      if (granted) {
-        setNotificationsEnabled(true);
-        scheduleCircadianNotifications({ wakeTimeStr: ritualData.wakeTime || '07:00' });
-        sendTestCircadianNotification();
-        setNotificationFeedback('Circadian push active: Alerts scheduled for T-30m Caffeine Cutoff & Digital Sunset.');
-        setTimeout(() => setNotificationFeedback(null), 3500);
-      } else {
-        setNotificationsEnabled(false);
-        setNotificationFeedback('Notification permission dismissed or denied.');
-        setTimeout(() => setNotificationFeedback(null), 3000);
-      }
-    }
-  };
 
   return (
     <>
@@ -163,81 +98,34 @@ export function TacticalStatusDock() {
           </div>
         </div>
 
-        {/* Biometric Weight Check-in & Social Quests Strip */}
-        <div className="flex flex-col gap-2 pt-1 pb-1 border-b border-[#1A2E26]/15">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 font-mono text-xs text-[#1A2E26]">
-              <span className="text-[#4A5D4E]">Weight:</span>
-              <span className="font-bold">{currentWeightKg} kg</span>
-              {latestTrend && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
-                  latestTrend === 'down'
-                    ? 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/30'
-                    : latestTrend === 'up'
-                    ? 'bg-[#EFF6FF] text-[#1E40AF] border-[#3B82F6]/30'
-                    : 'bg-[#FAF8F5] text-[#1A2E26]/70 border-[#1A2E26]/15'
-                }`}>
-                  {latestTrend === 'down' ? '↓' : latestTrend === 'up' ? '↑' : '→'} {latestDelta > 0 ? `+${latestDelta}` : latestDelta}kg
-                </span>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playInspectConfirm();
-                setIsWeightModalOpen(true);
-              }}
-              className="text-[11px] font-mono font-bold text-[#1A2E26] hover:bg-[#FAF6EE] cursor-pointer bg-[#FFFDF9] px-2.5 py-1 rounded-lg border border-[#1A2E26]/20 transition-all shadow-2xs"
-            >
-              Weight Log (+15 XP)
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between text-[11px] font-mono">
-            <span className="text-[#4A5D4E]">
-              Community Vanguard ({socialClaimedCount}/2)
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playInspectConfirm();
-                setIsSocialModalOpen(true);
-              }}
-              className="font-bold text-[#065F46] hover:underline cursor-pointer"
-            >
-              {socialClaimedCount === 2 ? '✓ Vanguard Follower' : 'Follow Cyath (+15 XP & Badge) →'}
-            </button>
-          </div>
-
-          {/* Web Push Notification Opt-in Strip */}
-          <div className="flex items-center justify-between pt-1 font-mono text-[10px] border-t border-[#1A2E26]/10">
-            <div className="flex items-center gap-1.5 text-[#4A5D4E]">
-              {notificationsEnabled ? (
-                <Bell className="w-3 h-3 text-[#065F46]" />
-              ) : (
-                <BellOff className="w-3 h-3 text-[#92400E]" />
-              )}
-              <span>Circadian Web Push:</span>
-              <span className={`font-bold ${notificationsEnabled ? 'text-[#065F46]' : 'text-[#92400E]'}`}>
-                {notificationsEnabled ? 'ACTIVE (T-30m Cutoff)' : 'OPT-IN'}
+        {/* Biometric Weight Check-in Strip */}
+        <div className="flex items-center justify-between pt-1 pb-1 border-b border-[#1A2E26]/15">
+          <div className="flex items-center gap-1.5 font-mono text-xs text-[#1A2E26]">
+            <span className="text-[#4A5D4E]">Weight:</span>
+            <span className="font-bold">{currentWeightKg} kg</span>
+            {latestTrend && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
+                latestTrend === 'down'
+                  ? 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/30'
+                  : latestTrend === 'up'
+                  ? 'bg-[#EFF6FF] text-[#1E40AF] border-[#3B82F6]/30'
+                  : 'bg-[#FAF8F5] text-[#1A2E26]/70 border-[#1A2E26]/15'
+              }`}>
+                {latestTrend === 'down' ? '↓' : latestTrend === 'up' ? '↑' : '→'} {latestDelta > 0 ? `+${latestDelta}` : latestDelta}kg
               </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleToggleNotifications}
-              className="font-bold underline cursor-pointer text-[#1A2E26] hover:text-[#065F46]"
-            >
-              {notificationsEnabled ? 'Mute' : 'Enable Push'}
-            </button>
+            )}
           </div>
 
-          {notificationFeedback && (
-            <div className="text-[10px] font-mono text-[#065F46] bg-[#ECFDF5] p-1.5 rounded border border-[#10B981]/30 animate-in fade-in">
-              {notificationFeedback}
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playInspectConfirm();
+              setIsWeightModalOpen(true);
+            }}
+            className="text-[11px] font-mono font-bold text-[#1A2E26] hover:bg-[#FAF6EE] cursor-pointer bg-[#FFFDF9] px-2.5 py-1 rounded-lg border border-[#1A2E26]/20 transition-all shadow-2xs"
+          >
+            Weight Log
+          </button>
         </div>
 
         {/* Dynamic Circadian Desk Ritual Command Block */}
@@ -261,25 +149,27 @@ export function TacticalStatusDock() {
             )}
           </div>
 
-          {/* Dynamic Monospace Countdown Timer */}
+          {/* Calm Static Circadian Milestone */}
           <div className="flex items-center justify-between bg-[#FAF6EE] px-2.5 py-1.5 rounded-lg border border-[#1A2E26]/15 font-mono text-xs">
             <span className="text-[#4A5D4E] text-[10px] uppercase font-bold">
               {dynamicPhase === 'morning'
-                ? 'Caffeine Buffer:'
+                ? 'Caffeine Delay:'
                 : dynamicPhase === 'midday'
                 ? 'Caffeine Cutoff:'
                 : 'Digital Sunset:'}
             </span>
-            <span className="font-bold text-[#1A2E26] tabular-nums tracking-wider">
+            <span className="font-bold text-[#1A2E26] tracking-wider">
               {dynamicPhase === 'morning'
                 ? (circadian.milestones.isCaffeinePermissible
-                  ? 'Caffeine Permissible Now'
-                  : `T-${formatCountdownMs(Math.max(0, (circadian.milestones.adenosineCaffeineBuffer.endMinutes - (circadian.currentHour * 60 + circadian.currentMinute)) * 60 * 1000))}`)
+                  ? 'Permissible Now'
+                  : `${circadian.milestones.adenosineCaffeineBuffer.end} (+90m)`)
                 : dynamicPhase === 'midday'
-                ? `T-${formatCountdownMs(circadian.milestones.msUntilCaffeineCutoff)}`
+                ? (circadian.milestones.isPastCaffeineCutoff
+                  ? `Cutoff Passed (${circadian.milestones.caffeineHardCutoff.cutoff})`
+                  : `${circadian.milestones.caffeineHardCutoff.cutoff}`)
                 : (circadian.milestones.isDigitalSunsetActive
-                  ? 'Digital Sunset In Progress'
-                  : `T-${formatCountdownMs(circadian.milestones.msUntilDigitalSunset)}`)}
+                  ? 'Sunset Active'
+                  : `${circadian.milestones.digitalSunsetWindow.start}`)}
             </span>
           </div>
 
@@ -370,10 +260,6 @@ export function TacticalStatusDock() {
       <WeightTrackerModal
         isOpen={isWeightModalOpen}
         onClose={() => setIsWeightModalOpen(false)}
-      />
-      <SocialQuestsModal
-        isOpen={isSocialModalOpen}
-        onClose={() => setIsSocialModalOpen(false)}
       />
     </>
   );

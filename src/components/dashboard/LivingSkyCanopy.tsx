@@ -7,12 +7,11 @@ import { getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
 import { IslandBiomeGalleryModal } from '@/components/progression/IslandBiomeGalleryModal';
-import { IslandDioramaOverlay, IslandDecorationsTray } from '@/components/progression/IslandDecorations';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 export function LivingIslandHero() {
-  const { totalXp, userProfile } = useHabitStore();
+  const { totalXp } = useHabitStore();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
 
@@ -122,7 +121,6 @@ export function LivingIslandHero() {
             className="object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)] select-none"
             style={{ imageRendering: 'pixelated' }}
           />
-          <IslandDioramaOverlay unlockedIds={userProfile?.unlockedDecorations} />
         </div>
 
         {/* Natural Floating Ground Shadow */}
@@ -148,8 +146,6 @@ export function LivingIslandHero() {
             <span>{progress.currentLevelXp} / {progress.xpForNextLevel} XP</span>
           </div>
         </div>
-
-        <IslandDecorationsTray unlockedIds={userProfile?.unlockedDecorations} />
       </div>
 
       {/* 10-Tier Island Biome Gallery Modal */}

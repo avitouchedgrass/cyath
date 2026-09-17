@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier } from '@/lib/progression/config';
-import { useHabitStore } from '@/store/useHabitStore';
-import { IslandDioramaOverlay, IslandDecorationsTray } from '@/components/progression/IslandDecorations';
 import { retroAudio } from '@/lib/retroAudio';
 
 interface FloatingIslandStageProps {
@@ -11,7 +9,6 @@ interface FloatingIslandStageProps {
 }
 
 export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) {
-  const { userProfile } = useHabitStore();
   const currentIsland = getIslandTier(currentLevel);
   const nextIsland = getNextIslandTier(currentLevel);
   const [inspectedTier, setInspectedTier] = useState<IslandTier | null>(null);
@@ -128,10 +125,6 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
             onDragStart={(e) => e.preventDefault()}
             aria-hidden="true"
           />
-
-          {isCurrent && (
-            <IslandDioramaOverlay unlockedIds={userProfile?.unlockedDecorations} />
-          )}
         </div>
 
         {/* Inverse scaling soft ground cloud shadow beneath the floating island */}
@@ -146,7 +139,6 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
         <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] leading-relaxed">
           {displayedIsland.description}
         </p>
-        <IslandDecorationsTray unlockedIds={userProfile?.unlockedDecorations} />
       </div>
 
       {/* Minimalist 10-Tier Scrubber Strip */}

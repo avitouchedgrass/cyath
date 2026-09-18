@@ -140,10 +140,10 @@ function DashboardContent() {
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
       {/* Main Sanctuary Cockpit Container */}
-      <main className="relative z-10 flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-20 flex flex-col gap-6">
+      <main className="relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex flex-col gap-6">
         
         {/* Cockpit Header Row: Status & Consolidated Utility Dock */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
@@ -186,10 +186,10 @@ function DashboardContent() {
             </p>
           </div>
 
-          {/* Unified Utility Suite */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Unified Utility Command Dock */}
+          <div className="flex items-center gap-1 p-1 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
             
-            {/* Ambient Schedule Chip (1-Click Popover) */}
+            {/* Ambient Schedule Chip */}
             <button
               type="button"
               onClick={() => {
@@ -199,18 +199,20 @@ function DashboardContent() {
                 setTempBed(userProfile?.bedTime || '23:30');
                 setIsScheduleModalOpen(true);
               }}
-              className="h-9 inline-flex items-center gap-1.5 px-3 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs"
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
               title="Click to adjust your sleep and wake schedule"
             >
               <Clock className="w-3.5 h-3.5 text-[#4A5D4E]" />
               <span>Wake {userProfile?.wakeTime || '07:30'} · Sleep {userProfile?.bedTime || '23:30'}</span>
             </button>
 
-            {/* Audio Mute Toggle Button */}
+            <div className="h-4 w-px bg-[#1A3629]/12" />
+
+            {/* Audio Mute Toggle */}
             <button
               type="button"
               onClick={handleToggleMute}
-              className="w-9 h-9 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 hover:bg-[#FAF6EE] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center justify-center shadow-2xs"
+              className="w-8 h-8 rounded-full hover:bg-[#FAF6EE] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center"
               title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
               aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
             >
@@ -221,11 +223,13 @@ function DashboardContent() {
               )}
             </button>
 
+            <div className="h-4 w-px bg-[#1A3629]/12" />
+
             {/* Specimen Vault Trigger */}
             <button
               type="button"
               onClick={() => handleOpenVault()}
-              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs group"
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer group"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
               <span>Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
@@ -239,7 +243,7 @@ function DashboardContent() {
                 haptics.tap();
                 setIsReceiptOpen(true);
               }}
-              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs"
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
               <Receipt className="w-3.5 h-3.5" />
               <span>Receipt</span>
@@ -253,7 +257,7 @@ function DashboardContent() {
                 haptics.tap();
                 setIsDossierOpen(true);
               }}
-              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs"
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>7-Day Dossier</span>
@@ -261,24 +265,24 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Consolidated Panoramic Grid: Balanced 3-Column Layout */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-150">
+        {/* Consolidated Panoramic Grid: Balanced 3-Column Triptych */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in duration-150">
           
           {/* MOBILE: Center Stage Island Renders First */}
           {/* DESKTOP: Center Column (lg:col-span-4 lg:order-2) */}
-          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center">
+          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col">
             <LivingIslandHero />
           </div>
 
           {/* MOBILE: Core Habits Card Renders Directly Below Island (Zero Scroll!) */}
           {/* DESKTOP: Left Column (lg:col-span-4 lg:order-1) */}
-          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col gap-4">
+          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col">
             <CoreHabitsCard />
           </div>
 
           {/* MOBILE: Daily Fuel Card Renders Next */}
           {/* DESKTOP: Right Column (lg:col-span-4 lg:order-3) */}
-          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col gap-4">
+          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col">
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}

@@ -137,7 +137,7 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
+    <div className="w-full h-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col justify-between gap-5">
       
       {/* Header & Target Summary */}
       <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">

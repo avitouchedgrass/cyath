@@ -122,15 +122,9 @@ function DashboardContent() {
 
   return (
     <div className="relative min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
-      {/* Subtle Archival Drafting Grid Pattern */}
+      {/* Subtle Ambient Sanctuary Lighting */}
       <div 
-        className="pointer-events-none fixed inset-0 z-0 opacity-40 mix-blend-multiply"
-        style={{
-          backgroundImage: 'radial-gradient(#1A3629 0.75px, transparent 0.75px)',
-          backgroundSize: '24px 24px',
-          maskImage: 'radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%)'
-        }}
+        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,253,249,0.7)_0%,_transparent_75%)]"
         aria-hidden="true"
       />
 
@@ -140,7 +134,7 @@ function DashboardContent() {
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
       {/* Main Sanctuary Cockpit Container */}
-      <main className="relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex flex-col gap-6">
+      <main className="relative z-10 flex-1 w-full max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 flex flex-col gap-6">
         
         {/* Cockpit Header Row: Status & Consolidated Utility Dock */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
@@ -151,7 +145,7 @@ function DashboardContent() {
               </h1>
 
               {/* Streak Badge with Custom Flame */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9]/90 border border-[#1A3629]/12 shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
                 {isForgedStreak ? (
                   <div className="w-4 h-4 relative">
                     <Image
@@ -187,7 +181,7 @@ function DashboardContent() {
           </div>
 
           {/* Unified Utility Command Dock */}
-          <div className="flex items-center gap-1 p-1 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
+          <div className="flex items-center gap-1 p-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
             
             {/* Ambient Schedule Chip */}
             <button
@@ -199,7 +193,7 @@ function DashboardContent() {
                 setTempBed(userProfile?.bedTime || '23:30');
                 setIsScheduleModalOpen(true);
               }}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
               title="Click to adjust your sleep and wake schedule"
             >
               <Clock className="w-3.5 h-3.5 text-[#4A5D4E]" />
@@ -212,7 +206,7 @@ function DashboardContent() {
             <button
               type="button"
               onClick={handleToggleMute}
-              className="w-8 h-8 rounded-full hover:bg-[#FAF6EE] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center"
+              className="w-8 h-8 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center"
               title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
               aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
             >
@@ -265,34 +259,27 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Consolidated Panoramic Grid: Balanced 3-Column Triptych */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in duration-150">
+        {/* Balanced Panoramic Sanctuary Triptych: 4 : 4 : 4 Grid */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start animate-in fade-in duration-150">
           
-          {/* MOBILE: Center Stage Island Renders First */}
-          {/* DESKTOP: Center Column (lg:col-span-4 lg:order-2) */}
-          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col">
+          {/* LEFT WING: Keystone Habits Punch-Pad & Evening Seal (lg:col-span-4) */}
+          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col gap-4">
+            <CoreHabitsCard />
+            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
+          </div>
+
+          {/* CENTER STAGE: Living Floating Sanctuary Diorama (lg:col-span-4) */}
+          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center">
             <LivingIslandHero />
           </div>
 
-          {/* MOBILE: Core Habits Card Renders Directly Below Island (Zero Scroll!) */}
-          {/* DESKTOP: Left Column (lg:col-span-4 lg:order-1) */}
-          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col">
-            <CoreHabitsCard />
-          </div>
-
-          {/* MOBILE: Daily Fuel Card Renders Next */}
-          {/* DESKTOP: Right Column (lg:col-span-4 lg:order-3) */}
-          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col">
+          {/* RIGHT WING: Daily Fuel & Macro Floor (lg:col-span-4) */}
+          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col gap-4">
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}
               currentDate={currentDate}
             />
-          </div>
-
-          {/* Evening Seal Ceremony Banner: Gracefully Spans Bottom on Desktop / Follows on Mobile */}
-          <div className="w-full lg:col-span-12 order-4">
-            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
 
         </div>

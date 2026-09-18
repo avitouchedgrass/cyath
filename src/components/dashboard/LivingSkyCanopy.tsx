@@ -40,21 +40,21 @@ export function LivingIslandHero() {
   return (
     <div
       id="living-island-stage"
-      className="w-full h-full min-h-[500px] bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col justify-between items-center select-none relative overflow-hidden"
+      className="w-full relative flex flex-col items-center justify-center select-none py-2"
     >
       {/* Subtle Atmospheric Back-Glow Behind Island */}
       <div 
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-radial from-amber-500/12 via-[#1A3629]/5 to-transparent blur-2xl"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[440px] lg:w-[540px] h-[320px] sm:h-[440px] lg:h-[540px] rounded-full bg-radial from-amber-500/10 via-[#1A3629]/4 to-transparent blur-3xl"
         aria-hidden="true"
       />
 
       {/* Sanctuary Stage Header */}
-      <div className="relative z-20 w-full flex flex-col items-center text-center gap-1.5 border-b border-[#1A3629]/10 pb-4">
-        <h2 className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+      <div className="relative z-20 flex flex-col items-center text-center gap-1 mb-2">
+        <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#1A3629] tracking-tight">
           {currentIsland.name}
         </h2>
 
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/10 text-[#1A3629] font-sans text-xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFDF9]/90 backdrop-blur-xs border border-[#1A3629]/12 text-[#1A3629] font-sans text-xs shadow-2xs">
           <span className="font-cabinet font-bold text-[#1A3629]">Tier {currentIsland.tier}</span>
           <span className="opacity-30">·</span>
           <span className="font-mono text-[#4A5D4E]">Level {progress.level}</span>
@@ -74,7 +74,7 @@ export function LivingIslandHero() {
 
         {/* Re-entry Shield Notice if streak was broken */}
         {streakCount === 0 && (
-          <div className="mt-1 flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-sm animate-in fade-in">
+          <div className="mt-2 flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-sm animate-in fade-in">
             <span className="font-sans text-xs text-[#4A5D4E]">
               Sanctuary in Dormant Mist
             </span>
@@ -90,10 +90,10 @@ export function LivingIslandHero() {
         )}
       </div>
 
-      {/* Center Stage: Floating Island Canvas with Reactive Layers */}
-      <div className="relative z-10 flex flex-col items-center justify-center my-auto py-4">
+      {/* Center Stage: Cardless Floating Island with Perfect Crisp Sizing */}
+      <div className="relative z-10 flex flex-col items-center justify-center my-1 sm:my-2">
         <div
-          className="relative z-10 w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[280px] md:h-[280px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
+          className="relative z-10 w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] lg:w-[340px] lg:h-[340px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
         >
           {/* Base Pixel Island */}
           <Image
@@ -101,8 +101,8 @@ export function LivingIslandHero() {
             alt={currentIsland.name}
             fill
             priority
-            sizes="(max-width: 640px) 200px, 280px"
-            className="object-contain drop-shadow-[0_15px_30px_rgba(26,54,41,0.15)] select-none"
+            sizes="(max-width: 640px) 260px, 340px"
+            className="object-contain drop-shadow-[0_20px_40px_rgba(26,54,41,0.18)] select-none"
             style={{ imageRendering: 'pixelated' }}
           />
 
@@ -118,7 +118,7 @@ export function LivingIslandHero() {
           {isHydrationDone && (
             <div 
               aria-label="Hydration active"
-              className="pointer-events-none absolute -bottom-2 -left-2 w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-radial from-cyan-400/30 via-blue-300/15 to-transparent mix-blend-screen animate-ping opacity-60"
+              className="pointer-events-none absolute -bottom-2 -left-2 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-radial from-cyan-400/30 via-blue-300/15 to-transparent mix-blend-screen animate-ping opacity-60"
             />
           )}
 
@@ -126,20 +126,20 @@ export function LivingIslandHero() {
           {isFuelDone && (
             <div 
               aria-label="Fuel active"
-              className="pointer-events-none absolute -top-1 right-4 w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-radial from-orange-500/30 via-amber-300/15 to-transparent mix-blend-screen animate-pulse"
+              className="pointer-events-none absolute -top-1 right-4 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-radial from-orange-500/30 via-amber-300/15 to-transparent mix-blend-screen animate-pulse"
             />
           )}
         </div>
 
         {/* Natural Floating Ground Shadow */}
-        <div className="w-[160px] sm:w-[200px] md:w-[220px] h-3 rounded-full bg-[#1A3629]/15 blur-[4px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
+        <div className="w-[180px] sm:w-[220px] lg:w-[250px] h-3 sm:h-3.5 rounded-full bg-[#1A3629]/15 blur-[5px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
       </div>
 
-      {/* Integrated Sanctuary Console: Elemental Runes + Level Meter */}
-      <div className="w-full flex flex-col items-center gap-2.5 pt-3 border-t border-[#1A3629]/10">
+      {/* Integrated Sanctuary Console: Ambient Elemental Runes + Level Meter */}
+      <div className="w-full max-w-sm flex flex-col items-center gap-2.5 mt-2 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)]">
         {/* Elemental Runes */}
         <div className="flex items-center justify-center gap-2 w-full">
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-sans transition-all duration-200 ${
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-xs font-sans transition-all duration-200 ${
             isSunlightDone
               ? 'bg-[#FEF3C7] border-[#D97706]/30 text-[#B45309] font-bold'
               : 'bg-[#FAF8F5] border-[#1A3629]/8 text-[#4A5D4E]/60'
@@ -148,7 +148,7 @@ export function LivingIslandHero() {
             <span>Light</span>
           </span>
 
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-sans transition-all duration-200 ${
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-xs font-sans transition-all duration-200 ${
             isHydrationDone
               ? 'bg-[#E0F2FE] border-[#0284C7]/30 text-[#0369A1] font-bold'
               : 'bg-[#FAF8F5] border-[#1A3629]/8 text-[#4A5D4E]/60'
@@ -157,7 +157,7 @@ export function LivingIslandHero() {
             <span>Water</span>
           </span>
 
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-sans transition-all duration-200 ${
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-xs font-sans transition-all duration-200 ${
             isFuelDone
               ? 'bg-[#ECFDF5] border-[#10B981]/30 text-[#065F46] font-bold'
               : 'bg-[#FAF8F5] border-[#1A3629]/8 text-[#4A5D4E]/60'
@@ -168,7 +168,7 @@ export function LivingIslandHero() {
         </div>
 
         {/* Level XP Meter */}
-        <div className="w-full flex flex-col gap-1.5">
+        <div className="w-full flex flex-col gap-1 pt-2 border-t border-[#1A3629]/10">
           <div className="w-full h-1.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#1A3629] rounded-full transition-all duration-700 ease-out"

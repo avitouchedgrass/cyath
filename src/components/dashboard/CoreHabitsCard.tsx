@@ -141,9 +141,9 @@ export function CoreHabitsCard() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full flex flex-col gap-4">
       {/* Habits Card Surface */}
-      <div className="w-full h-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col justify-between gap-5">
+      <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
@@ -191,7 +191,7 @@ export function CoreHabitsCard() {
 
                   <div className="flex flex-col min-w-0">
                     <span className={`font-cabinet font-bold text-sm tracking-tight truncate ${
-                      isDone ? 'line-through text-[#4A5D4E]/80' : 'text-[#1A3629]'
+                      isDone ? 'text-[#1A3629]' : 'text-[#1A3629]'
                     }`}>
                       {habit.title}
                     </span>
@@ -201,16 +201,17 @@ export function CoreHabitsCard() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded border border-[#1A3629]/15 bg-[#FAF8F5] font-mono text-[10px] font-bold text-[#4A5D4E]">
-                    {habit.keyNumber}
-                  </kbd>
-                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
+                <div className="shrink-0">
+                  <div className={`w-6 h-6 rounded-lg border transition-all duration-200 flex items-center justify-center ${
                     isDone
                       ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                      : 'border-[#1A3629]/25 bg-transparent group-hover:border-[#1A3629]/50'
+                      : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#4A5D4E] group-hover:border-[#1A3629] group-hover:text-[#1A3629]'
                   }`}>
-                    {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                    {isDone ? (
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    ) : (
+                      <span className="font-mono text-[11px] font-bold">{habit.keyNumber}</span>
+                    )}
                   </div>
                 </div>
               </button>

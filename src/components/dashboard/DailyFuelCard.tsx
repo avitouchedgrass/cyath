@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, Sparkles } from 'lucide-react';
+import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, Sparkles, X } from 'lucide-react';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -25,6 +25,7 @@ export function DailyFuelCard({
 }: DailyFuelCardProps) {
   const {
     logMealToDay,
+    removeMealFromDay,
     logWeight,
     userProfile,
     getDailyLog,
@@ -137,7 +138,7 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full h-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col justify-between gap-5">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
       
       {/* Header & Target Summary */}
       <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
@@ -248,6 +249,58 @@ export function DailyFuelCard({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Today's Logged Fuel Feed */}
+      <div className="flex flex-col gap-2 pt-3 border-t border-[#1A3629]/10">
+        <div className="flex items-center justify-between">
+          <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+            Today's Logged Fuel
+          </span>
+          <span className="font-mono text-[11px] text-[#4A5D4E]">
+            {currentLog.loggedMeals?.length || 0} {currentLog.loggedMeals?.length === 1 ? 'meal' : 'meals'}
+          </span>
+        </div>
+
+        {currentLog.loggedMeals && currentLog.loggedMeals.length > 0 ? (
+          <div className="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1">
+            {currentLog.loggedMeals.map((meal) => (
+              <div
+                key={meal.id}
+                className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs transition-colors hover:border-[#1A3629]/20"
+              >
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="font-cabinet font-bold text-[#1A3629] truncate">
+                    {meal.name}
+                  </span>
+                  <div className="flex items-center gap-2 font-mono text-[10px] text-[#4A5D4E]">
+                    <span className="text-[#065F46] font-bold">+{meal.protein}g protein</span>
+                    <span>·</span>
+                    <span>{meal.calories} kcal</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    haptics.tap();
+                    removeMealFromDay(meal.id, currentDate);
+                  }}
+                  className="w-6 h-6 rounded-md hover:bg-[#DC2626]/10 text-[#4A5D4E] hover:text-[#DC2626] transition-colors flex items-center justify-center cursor-pointer shrink-0"
+                  title="Remove meal entry"
+                  aria-label={`Remove ${meal.name}`}
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/12 bg-[#FAF8F5]/50 text-center font-sans text-xs text-[#4A5D4E]">
+            No meals logged yet today. Use the natural search bar or quick plates above.
+          </div>
+        )}
       </div>
 
       {/* Weight Check-In Strip */}

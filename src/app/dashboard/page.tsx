@@ -13,7 +13,7 @@ import { CoreHabitsCard } from '@/components/dashboard/CoreHabitsCard';
 import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
 import { EveningSealButton } from '@/components/dashboard/EveningSealButton';
 import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
-import { SpecimenVaultDrawer } from '@/components/dashboard/SpecimenVaultDrawer';
+import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfloor';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
 import {
@@ -32,9 +32,7 @@ function DashboardContent() {
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Modal / Drawer States
-  const [isVaultOpen, setIsVaultOpen] = useState(false);
-  const [vaultInitialTrophyId, setVaultInitialTrophyId] = useState<string | null>(null);
+  // Modal States
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -69,7 +67,7 @@ function DashboardContent() {
       if (activeTag === 'input' || activeTag === 'textarea') return;
       if (e.key === 'v' || e.key === 'V') {
         e.preventDefault();
-        setIsVaultOpen((prev) => !prev);
+        handleOpenVault();
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -109,9 +107,13 @@ function DashboardContent() {
     haptics.tap();
   };
 
-  const handleOpenVault = (trophyId?: string) => {
-    setVaultInitialTrophyId(trophyId || null);
-    setIsVaultOpen(true);
+  const handleOpenVault = () => {
+    retroAudio.playInspectConfirm();
+    haptics.tap();
+    const el = document.getElementById('specimen-reliquary');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleSaveSchedule = (e: React.FormEvent) => {
@@ -144,11 +146,7 @@ function DashboardContent() {
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
       {/* Main Sanctuary Cockpit Container (Edge-to-Edge Spatial Architecture) */}
-      <main
-        className={`relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-8 xl:px-12 pt-24 pb-28 flex flex-col gap-6 transition-all duration-500 ease-out ${
-          isVaultOpen ? '-translate-y-28 sm:-translate-y-36 opacity-75 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'
-        }`}
-      >
+      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-8 xl:px-12 pt-24 pb-28 flex flex-col gap-8">
         
         {/* Cockpit Header Row: Status & Minimal Ambient Tools */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
@@ -229,6 +227,18 @@ function DashboardContent() {
               <FileText className="w-3.5 h-3.5" />
               <span>Weekly Review</span>
             </button>
+
+            <div className="h-4 w-px bg-[#1A3629]/12" />
+
+            {/* Specimen Reliquary Sub-Floor Jump Button */}
+            <button
+              type="button"
+              onClick={handleOpenVault}
+              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
+            >
+              <Trophy className="w-3.5 h-3.5 text-[#D97706]" />
+              <span>Reliquary ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
+            </button>
           </div>
         </div>
 
@@ -257,6 +267,9 @@ function DashboardContent() {
 
         </div>
 
+        {/* Archival Museum Specimen Reliquary Sub-Floor (Treatment 2 & Location 2) */}
+        <SpecimenVaultSubfloor />
+
       </main>
 
       {/* Bottom Left: Discreet Audio Toggle */}
@@ -273,26 +286,6 @@ function DashboardContent() {
           <Volume2 className="w-4 h-4 text-[#10B981] group-hover:text-white" />
         )}
       </button>
-
-      {/* Bottom Middle: Specimen Vault Trigger */}
-      <button
-        type="button"
-        onClick={() => handleOpenVault()}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 h-11 px-5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-md text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-2 cursor-pointer group"
-      >
-        <Trophy className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
-        <span>Specimen Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
-        <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#FAF8F5] border border-[#1A3629]/10 group-hover:bg-white/10 group-hover:border-white/20 text-[#4A5D4E] group-hover:text-white">
-          V
-        </kbd>
-      </button>
-
-      {/* Specimen Vault Slide-Over Drawer */}
-      <SpecimenVaultDrawer
-        isOpen={isVaultOpen}
-        onClose={() => setIsVaultOpen(false)}
-        initialSelectedId={vaultInitialTrophyId}
-      />
 
       {/* Minimalist Thermal Receipt Modal */}
       <MinimalistReceiptModal

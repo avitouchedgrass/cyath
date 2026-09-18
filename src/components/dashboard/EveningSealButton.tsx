@@ -5,7 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { ShieldCheck, Lock, Sparkles, Check } from 'lucide-react';
+import { ShieldCheck, Lock, Check } from 'lucide-react';
 
 interface EveningSealButtonProps {
   onOpenReceipt?: () => void;
@@ -120,7 +120,7 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
           <span>View Thermal Receipt</span>
         ) : (
           <>
-            <Sparkles className="w-3.5 h-3.5 text-[#FCD34D]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#FCD34D]" />
             <span>{isSealing ? 'Sealing...' : 'Seal Ledger (+50 XP)'}</span>
           </>
         )}

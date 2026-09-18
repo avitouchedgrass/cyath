@@ -5,7 +5,7 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { Check, Sun, Droplets, Utensils, Plus, Sparkles, Zap, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
+import { Check, Sun, Droplets, Utensils, Plus, Zap, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
 
 export function CoreHabitsCard() {
   const {

@@ -128,6 +128,7 @@ export interface TrophyDefinition {
   isShame: boolean;
   spriteUrl: string;
   unlockCondition: string;
+  tier?: 'Bronze' | 'Silver' | 'Gold' | 'Celestial' | 'Shame';
 }
 
 export const TROPHIES_ROSTER: TrophyDefinition[] = [
@@ -135,10 +136,11 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     id: 'solar_vanguard',
     title: 'The Solar Vanguard',
     subtitle: 'Circadian Eye Master',
-    description: 'Logged morning sunlight within your light window 3 days in a row.',
+    description: 'Logged morning sunlight within your wake window 3 days in a row.',
     isShame: false,
     spriteUrl: '/assets/trophies/solar_vanguard.png',
     unlockCondition: '3-day morning light streak',
+    tier: 'Gold',
   },
   {
     id: 'iron_anchor',
@@ -148,6 +150,7 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     isShame: false,
     spriteUrl: '/assets/trophies/iron_anchor.png',
     unlockCondition: 'Daily protein floor reached',
+    tier: 'Gold',
   },
   {
     id: 'hydration_alchemist',
@@ -157,6 +160,7 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     isShame: false,
     spriteUrl: '/assets/trophies/hydration_alchemist.png',
     unlockCondition: '2.5L water logged',
+    tier: 'Silver',
   },
   {
     id: 'desk_goblin',
@@ -166,6 +170,7 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     isShame: true,
     spriteUrl: '/assets/trophies/desk_goblin.png',
     unlockCondition: 'Afternoon energy slump rating <= 3',
+    tier: 'Shame',
   },
   {
     id: 'midnight_gambler',
@@ -175,6 +180,157 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     isShame: true,
     spriteUrl: '/assets/trophies/midnight_gambler.png',
     unlockCondition: 'Caffeine logged past cutoff window',
+    tier: 'Shame',
+  },
+  {
+    id: 'first_light',
+    title: 'First Light Sentry',
+    subtitle: 'Dawn Pioneer',
+    description: 'Logged morning sunlight within 30 minutes of waking.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/solar_vanguard.png',
+    unlockCondition: 'Sunlight logged within wake window',
+    tier: 'Bronze',
+  },
+  {
+    id: 'forged_reentry',
+    title: 'Forged Fire Heart',
+    subtitle: 'Phoenix of the Ledger',
+    description: 'Recovered a lapsed habit streak through the Grace Re-entry Protocol.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_iron.png',
+    unlockCondition: 'Activate Grace Re-entry Protocol',
+    tier: 'Gold',
+  },
+  {
+    id: 'streak_7d',
+    title: 'The 7-Day Monolith',
+    subtitle: 'Unbroken Orbit',
+    description: 'Maintained an unbroken habit momentum for 7 consecutive days.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_normal.png',
+    unlockCondition: '7-day habit streak reached',
+    tier: 'Silver',
+  },
+  {
+    id: 'streak_30d',
+    title: 'The 30-Day Solstice',
+    subtitle: 'Master of Cadence',
+    description: 'Forged 30 consecutive days of habit consistency.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_normal.png',
+    unlockCondition: '30-day habit streak achieved',
+    tier: 'Celestial',
+  },
+  {
+    id: 'protein_streak',
+    title: 'Whole-Food Sentinel',
+    subtitle: 'Cellular Foundation',
+    description: 'Hit your daily protein floor 5 days in a row.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/iron_anchor.png',
+    unlockCondition: '5-day protein target streak',
+    tier: 'Silver',
+  },
+  {
+    id: 'clean_plate',
+    title: 'High-Protein Chef',
+    subtitle: 'Whole-Plate Mastery',
+    description: 'Logged 3 whole-food calibrated meals in a single day.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/iron_anchor.png',
+    unlockCondition: '3 whole-food meals logged in a day',
+    tier: 'Bronze',
+  },
+  {
+    id: 'cellular_surge',
+    title: 'Deep Hydration Crown',
+    subtitle: 'Flow State Architect',
+    description: 'Logged 3.0 liters of pure cellular hydration.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/hydration_alchemist.png',
+    unlockCondition: '3.0L water logged in a single day',
+    tier: 'Gold',
+  },
+  {
+    id: 'zero_slump',
+    title: 'The Slumpless Horizon',
+    subtitle: 'Unshakable Focus',
+    description: 'Recorded Peak energy ratings across 3 consecutive afternoons.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/solar_vanguard.png',
+    unlockCondition: '3 consecutive Peak energy ratings',
+    tier: 'Gold',
+  },
+  {
+    id: 'evening_seal_master',
+    title: 'Golden Coin Minter',
+    subtitle: 'Ceremonial Closer',
+    description: 'Completed the Evening Seal Ceremony before your target bedtime.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_normal.png',
+    unlockCondition: 'Seal daily ledger on schedule',
+    tier: 'Silver',
+  },
+  {
+    id: 'thermal_receipt',
+    title: 'The Archival Ledger',
+    subtitle: 'Thermal Proof',
+    description: 'Viewed or exported a daily thermal receipt summary.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/trophy_lock.png',
+    unlockCondition: 'Generate a daily thermal receipt',
+    tier: 'Bronze',
+  },
+  {
+    id: 'zone2_pathfinder',
+    title: '10k Movement Ranger',
+    subtitle: 'Endless Horizon',
+    description: 'Logged daily walking steps or aerobic movement lever.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/solar_vanguard.png',
+    unlockCondition: 'Custom movement lever completed',
+    tier: 'Silver',
+  },
+  {
+    id: 'cold_plunge_glaze',
+    title: 'The Cryo Core',
+    subtitle: 'Thermal Resilience',
+    description: 'Completed cold shower or plunge recovery lever.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/hydration_alchemist.png',
+    unlockCondition: 'Cold recovery lever logged',
+    tier: 'Gold',
+  },
+  {
+    id: 'screens_off_sentry',
+    title: 'The Melatonin Shield',
+    subtitle: 'Twilight Sanctuary',
+    description: 'Power down screens 60 minutes prior to circadian sleep window.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/midnight_gambler.png',
+    unlockCondition: 'Screens-off pre-bed lever logged',
+    tier: 'Silver',
+  },
+  {
+    id: 'weekly_architect',
+    title: 'Weekly Auditor',
+    subtitle: 'Energy Architect',
+    description: 'Sealed a 7-Day Weekly Review and reclaimed focus hours.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_iron.png',
+    unlockCondition: 'Seal 7-Day Weekly Review',
+    tier: 'Gold',
+  },
+  {
+    id: 'sanctuary_titan',
+    title: 'Sanctuary Sovereign',
+    subtitle: 'Island Ascendant',
+    description: 'Ascended your living pixel sanctuary to Tier 2 or beyond.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/flame_normal.png',
+    unlockCondition: 'Living Island reaches Tier 2+',
+    tier: 'Celestial',
   },
 ];
 
@@ -2394,6 +2550,53 @@ export const useHabitStore = create<HabitStoreState>()(
         // 5. Midnight Gambler: caffeine after cutoff
         if (ritual?.caffeineStatus === 'after_cutoff') {
           get().unlockTrophy('midnight_gambler');
+        }
+
+        // 6. First Light Sentry: logged sunlight today
+        if (log.habitsCompleted?.['sunlight']) {
+          get().unlockTrophy('first_light');
+        }
+
+        // 7. Forged Fire Heart: restored via grace re-entry
+        if (get().isForgedStreak) {
+          get().unlockTrophy('forged_reentry');
+        }
+
+        // 8. The 7-Day Monolith
+        if (get().streakCount >= 7) {
+          get().unlockTrophy('streak_7d');
+        }
+
+        // 9. The 30-Day Solstice
+        if (get().streakCount >= 30) {
+          get().unlockTrophy('streak_30d');
+        }
+
+        // 10. High-Protein Chef (clean_plate): 3 meals logged
+        const mealsCount = (log.loggedMeals?.length || 0) + (log.loggedRecipeIds?.length || 0);
+        if (mealsCount >= 3) {
+          get().unlockTrophy('clean_plate');
+        }
+
+        // 11. Deep Hydration Crown: 3.0L+
+        if (log.hydrationLiters >= 3.0) {
+          get().unlockTrophy('cellular_surge');
+        }
+
+        // 12. Golden Coin Minter: sealed today
+        if (get().isLedgerSealedByDate[targetDate]) {
+          get().unlockTrophy('evening_seal_master');
+        }
+
+        // 13. Movement / Custom Levers
+        if (profile?.customHabitSlot && log.habitsCompleted?.[profile.customHabitSlot]) {
+          if (profile.customHabitSlot === 'steps_10k' || profile.customHabitSlot === 'zone2_walk') {
+            get().unlockTrophy('zone2_pathfinder');
+          } else if (profile.customHabitSlot === 'cold_shower') {
+            get().unlockTrophy('cold_plunge_glaze');
+          } else if (profile.customHabitSlot === 'screens_off') {
+            get().unlockTrophy('screens_off_sentry');
+          }
         }
       },
     }),

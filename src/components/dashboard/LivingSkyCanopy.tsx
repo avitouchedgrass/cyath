@@ -7,16 +7,19 @@ import { getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Sparkles, Shield, Flame, Sun, Droplets, Utensils } from 'lucide-react';
+import { Shield, Sun, Droplets, Utensils, Receipt } from 'lucide-react';
 
-export function LivingIslandHero() {
+interface LivingIslandHeroProps {
+  onOpenReceipt?: () => void;
+}
+
+export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
   const {
     totalXp,
     currentDate,
     getDailyLog,
     streakCount,
     isForgedStreak,
-    isReentryAvailable,
     activateReentryProtocol,
   } = useHabitStore();
 
@@ -29,8 +32,6 @@ export function LivingIslandHero() {
   const isHydrationDone = (currentLog.hydrationLiters || 0) >= 2.0 || !!currentLog.habitsCompleted?.['hydration'];
   const isFuelDone = (currentLog.totalProteinLogged || 0) >= 100 || !!currentLog.habitsCompleted?.['protein_target'];
 
-  const allHabitsDone = isSunlightDone && isHydrationDone && isFuelDone;
-
   const handleReentry = () => {
     retroAudio.playTierUpgrade();
     haptics.heavy();
@@ -42,9 +43,9 @@ export function LivingIslandHero() {
       id="living-island-stage"
       className="w-full relative flex flex-col items-center justify-center select-none py-2"
     >
-      {/* Subtle Atmospheric Back-Glow Behind Island */}
+      {/* Soft Ethereal Horizon Glow Behind Island */}
       <div 
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[440px] lg:w-[540px] h-[320px] sm:h-[440px] lg:h-[540px] rounded-full bg-radial from-amber-500/10 via-[#1A3629]/4 to-transparent blur-3xl"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[520px] lg:w-[640px] h-[400px] sm:h-[520px] lg:h-[640px] rounded-full bg-[radial-gradient(circle_at_center,_rgba(245,215,160,0.18)_0%,_rgba(26,54,41,0.02)_55%,_transparent_75%)] blur-2xl"
         aria-hidden="true"
       />
 
@@ -54,7 +55,7 @@ export function LivingIslandHero() {
           {currentIsland.name}
         </h2>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFDF9]/90 backdrop-blur-xs border border-[#1A3629]/12 text-[#1A3629] font-sans text-xs shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] font-sans text-xs shadow-2xs">
           <span className="font-cabinet font-bold text-[#1A3629]">Tier {currentIsland.tier}</span>
           <span className="opacity-30">·</span>
           <span className="font-mono text-[#4A5D4E]">Level {progress.level}</span>
@@ -90,10 +91,10 @@ export function LivingIslandHero() {
         )}
       </div>
 
-      {/* Center Stage: Cardless Floating Island with Perfect Crisp Sizing */}
-      <div className="relative z-10 flex flex-col items-center justify-center my-1 sm:my-2">
+      {/* Center Stage: Monumental Hero Pixel Island */}
+      <div className="relative z-10 flex flex-col items-center justify-center my-2 sm:my-3">
         <div
-          className="relative z-10 w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] lg:w-[340px] lg:h-[340px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
+          className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] md:w-[380px] md:h-[380px] lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px] 2xl:w-[500px] 2xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
         >
           {/* Base Pixel Island */}
           <Image
@@ -101,38 +102,14 @@ export function LivingIslandHero() {
             alt={currentIsland.name}
             fill
             priority
-            sizes="(max-width: 640px) 260px, 340px"
-            className="object-contain drop-shadow-[0_20px_40px_rgba(26,54,41,0.18)] select-none"
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 400px, 500px"
+            className="object-contain drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)] select-none"
             style={{ imageRendering: 'pixelated' }}
           />
-
-          {/* 1. Sunlight Reactive Layer: Golden Sunbeam Sweep */}
-          {isSunlightDone && (
-            <div 
-              aria-label="Sunlight active"
-              className="pointer-events-none absolute inset-0 rounded-full bg-radial from-amber-400/25 via-yellow-200/15 to-transparent mix-blend-screen animate-pulse"
-            />
-          )}
-
-          {/* 2. Hydration Reactive Layer: Spring Glow */}
-          {isHydrationDone && (
-            <div 
-              aria-label="Hydration active"
-              className="pointer-events-none absolute -bottom-2 -left-2 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-radial from-cyan-400/30 via-blue-300/15 to-transparent mix-blend-screen animate-ping opacity-60"
-            />
-          )}
-
-          {/* 3. Fuel Reactive Layer: Hearth Embers Glow */}
-          {isFuelDone && (
-            <div 
-              aria-label="Fuel active"
-              className="pointer-events-none absolute -top-1 right-4 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-radial from-orange-500/30 via-amber-300/15 to-transparent mix-blend-screen animate-pulse"
-            />
-          )}
         </div>
 
         {/* Natural Floating Ground Shadow */}
-        <div className="w-[180px] sm:w-[220px] lg:w-[250px] h-3 sm:h-3.5 rounded-full bg-[#1A3629]/15 blur-[5px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
+        <div className="w-[200px] sm:w-[280px] md:w-[320px] lg:w-[350px] xl:w-[380px] h-3.5 sm:h-4.5 rounded-full bg-[#1A3629]/15 blur-[6px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
       </div>
 
       {/* Integrated Sanctuary Console: Ambient Elemental Runes + Level Meter */}
@@ -181,6 +158,23 @@ export function LivingIslandHero() {
           </div>
         </div>
       </div>
+
+      {/* Thermal Receipt Anchor Below Sanctuary */}
+      {onOpenReceipt && (
+        <button
+          type="button"
+          onClick={() => {
+            retroAudio.playBlip();
+            haptics.tap();
+            onOpenReceipt();
+          }}
+          className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-2xs transition-all cursor-pointer group"
+        >
+          <Receipt className="w-3.5 h-3.5" />
+          <span>Thermal Daily Receipt</span>
+        </button>
+      )}
     </div>
   );
 }
+

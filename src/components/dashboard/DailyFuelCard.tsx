@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, Sparkles, X } from 'lucide-react';
+import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, X } from 'lucide-react';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -185,12 +185,9 @@ export function DailyFuelCard({
 
       {/* HERO FOOD INPUT: Natural Language Command Bar */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs text-[#1A3629]">
-            Natural Language Meal Entry
-          </label>
-          <span className="text-[11px] font-sans text-[#4A5D4E]">AI-calibrated macros</span>
-        </div>
+        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs text-[#1A3629]">
+          Log Meal or Ingredient
+        </label>
         
         <div className="relative flex items-center">
           <input
@@ -200,12 +197,12 @@ export function DailyFuelCard({
             onChange={(e) => setAmbientMealText(e.target.value)}
             placeholder="e.g. 3 scrambled eggs with sourdough"
             disabled={isSubmittingMeal}
-            className="w-full pl-4 pr-24 py-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] transition-all duration-200"
+            className="w-full pl-4 pr-24 py-3.5 rounded-xl border-[1.5px] border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-3 focus:ring-[#1A3629]/10 shadow-[0_2px_12px_rgba(26,54,41,0.04)] transition-all duration-200"
           />
           <button
             type="submit"
             disabled={!ambientMealText.trim() || isSubmittingMeal}
-            className="absolute right-1.5 px-3.5 py-1.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs"
+            className="absolute right-1.5 px-3.5 py-2 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs"
           >
             {isSubmittingMeal ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -84,15 +84,15 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[#4A5D4E]">
-                7-Day Reclamation Dossier
+              <span className="font-mono text-xs font-semibold text-[#4A5D4E]">
+                7-Day Consistency Review
               </span>
             </div>
-            <h2 id="dossier-modal-title" className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1.5 tracking-tight">
-              Weekly Energy Audit &amp; Impact
+            <h2 id="dossier-modal-title" className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tracking-tight">
+              Weekly Review &amp; Energy Impact
             </h2>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
-              Correlating daily circadian protocols against recorded afternoon energy dips.
+              Correlating daily foundational habits against recorded afternoon energy dips.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
         {/* Core Metric Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+            <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
               Focus Hours Reclaimed
             </span>
             <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
@@ -121,7 +121,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
           </div>
 
           <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+            <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
               2 PM Slump Reduction
             </span>
             <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
@@ -133,22 +133,22 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
           </div>
 
           <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-              Directives Locked
+            <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
+              Habit Days Completed
             </span>
             <span className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1 tabular-nums">
               {report.protocolsCommittedCount} / 7
             </span>
             <span className="font-sans text-[11px] text-[#4A5D4E] mt-0.5">
-              Days protocol executed
+              Days foundational levers logged
             </span>
           </div>
         </div>
 
         {/* 7-Day Micro-Timeline Breakdown */}
         <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2.5">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-            Day-by-Day Protocol Execution
+          <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
+            Day-by-Day Habit Execution
           </span>
           <div className="grid grid-cols-7 gap-1.5 text-center">
             {report.dailyBreakdown.map((d) => (
@@ -178,8 +178,8 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
 
         {/* Clinical Insights */}
         <div className="space-y-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-            Observed Biological Correlations
+          <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
+            Observed Energy Insights
           </span>
           <div className="space-y-2">
             {report.insights.map((insight, idx) => (
@@ -196,8 +196,8 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
 
         {/* Next 7-Day Progression */}
         <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FAF8F5] flex flex-col gap-1">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-            NEXT 7-DAY PROGRESSION DIRECTIVE
+          <span className="font-mono text-[11px] font-bold text-[#4A5D4E]">
+            Suggested Focus for Next Week
           </span>
           <p className="font-cabinet text-xs font-semibold text-[#1A3629] leading-relaxed">
             {report.nextWeekAction}
@@ -233,11 +233,10 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
             </button>
           </div>
 
-
           {isAlreadyClaimed ? (
             <div className="px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold flex items-center gap-1.5">
               <span>✓</span>
-              <span>Weekly Dossier Sealed (+100 XP Claimed)</span>
+              <span>Weekly Review Sealed (+100 XP Claimed)</span>
             </div>
           ) : (
             <button
@@ -245,7 +244,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
               onClick={handleClaim}
               className="px-6 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet text-xs font-bold transition-all cursor-pointer shadow-2xs"
             >
-              Seal Weekly Dossier (+100 XP) →
+              Seal Weekly Review (+100 XP) →
             </button>
           )}
         </div>

@@ -17,15 +17,14 @@ import { SpecimenVaultDrawer } from '@/components/dashboard/SpecimenVaultDrawer'
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
 import {
-  Sparkles,
   Volume2,
   VolumeX,
   Clock,
-  Receipt,
   FileText,
   Shield,
   X,
   Check,
+  Trophy,
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -65,6 +64,16 @@ function DashboardContent() {
     };
     window.addEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
 
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (activeTag === 'input' || activeTag === 'textarea') return;
+      if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault();
+        setIsVaultOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
     if (!hasCalibratedTodayRef.current) {
       hasCalibratedTodayRef.current = true;
       const today = formatLocalDate();
@@ -79,6 +88,7 @@ function DashboardContent() {
 
     return () => {
       window.removeEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
+      window.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, [isAuthenticated, userProfile, router, currentDate, setDate]);
 
@@ -133,10 +143,14 @@ function DashboardContent() {
       {/* Celebratory Dropdown on Trophy Earned */}
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
-      {/* Main Sanctuary Cockpit Container */}
-      <main className="relative z-10 flex-1 w-full max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-16 flex flex-col gap-6">
+      {/* Main Sanctuary Cockpit Container (Edge-to-Edge Spatial Architecture) */}
+      <main
+        className={`relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-8 xl:px-12 pt-24 pb-28 flex flex-col gap-6 transition-all duration-500 ease-out ${
+          isVaultOpen ? '-translate-y-28 sm:-translate-y-36 opacity-75 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'
+        }`}
+      >
         
-        {/* Cockpit Header Row: Status & Consolidated Utility Dock */}
+        {/* Cockpit Header Row: Status & Minimal Ambient Tools */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3 flex-wrap">
@@ -180,8 +194,8 @@ function DashboardContent() {
             </p>
           </div>
 
-          {/* Unified Utility Command Dock */}
-          <div className="flex items-center gap-1 p-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
+          {/* Minimal Essential Header Tools */}
+          <div className="flex items-center gap-1.5 p-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
             
             {/* Ambient Schedule Chip */}
             <button
@@ -202,48 +216,7 @@ function DashboardContent() {
 
             <div className="h-4 w-px bg-[#1A3629]/12" />
 
-            {/* Audio Mute Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleMute}
-              className="w-8 h-8 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center"
-              title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
-              aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
-            >
-              {isMuted ? (
-                <VolumeX className="w-4 h-4 text-[#DC2626]" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-[#10B981]" />
-              )}
-            </button>
-
-            <div className="h-4 w-px bg-[#1A3629]/12" />
-
-            {/* Specimen Vault Trigger */}
-            <button
-              type="button"
-              onClick={() => handleOpenVault()}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer group"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
-              <span>Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
-            </button>
-
-            {/* Minimalist Receipt Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                setIsReceiptOpen(true);
-              }}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
-            >
-              <Receipt className="w-3.5 h-3.5" />
-              <span>Receipt</span>
-            </button>
-
-            {/* 7-Day Dossier Trigger */}
+            {/* Weekly Review Trigger */}
             <button
               type="button"
               onClick={() => {
@@ -254,27 +227,27 @@ function DashboardContent() {
               className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>7-Day Dossier</span>
+              <span>Weekly Review</span>
             </button>
           </div>
         </div>
 
-        {/* Balanced Panoramic Sanctuary Triptych: 4 : 4 : 4 Grid */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start animate-in fade-in duration-150">
+        {/* Panoramic Spatial Layout: Cards Pushed to Edges, Monumental Island Center */}
+        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 xl:gap-10 animate-in fade-in duration-150">
           
-          {/* LEFT WING: Keystone Habits Punch-Pad & Evening Seal (lg:col-span-4) */}
-          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col gap-4">
+          {/* LEFT FLANK: Keystone Habits Punch-Pad & Evening Seal (Pinned to Left Edge) */}
+          <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-2 lg:order-1 flex flex-col gap-4">
             <CoreHabitsCard />
             <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
 
-          {/* CENTER STAGE: Living Floating Sanctuary Diorama (lg:col-span-4) */}
-          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center">
-            <LivingIslandHero />
+          {/* CENTER STAGE: Monumental Living Floating Island (Center of Attraction) */}
+          <div className="flex-1 w-full order-1 lg:order-2 flex flex-col items-center justify-center min-w-0 py-2">
+            <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
 
-          {/* RIGHT WING: Daily Fuel & Macro Floor (lg:col-span-4) */}
-          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col gap-4">
+          {/* RIGHT FLANK: Daily Fuel & Macro Floor (Pinned to Right Edge) */}
+          <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-3 lg:order-3 flex flex-col gap-4">
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}
@@ -285,6 +258,34 @@ function DashboardContent() {
         </div>
 
       </main>
+
+      {/* Bottom Left: Discreet Audio Toggle */}
+      <button
+        type="button"
+        onClick={handleToggleMute}
+        className="fixed bottom-6 left-6 z-30 w-11 h-11 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-md text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all flex items-center justify-center cursor-pointer group"
+        title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
+        aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+      >
+        {isMuted ? (
+          <VolumeX className="w-4 h-4 text-[#DC2626] group-hover:text-white" />
+        ) : (
+          <Volume2 className="w-4 h-4 text-[#10B981] group-hover:text-white" />
+        )}
+      </button>
+
+      {/* Bottom Middle: Specimen Vault Trigger */}
+      <button
+        type="button"
+        onClick={() => handleOpenVault()}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 h-11 px-5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-md text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-2 cursor-pointer group"
+      >
+        <Trophy className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
+        <span>Specimen Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
+        <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#FAF8F5] border border-[#1A3629]/10 group-hover:bg-white/10 group-hover:border-white/20 text-[#4A5D4E] group-hover:text-white">
+          V
+        </kbd>
+      </button>
 
       {/* Specimen Vault Slide-Over Drawer */}
       <SpecimenVaultDrawer

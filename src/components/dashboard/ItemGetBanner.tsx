@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Sparkles } from 'lucide-react';
+import { X, Trophy } from 'lucide-react';
 
 interface ItemGetBannerProps {
   onOpenVault: (trophyId?: string) => void;
@@ -49,7 +49,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
 
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-[#D97706]" />
+            <Trophy className="w-3.5 h-3.5 text-[#D97706]" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#D97706]">
               {pendingTrophyUnlock.isShame ? 'Trophy of Shame Unlocked' : 'New Specimen Acquired'}
             </span>

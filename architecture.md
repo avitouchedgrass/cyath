@@ -24,7 +24,7 @@
 
 ### 2.2 Typography
 
-* **Headings (`h1`, `h2`, `h3`, `h4`):** `Playfair Display`, serif, high-contrast, weights 600 & 700.
+* **Headings (`h1`, `h2`, `h3`, `h4`):** `Cabinet Grotesk`, sans-serif, high-contrast, weights 600 & 700.
 * **Body, Controls & Data:** `Inter` or `Space Grotesk`, sans-serif, weights 400 & 500.
 * **Metrics & Nutritional Values:** `JetBrains Mono` or tabular numbers (`font-variant-numeric: tabular-nums`).
 

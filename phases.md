@@ -5,7 +5,7 @@
 | Phase | Timeline | Core Focus | Primary Exit Criteria |
 | --- | --- | --- | --- |
 | **Phase 1** | Days 1–3 | Core Infrastructure & Database Models | Next.js scaffolding complete, Tailwind tokens configured, database seeded with 12 recipes. |
-| **Phase 2** | Days 4–5 | UI Shell & Design System Integration | Glassmorphic layout, Playfair typography, navbar, and hero page with floating pixel wave rendering. |
+| **Phase 2** | Days 4–5 | UI Shell & Design System Integration | Glassmorphic layout, Cabinet Grotesk typography, navbar, and hero page with floating pixel wave rendering. |
 | **Phase 3** | Days 6–7 | Interactive Logging & Recipe Modules | Working habit check-ins, macro logging, and pixel recipe catalog with nearest-neighbor scaling. |
 | **Phase 4** | Days 8–9 | Behavioral Engine & Correlation Analytics | Algorithmic correlation calculation working, monochrome heatmap matrix rendering live data. |
 | **Phase 5** | Day 10 | Edge Polish, Performance & Pitch Demo | Zero hydration bugs, smooth CSS backdrop-blur performance, demo seed script ready for presentation. |
@@ -17,7 +17,7 @@
 ### Phase 1: Core Setup & Data Infrastructure (Days 1–3)
 
 * Initialize Next.js 14+ project with TypeScript and Tailwind CSS.
-* Configure `tailwind.config.ts` with custom monochrome color scales, blur utilities, and font definitions (`Playfair Display`, `Inter`/`Space Grotesk`).
+* Configure `tailwind.config.ts` with custom monochrome color scales, blur utilities, and font definitions (`Cabinet Grotesk`, `Inter`/`Space Grotesk`).
 * Define database schemas (PostgreSQL/Prisma or MongoDB) for `User`, `Recipe`, and `DailyLog`.
 * Create a seed script populating **10–15 curated recipes** with macro breakdowns and pixel asset metadata.
 * Set up Zustand store (`useHabitStore.ts`) with optimistic local updates for instant UI interactions.

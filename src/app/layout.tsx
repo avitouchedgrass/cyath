@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono, Fraunces, Pixelify_Sans } from "next/font/google";
+import { Inter, JetBrains_Mono, Pixelify_Sans } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
@@ -15,20 +15,6 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -104,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${fraunces.variable} ${jetbrainsMono.variable} ${pixelFont.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${pixelFont.variable} h-full antialiased`}>
       <head>
         <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />

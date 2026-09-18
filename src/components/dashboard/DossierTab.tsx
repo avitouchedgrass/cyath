@@ -177,15 +177,15 @@ export function DossierTab() {
     <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">
       
       {/* 1. Weekly Executive Dossier Header */}
-      <div className="w-full rounded-3xl border border-[#1A2E26]/15 bg-[#FFFDF9] p-5 sm:p-6 shadow-[2px_2px_0px_rgba(26,46,38,0.08)] flex flex-col gap-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A2E26]/10">
+      <div className="w-full rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] p-5 sm:p-6 shadow-[2px_2px_0px_rgba(26,54,41,0.08)] flex flex-col gap-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/10">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/12 flex items-center justify-center text-[#1A2E26] shrink-0 shadow-2xs">
-              <FileText className="w-5 h-5 text-[#1A2E26]" />
+            <div className="w-10 h-10 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 flex items-center justify-center text-[#1A3629] shrink-0 shadow-2xs">
+              <FileText className="w-5 h-5 text-[#1A3629]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-cabinet font-extrabold text-lg sm:text-xl text-[#1A2E26] tracking-tight">
+                <h2 className="font-cabinet font-extrabold text-lg sm:text-xl text-[#1A3629] tracking-tight">
                   Weekly Biological Dossier
                 </h2>
                 {isDossierClaimed && (
@@ -213,9 +213,9 @@ export function DossierTab() {
                   currentDate,
                 });
               }}
-              className="px-3.5 py-2 rounded-full border-2 border-[#1A2E26] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A2E26] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-[2px_2px_0px_#1A2E26] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+              className="px-3.5 py-2 rounded-full border-2 border-[#1A3629] bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
             >
-              <Printer className="w-3.5 h-3.5 text-[#1A2E26]" />
+              <Printer className="w-3.5 h-3.5 text-[#1A3629]" />
               <span>Export PDF Report</span>
             </button>
 
@@ -225,7 +225,7 @@ export function DossierTab() {
                 retroAudio.playInspectConfirm();
                 setIsDossierOpen(true);
               }}
-              className="px-4 py-2 rounded-full bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              className="px-4 py-2 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
               <span>Full Clinical Dossier</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -237,18 +237,18 @@ export function DossierTab() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           {/* Card 1: Sleep Consistency */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/12 flex flex-col justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 flex flex-col justify-between gap-3">
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1">
-                  <Moon className="w-3 h-3 text-[#1A2E26]" />
+                  <Moon className="w-3 h-3 text-[#1A3629]" />
                   <span>Sleep &amp; Recovery</span>
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1A2E26]">
+                <span className="font-mono text-xs font-bold text-[#1A3629]">
                   {avgSleep}h avg
                 </span>
               </div>
-              <h4 className="font-cabinet font-bold text-sm text-[#1A2E26] leading-snug">
+              <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-snug">
                 {avgSleep >= 7.0
                   ? 'Consistent Sleep Recovery'
                   : 'Slight Sleep Debt'}
@@ -261,7 +261,7 @@ export function DossierTab() {
             </div>
 
             {/* 7-Day Sleep Sparkline */}
-            <div className="pt-2 border-t border-[#1A2E26]/8">
+            <div className="pt-2 border-t border-[#1A3629]/8">
               <div className="flex items-end justify-between gap-1.5 h-12 pt-2">
                 {past7DaysData.map((d, i) => {
                   const heightPct = Math.min(100, Math.max(25, (d.sleepHours / 9) * 100));
@@ -269,7 +269,7 @@ export function DossierTab() {
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
                       <div
                         className={`w-full rounded-md transition-all ${
-                          d.sleepHours >= 7 ? 'bg-[#1A2E26]' : 'bg-[#D97706]'
+                          d.sleepHours >= 7 ? 'bg-[#1A3629]' : 'bg-[#D97706]'
                         }`}
                         style={{ height: `${heightPct}%` }}
                         title={`${d.dateStr}: ${d.sleepHours}h sleep`}
@@ -285,7 +285,7 @@ export function DossierTab() {
           </div>
 
           {/* Card 2: Habit Adherence */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/12 flex flex-col justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 flex flex-col justify-between gap-3">
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1">
@@ -296,7 +296,7 @@ export function DossierTab() {
                   {habitAdherencePct}%
                 </span>
               </div>
-              <h4 className="font-cabinet font-bold text-sm text-[#1A2E26] leading-snug">
+              <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-snug">
                 {habitAdherencePct >= 75
                   ? 'Disciplined Non-Negotiables'
                   : 'Building Momentum'}
@@ -309,7 +309,7 @@ export function DossierTab() {
             </div>
 
             {/* 7-Day Habit Sparkline */}
-            <div className="pt-2 border-t border-[#1A2E26]/8">
+            <div className="pt-2 border-t border-[#1A3629]/8">
               <div className="flex items-end justify-between gap-1.5 h-12 pt-2">
                 {past7DaysData.map((d, i) => {
                   const heightPct = Math.max(20, (d.habitsDone / 3) * 100);
@@ -321,7 +321,7 @@ export function DossierTab() {
                             ? 'bg-[#065F46]'
                             : d.habitsDone > 0
                             ? 'bg-[#5B8C70]'
-                            : 'bg-[#1A2E26]/20'
+                            : 'bg-[#1A3629]/20'
                         }`}
                         style={{ height: `${heightPct}%` }}
                         title={`${d.dateStr}: ${d.habitsDone}/3 core habits`}
@@ -337,18 +337,18 @@ export function DossierTab() {
           </div>
 
           {/* Card 3: Protein Target Hit Rate */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/12 flex flex-col justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 flex flex-col justify-between gap-3">
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1">
                   <Utensils className="w-3 h-3 text-[#C9A84C]" />
                   <span>Metabolic Fuel</span>
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1A2E26]">
+                <span className="font-mono text-xs font-bold text-[#1A3629]">
                   {daysProteinMet}/7 days met
                 </span>
               </div>
-              <h4 className="font-cabinet font-bold text-sm text-[#1A2E26] leading-snug">
+              <h4 className="font-cabinet font-bold text-sm text-[#1A3629] leading-snug">
                 {daysProteinMet >= 4
                   ? 'Strong Protein Calibration'
                   : 'Floor Needs Elevation'}
@@ -359,7 +359,7 @@ export function DossierTab() {
             </div>
 
             {/* 7-Day Protein Sparkline */}
-            <div className="pt-2 border-t border-[#1A2E26]/8">
+            <div className="pt-2 border-t border-[#1A3629]/8">
               <div className="flex items-end justify-between gap-1.5 h-12 pt-2">
                 {past7DaysData.map((d, i) => {
                   const heightPct = Math.min(100, Math.max(20, (d.protein / targetProtein) * 100));
@@ -386,10 +386,10 @@ export function DossierTab() {
       </div>
 
       {/* 3. Consistency Cadence Heatmap (7 vs 28 Days) */}
-      <div className="w-full rounded-3xl border border-[#1A2E26]/15 bg-[#FFFDF9] p-5 sm:p-6 shadow-[2px_2px_0px_rgba(26,46,38,0.08)] flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A2E26]/10">
+      <div className="w-full rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] p-5 sm:p-6 shadow-[2px_2px_0px_rgba(26,54,41,0.08)] flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/10">
           <div>
-            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A2E26] tracking-tight">
+            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629] tracking-tight">
               Consistency Footprint
             </h3>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
@@ -401,7 +401,7 @@ export function DossierTab() {
             <div
               role="group"
               aria-label="Consistency history duration"
-              className="inline-flex items-center p-1 rounded-full border border-[#1A2E26]/12 bg-[#FAF8F5]"
+              className="inline-flex items-center p-1 rounded-full border border-[#1A3629]/12 bg-[#FAF8F5]"
             >
               <button
                 type="button"
@@ -412,8 +412,8 @@ export function DossierTab() {
                 }}
                 className={`px-3 py-1 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
                   historyRange === 7
-                    ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                    : 'text-[#1A2E26]/70 hover:text-[#1A2E26]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                    : 'text-[#1A3629]/70 hover:text-[#1A3629]'
                 }`}
               >
                 7 Days
@@ -427,16 +427,16 @@ export function DossierTab() {
                 }}
                 className={`px-3 py-1 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
                   historyRange === 28
-                    ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                    : 'text-[#1A2E26]/70 hover:text-[#1A2E26]'
+                    ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                    : 'text-[#1A3629]/70 hover:text-[#1A3629]'
                 }`}
               >
                 28 Days
               </button>
             </div>
 
-            <div className="text-xs font-mono font-semibold text-[#1A2E26]/70 border-l border-[#1A2E26]/12 pl-3">
-              <span>Pace: <strong className="text-[#1A2E26]">{avgDailyActions}/day</strong></span>
+            <div className="text-xs font-mono font-semibold text-[#1A3629]/70 border-l border-[#1A3629]/12 pl-3">
+              <span>Pace: <strong className="text-[#1A3629]">{avgDailyActions}/day</strong></span>
             </div>
           </div>
         </div>
@@ -447,11 +447,11 @@ export function DossierTab() {
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
               const levelStyle = {
-                0: 'bg-[#FAF8F5] border-[#1A2E26]/10 text-[#1A2E26]/60 hover:bg-[#F5F1EA]',
-                1: 'bg-[#EDE7DE] border-[#1A2E26]/15 text-[#1A2E26]',
-                2: 'bg-[#D2E2D7] border-[#1A2E26]/20 text-[#1A2E26] font-bold',
-                3: 'bg-[#5B8C70] border-[#1A2E26]/25 text-[#FFFDF9] font-bold',
-                4: 'bg-[#1A2E26] border-[#1A2E26] text-[#FFFDF9] font-bold',
+                0: 'bg-[#FAF8F5] border-[#1A3629]/10 text-[#1A3629]/60 hover:bg-[#F5F1EA]',
+                1: 'bg-[#EDE7DE] border-[#1A3629]/15 text-[#1A3629]',
+                2: 'bg-[#D2E2D7] border-[#1A3629]/20 text-[#1A3629] font-bold',
+                3: 'bg-[#5B8C70] border-[#1A3629]/25 text-[#FFFDF9] font-bold',
+                4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-bold',
               }[day.level];
 
               return (
@@ -464,8 +464,8 @@ export function DossierTab() {
                   }}
                   className={`h-20 sm:h-22 rounded-2xl border flex flex-col items-center justify-between p-2.5 transition-all cursor-pointer ${levelStyle} ${
                     isSelected
-                      ? 'ring-2 ring-[#1A2E26] ring-offset-2 ring-offset-[#FFFDF9]'
-                      : 'hover:border-[#1A2E26]/30'
+                      ? 'ring-2 ring-[#1A3629] ring-offset-2 ring-offset-[#FFFDF9]'
+                      : 'hover:border-[#1A3629]/30'
                   }`}
                   title={`${day.dateStr}: ${day.totalActions} actions ${day.isToday ? '(Today)' : '(Read-only)'}`}
                 >
@@ -487,11 +487,11 @@ export function DossierTab() {
             {heatmapDays.map((day) => {
               const isSelected = day.isSelected;
               const levelStyle = {
-                0: 'bg-[#FAF8F5] border-[#1A2E26]/10 text-[#1A2E26]/50 hover:bg-[#F5F1EA]',
-                1: 'bg-[#EDE7DE] border-[#1A2E26]/15 text-[#1A2E26]',
-                2: 'bg-[#D2E2D7] border-[#1A2E26]/20 text-[#1A2E26] font-bold',
-                3: 'bg-[#5B8C70] border-[#1A2E26]/25 text-[#FFFDF9] font-bold',
-                4: 'bg-[#1A2E26] border-[#1A2E26] text-[#FFFDF9] font-bold',
+                0: 'bg-[#FAF8F5] border-[#1A3629]/10 text-[#1A3629]/50 hover:bg-[#F5F1EA]',
+                1: 'bg-[#EDE7DE] border-[#1A3629]/15 text-[#1A3629]',
+                2: 'bg-[#D2E2D7] border-[#1A3629]/20 text-[#1A3629] font-bold',
+                3: 'bg-[#5B8C70] border-[#1A3629]/25 text-[#FFFDF9] font-bold',
+                4: 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] font-bold',
               }[day.level];
 
               return (
@@ -503,7 +503,7 @@ export function DossierTab() {
                     setDate(day.dateStr);
                   }}
                   className={`h-12 rounded-xl border flex flex-col items-center justify-center p-1 transition-all cursor-pointer ${levelStyle} ${
-                    isSelected ? 'ring-2 ring-[#1A2E26] font-bold' : 'hover:border-[#1A2E26]/30'
+                    isSelected ? 'ring-2 ring-[#1A3629] font-bold' : 'hover:border-[#1A3629]/30'
                   }`}
                   title={`${day.dateStr}: ${day.totalActions} actions`}
                 >
@@ -516,13 +516,13 @@ export function DossierTab() {
       </div>
 
       {/* 4. Quick Cockpit Return Banner */}
-      <div className="w-full rounded-3xl border border-[#1A2E26]/15 bg-[#FAF8F5] p-5 shadow-[2px_2px_0px_rgba(26,46,38,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="w-full rounded-3xl border border-[#1A3629]/15 bg-[#FAF8F5] p-5 shadow-[2px_2px_0px_rgba(26,54,41,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-[#FFFDF9] border border-[#1A2E26]/12 flex items-center justify-center text-[#1A2E26] shrink-0 shadow-2xs">
+          <div className="w-9 h-9 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 flex items-center justify-center text-[#1A3629] shrink-0 shadow-2xs">
             <Sparkles className="w-4 h-4 text-[#C9A84C]" />
           </div>
           <div>
-            <h4 className="font-cabinet font-bold text-sm text-[#1A2E26]">
+            <h4 className="font-cabinet font-bold text-sm text-[#1A3629]">
               Calibrate Today&apos;s Non-Negotiables
             </h4>
             <p className="font-sans text-xs text-[#4A5D4E]">
@@ -533,7 +533,7 @@ export function DossierTab() {
 
         <Link
           href="/dashboard?tab=today"
-          className="px-4 py-2 rounded-full bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-2xs group"
+          className="px-4 py-2 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-2xs group"
         >
           <span>Return to Cockpit</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
@@ -77,7 +77,7 @@ export function CoreHabitsCard() {
     return activeHabits.filter((h) => currentLog.habitsCompleted[h.id]).length;
   }, [activeHabits, currentLog.habitsCompleted]);
 
-  const handleToggle = (habitId: string, event?: React.MouseEvent) => {
+  const handleToggle = useCallback((habitId: string, event?: React.MouseEvent) => {
     const isDone = !!currentLog.habitsCompleted[habitId];
     if (!isDone) {
       retroAudio.playInspectConfirm();
@@ -94,7 +94,38 @@ export function CoreHabitsCard() {
       retroAudio.playBlip();
     }
     toggleHabit(habitId, currentDate);
-  };
+  }, [currentLog.habitsCompleted, completedCount, activeHabits.length, toggleHabit, currentDate]);
+
+  // Power-User Accelerators: keys 1, 2, 3 toggle core habits; Esc dismisses drawers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (activeDrawer !== 'none') {
+          setActiveDrawer('none');
+        }
+        return;
+      }
+
+      if (e.key === '1' && activeHabits[0]) {
+        e.preventDefault();
+        handleToggle(activeHabits[0].id);
+      } else if (e.key === '2' && activeHabits[1]) {
+        e.preventDefault();
+        handleToggle(activeHabits[1].id);
+      } else if (e.key === '3' && activeHabits[2]) {
+        e.preventDefault();
+        handleToggle(activeHabits[2].id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeHabits, activeDrawer, handleToggle]);
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,16 +170,17 @@ export function CoreHabitsCard() {
   return (
     <div
       id="tour-core-habits"
-      className="w-full h-full min-h-0 sm:min-h-[350px] rounded-3xl border border-[#1A2E26]/15 bg-[#FFFDF9] p-4 sm:p-6 shadow-[2px_2px_0px_rgba(26,46,38,0.08)] hover:border-[#1A2E26]/25 transition-all duration-300 flex flex-col justify-between gap-4 sm:gap-5"
+      className="w-full h-full min-h-0 sm:min-h-[350px] rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] p-4 sm:p-6 shadow-[2px_2px_0px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/25 transition-all duration-300 flex flex-col justify-between gap-4 sm:gap-5"
     >
       <div>
         {/* 1. Zero-Modal 3-Stage Daily Stepper Bar */}
-        <div className="pb-3.5 border-b border-[#1A2E26]/10">
-          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/12">
+        <div className="pb-3.5 border-b border-[#1A3629]/10">
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12">
             
             {/* Step 1: Morning Boot */}
             <button
               type="button"
+              aria-expanded={activeDrawer === 'morning'}
               onClick={() => {
                 retroAudio.playBlip();
                 setActiveDrawer(activeDrawer === 'morning' ? 'none' : 'morning');
@@ -157,8 +189,8 @@ export function CoreHabitsCard() {
                 ritual.morningBootCompleted
                   ? 'bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46]'
                   : activeDrawer === 'morning'
-                  ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                  : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26] hover:border-[#1A2E26]/30'
+                  ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                  : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629] hover:border-[#1A3629]/30'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -184,7 +216,7 @@ export function CoreHabitsCard() {
               className={`p-2 rounded-xl text-left transition-all cursor-pointer flex flex-col gap-0.5 select-none ${
                 isProteinMet
                   ? 'bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46]'
-                  : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26] hover:border-[#1A2E26]/30'
+                  : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629] hover:border-[#1A3629]/30'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -201,6 +233,7 @@ export function CoreHabitsCard() {
             {/* Step 3: Evening Wrap */}
             <button
               type="button"
+              aria-expanded={activeDrawer === 'evening'}
               onClick={() => {
                 retroAudio.playBlip();
                 setActiveDrawer(activeDrawer === 'evening' ? 'none' : 'evening');
@@ -209,8 +242,8 @@ export function CoreHabitsCard() {
                 ritual.eveningWrapCompleted
                   ? 'bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46]'
                   : activeDrawer === 'evening'
-                  ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                  : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26] hover:border-[#1A2E26]/30'
+                  ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                  : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629] hover:border-[#1A3629]/30'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -227,15 +260,15 @@ export function CoreHabitsCard() {
 
           {/* Inline Expandable Drawer: Morning Boot */}
           {activeDrawer === 'morning' && (
-            <div className="mt-3 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/15 flex flex-col gap-3 animate-in fade-in duration-150">
+            <div className="mt-3 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3 animate-in fade-in duration-150">
               <div className="flex items-center justify-between">
-                <span className="font-cabinet font-bold text-xs text-[#1A2E26]">
+                <span className="font-cabinet font-bold text-xs text-[#1A3629]">
                   Morning Boot Calibration
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveDrawer('none')}
-                  className="text-xs font-mono text-[#4A5D4E] hover:text-[#1A2E26] cursor-pointer"
+                  className="text-xs font-mono text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer"
                 >
                   <ChevronUp className="w-3.5 h-3.5" />
                 </button>
@@ -254,8 +287,8 @@ export function CoreHabitsCard() {
                       onClick={() => setMorningSleep(hrs)}
                       className={`py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         morningSleep === hrs
-                          ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                          : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629]'
                       }`}
                     >
                       {hrs}h
@@ -277,8 +310,8 @@ export function CoreHabitsCard() {
                       onClick={() => setMorningRested(score)}
                       className={`py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         morningRested === score
-                          ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                          : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629]'
                       }`}
                     >
                       {score}
@@ -288,12 +321,12 @@ export function CoreHabitsCard() {
               </div>
 
               {/* Sunlight Toggle */}
-              <label className="flex items-center gap-2 text-xs font-cabinet text-[#1A2E26] cursor-pointer select-none">
+              <label className="flex items-center gap-2 text-xs font-cabinet text-[#1A3629] cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={morningSunlight}
                   onChange={(e) => setMorningSunlight(e.target.checked)}
-                  className="rounded border-[#1A2E26]/20 text-[#1A2E26] accent-[#1A2E26]"
+                  className="rounded border-[#1A3629]/20 text-[#1A3629] accent-[#1A3629]"
                 />
                 <span>15m Natural Sunlight & Hydration primed</span>
               </label>
@@ -302,7 +335,7 @@ export function CoreHabitsCard() {
               <button
                 type="button"
                 onClick={handleSaveMorningBoot}
-                className="w-full py-2 rounded-xl bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
+                className="w-full py-2 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
               >
                 Complete Morning Boot (+45 XP)
               </button>
@@ -311,15 +344,15 @@ export function CoreHabitsCard() {
 
           {/* Inline Expandable Drawer: Evening Wrap */}
           {activeDrawer === 'evening' && (
-            <div className="mt-3 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A2E26]/15 flex flex-col gap-3 animate-in fade-in duration-150">
+            <div className="mt-3 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3 animate-in fade-in duration-150">
               <div className="flex items-center justify-between">
-                <span className="font-cabinet font-bold text-xs text-[#1A2E26]">
+                <span className="font-cabinet font-bold text-xs text-[#1A3629]">
                   Evening Wrap Seal
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveDrawer('none')}
-                  className="text-xs font-mono text-[#4A5D4E] hover:text-[#1A2E26] cursor-pointer"
+                  className="text-xs font-mono text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer"
                 >
                   <ChevronUp className="w-3.5 h-3.5" />
                 </button>
@@ -342,8 +375,8 @@ export function CoreHabitsCard() {
                       onClick={() => setEveningCaffeine(caff.id as any)}
                       className={`py-1 px-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         eveningCaffeine === caff.id
-                          ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                          : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629]'
                       }`}
                     >
                       {caff.label}
@@ -365,8 +398,8 @@ export function CoreHabitsCard() {
                       onClick={() => setEveningSlump(score)}
                       className={`py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         eveningSlump === score
-                          ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                          : 'bg-[#FFFDF9] border border-[#1A2E26]/10 text-[#1A2E26]'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                          : 'bg-[#FFFDF9] border border-[#1A3629]/10 text-[#1A3629]'
                       }`}
                     >
                       {score}
@@ -379,7 +412,7 @@ export function CoreHabitsCard() {
               <button
                 type="button"
                 onClick={handleSaveEveningWrap}
-                className="w-full py-2 rounded-xl bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
+                className="w-full py-2 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
               >
                 Seal Evening Wrap (+20 XP)
               </button>
@@ -388,10 +421,10 @@ export function CoreHabitsCard() {
         </div>
 
         {/* 2. Header: Title + Completion Counter */}
-        <div className="flex items-start justify-between gap-3 pt-3 pb-3 border-b border-[#1A2E26]/10">
+        <div className="flex items-start justify-between gap-3 pt-3 pb-3 border-b border-[#1A3629]/10">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A2E26] tracking-tight">
+              <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629] tracking-tight">
                 {isDownscaled ? 'Restorative Essentials' : 'Focus Essentials'}
               </h2>
               {isDownscaled && (
@@ -408,7 +441,7 @@ export function CoreHabitsCard() {
             </p>
           </div>
 
-          <span className="font-mono text-xs font-semibold text-[#1A2E26]/80 bg-[#FAF8F5] border border-[#1A2E26]/10 px-2.5 py-1 rounded-full shrink-0 tabular-nums">
+          <span className="font-mono text-xs font-semibold text-[#1A3629]/80 bg-[#FAF8F5] border border-[#1A3629]/10 px-2.5 py-1 rounded-full shrink-0 tabular-nums">
             {completedCount}/{activeHabits.length} done
           </span>
         </div>
@@ -423,9 +456,9 @@ export function CoreHabitsCard() {
           </div>
         )}
 
-        {/* Clean, Tactile Habit List */}
-        <div className="flex flex-col divide-y divide-[#1A2E26]/8 pt-1">
-          {activeHabits.map((habit) => {
+        {/* Clean, Tactile Habit List with Hotkeys */}
+        <div className="flex flex-col divide-y divide-[#1A3629]/8 pt-1">
+          {activeHabits.map((habit, idx) => {
             const isDone = !!currentLog.habitsCompleted[habit.id];
 
             return (
@@ -440,8 +473,8 @@ export function CoreHabitsCard() {
                   <div
                     className={`w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                       isDone
-                        ? 'border-[#1A2E26] bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                        : 'border-[#1A2E26]/25 bg-transparent group-hover:border-[#1A2E26]'
+                        ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                        : 'border-[#1A3629]/25 bg-transparent group-hover:border-[#1A3629]'
                     }`}
                   >
                     {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -451,7 +484,7 @@ export function CoreHabitsCard() {
                   <div className="flex flex-col min-w-0 flex-1">
                     <span
                       className={`font-cabinet font-semibold text-sm leading-snug transition-colors ${
-                        isDone ? 'text-[#1A2E26]/50 line-through decoration-[#1A2E26]/30' : 'text-[#1A2E26]'
+                        isDone ? 'text-[#1A3629]/50 line-through decoration-[#1A3629]/30' : 'text-[#1A3629]'
                       }`}
                     >
                       {habit.title}
@@ -462,14 +495,19 @@ export function CoreHabitsCard() {
                   </div>
                 </div>
 
-                {/* Reward */}
-                <span
-                  className={`font-mono text-xs font-semibold shrink-0 transition-colors ${
-                    isDone ? 'text-[#1A2E26]/40' : 'text-[#C9A84C]'
-                  }`}
-                >
-                  {isDone ? '✓' : '+15 XP'}
-                </span>
+                {/* Reward & Keyboard Accelerator Badge */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <kbd className="hidden sm:inline-flex items-center justify-center w-5 h-5 text-[10px] font-mono font-semibold text-[#1A3629]/40 bg-[#FAF8F5] border border-[#1A3629]/15 rounded shadow-2xs group-hover:border-[#1A3629]/30 group-hover:text-[#1A3629]/70 transition-colors">
+                    {idx + 1}
+                  </kbd>
+                  <span
+                    className={`font-mono text-xs font-semibold shrink-0 transition-colors ${
+                      isDone ? 'text-[#1A3629]/40' : 'text-[#C9A84C]'
+                    }`}
+                  >
+                    {isDone ? '✓' : '+15 XP'}
+                  </span>
+                </div>
               </button>
             );
           })}
@@ -478,12 +516,13 @@ export function CoreHabitsCard() {
 
       {/* Secondary Habits Tray */}
       {secondaryHabits.length > 0 && (
-        <div className="pt-3 border-t border-[#1A2E26]/8 flex flex-col gap-2">
+        <div className="pt-3 border-t border-[#1A3629]/8 flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs">
             <button
               type="button"
+              aria-expanded={isTrayOpen}
               onClick={() => setIsTrayOpen(!isTrayOpen)}
-              className="text-xs font-cabinet font-bold text-[#4A5D4E] hover:text-[#1A2E26] cursor-pointer flex items-center gap-1"
+              className="text-xs font-cabinet font-bold text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer flex items-center gap-1"
             >
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isTrayOpen ? 'rotate-180' : ''}`} />
               <span>{isTrayOpen ? 'Hide secondary habits' : `View ${secondaryHabits.length} more habits`}</span>
@@ -492,7 +531,7 @@ export function CoreHabitsCard() {
             <button
               type="button"
               onClick={() => setShowAddForm(!showAddForm)}
-              className="text-xs font-cabinet font-bold text-[#1A2E26] hover:underline cursor-pointer flex items-center gap-1"
+              className="text-xs font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
             >
               <Plus className="w-3 h-3" />
               <span>Custom Habit</span>
@@ -500,7 +539,7 @@ export function CoreHabitsCard() {
           </div>
 
           {isTrayOpen && (
-            <div className="flex flex-col divide-y divide-[#1A2E26]/6 pt-1 animate-in fade-in duration-150">
+            <div className="flex flex-col divide-y divide-[#1A3629]/6 pt-1 animate-in fade-in duration-150">
               {secondaryHabits.map((habit) => {
                 const isDone = !!currentLog.habitsCompleted[habit.id];
                 return (
@@ -512,7 +551,7 @@ export function CoreHabitsCard() {
                   >
                     <span
                       className={`font-cabinet font-medium truncate ${
-                        isDone ? 'text-[#1A2E26]/40 line-through decoration-[#1A2E26]/25' : 'text-[#1A2E26]'
+                        isDone ? 'text-[#1A3629]/40 line-through decoration-[#1A3629]/25' : 'text-[#1A3629]'
                       }`}
                     >
                       {habit.title}
@@ -533,11 +572,11 @@ export function CoreHabitsCard() {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Habit title (e.g. 10m Box Breathing)"
-                className="flex-1 text-xs font-cabinet bg-[#FAF8F5] border border-[#1A2E26]/20 rounded-lg p-2 outline-none text-[#1A2E26]"
+                className="flex-1 text-xs font-cabinet bg-[#FAF8F5] border border-[#1A3629]/20 rounded-lg p-2 outline-none text-[#1A3629]"
               />
               <button
                 type="submit"
-                className="px-3 py-2 bg-[#1A2E26] text-[#FFFDF9] text-xs font-cabinet font-bold rounded-lg cursor-pointer"
+                className="px-3 py-2 bg-[#1A3629] text-[#FFFDF9] text-xs font-cabinet font-bold rounded-lg cursor-pointer hover:bg-[#2C4A3B]"
               >
                 Add
               </button>

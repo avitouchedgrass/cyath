@@ -63,7 +63,7 @@ export function QuestPanel() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#1A3629]/15 pb-4">
         <div>
-          <h3 className="font-fraunces font-black text-2xl text-[#1A3629] tracking-tight">
+          <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
             Active Quests & Challenges
           </h3>
         </div>
@@ -103,7 +103,7 @@ export function QuestPanel() {
                   </span>
                 </div>
 
-                <h4 className="font-fraunces font-bold text-lg text-[#1A3629] mb-1">
+                <h4 className="font-cabinet font-bold text-lg text-[#1A3629] mb-1">
                   {quest.title}
                 </h4>
                 <p className="font-sans text-xs text-[#4A5D4E] mb-4 leading-relaxed">
@@ -164,7 +164,7 @@ export function QuestPanel() {
               Weekly Endurance Goal
             </span>
           </div>
-          <h4 className="font-fraunces font-bold text-xl text-[#1A3629] mb-1">
+          <h4 className="font-cabinet font-bold text-xl text-[#1A3629] mb-1">
             7-Day Consistency Challenge
           </h4>
           <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed">

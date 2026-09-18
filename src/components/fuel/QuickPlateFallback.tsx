@@ -69,9 +69,9 @@ export function QuickPlateFallback({ onLogged }: QuickPlateFallbackProps) {
   };
 
   return (
-    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-[#1A2E26]/12 bg-[#FDFBF7]">
+    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FDFBF7]">
       <div className="flex flex-col">
-        <span className="font-cabinet font-bold text-xs text-[#1A2E26]">
+        <span className="font-cabinet font-bold text-xs text-[#1A3629]">
           1-Tap Quick Meal Log
         </span>
         <span className="text-[11px] text-[#4A5D4E] font-sans">
@@ -85,7 +85,7 @@ export function QuickPlateFallback({ onLogged }: QuickPlateFallbackProps) {
             key={plate.type}
             type="button"
             onClick={(e) => handleSelectPlate(plate, e)}
-            className="flex-1 sm:flex-none inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border border-[#1A2E26]/15 bg-[#FFFDF9] hover:bg-[#1A2E26] hover:text-[#FFFDF9] text-[#1A2E26] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs group active:scale-98"
+            className="flex-1 sm:flex-none inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs group active:scale-98"
           >
             <span>{plate.label}</span>
             <span className="font-mono text-[10px] opacity-70 group-hover:opacity-90">

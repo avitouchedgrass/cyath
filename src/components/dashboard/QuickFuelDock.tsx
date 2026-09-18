@@ -45,7 +45,7 @@ export function QuickFuelDock() {
       {/* Dock Header */}
       <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/15">
         <div className="min-w-0">
-          <h2 className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629] truncate">
+          <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629] truncate">
             Quick Nutrition Presets
           </h2>
           <p className="font-cabinet text-xs text-[#4A5D4E] truncate">

@@ -39,7 +39,12 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
     });
   }, [currentDate, logsByDate, deskRitualsByDate, dailyProtocolsAcceptedByDate]);
 
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    if (isOpen) {
+      modalRef.current?.focus();
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) onClose();
     };
@@ -63,13 +68,16 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dossier-modal-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3629]/30 backdrop-blur-xs animate-in fade-in"
     >
       <div
-        className="w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.14)] max-h-[90vh] overflow-y-auto flex flex-col gap-6"
+        ref={modalRef}
+        tabIndex={-1}
+        className="w-full max-w-2xl bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(26,54,41,0.14)] max-h-[90vh] overflow-y-auto flex flex-col gap-6 outline-none"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#1A3629]/10">
@@ -80,7 +88,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
                 7-Day Reclamation Dossier
               </span>
             </div>
-            <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1.5 tracking-tight">
+            <h2 id="dossier-modal-title" className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-1.5 tracking-tight">
               Weekly Energy Audit &amp; Impact
             </h2>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">

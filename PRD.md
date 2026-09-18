@@ -24,7 +24,7 @@
 
 ### 2.2 Typography
 
-* **Headings (`h1`, `h2`, `h3`):** `Playfair Display` (High-contrast serif for a refined editorial feel).
+* **Headings (`h1`, `h2`, `h3`):** `Cabinet Grotesk` (High-contrast sans-serif for a refined modern aesthetic).
 * **Body Text & Metrics:** `Inter` or `Space Grotesk` (Clean sans-serif optimized for 14–16px legibility).
 
 ### 2.3 Glassmorphism Standards
@@ -38,7 +38,7 @@
 ### 3.1 Hero & Landing Shell
 
 * Sticky frosted-glass navigation bar featuring the pixel-wave monogram logo and inverted monochrome authentication actions.
-* Editorial serif headline paired with animated floating pixel-art food assets driven by CSS keyframes.
+* Display sans-serif headline paired with animated floating pixel-art food assets driven by CSS keyframes.
 
 ### 3.2 Recipe & Food Logging Engine
 

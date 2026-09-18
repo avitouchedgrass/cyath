@@ -142,7 +142,7 @@ export function OmniDock() {
       <div className="flex items-center justify-between pb-3 border-b border-[#1A3629]/15">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
-          <h2 className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629]">
+          <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629]">
             {isMorning
               ? 'Morning Boot · 10-Second Check-In'
               : isEvening

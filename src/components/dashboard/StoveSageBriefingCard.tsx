@@ -30,7 +30,7 @@ export function StoveSageBriefingCard() {
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] block mb-0.5">
             StoveSage · Intelligence Briefing
           </span>
-          <h3 className="font-fraunces font-bold text-lg text-[#1A3629] leading-tight">
+          <h3 className="font-cabinet font-bold text-lg text-[#1A3629] leading-tight">
             {briefing.greeting}
           </h3>
         </div>

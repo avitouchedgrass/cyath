@@ -558,17 +558,17 @@ function PlaybookContent() {
         {/* Recipe Detail Modal — Spacious Editorial Culinary Spread */}
         {selectedRecipe && (
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#1A2E26]/40 backdrop-blur-xs animate-in fade-in duration-200"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#1A3629]/40 backdrop-blur-xs animate-in fade-in duration-200"
             onClick={() => setSelectedRecipe(null)}
           >
             <div 
-              className="w-full max-w-5xl bg-[#FFFDF9] border-2 border-[#1A2E26] rounded-3xl shadow-[8px_8px_0px_#1A2E26] flex flex-col max-h-[92vh] overflow-hidden"
+              className="w-full max-w-5xl bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl shadow-[8px_8px_0px_#1A3629] flex flex-col max-h-[92vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Top Bar */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A2E26]/12 bg-[#FAF8F5]/80 shrink-0">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A3629]/12 bg-[#FAF8F5]/80 shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26] bg-[#FFFDF9] px-3 py-1 rounded-full border border-[#1A2E26]/15 shadow-2xs">
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629] bg-[#FFFDF9] px-3 py-1 rounded-full border border-[#1A3629]/15 shadow-2xs">
                     {selectedRecipe.category}
                   </span>
                   <span className="font-mono text-xs text-[#4A5D4E]">·</span>
@@ -580,7 +580,7 @@ function PlaybookContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedRecipe(null)}
-                  className="w-8 h-8 rounded-full border border-[#1A2E26]/20 bg-[#FFFDF9] text-[#1A2E26] hover:bg-[#1A2E26] hover:text-[#FFFDF9] transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+                  className="w-8 h-8 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all flex items-center justify-center cursor-pointer shadow-2xs"
                   aria-label="Close modal"
                 >
                   <X className="w-4 h-4" />
@@ -588,13 +588,13 @@ function PlaybookContent() {
               </div>
 
               {/* 2-Column Culinary Magazine Spread */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 divide-y lg:divide-y-0 lg:divide-x divide-[#1A2E26]/12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 divide-y lg:divide-y-0 lg:divide-x divide-[#1A3629]/12">
                 
                 {/* LEFT COLUMN: Food Diorama, Macros & Primary CTA */}
                 <div className="lg:col-span-5 p-6 sm:p-7 flex flex-col gap-4 bg-[#FAF8F5]/50 overflow-y-auto">
                   
                   {/* Food Plate Showcase */}
-                  <div className="w-full aspect-square max-w-[260px] mx-auto relative flex items-center justify-center bg-[#FAF8F5] rounded-2xl border border-[#1A2E26]/15 p-4 shadow-[inset_0_2px_8px_rgba(26,46,38,0.06)]">
+                  <div className="w-full aspect-square max-w-[260px] mx-auto relative flex items-center justify-center bg-[#FAF8F5] rounded-2xl border border-[#1A3629]/15 p-4 shadow-[inset_0_2px_8px_rgba(26,54,41,0.06)]">
                     <PixelSteam active={true} intensity={0.9} />
                     <img
                       src={selectedRecipe.portionImages?.[portionMultiplier] || selectedRecipe.image}
@@ -612,11 +612,11 @@ function PlaybookContent() {
                   </div>
 
                   {/* Portion Multiplier Pills */}
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A2E26]/12">
-                    <span className="font-mono text-xs font-bold text-[#1A2E26]">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/12">
+                    <span className="font-mono text-xs font-bold text-[#1A3629]">
                       Portion:
                     </span>
-                    <div className="inline-flex items-center gap-1 p-0.5 rounded-lg border border-[#1A2E26]/20 bg-[#FAF8F5]">
+                    <div className="inline-flex items-center gap-1 p-0.5 rounded-lg border border-[#1A3629]/20 bg-[#FAF8F5]">
                       {PORTION_MULTIPLIERS.map((mult) => (
                         <button
                           key={mult}
@@ -627,8 +627,8 @@ function PlaybookContent() {
                           }}
                           className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
                             portionMultiplier === mult
-                              ? 'bg-[#1A2E26] text-[#FFFDF9] shadow-2xs'
-                              : 'text-[#1A2E26]/70 hover:text-[#1A2E26]'
+                              ? 'bg-[#1A3629] text-[#FFFDF9] shadow-2xs'
+                              : 'text-[#1A3629]/70 hover:text-[#1A3629]'
                           }`}
                         >
                           {mult}x
@@ -666,7 +666,7 @@ function PlaybookContent() {
                     <button
                       type="button"
                       onClick={(e) => handleLogRecipe(selectedRecipe, portionMultiplier, e)}
-                      className="flex-1 py-3 px-5 rounded-xl border-2 border-[#1A2E26] bg-[#1A2E26] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm hover:bg-[#2C4A3B] shadow-[2px_2px_0px_#3A6B52] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
+                      className="flex-1 py-3 px-5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs sm:text-sm hover:bg-[#2C4A3B] shadow-[2px_2px_0px_#3A6B52] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       <span>+ Log Meal to Today</span>
                       <span className="font-mono text-xs opacity-80">
@@ -681,7 +681,7 @@ function PlaybookContent() {
                   
                   {/* Title & Description */}
                   <div className="flex flex-col gap-2">
-                    <h3 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A2E26] tracking-tight leading-snug">
+                    <h3 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight leading-snug">
                       {selectedRecipe.name}
                     </h3>
                     <p className="font-cabinet text-sm text-[#4A5D4E] leading-relaxed">
@@ -691,8 +691,8 @@ function PlaybookContent() {
 
                   {/* Ingredients Section */}
                   <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-[#1A2E26]/15">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26]">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-[#1A3629]/15">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
                         Ingredients ({selectedRecipe.ingredients.length})
                       </span>
                       <span className="font-mono text-[11px] text-[#4A5D4E]">
@@ -704,10 +704,10 @@ function PlaybookContent() {
                       {selectedRecipe.ingredients.map((ing, i) => (
                         <div
                           key={i}
-                          className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF8F5] border border-[#1A2E26]/10 text-xs font-mono text-[#1A2E26]"
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/10 text-xs font-mono text-[#1A3629]"
                         >
                           <span className="truncate pr-2 font-medium">{ing.item}</span>
-                          <span className="font-bold shrink-0 text-[#065F46] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A2E26]/10">
+                          <span className="font-bold shrink-0 text-[#065F46] bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#1A3629]/10">
                             {ing.amount}
                           </span>
                         </div>
@@ -717,19 +717,19 @@ function PlaybookContent() {
 
                   {/* Preparation Steps Section */}
                   <div className="flex flex-col gap-3 pt-1">
-                    <div className="pb-1.5 border-b border-[#1A2E26]/15">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A2E26]">
+                    <div className="pb-1.5 border-b border-[#1A3629]/15">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
                         Preparation Steps
                       </span>
                     </div>
 
                     <div className="flex flex-col gap-2.5">
                       {selectedRecipe.instructions.map((step, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#FAF8F5]/60 border border-[#1A2E26]/8">
-                          <span className="w-6 h-6 rounded-lg bg-[#1A2E26] text-[#FFFDF9] font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#FAF8F5]/60 border border-[#1A3629]/8">
+                          <span className="w-6 h-6 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                             {i + 1}
                           </span>
-                          <p className="font-cabinet text-xs sm:text-sm text-[#1A2E26] leading-relaxed pt-0.5">
+                          <p className="font-cabinet text-xs sm:text-sm text-[#1A3629] leading-relaxed pt-0.5">
                             {step}
                           </p>
                         </div>

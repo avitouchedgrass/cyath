@@ -101,7 +101,7 @@ export function BiologicalReflectionMatrix() {
               LIVE SANCTUARY STATUS · OBSERVATORY
             </span>
           </div>
-          <h2 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] mt-2 tracking-tight">
+          <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-2 tracking-tight">
             Ecosystem Vitality · Level {matrix.ecosystemVitalityLevel} / 10
           </h2>
           <p className="font-cabinet text-xs sm:text-sm font-medium text-[#2C4A3B] mt-1 leading-relaxed">
@@ -112,7 +112,7 @@ export function BiologicalReflectionMatrix() {
         {/* Integrated Biome Vitality Dial */}
         <div className="flex items-center gap-4 bg-[#FAF8F5] p-3.5 sm:p-4 rounded-2xl border-2 border-[#1A3629] shrink-0 shadow-[2px_2px_0px_#1A3629]">
           <div className="relative w-14 h-14 rounded-full border-2 border-[#1A3629] bg-[#1A3629] flex flex-col items-center justify-center text-[#FFFDF9] shadow-[1px_1px_0px_#C9A84C]">
-            <span className="font-fraunces font-black text-xl leading-none">
+            <span className="font-cabinet font-extrabold text-xl leading-none">
               {matrix.ecosystemVitalityLevel}
             </span>
             <span className="font-mono text-[8px] tracking-widest text-[#C9A84C] uppercase mt-0.5">
@@ -123,7 +123,7 @@ export function BiologicalReflectionMatrix() {
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
               Ecosystem Harmony
             </span>
-            <span className="font-fraunces font-bold text-lg text-[#1A3629] tabular-nums leading-tight">
+            <span className="font-cabinet font-bold text-lg text-[#1A3629] tabular-nums leading-tight">
               {matrix.ecosystemVitalityLevel * 10}% Biome Health
             </span>
             <span className="font-mono text-[10px] text-[#1A3629]/70">
@@ -170,7 +170,7 @@ export function BiologicalReflectionMatrix() {
             </div>
 
             {/* Metrics */}
-            <div className="font-fraunces font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+            <div className="font-cabinet font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
               {matrix.hearth.primaryMetric}
             </div>
             <div className="font-mono text-xs text-[#4A5D4E] mt-0.5">
@@ -234,7 +234,7 @@ export function BiologicalReflectionMatrix() {
             </div>
 
             {/* Metrics */}
-            <div className="font-fraunces font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+            <div className="font-cabinet font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
               {matrix.canopy.primaryMetric}
             </div>
             <div className="font-mono text-xs text-[#4A5D4E] mt-0.5">
@@ -298,7 +298,7 @@ export function BiologicalReflectionMatrix() {
             </div>
 
             {/* Metrics */}
-            <div className="font-fraunces font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
+            <div className="font-cabinet font-bold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
               {matrix.atmosphere.primaryMetric}
             </div>
             <div className="font-mono text-xs text-[#4A5D4E] mt-0.5">

@@ -67,7 +67,7 @@ export function DailyQuestsMini() {
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/70 block">
             Daily Rituals
           </span>
-          <h3 className="font-fraunces font-bold text-base text-[#1A3629] tracking-tight">
+          <h3 className="font-cabinet font-bold text-base text-[#1A3629] tracking-tight">
             Daily Focus
           </h3>
         </div>

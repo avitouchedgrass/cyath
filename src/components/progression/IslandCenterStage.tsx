@@ -191,7 +191,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
                   </span>
                 )}
               </div>
-              <h3 className="font-fraunces font-bold text-base sm:text-lg text-[#1A3629] tracking-tight leading-none mt-0.5">
+              <h3 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629] tracking-tight leading-none mt-0.5">
                 {displayedIsland.name}
               </h3>
             </div>

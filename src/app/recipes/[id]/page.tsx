@@ -142,22 +142,22 @@ export default async function RecipeDetailPage({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
               <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Protein</div>
-                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-emerald-700 mt-0.5">{recipe.protein}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-0.5">{recipe.protein}g</div>
               </div>
 
               <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Calories</div>
-                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-amber-700 mt-0.5">{recipe.calories}</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#A3432A] mt-0.5">{recipe.calories}</div>
               </div>
 
               <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Carbs</div>
-                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-blue-700 mt-0.5">{recipe.carbs}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#2C5E43] mt-0.5">{recipe.carbs}g</div>
               </div>
 
               <div className="border border-[#1A3629]/10 bg-[#FAF6EE] rounded-2xl p-3.5 text-center shadow-2xs">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">Fats</div>
-                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-purple-700 mt-0.5">{recipe.fats}g</div>
+                <div className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#78350F] mt-0.5">{recipe.fats}g</div>
               </div>
             </div>
           </header>

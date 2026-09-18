@@ -98,12 +98,12 @@ export function CommandProtocolCard() {
       <div className="flex flex-col gap-3">
         <h2 
           id="daily-protocol-title"
-          className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] tracking-tight leading-tight"
+          className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight leading-tight"
         >
           {protocol.title}
         </h2>
 
-        <div className="border-l-3 border-[#1A3629] bg-[#FAF6EE] px-4 py-3.5 rounded-r-xl">
+        <div className="border border-[#1A3629]/15 bg-[#FAF6EE] px-4 py-3.5 rounded-2xl">
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#92400E] block mb-1">
             Exact Directive
           </span>

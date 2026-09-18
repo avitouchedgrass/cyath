@@ -133,7 +133,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
 
       {/* Island Description & Details */}
       <div className="z-10 text-center max-w-md flex flex-col items-center gap-1.5 mb-6">
-        <h2 className="font-fraunces font-black text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
+        <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
           {displayedIsland.name}
         </h2>
         <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] leading-relaxed">

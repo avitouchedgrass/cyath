@@ -618,13 +618,13 @@ export function FuelTab() {
       )}
 
       {/* 4. Playbook Invitation Banner */}
-      <div className="w-full rounded-3xl border border-[#1A2E26]/15 bg-[#FAF8F5] p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[2px_2px_0px_rgba(26,46,38,0.06)]">
+      <div className="w-full rounded-3xl border border-[#1A3629]/15 bg-[#FAF8F5] p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[2px_2px_0px_rgba(26,54,41,0.06)]">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-[#FFFDF9] border border-[#1A2E26]/12 flex items-center justify-center text-[#1A2E26] shrink-0 shadow-2xs">
+          <div className="w-10 h-10 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 flex items-center justify-center text-[#1A3629] shrink-0 shadow-2xs">
             <Utensils className="w-5 h-5 text-[#C9A84C]" />
           </div>
           <div>
-            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A2E26]">
+            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629]">
               Looking for Science-Backed Meals?
             </h3>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
@@ -635,7 +635,7 @@ export function FuelTab() {
 
         <Link
           href="/playbook?tab=fuel"
-          className="px-5 py-2.5 rounded-full bg-[#1A2E26] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-2xs group"
+          className="px-5 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-all flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-2xs group"
         >
           <span>Open Recipe Playbook</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

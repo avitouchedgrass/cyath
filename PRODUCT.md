@@ -39,7 +39,7 @@ Unlike generic calorie counters and noisy fitness apps filled with ads and compl
 
 - **Name**: Cyath
 - **Tagline**: Pixel-Perfect Health
-- **Visual Identity**: Obsidian charcoal background, subtle frosted glass surfaces, high-contrast typography (`Playfair Display` serif headers + `Inter` sans-serif metrics/body), and crisp un-blurred pixel art (`image-rendering: pixelated`).
+- **Visual Identity**: Obsidian charcoal background, subtle frosted glass surfaces, high-contrast typography (`Cabinet Grotesk` sans-serif headers + `Inter` sans-serif metrics/body), and crisp un-blurred pixel art (`image-rendering: pixelated`).
 
 ## Evidence on Hand
 

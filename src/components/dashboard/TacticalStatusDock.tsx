@@ -44,17 +44,17 @@ export function TacticalStatusDock() {
     <>
       <section 
         aria-label="Daily Routines and Desk Check-ins"
-        className="w-full border-2 border-[#1A2E26] bg-[#FFFDF9] rounded-2xl p-5 shadow-[3px_3px_0px_#1A2E26] flex flex-col gap-4 transition-all"
+        className="w-full border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4 transition-all"
       >
         {/* Progression & Sanctuary Block */}
-        <div className="flex flex-col gap-3 pb-3.5 border-b border-[#1A2E26]/15">
+        <div className="flex flex-col gap-3 pb-3.5 border-b border-[#1A3629]/15">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-[#1A2E26] text-[#FFFDF9] font-mono font-black text-xs flex items-center justify-center">
+              <span className="w-8 h-8 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-mono font-black text-xs flex items-center justify-center">
                 L{progress.level}
               </span>
               <div>
-                <span className="font-cabinet font-bold text-xs text-[#1A2E26] block leading-tight">
+                <span className="font-cabinet font-bold text-xs text-[#1A3629] block leading-tight">
                   {islandTier.name}
                 </span>
                 <span className="font-mono text-[10px] text-[#4A5D4E] block">
@@ -64,7 +64,7 @@ export function TacticalStatusDock() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full border border-[#1A2E26]/20 bg-[#FAF6EE] text-[11px] font-mono font-bold text-[#1A2E26] tabular-nums">
+              <span className="px-2.5 py-1 rounded-full border border-[#1A3629]/20 bg-[#FAF6EE] text-[11px] font-mono font-bold text-[#1A3629] tabular-nums">
                 {streakCount} {streakCount === 1 ? 'Day Streak' : 'Days Streak'}
               </span>
             </div>
@@ -73,13 +73,13 @@ export function TacticalStatusDock() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-[10px] font-mono">
               <span className="text-[#4A5D4E]">Level Progress</span>
-              <span className="font-bold text-[#1A2E26]">
+              <span className="font-bold text-[#1A3629]">
                 {progress.isMaxLevel ? 'Max Level' : `${progress.currentLevelXp} / ${progress.xpForNextLevel} XP`}
               </span>
             </div>
             <div className="w-full h-2 bg-[#EAE3D2] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#1A2E26] rounded-full transition-all duration-500"
+                className="h-full bg-[#1A3629] rounded-full transition-all duration-500"
                 style={{ width: `${progress.progressPercent}%` }}
               />
             </div>
@@ -88,7 +88,7 @@ export function TacticalStatusDock() {
           <div className="flex items-center justify-between pt-0.5">
             <Link
               href="/sanctuary"
-              className="text-xs font-cabinet font-bold text-[#1A2E26] hover:text-[#065F46] hover:underline cursor-pointer"
+              className="text-xs font-cabinet font-bold text-[#1A3629] hover:text-[#065F46] hover:underline cursor-pointer"
             >
               Sanctuary Island →
             </Link>
@@ -99,8 +99,8 @@ export function TacticalStatusDock() {
         </div>
 
         {/* Biometric Weight Check-in Strip */}
-        <div className="flex items-center justify-between pt-1 pb-1 border-b border-[#1A2E26]/15">
-          <div className="flex items-center gap-1.5 font-mono text-xs text-[#1A2E26]">
+        <div className="flex items-center justify-between pt-1 pb-1 border-b border-[#1A3629]/15">
+          <div className="flex items-center gap-1.5 font-mono text-xs text-[#1A3629]">
             <span className="text-[#4A5D4E]">Weight:</span>
             <span className="font-bold">{currentWeightKg} kg</span>
             {latestTrend && (
@@ -109,7 +109,7 @@ export function TacticalStatusDock() {
                   ? 'bg-[#ECFDF5] text-[#065F46] border-[#10B981]/30'
                   : latestTrend === 'up'
                   ? 'bg-[#EFF6FF] text-[#1E40AF] border-[#3B82F6]/30'
-                  : 'bg-[#FAF8F5] text-[#1A2E26]/70 border-[#1A2E26]/15'
+                  : 'bg-[#FAF8F5] text-[#1A3629]/70 border-[#1A3629]/15'
               }`}>
                 {latestTrend === 'down' ? '↓' : latestTrend === 'up' ? '↑' : '→'} {latestDelta > 0 ? `+${latestDelta}` : latestDelta}kg
               </span>
@@ -122,7 +122,7 @@ export function TacticalStatusDock() {
               retroAudio.playInspectConfirm();
               setIsWeightModalOpen(true);
             }}
-            className="text-[11px] font-mono font-bold text-[#1A2E26] hover:bg-[#FAF6EE] cursor-pointer bg-[#FFFDF9] px-2.5 py-1 rounded-lg border border-[#1A2E26]/20 transition-all shadow-2xs"
+            className="text-[11px] font-mono font-bold text-[#1A3629] hover:bg-[#FAF6EE] cursor-pointer bg-[#FFFDF9] px-2.5 py-1 rounded-lg border border-[#1A3629]/20 transition-all shadow-2xs"
           >
             Weight Log
           </button>
@@ -150,7 +150,7 @@ export function TacticalStatusDock() {
           </div>
 
           {/* Calm Static Circadian Milestone */}
-          <div className="flex items-center justify-between bg-[#FAF6EE] px-2.5 py-1.5 rounded-lg border border-[#1A2E26]/15 font-mono text-xs">
+          <div className="flex items-center justify-between bg-[#FAF6EE] px-2.5 py-1.5 rounded-lg border border-[#1A3629]/15 font-mono text-xs">
             <span className="text-[#4A5D4E] text-[10px] uppercase font-bold">
               {dynamicPhase === 'morning'
                 ? 'Caffeine Delay:'
@@ -158,7 +158,7 @@ export function TacticalStatusDock() {
                 ? 'Caffeine Cutoff:'
                 : 'Digital Sunset:'}
             </span>
-            <span className="font-bold text-[#1A2E26] tracking-wider">
+            <span className="font-bold text-[#1A3629] tracking-wider">
               {dynamicPhase === 'morning'
                 ? (circadian.milestones.isCaffeinePermissible
                   ? 'Permissible Now'
@@ -174,7 +174,7 @@ export function TacticalStatusDock() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <h3 className="font-fraunces font-bold text-base text-[#1A2E26] leading-snug">
+            <h3 className="font-cabinet font-bold text-base text-[#1A3629] leading-snug">
               {dynamicPhase === 'morning'
                 ? morningDone
                   ? 'Morning Baseline Calibrated'
@@ -204,8 +204,8 @@ export function TacticalStatusDock() {
                 }}
                 className={`w-full py-2.5 px-4 rounded-xl border-2 font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center ${
                   morningDone
-                    ? 'bg-[#FAF6EE] border-[#1A2E26] text-[#1A2E26] hover:bg-[#FFFDF9]'
-                    : 'bg-[#1A2E26] border-[#1A2E26] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
+                    ? 'bg-[#FAF6EE] border-[#1A3629] text-[#1A3629] hover:bg-[#FFFDF9]'
+                    : 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
                 }`}
               >
                 {morningDone ? 'Review Morning Boot' : `Start Morning Boot (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP)`}
@@ -223,7 +223,7 @@ export function TacticalStatusDock() {
                     setIsEveningModalOpen(true);
                   }
                 }}
-                className="w-full py-2.5 px-4 rounded-xl border-2 border-[#1A2E26] bg-[#FAF6EE] hover:bg-[#FFFDF9] text-[#1A2E26] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A2E26] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center"
+                className="w-full py-2.5 px-4 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] hover:bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center"
               >
                 {morningDone ? 'Pre-log Evening Wrap →' : `Log Morning Boot (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP) →`}
               </button>
@@ -238,8 +238,8 @@ export function TacticalStatusDock() {
                 }}
                 className={`w-full py-2.5 px-4 rounded-xl border-2 font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center ${
                   eveningDone
-                    ? 'bg-[#FAF6EE] border-[#1A2E26] text-[#1A2E26] hover:bg-[#FFFDF9]'
-                    : 'bg-[#1A2E26] border-[#1A2E26] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
+                    ? 'bg-[#FAF6EE] border-[#1A3629] text-[#1A3629] hover:bg-[#FFFDF9]'
+                    : 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
                 }`}
               >
                 {eveningDone ? 'Review Desk Wrap' : `Seal Desk Wrap (+${XP_MATRIX.EVENING_WRAP} XP)`}

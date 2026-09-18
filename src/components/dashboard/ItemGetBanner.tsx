@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { X, Trophy } from 'lucide-react';
+
+import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 
 interface ItemGetBannerProps {
   onOpenVault: (trophyId?: string) => void;
@@ -37,13 +38,11 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-auto animate-in slide-in-from-top-4 fade-in duration-300">
       <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-4 shadow-[6px_6px_0px_#1A3629] flex items-center gap-4">
         <div className="w-14 h-14 relative shrink-0 bg-[#FAF8F5] rounded-xl border border-[#1A3629]/20 p-1 flex items-center justify-center">
-          <Image
-            src={pendingTrophyUnlock.spriteUrl}
-            alt={pendingTrophyUnlock.title}
-            width={48}
-            height={48}
-            className="object-contain select-none"
-            style={{ imageRendering: 'pixelated' }}
+          <TrophyRelicSprite
+            trophyId={pendingTrophyUnlock.id}
+            tier={pendingTrophyUnlock.tier}
+            isUnlocked={true}
+            size={44}
           />
         </div>
 

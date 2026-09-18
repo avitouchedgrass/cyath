@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition } from '@/store/useHabitStore';
+import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Lock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { X, Lock, CheckCircle2, AlertTriangle, Shield } from 'lucide-react';
 
 interface SpecimenVaultDrawerProps {
   isOpen: boolean;
@@ -13,9 +13,12 @@ interface SpecimenVaultDrawerProps {
   initialSelectedId?: string | null;
 }
 
+type FilterCategory = 'all' | 'keystones' | 'streaks' | 'mastery' | 'shame';
+
 export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: SpecimenVaultDrawerProps) {
   const { unlockedTrophies } = useHabitStore();
   const [selectedTrophy, setSelectedTrophy] = useState<TrophyDefinition | null>(null);
+  const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
 
   useEffect(() => {
     if (initialSelectedId) {
@@ -38,51 +41,112 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, selectedTrophy, onClose]);
 
-  if (!isOpen) return null;
-
   const unlockedCount = unlockedTrophies.length;
   const totalCount = TROPHIES_ROSTER.length;
+
+  const filteredTrophies = useMemo(() => {
+    if (activeCategory === 'all') return TROPHIES_ROSTER;
+    if (activeCategory === 'shame') return TROPHIES_ROSTER.filter((t) => t.isShame);
+    if (activeCategory === 'keystones') {
+      return TROPHIES_ROSTER.filter((t) =>
+        ['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light'].includes(t.id)
+      );
+    }
+    if (activeCategory === 'streaks') {
+      return TROPHIES_ROSTER.filter((t) =>
+        ['streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
+      );
+    }
+    // mastery
+    return TROPHIES_ROSTER.filter(
+      (t) =>
+        !t.isShame &&
+        !['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light', 'streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
+    );
+  }, [activeCategory]);
+
+  if (!isOpen) return null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="vault-drawer-title"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#1A3629]/40 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#050A07]/80 backdrop-blur-md animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Slide-Up Bottom Drawer with 20 Trophy Grid */}
-      <div className="w-full max-w-6xl max-h-[85vh] bg-[#FAF8F5] border-t border-x border-[#1A3629]/15 rounded-t-3xl flex flex-col shadow-[0_-20px_50px_rgba(26,54,41,0.15)] animate-in slide-in-from-bottom duration-300 overflow-hidden">
+      {/* Slide-Up Obsidian & Burnished Brass Reliquary Chamber */}
+      <div className="w-full max-w-6xl max-h-[88vh] bg-[#0A120D] border-t border-x border-[#2A3E31] rounded-t-3xl flex flex-col shadow-[0_-30px_90px_rgba(0,0,0,0.85)] animate-in slide-in-from-bottom duration-300 overflow-hidden">
         
-        {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-[#1A3629]/10 bg-[#FFFDF9] shrink-0">
-          <div className="flex items-center gap-3">
+        {/* Machined Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 sm:px-8 py-5 border-b border-[#1E2E24] bg-[#0E1A12] shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#060D09] border border-[#2A3E31] flex items-center justify-center text-[#FBBF24] shadow-[inset_0_2px_6px_rgba(0,0,0,0.6)]">
+              <Shield className="w-5 h-5" />
+            </div>
             <div>
-              <h2 id="vault-drawer-title" className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
-                Specimen Vault
-              </h2>
-              <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-                {unlockedCount} of {totalCount} specimens unlocked
+              <div className="flex items-center gap-2.5">
+                <h2 id="vault-drawer-title" className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#E2E8F0] tracking-tight">
+                  Specimen Reliquary
+                </h2>
+                <span className="font-mono text-xs font-bold text-[#FBBF24] bg-[#FBBF24]/10 border border-[#FBBF24]/20 px-2.5 py-0.5 rounded-full">
+                  {unlockedCount} // {totalCount} CLAIMED
+                </span>
+              </div>
+              <p className="font-sans text-xs text-[#738A7D] mt-0.5">
+                Uniform pixel-art chalice trophies minted through biological consistency.
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-9 h-9 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
-            aria-label="Close vault"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[#060D09] border border-[#1E2E24]">
+              {(
+                [
+                  { id: 'all', label: 'All' },
+                  { id: 'keystones', label: 'Keystones' },
+                  { id: 'streaks', label: 'Streaks' },
+                  { id: 'mastery', label: 'Mastery' },
+                  { id: 'shame', label: 'Shame' },
+                ] as const
+              ).map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playBlip();
+                    haptics.tap();
+                    setActiveCategory(cat.id);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-cabinet font-bold transition-all cursor-pointer ${
+                    activeCategory === cat.id
+                      ? 'bg-[#1E2E24] text-[#E2E8F0] shadow-xs'
+                      : 'text-[#738A7D] hover:text-[#E2E8F0]'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-9 h-9 rounded-full border border-[#2A3E31] bg-[#060D09] text-[#738A7D] hover:text-[#E2E8F0] hover:border-[#E2E8F0]/30 transition-colors flex items-center justify-center cursor-pointer"
+              aria-label="Close reliquary"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* 20-Trophy Clean Transparent Grid Showcase */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
-            {TROPHIES_ROSTER.map((trophy) => {
+        {/* 20-Trophy Uniform Recessed Alcoves Grid */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-[#08100B]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+            {filteredTrophies.map((trophy) => {
               const isUnlocked = unlockedTrophies.includes(trophy.id);
 
               return (
@@ -94,50 +158,55 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                     haptics.tap();
                     setSelectedTrophy(trophy);
                   }}
-                  className="flex flex-col items-center p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FFFDF9] hover:bg-[#FAF6EE] hover:border-[#1A3629]/30 transition-all cursor-pointer group shadow-2xs text-center"
+                  className="flex flex-col items-center p-4 rounded-2xl border border-[#1A2820] bg-[#060D09] hover:bg-[#0C1711] hover:border-[#344E3E] transition-all cursor-pointer group shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] text-center relative overflow-hidden"
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center mb-2.5">
-                    {isUnlocked ? (
-                      <Image
-                        src={trophy.spriteUrl}
-                        alt={trophy.title}
-                        fill
-                        className="object-contain drop-shadow-[0_8px_16px_rgba(26,54,41,0.18)] group-hover:scale-110 transition-transform select-none"
-                        style={{ imageRendering: 'pixelated' }}
-                      />
-                    ) : (
-                      <div className="w-full h-full relative opacity-40 group-hover:opacity-60 transition-opacity flex items-center justify-center">
-                        <Image
-                          src={trophy.spriteUrl}
-                          alt={trophy.title}
-                          fill
-                          className="object-contain grayscale select-none"
-                          style={{ imageRendering: 'pixelated' }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Lock className="w-6 h-6 text-[#1A3629]/70" />
-                        </div>
-                      </div>
-                    )}
+                  {/* Subtle Alcove Lighting Behind Pedestal */}
+                  <div
+                    className={`pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                      isUnlocked
+                        ? trophy.isShame
+                          ? 'bg-radial from-red-500/10 to-transparent'
+                          : trophy.tier === 'Celestial'
+                          ? 'bg-radial from-purple-500/15 to-transparent'
+                          : 'bg-radial from-amber-500/15 to-transparent'
+                        : 'bg-radial from-slate-500/5 to-transparent'
+                    }`}
+                    aria-hidden="true"
+                  />
+
+                  {/* Uniform Pixel Art Trophy Chalice */}
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center mb-2.5 z-10 group-hover:scale-105 transition-transform duration-200">
+                    <TrophyRelicSprite
+                      trophyId={trophy.id}
+                      tier={trophy.tier}
+                      isUnlocked={isUnlocked}
+                      size={80}
+                    />
                   </div>
 
-                  <span className="font-cabinet font-extrabold text-xs text-[#1A3629] line-clamp-1 w-full group-hover:text-[#2C4A3B] transition-colors">
-                    {isUnlocked ? trophy.title : 'Locked Relic'}
+                  {/* Engraved Plinth Nameplate */}
+                  <span className="font-cabinet font-extrabold text-xs text-[#E2E8F0] line-clamp-1 w-full group-hover:text-white transition-colors z-10">
+                    {isUnlocked ? trophy.title : 'Locked Specimen'}
                   </span>
 
-                  <span className="text-[10px] font-mono text-[#4A5D4E] mt-1">
-                    {trophy.tier || (trophy.isShame ? 'Shame' : 'Standard')}
-                  </span>
+                  <div className="flex items-center gap-1.5 mt-1 z-10">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#738A7D]">
+                      {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Encrypted'}
+                    </span>
+                    {trophy.isShame && isUnlocked && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    )}
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Footer Info Bar */}
-        <div className="px-6 sm:px-8 py-3.5 border-t border-[#1A3629]/10 bg-[#FFFDF9] flex items-center justify-between text-xs text-[#4A5D4E] font-sans">
-          <span>Click any relic to inspect in full resolution.</span>
-          <span className="font-mono text-[#1A3629] font-bold">+50 XP per unlock</span>
+        {/* Footer Engraving Bar */}
+        <div className="px-6 sm:px-8 py-3.5 border-t border-[#1E2E24] bg-[#0E1A12] flex items-center justify-between text-xs text-[#738A7D] font-sans">
+          <span>Click any specimen to inspect high-resolution chalice lore.</span>
+          <span className="font-mono text-[#FBBF24] font-bold">+50 XP per unlocked relic</span>
         </div>
       </div>
 
@@ -146,7 +215,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-70 flex items-center justify-center p-6 sm:p-12 bg-[#1A3629]/60 backdrop-blur-xl animate-in fade-in duration-200"
+          className="fixed inset-0 z-70 flex items-center justify-center p-6 sm:p-12 bg-[#050A07]/85 backdrop-blur-2xl animate-in fade-in duration-200"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedTrophy(null);
           }}
@@ -163,36 +232,28 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
               <X className="w-5 h-5" />
             </button>
 
-            {/* Left Side: Monumental Cardless Transparent Floating Trophy */}
-            <div className="relative w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] md:w-[440px] md:h-[440px] lg:w-[480px] lg:h-[480px] flex items-center justify-center select-none shrink-0 animate-[islandFloat_6s_ease-in-out_infinite]">
+            {/* Left Side: Monumental Cardless Floating Trophy */}
+            <div className="relative w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px] flex items-center justify-center select-none shrink-0 animate-[islandFloat_6s_ease-in-out_infinite]">
               {/* Soft Ambient Halo */}
               <div 
-                className="pointer-events-none absolute inset-0 rounded-full bg-radial from-amber-400/20 via-white/5 to-transparent blur-3xl"
+                className={`pointer-events-none absolute inset-0 rounded-full blur-3xl ${
+                  unlockedTrophies.includes(selectedTrophy.id)
+                    ? selectedTrophy.isShame
+                      ? 'bg-radial from-red-500/25 via-red-900/10 to-transparent'
+                      : selectedTrophy.tier === 'Celestial'
+                      ? 'bg-radial from-purple-500/25 via-cyan-500/10 to-transparent'
+                      : 'bg-radial from-amber-400/25 via-amber-600/10 to-transparent'
+                    : 'bg-radial from-slate-600/15 via-slate-800/10 to-transparent'
+                }`}
                 aria-hidden="true"
               />
 
-              {unlockedTrophies.includes(selectedTrophy.id) ? (
-                <Image
-                  src={selectedTrophy.spriteUrl}
-                  alt={selectedTrophy.title}
-                  fill
-                  className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)] select-none"
-                  style={{ imageRendering: 'pixelated' }}
-                />
-              ) : (
-                <div className="w-full h-full relative flex items-center justify-center opacity-50">
-                  <Image
-                    src={selectedTrophy.spriteUrl}
-                    alt={selectedTrophy.title}
-                    fill
-                    className="object-contain grayscale select-none"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Lock className="w-16 h-16 text-white/80 drop-shadow-lg" />
-                  </div>
-                </div>
-              )}
+              <TrophyRelicSprite
+                trophyId={selectedTrophy.id}
+                tier={selectedTrophy.tier}
+                isUnlocked={unlockedTrophies.includes(selectedTrophy.id)}
+                size={340}
+              />
             </div>
 
             {/* Right Side: Editorial Info & Lore */}
@@ -240,7 +301,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                 ) : (
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Locked Relic</span>
+                    <span>Locked Specimen</span>
                   </div>
                 )}
 
@@ -249,10 +310,11 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                   onClick={() => setSelectedTrophy(null)}
                   className="px-5 py-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white hover:text-[#1A3629] text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
                 >
-                  Return to Vault
+                  Back to Reliquary
                 </button>
               </div>
             </div>
+
           </div>
         </div>
       )}

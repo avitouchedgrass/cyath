@@ -8,7 +8,6 @@ import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Shield, Receipt, ChevronDown } from 'lucide-react';
 
 interface LivingIslandHeroProps {
   onOpenReceipt?: () => void;
@@ -116,9 +115,8 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
             <button
               type="button"
               onClick={handleReentry}
-              className="px-2.5 py-1 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer flex items-center gap-1"
+              className="px-2.5 py-1 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
             >
-              <Shield className="w-3 h-3 text-[#60A5FA]" />
               <span>Forged Re-Entry</span>
             </button>
           </div>
@@ -179,10 +177,9 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
             haptics.tap();
             onOpenReceipt();
           }}
-          className="mt-3.5 inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border border-dashed border-[#1A3629]/25 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] shadow-2xs transition-all cursor-pointer group"
+          className="mt-3.5 inline-flex items-center px-4 py-2 rounded-xl border border-dashed border-[#1A3629]/25 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] shadow-2xs transition-all cursor-pointer group"
           title="Click to print and inspect daily thermal receipt"
         >
-          <Receipt className="w-3.5 h-3.5 text-[#4A5D4E] group-hover:text-white" />
           <span className="font-mono text-xs font-bold tracking-tight">
             RECEIPT · {completedHabitsCount}/3 ANCHORS · {currentLog.totalProteinLogged || 0}g
           </span>
@@ -192,10 +189,9 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
       {/* Sub-Floor Descent Indicator */}
       <a
         href="#specimen-reliquary"
-        className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] text-[#4A5D4E]/80 hover:text-[#1A3629] transition-colors cursor-pointer group"
+        className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] text-[#4A5D4E]/80 hover:text-[#1A3629] transition-colors cursor-pointer"
       >
-        <span>Specimen Reliquary Sub-Floor</span>
-        <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+        <span>Specimen Reliquary Sub-Floor ↓</span>
       </a>
     </div>
   );

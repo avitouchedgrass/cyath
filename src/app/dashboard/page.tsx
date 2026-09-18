@@ -19,12 +19,7 @@ import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
 import {
   Volume2,
   VolumeX,
-  Clock,
-  FileText,
-  Shield,
   X,
-  Check,
-  Trophy,
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -205,10 +200,9 @@ function DashboardContent() {
                 setTempBed(userProfile?.bedTime || '23:30');
                 setIsScheduleModalOpen(true);
               }}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
+              className="h-8 inline-flex items-center px-3 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
               title="Click to adjust your sleep and wake schedule"
             >
-              <Clock className="w-3.5 h-3.5 text-[#4A5D4E]" />
               <span>Wake {userProfile?.wakeTime || '07:30'} · Sleep {userProfile?.bedTime || '23:30'}</span>
             </button>
 
@@ -222,9 +216,8 @@ function DashboardContent() {
                 haptics.tap();
                 setIsDossierOpen(true);
               }}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
+              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
-              <FileText className="w-3.5 h-3.5" />
               <span>Weekly Review</span>
             </button>
 
@@ -234,9 +227,8 @@ function DashboardContent() {
             <button
               type="button"
               onClick={handleOpenVault}
-              className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
+              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
-              <Trophy className="w-3.5 h-3.5 text-[#D97706]" />
               <span>Reliquary ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
             </button>
           </div>

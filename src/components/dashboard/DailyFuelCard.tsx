@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -142,18 +142,13 @@ export function DailyFuelCard({
       
       {/* Header & Target Summary */}
       <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#FAF8F5] border border-[#1A3629]/12 flex items-center justify-center text-[#1A3629]">
-            <Utensils className="w-4 h-4" />
-          </div>
-          <div className="flex flex-col">
-            <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
-              Daily Fuel &amp; Protein
-            </h3>
-            <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              Calibrated whole-food nutrition
-            </span>
-          </div>
+        <div className="flex flex-col">
+          <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
+            Daily Fuel &amp; Protein
+          </h3>
+          <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+            Calibrated whole-food nutrition
+          </span>
         </div>
 
         <div className="flex flex-col items-end">
@@ -298,8 +293,7 @@ export function DailyFuelCard({
 
       {/* Weight Check-In Strip */}
       <div className="border-t border-[#1A3629]/10 pt-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Scale className="w-4 h-4 text-[#4A5D4E]" />
+        <div className="flex items-center gap-1.5">
           <span className="font-sans text-xs text-[#4A5D4E]">Current Weight:</span>
           {isEditingWeight ? (
             <form onSubmit={handleSaveWeight} className="flex items-center gap-1.5">

@@ -5,7 +5,7 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { Check, Sun, Droplets, Utensils, Plus, Zap, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
+import { Check, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
 
 export function CoreHabitsCard() {
   const {
@@ -41,7 +41,6 @@ export function CoreHabitsCard() {
         keyNumber: 1,
         title: 'Morning Sunlight',
         subtitle: '10–20 mins within wake window',
-        icon: Sun,
         isDone: !!currentLog.habitsCompleted?.['sunlight'],
       },
       {
@@ -49,7 +48,6 @@ export function CoreHabitsCard() {
         keyNumber: 2,
         title: 'Hydration Target',
         subtitle: `${(currentLog.hydrationLiters || 0).toFixed(1)}L / 2.5L logged`,
-        icon: Droplets,
         isDone: (currentLog.hydrationLiters || 0) >= 2.5 || !!currentLog.habitsCompleted?.['hydration'],
       },
       {
@@ -57,7 +55,6 @@ export function CoreHabitsCard() {
         keyNumber: 3,
         title: 'Whole-Food Protein',
         subtitle: `${currentProtein}g / ${targetProtein}g daily floor`,
-        icon: Utensils,
         isDone: isProteinMet || !!currentLog.habitsCompleted?.['protein_target'],
       },
     ];
@@ -68,7 +65,6 @@ export function CoreHabitsCard() {
         keyNumber: 4,
         title: customDefinition.title,
         subtitle: 'Custom power lever',
-        icon: Zap,
         isDone: !!currentLog.habitsCompleted?.[customDefinition.id],
       });
     }
@@ -166,7 +162,6 @@ export function CoreHabitsCard() {
         {/* 1-Tap Habit Buttons */}
         <div className="flex flex-col gap-2">
           {displayHabits.map((habit) => {
-            const Icon = habit.icon;
             const isDone = habit.isDone;
 
             return (
@@ -181,18 +176,20 @@ export function CoreHabitsCard() {
                 }`}
               >
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-200 ${
+                  <div className={`w-7 h-7 rounded-lg border transition-all duration-200 flex items-center justify-center shrink-0 ${
                     isDone
-                      ? 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9]'
-                      : 'bg-[#FAF8F5] border-[#1A3629]/12 text-[#1A3629] group-hover:bg-[#1A3629] group-hover:text-[#FFFDF9]'
+                      ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                      : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
                   }`}>
-                    <Icon className="w-4 h-4" />
+                    {isDone ? (
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    ) : (
+                      <span className="font-mono text-xs font-bold">{habit.keyNumber}</span>
+                    )}
                   </div>
 
                   <div className="flex flex-col min-w-0">
-                    <span className={`font-cabinet font-bold text-sm tracking-tight truncate ${
-                      isDone ? 'text-[#1A3629]' : 'text-[#1A3629]'
-                    }`}>
+                    <span className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629] truncate">
                       {habit.title}
                     </span>
                     <span className="text-xs font-sans text-[#4A5D4E] truncate">
@@ -201,18 +198,8 @@ export function CoreHabitsCard() {
                   </div>
                 </div>
 
-                <div className="shrink-0">
-                  <div className={`w-6 h-6 rounded-lg border transition-all duration-200 flex items-center justify-center ${
-                    isDone
-                      ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                      : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#4A5D4E] group-hover:border-[#1A3629] group-hover:text-[#1A3629]'
-                  }`}>
-                    {isDone ? (
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    ) : (
-                      <span className="font-mono text-[11px] font-bold">{habit.keyNumber}</span>
-                    )}
-                  </div>
+                <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-[#4A5D4E]/80">
+                  {isDone ? 'Completed' : 'Pending'}
                 </div>
               </button>
             );
@@ -225,8 +212,7 @@ export function CoreHabitsCard() {
               onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
               className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <Plus className="w-3.5 h-3.5 text-[#4A5D4E]" />
-              <span>Add 4th Custom Power Habit</span>
+              <span>+ Add 4th Custom Power Habit</span>
             </button>
           )}
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
-import { Gift, Bot, Compass, Utensils, BookOpen, FileText, User } from "lucide-react";
+import { Gift, Bot, Compass, Utensils, BookOpen, FileText } from "lucide-react";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -226,9 +226,8 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               <Link
                 id="tour-nav-profile"
                 href="/profile"
-                className="border border-[#1A3629]/25 bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer h-9"
+                className="border border-[#1A3629]/25 bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all flex items-center justify-center cursor-pointer h-9"
               >
-                <User className="w-3.5 h-3.5 text-[#FFFDF9]/80" />
                 <span>Profile</span>
               </Link>
             ) : (

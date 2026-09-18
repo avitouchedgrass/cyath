@@ -5,7 +5,7 @@ import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition } from '@/store/useHab
 import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Trophy, X, CheckCircle2, Lock, AlertTriangle } from 'lucide-react';
+import { X } from 'lucide-react';
 
 type FilterCategory = 'all' | 'keystones' | 'streaks' | 'mastery' | 'shame';
 
@@ -45,23 +45,18 @@ export function SpecimenVaultSubfloor() {
     >
       {/* Archival Museum Header */}
       <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EDE8DF] border border-[#1A3629]/15 rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(26,54,41,0.03)]">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 flex items-center justify-center text-[#B45309] shadow-2xs">
-            <Trophy className="w-6 h-6" />
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
+              The Specimen Reliquary
+            </h2>
+            <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FFFDF9] border border-[#1A3629]/15 px-3 py-1 rounded-full shadow-2xs">
+              {unlockedCount} / {totalCount} Secured
+            </span>
           </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-                The Specimen Reliquary
-              </h2>
-              <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FFFDF9] border border-[#1A3629]/15 px-3 py-1 rounded-full shadow-2xs">
-                {unlockedCount} / {totalCount} Secured
-              </span>
-            </div>
-            <p className="font-sans text-xs text-[#4A5D4E] mt-1">
-              Uniform archival chalices minted through habit consistency and circadian discipline.
-            </p>
-          </div>
+          <p className="font-sans text-xs text-[#4A5D4E] mt-1">
+            Uniform archival chalices minted through habit consistency and circadian discipline.
+          </p>
         </div>
 
         {/* Category Filter Tabs */}
@@ -206,9 +201,8 @@ export function SpecimenVaultSubfloor() {
                   {selectedTrophy.tier || (selectedTrophy.isShame ? 'Shame' : 'Standard')} Relic
                 </span>
                 {selectedTrophy.isShame && (
-                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" />
-                    <span>Satirical Shame</span>
+                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200">
+                    Satirical Shame
                   </span>
                 )}
               </div>
@@ -237,13 +231,11 @@ export function SpecimenVaultSubfloor() {
 
               <div className="flex items-center gap-3 pt-2">
                 {unlockedTrophies.includes(selectedTrophy.id) ? (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-cabinet font-bold text-xs">
-                    <CheckCircle2 className="w-4 h-4" />
+                  <div className="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-cabinet font-bold text-xs">
                     <span>Unlocked &amp; Claimed</span>
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
-                    <Lock className="w-3.5 h-3.5" />
+                  <div className="inline-flex items-center px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
                     <span>Locked Specimen</span>
                   </div>
                 )}

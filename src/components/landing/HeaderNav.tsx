@@ -183,7 +183,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const memberNavItems: NavItem[] = [
     { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
-    { name: "Profile", href: "/profile", id: "profile", icon: User },
   ];
 
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';

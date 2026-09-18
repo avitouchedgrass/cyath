@@ -121,17 +121,29 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
+    <div className="relative min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
+      {/* Subtle Archival Drafting Grid Pattern */}
+      <div 
+        className="pointer-events-none fixed inset-0 z-0 opacity-40 mix-blend-multiply"
+        style={{
+          backgroundImage: 'radial-gradient(#1A3629 0.75px, transparent 0.75px)',
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%)'
+        }}
+        aria-hidden="true"
+      />
+
       <HeaderNav />
 
       {/* Celebratory Dropdown on Trophy Earned */}
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
       {/* Main Sanctuary Cockpit Container */}
-      <main className="relative z-10 flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-24 flex flex-col gap-6">
+      <main className="relative z-10 flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-20 flex flex-col gap-6">
         
-        {/* Cockpit Header Row: Status, Ambient Schedule Chip, Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1A3629]/10 pb-4">
+        {/* Cockpit Header Row: Status & Consolidated Utility Dock */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
@@ -139,7 +151,7 @@ function DashboardContent() {
               </h1>
 
               {/* Streak Badge with Custom Flame */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9]/90 border border-[#1A3629]/12 shadow-2xs">
                 {isForgedStreak ? (
                   <div className="w-4 h-4 relative">
                     <Image
@@ -174,7 +186,7 @@ function DashboardContent() {
             </p>
           </div>
 
-          {/* Right Action Suite: Schedule Chip, Mute Toggle, Vault, Receipt, Dossier */}
+          {/* Unified Utility Suite */}
           <div className="flex items-center gap-2 flex-wrap">
             
             {/* Ambient Schedule Chip (1-Click Popover) */}
@@ -187,7 +199,7 @@ function DashboardContent() {
                 setTempBed(userProfile?.bedTime || '23:30');
                 setIsScheduleModalOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              className="h-9 inline-flex items-center gap-1.5 px-3 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs"
               title="Click to adjust your sleep and wake schedule"
             >
               <Clock className="w-3.5 h-3.5 text-[#4A5D4E]" />
@@ -198,7 +210,7 @@ function DashboardContent() {
             <button
               type="button"
               onClick={handleToggleMute}
-              className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+              className="w-9 h-9 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 hover:bg-[#FAF6EE] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center justify-center shadow-2xs"
               title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
               aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
             >
@@ -213,7 +225,7 @@ function DashboardContent() {
             <button
               type="button"
               onClick={() => handleOpenVault()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs group"
+              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs group"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
               <span>Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
@@ -227,7 +239,7 @@ function DashboardContent() {
                 haptics.tap();
                 setIsReceiptOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
+              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs"
             >
               <Receipt className="w-3.5 h-3.5" />
               <span>Receipt</span>
@@ -241,7 +253,7 @@ function DashboardContent() {
                 haptics.tap();
                 setIsDossierOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
+              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/90 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all duration-200 cursor-pointer shadow-2xs"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>7-Day Dossier</span>
@@ -249,10 +261,10 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Consolidated Panoramic Grid: Mobile-First Ergonomics */}
+        {/* Consolidated Panoramic Grid: Balanced 3-Column Layout */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-150">
           
-          {/* MOBILE: Center Stage Island Renders First (Compact ~150px) */}
+          {/* MOBILE: Center Stage Island Renders First */}
           {/* DESKTOP: Center Column (lg:col-span-4 lg:order-2) */}
           <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center">
             <LivingIslandHero />
@@ -262,7 +274,6 @@ function DashboardContent() {
           {/* DESKTOP: Left Column (lg:col-span-4 lg:order-1) */}
           <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col gap-4">
             <CoreHabitsCard />
-            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
 
           {/* MOBILE: Daily Fuel Card Renders Next */}
@@ -273,6 +284,11 @@ function DashboardContent() {
               targetProtein={targetProtein}
               currentDate={currentDate}
             />
+          </div>
+
+          {/* Evening Seal Ceremony Banner: Gracefully Spans Bottom on Desktop / Follows on Mobile */}
+          <div className="w-full lg:col-span-12 order-4">
+            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
 
         </div>
@@ -308,11 +324,11 @@ function DashboardContent() {
             if (e.target === e.currentTarget) setIsScheduleModalOpen(false);
           }}
         >
-          <div className="w-full max-w-sm bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-6 shadow-[8px_8px_0px_#1A3629] flex flex-col gap-4 relative">
+          <div className="w-full max-w-sm bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-6 shadow-[0_20px_50px_rgba(26,54,41,0.15)] flex flex-col gap-4 relative">
             <button
               type="button"
               onClick={() => setIsScheduleModalOpen(false)}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
+              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
               aria-label="Close modal"
             >
               <X className="w-3.5 h-3.5" />
@@ -329,26 +345,26 @@ function DashboardContent() {
 
             <form onSubmit={handleSaveSchedule} className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                <label className="font-cabinet font-bold text-xs text-[#1A3629]">
                   Wake Time
                 </label>
                 <input
                   type="time"
                   value={tempWake}
                   onChange={(e) => setTempWake(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/20 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/15 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                <label className="font-cabinet font-bold text-xs text-[#1A3629]">
                   Target Bedtime
                 </label>
                 <input
                   type="time"
                   value={tempBed}
                   onChange={(e) => setTempBed(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/20 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/15 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
                 />
               </div>
 

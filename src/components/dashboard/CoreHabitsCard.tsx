@@ -143,31 +143,28 @@ export function CoreHabitsCard() {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Habits Card Surface */}
-      <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-4">
+      <div className="w-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#1A3629]" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#4A5D4E]">
-                Daily Punch Pad
-              </span>
-            </div>
-            <h3 className="font-cabinet font-extrabold text-lg text-[#1A3629] mt-0.5 tracking-tight">
+        <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
+          <div className="flex flex-col">
+            <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
               Keystone Levers
             </h3>
+            <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+              Daily foundational anchors
+            </span>
           </div>
 
-          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/15 font-mono text-xs font-bold text-[#1A3629]">
-            <span>{completedCount}</span>
-            <span className="opacity-40">/</span>
-            <span>{displayHabits.length} Done</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/12 font-mono text-xs font-bold text-[#1A3629]">
+            <span className="text-[#10B981]">{completedCount}</span>
+            <span className="opacity-30">/</span>
+            <span>{displayHabits.length} Complete</span>
           </div>
         </div>
 
         {/* 1-Tap Habit Buttons */}
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           {displayHabits.map((habit) => {
             const Icon = habit.icon;
             const isDone = habit.isDone;
@@ -177,47 +174,43 @@ export function CoreHabitsCard() {
                 key={habit.id}
                 type="button"
                 onClick={(e) => handleToggle(habit.id, e)}
-                className={`w-full p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 text-left group active:scale-[0.99] ${
+                className={`w-full p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 text-left group active:scale-[0.99] ${
                   isDone
-                    ? 'border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] shadow-none'
-                    : 'border-[#1A3629]/20 bg-[#FFFDF9] hover:border-[#1A3629] hover:bg-[#FAF6EE] shadow-2xs'
+                    ? 'border-[#1A3629]/15 bg-[#FAF8F5]/80 text-[#1A3629]'
+                    : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5] shadow-[0_2px_8px_rgba(26,54,41,0.02)]'
                 }`}
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-all ${
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-200 ${
                     isDone
                       ? 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9]'
-                      : 'bg-[#FAF8F5] border-[#1A3629]/15 text-[#1A3629]'
+                      : 'bg-[#FAF8F5] border-[#1A3629]/12 text-[#1A3629] group-hover:bg-[#1A3629] group-hover:text-[#FFFDF9]'
                   }`}>
-                    {isDone ? (
-                      <Check className="w-4 h-4 stroke-[3]" />
-                    ) : (
-                      <Icon className="w-4 h-4" />
-                    )}
+                    <Icon className="w-4 h-4" />
                   </div>
 
                   <div className="flex flex-col min-w-0">
-                    <span className={`font-cabinet font-bold text-xs sm:text-sm tracking-tight truncate ${
-                      isDone ? 'line-through text-[#4A5D4E]' : 'text-[#1A3629]'
+                    <span className={`font-cabinet font-bold text-sm tracking-tight truncate ${
+                      isDone ? 'line-through text-[#4A5D4E]/80' : 'text-[#1A3629]'
                     }`}>
                       {habit.title}
                     </span>
-                    <span className="text-[11px] font-sans text-[#4A5D4E] truncate">
+                    <span className="text-xs font-sans text-[#4A5D4E] truncate">
                       {habit.subtitle}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded border border-[#1A3629]/20 bg-[#FAF8F5] font-mono text-[10px] font-bold text-[#4A5D4E]">
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded border border-[#1A3629]/15 bg-[#FAF8F5] font-mono text-[10px] font-bold text-[#4A5D4E]">
                     {habit.keyNumber}
                   </kbd>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
                     isDone
                       ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                      : 'border-[#1A3629]/30 bg-transparent'
+                      : 'border-[#1A3629]/25 bg-transparent group-hover:border-[#1A3629]/50'
                   }`}>
-                    {isDone && <Check className="w-3 h-3 stroke-[3]" />}
+                    {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                   </div>
                 </div>
               </button>
@@ -229,20 +222,20 @@ export function CoreHabitsCard() {
             <button
               type="button"
               onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
-              className="w-full py-2.5 px-3.5 rounded-2xl border border-dashed border-[#1A3629]/25 bg-[#FAF8F5]/60 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-[#4A5D4E]" />
               <span>Add 4th Custom Power Habit</span>
             </button>
           )}
 
           {/* Custom Slot Picker Dropdown */}
           {isSlotPickerOpen && !customDefinition && (
-            <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/20 flex flex-col gap-2 animate-in fade-in duration-150">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-                Select 4th Lever
+            <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-2 animate-in fade-in duration-150">
+              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                Choose 4th Habit Lever
               </span>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 {CUSTOM_HABITS_LIBRARY.map((item) => (
                   <button
                     key={item.id}
@@ -253,7 +246,7 @@ export function CoreHabitsCard() {
                       setCustomHabitSlot(item.id);
                       setIsSlotPickerOpen(false);
                     }}
-                    className="p-2 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] transition-all text-left cursor-pointer"
+                    className="p-2.5 rounded-lg border border-[#1A3629]/12 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] transition-all text-left cursor-pointer"
                   >
                     <span>{item.shortLabel}</span>
                   </button>
@@ -264,13 +257,13 @@ export function CoreHabitsCard() {
         </div>
 
         {/* 1-Tap Afternoon Slump Check */}
-        <div className="border-t border-[#1A3629]/10 pt-3 flex flex-col gap-2">
+        <div className="border-t border-[#1A3629]/10 pt-4 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-              Afternoon Energy Check
+            <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+              Afternoon Energy Cadence
             </span>
-            <span className="font-mono text-[10px] text-[#1A3629]/70">
-              {ritual.afternoonSlumpScore ? `Logged: ${ritual.afternoonSlumpScore}/10` : '1-tap check'}
+            <span className="font-mono text-[11px] text-[#4A5D4E]">
+              {ritual.afternoonSlumpScore ? `Logged ${ritual.afternoonSlumpScore}/10` : '1-tap check'}
             </span>
           </div>
 
@@ -278,10 +271,10 @@ export function CoreHabitsCard() {
             <button
               type="button"
               onClick={() => handleEnergyRating(2)}
-              className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
-                  ? 'border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                  : 'border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
               <BatteryLow className="w-3.5 h-3.5 text-[#DC2626]" />
@@ -291,10 +284,10 @@ export function CoreHabitsCard() {
             <button
               type="button"
               onClick={() => handleEnergyRating(6)}
-              className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
-                  ? 'border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                  : 'border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
               <BatteryMedium className="w-3.5 h-3.5 text-[#D97706]" />
@@ -304,10 +297,10 @@ export function CoreHabitsCard() {
             <button
               type="button"
               onClick={() => handleEnergyRating(9)}
-              className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
-                  ? 'border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                  : 'border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
               <Battery className="w-3.5 h-3.5 text-[#10B981]" />

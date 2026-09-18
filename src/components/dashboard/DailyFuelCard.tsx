@@ -137,59 +137,61 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-5">
+    <div className="w-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/12 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
       
       {/* Header & Target Summary */}
-      <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#FAF8F5] border border-[#1A3629]/15 flex items-center justify-center text-[#1A3629]">
-            <Utensils className="w-3.5 h-3.5" />
+      <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#FAF8F5] border border-[#1A3629]/12 flex items-center justify-center text-[#1A3629]">
+            <Utensils className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629] tracking-tight leading-tight">
-              Daily Fuel &amp; Protein Floor
+          <div className="flex flex-col">
+            <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
+              Daily Fuel &amp; Protein
             </h3>
-            <span className="font-sans text-xs text-[#4A5D4E]">
-              Whole-food calibrated nutrition
+            <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+              Calibrated whole-food nutrition
             </span>
           </div>
         </div>
 
         <div className="flex flex-col items-end">
           <div className="flex items-baseline gap-1 font-mono">
-            <span className="font-cabinet font-extrabold text-xl text-[#1A3629] tabular-nums">
+            <span className="font-cabinet font-extrabold text-2xl text-[#1A3629] tabular-nums">
               {currentProtein}
             </span>
-            <span className="text-xs text-[#4A5D4E]">/ {targetProtein}g</span>
+            <span className="text-xs font-sans text-[#4A5D4E]">/ {targetProtein}g</span>
           </div>
-          <span className="text-[10px] font-mono text-[#4A5D4E]">
-            {remaining > 0 ? `${remaining}g remaining` : 'Target Secured'}
+          <span className="text-[11px] font-sans text-[#4A5D4E]">
+            {remaining > 0 ? `${remaining}g to floor` : 'Target secured'}
           </span>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="flex flex-col gap-1.5">
-        <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/15 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">
           <div
             className="h-full bg-[#1A3629] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#4A5D4E]">
+        <div className="flex items-center justify-between font-mono text-[11px] text-[#4A5D4E]">
           <span>{percent}% of daily floor</span>
-          <span>{loggedMealsCount} items logged today</span>
+          <span>{loggedMealsCount} {loggedMealsCount === 1 ? 'item' : 'items'} logged today</span>
         </div>
       </div>
 
-      {/* HERO FOOD INPUT: Natural Language First */}
+      {/* HERO FOOD INPUT: Natural Language Command Bar */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-2">
-        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629] flex items-center gap-1.5">
-          <Sparkles className="w-3 h-3 text-[#1A3629]" />
-          <span>Natural Language Meal Log</span>
-        </label>
+        <div className="flex items-center justify-between">
+          <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs text-[#1A3629]">
+            Natural Language Meal Entry
+          </label>
+          <span className="text-[11px] font-sans text-[#4A5D4E]">AI-calibrated macros</span>
+        </div>
         
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center">
           <input
             id="natural-meal-input"
             type="text"
@@ -197,17 +199,17 @@ export function DailyFuelCard({
             onChange={(e) => setAmbientMealText(e.target.value)}
             placeholder="e.g. 3 scrambled eggs with sourdough"
             disabled={isSubmittingMeal}
-            className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:border-[#1A3629]"
+            className="w-full pl-4 pr-24 py-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] transition-all duration-200"
           />
           <button
             type="submit"
             disabled={!ambientMealText.trim() || isSubmittingMeal}
-            className="px-4 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-40 flex items-center justify-center shrink-0 shadow-2xs"
+            className="absolute right-1.5 px-3.5 py-1.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs"
           >
             {isSubmittingMeal ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <span>Calculate</span>
+              <span>Log Meal</span>
             )}
           </button>
         </div>
@@ -219,9 +221,9 @@ export function DailyFuelCard({
         )}
       </form>
 
-      {/* 1-Tap Quick Plates (Fast Estimation Below) */}
-      <div className="flex flex-col gap-2">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+      {/* 1-Tap Quick Plates */}
+      <div className="flex flex-col gap-2.5">
+        <span className="font-cabinet font-bold text-xs text-[#1A3629]">
           1-Tap Quick Plates
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -230,7 +232,7 @@ export function DailyFuelCard({
               key={preset.label}
               type="button"
               onClick={() => handleLogPreset(preset)}
-              className="p-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer flex flex-col text-left group shadow-2xs"
+              className="p-3 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5]/80 hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all duration-200 cursor-pointer flex flex-col text-left group shadow-[0_2px_8px_rgba(26,54,41,0.02)]"
             >
               <div className="flex items-center justify-between w-full">
                 <span className="font-cabinet font-bold text-xs text-[#1A3629] group-hover:text-[#FFFDF9]">
@@ -240,7 +242,7 @@ export function DailyFuelCard({
                   +{preset.protein}g
                 </span>
               </div>
-              <span className="text-[10px] font-sans text-[#4A5D4E] group-hover:text-[#FFFDF9]/80 mt-0.5">
+              <span className="text-[11px] font-sans text-[#4A5D4E] group-hover:text-[#FFFDF9]/80 mt-1">
                 {preset.desc}
               </span>
             </button>
@@ -249,10 +251,10 @@ export function DailyFuelCard({
       </div>
 
       {/* Weight Check-In Strip */}
-      <div className="border-t border-[#1A3629]/10 pt-3 flex items-center justify-between">
+      <div className="border-t border-[#1A3629]/10 pt-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Scale className="w-4 h-4 text-[#4A5D4E]" />
-          <span className="font-mono text-xs text-[#4A5D4E]">Current Weight:</span>
+          <span className="font-sans text-xs text-[#4A5D4E]">Current Weight:</span>
           {isEditingWeight ? (
             <form onSubmit={handleSaveWeight} className="flex items-center gap-1.5">
               <input
@@ -282,7 +284,7 @@ export function DailyFuelCard({
           <button
             type="button"
             onClick={() => setIsEditingWeight(true)}
-            className="text-[11px] font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer"
+            className="text-xs font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer"
           >
             Update
           </button>

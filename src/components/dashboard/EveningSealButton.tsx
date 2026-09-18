@@ -75,12 +75,12 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
   }
 
   return (
-    <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-3xl border-2 border-[#1A3629] bg-[#FFFDF9] shadow-[4px_4px_0px_#1A3629] animate-in fade-in duration-200">
+    <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FFFDF9]/90 backdrop-blur-md shadow-[0_8px_30px_rgba(26,54,41,0.04)] animate-in fade-in duration-200">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
           isAlreadySealed
-            ? 'bg-[#ECFDF5] border-[#10B981]/40 text-[#065F46]'
-            : 'bg-[#FEF3C7] border-[#D97706]/40 text-[#B45309]'
+            ? 'bg-[#ECFDF5] border-[#10B981]/30 text-[#065F46]'
+            : 'bg-[#FEF3C7] border-[#D97706]/30 text-[#B45309]'
         }`}>
           {isAlreadySealed ? (
             <Check className="w-5 h-5 text-[#10B981]" />
@@ -92,16 +92,16 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <span className="font-cabinet font-extrabold text-sm text-[#1A3629]">
-              {isAlreadySealed ? 'Ledger Sealed for Today' : "Evening Seal Ceremony Ready"}
+              {isAlreadySealed ? 'Daily Ledger Sealed' : 'Evening Seal Ceremony'}
             </span>
-            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FAF8F5] border border-[#1A3629]/15 text-[#1A3629]">
+            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FAF8F5] border border-[#1A3629]/10 text-[#1A3629]">
               {isAlreadySealed ? 'Verified' : '+50 XP'}
             </span>
           </div>
-          <span className="font-sans text-xs text-[#4A5D4E]">
+          <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
             {isAlreadySealed
-              ? `Next: First Light at ${wakeTime} tomorrow morning.`
-              : 'Lock in today’s habit streak and mint your gold calendar coin.'}
+              ? `First light scheduled for ${wakeTime} tomorrow.`
+              : 'Lock in today’s habit streak and mint your calendar coin.'}
           </span>
         </div>
       </div>
@@ -111,10 +111,10 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
           type="button"
           onClick={handleSeal}
           disabled={isSealing}
-          className={`flex-1 sm:flex-none px-5 py-2.5 rounded-2xl font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none ${
+          className={`flex-1 sm:flex-none px-4 py-2 rounded-xl font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs ${
             isAlreadySealed
-              ? 'border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-              : 'border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B]'
+              ? 'border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              : 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B]'
           }`}
         >
           {isAlreadySealed ? (

@@ -219,29 +219,25 @@ export function DailyFuelCard({
         )}
       </form>
 
-      {/* 1-Tap Quick Plates */}
-      <div className="flex flex-col gap-2.5">
+      {/* 1-Tap Pantry Plates (Proposal D) */}
+      <div className="flex flex-col gap-2">
         <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-          1-Tap Quick Plates
+          1-Tap Pantry Plates
         </span>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {PRESET_MEALS.map((preset) => (
             <button
               key={preset.label}
               type="button"
               onClick={() => handleLogPreset(preset)}
-              className="p-3 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5]/80 hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all duration-200 cursor-pointer flex flex-col text-left group shadow-[0_2px_8px_rgba(26,54,41,0.02)]"
+              className="px-3 py-2 rounded-xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 group shadow-2xs"
+              title={preset.desc}
             >
-              <div className="flex items-center justify-between w-full">
-                <span className="font-cabinet font-bold text-xs text-[#1A3629] group-hover:text-[#FFFDF9]">
-                  {preset.label}
-                </span>
-                <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] group-hover:bg-[#FFFDF9] group-hover:text-[#1A3629] px-1.5 py-0.5 rounded">
-                  +{preset.protein}g
-                </span>
-              </div>
-              <span className="text-[11px] font-sans text-[#4A5D4E] group-hover:text-[#FFFDF9]/80 mt-1">
-                {preset.desc}
+              <span className="font-cabinet font-bold text-xs group-hover:text-[#FFFDF9]">
+                {preset.label}
+              </span>
+              <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] group-hover:bg-white/15 group-hover:text-white px-1.5 py-0.5 rounded border border-[#10B981]/20 group-hover:border-white/20">
+                +{preset.protein}g
               </span>
             </button>
           ))}

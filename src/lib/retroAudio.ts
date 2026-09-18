@@ -8,6 +8,9 @@ class RetroAudioEngine {
 
   constructor() {
     if (typeof window !== 'undefined') {
+      try {
+        this.isMuted = localStorage.getItem('cyath_audio_muted') === 'true';
+      } catch {}
       this.enableOnFirstInteraction();
     }
   }
@@ -43,12 +46,22 @@ class RetroAudioEngine {
     }
   }
 
-  public toggleMute() {
-    this.isMuted = !this.isMuted;
+  public toggleMute(): boolean {
+    this.setMuted(!this.isMuted);
+    return this.isMuted;
+  }
+
+  public setMuted(muted: boolean): void {
+    this.isMuted = muted;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('cyath_audio_muted', muted ? 'true' : 'false');
+        window.dispatchEvent(new CustomEvent('cyath-audio-mute-changed', { detail: { isMuted: muted } }));
+      } catch {}
+    }
     if (!this.isMuted) {
       this.initCtx();
     }
-    return this.isMuted;
   }
 
   public getMuted() {

@@ -87,6 +87,9 @@ export interface UserProfile {
   dietaryRestrictions: string[];
   onboardingCompleted: boolean;
   walkthroughCompleted?: boolean;
+  wakeTime?: string;
+  bedTime?: string;
+  customHabitSlot?: string;
   referralCode?: string;
   referredBy?: string;
   referralCount?: number;
@@ -101,6 +104,79 @@ export interface UserProfile {
     protocolId: string;
   };
 }
+
+export interface CustomHabitDefinition {
+  id: string;
+  title: string;
+  shortLabel: string;
+  category: 'fuel' | 'movement' | 'recovery' | 'circadian';
+}
+
+export const CUSTOM_HABITS_LIBRARY: CustomHabitDefinition[] = [
+  { id: 'creatine', title: 'Creatine Monohydrate (5g)', shortLabel: 'Creatine', category: 'fuel' },
+  { id: 'steps_10k', title: '10,000 Daily Walking Steps', shortLabel: '10k Steps', category: 'movement' },
+  { id: 'zone2_walk', title: 'Zone 2 Brisk Walk (20m)', shortLabel: 'Zone 2', category: 'movement' },
+  { id: 'cold_shower', title: 'Cold Shower / Cold Plunge', shortLabel: 'Cold Plunge', category: 'recovery' },
+  { id: 'screens_off', title: 'Screens Off 60m Pre-Bed', shortLabel: 'Screens Off', category: 'circadian' },
+];
+
+export interface TrophyDefinition {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  isShame: boolean;
+  spriteUrl: string;
+  unlockCondition: string;
+}
+
+export const TROPHIES_ROSTER: TrophyDefinition[] = [
+  {
+    id: 'solar_vanguard',
+    title: 'The Solar Vanguard',
+    subtitle: 'Circadian Eye Master',
+    description: 'Logged morning sunlight within your light window 3 days in a row.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/solar_vanguard.png',
+    unlockCondition: '3-day morning light streak',
+  },
+  {
+    id: 'iron_anchor',
+    title: 'Iron Protein Anchor',
+    subtitle: 'Whole-Food Sentry',
+    description: 'Hit your personalized daily protein floor with whole-food fuel.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/iron_anchor.png',
+    unlockCondition: 'Daily protein floor reached',
+  },
+  {
+    id: 'hydration_alchemist',
+    title: 'Hydration Alchemist',
+    subtitle: 'Cellular Osmosis',
+    description: 'Reached 2.5L+ hydration before mid-afternoon.',
+    isShame: false,
+    spriteUrl: '/assets/trophies/hydration_alchemist.png',
+    unlockCondition: '2.5L water logged',
+  },
+  {
+    id: 'desk_goblin',
+    title: 'The 3 PM Desk Goblin',
+    subtitle: 'Trophy of Slump & Sloth',
+    description: 'Experienced a sub-3/10 afternoon energy crash after skipping morning light or wholesome fuel.',
+    isShame: true,
+    spriteUrl: '/assets/trophies/desk_goblin.png',
+    unlockCondition: 'Afternoon energy slump rating <= 3',
+  },
+  {
+    id: 'midnight_gambler',
+    title: 'Caffeine Midnight Gambler',
+    subtitle: 'Trophy of Jittery Regret',
+    description: 'Logged caffeine consumed after your calculated evening caffeine cutoff.',
+    isShame: true,
+    spriteUrl: '/assets/trophies/midnight_gambler.png',
+    unlockCondition: 'Caffeine logged past cutoff window',
+  },
+];
 
 export function generateReferralCode(identifier?: string): string {
   const clean = (identifier || 'CYATH')
@@ -217,6 +293,20 @@ export interface HabitStoreState {
   setIsDownscaled: (date: string, isDownscaled: boolean) => void;
   unlockDecoration: (decorationId: string) => void;
   setKeystoneProtocol: (protocolId: string) => void;
+
+  isForgedStreak: boolean;
+  isReentryAvailable: boolean;
+  isLedgerSealedByDate: Record<string, boolean>;
+  unlockedTrophies: string[];
+  pendingTrophyUnlock: TrophyDefinition | null;
+
+  setCircadianSchedule: (wakeTime: string, bedTime: string) => void;
+  setCustomHabitSlot: (habitId: string) => void;
+  sealDailyLedger: (date?: string) => { success: boolean; xpAwarded: number };
+  activateReentryProtocol: (date?: string) => { success: boolean; message: string };
+  unlockTrophy: (trophyId: string) => boolean;
+  dismissPendingTrophy: () => void;
+  evaluateTrophies: (date?: string) => void;
 }
 
 const getTodayString = () => formatLocalDate();
@@ -252,6 +342,9 @@ interface UserLocalProgressData {
   claimedDossiersByWeek?: Record<string, boolean>;
   weightHistory?: WeightEntry[];
   socialQuests?: SocialQuestsState;
+  isForgedStreak?: boolean;
+  isLedgerSealedByDate?: Record<string, boolean>;
+  unlockedTrophies?: string[];
 }
 
 const DEFAULT_SOCIAL_QUESTS: SocialQuestsState = {
@@ -288,6 +381,9 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       claimedDossiersByWeek: data.claimedDossiersByWeek && typeof data.claimedDossiersByWeek === 'object' ? data.claimedDossiersByWeek : (existing.claimedDossiersByWeek ?? {}),
       weightHistory: Array.isArray(data.weightHistory) ? data.weightHistory : (existing.weightHistory ?? []),
       socialQuests: data.socialQuests && typeof data.socialQuests === 'object' ? data.socialQuests : (existing.socialQuests ?? DEFAULT_SOCIAL_QUESTS),
+      isForgedStreak: typeof data.isForgedStreak === 'boolean' ? data.isForgedStreak : (existing.isForgedStreak ?? false),
+      isLedgerSealedByDate: data.isLedgerSealedByDate && typeof data.isLedgerSealedByDate === 'object' ? data.isLedgerSealedByDate : (existing.isLedgerSealedByDate ?? {}),
+      unlockedTrophies: Array.isArray(data.unlockedTrophies) ? data.unlockedTrophies : (existing.unlockedTrophies ?? []),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -332,6 +428,11 @@ export const useHabitStore = create<HabitStoreState>()(
       claimedDossiersByWeek: {},
       weightHistory: [],
       socialQuests: DEFAULT_SOCIAL_QUESTS,
+      isForgedStreak: false,
+      isReentryAvailable: false,
+      isLedgerSealedByDate: {},
+      unlockedTrophies: [],
+      pendingTrophyUnlock: null,
 
       setDate: (date) => set({ currentDate: date }),
 
@@ -2171,6 +2272,130 @@ export const useHabitStore = create<HabitStoreState>()(
           socialQuests: DEFAULT_SOCIAL_QUESTS,
         });
       },
+
+      setCircadianSchedule: (wakeTime: string, bedTime: string) => {
+        const currentProfile = get().userProfile || {
+          fullName: 'Cyath Explorer',
+          age: 26,
+          sex: 'other' as const,
+          heightCm: 178,
+          weightKg: 74,
+          primaryGoal: 'focus' as const,
+          allergies: [],
+          dietaryRestrictions: [],
+          onboardingCompleted: true,
+        };
+        get().updateUserProfile({ ...currentProfile, wakeTime, bedTime });
+      },
+
+      setCustomHabitSlot: (habitId: string) => {
+        const definition = CUSTOM_HABITS_LIBRARY.find((h) => h.id === habitId);
+        const currentProfile = get().userProfile;
+        if (currentProfile) {
+          get().updateUserProfile({ ...currentProfile, customHabitSlot: habitId });
+        }
+        if (definition) {
+          const currentHabits = get().habits;
+          if (!currentHabits.some((h) => h.id === habitId)) {
+            set({
+              habits: [
+                ...currentHabits,
+                {
+                  id: definition.id,
+                  title: definition.title,
+                  category: definition.category as any,
+                  targetDaysPerWeek: 7,
+                },
+              ],
+            });
+          }
+        }
+      },
+
+      sealDailyLedger: (date?: string) => {
+        const targetDate = date || get().currentDate;
+        if (get().isLedgerSealedByDate[targetDate]) {
+          return { success: false, xpAwarded: 0 };
+        }
+        const updatedSeals = {
+          ...get().isLedgerSealedByDate,
+          [targetDate]: true,
+        };
+        set({ isLedgerSealedByDate: updatedSeals });
+        get().gainXp(50, 'Daily Ledger Sealed', 'ledger_seal');
+
+        const sealedCount = Object.values(updatedSeals).filter(Boolean).length;
+        if (sealedCount > 0 && sealedCount % 5 === 0 && get().streakFreezeStock < 3) {
+          set({ streakFreezeStock: get().streakFreezeStock + 1 });
+        }
+
+        get().evaluateTrophies(targetDate);
+        return { success: true, xpAwarded: 50 };
+      },
+
+      activateReentryProtocol: (date?: string) => {
+        const targetDate = date || get().currentDate;
+        const currentStreak = get().streakCount;
+        const restoredStreak = Math.max(2, currentStreak + 1);
+        set({
+          isForgedStreak: true,
+          isReentryAvailable: false,
+          streakCount: restoredStreak,
+        });
+        get().gainXp(50, 'Grace Re-entry: Forged Streak Activated', 'streak');
+        return { success: true, message: `Forged Streak Activated! ${restoredStreak}-day streak restored.` };
+      },
+
+      unlockTrophy: (trophyId: string) => {
+        const currentUnlocked = get().unlockedTrophies;
+        if (currentUnlocked.includes(trophyId)) return false;
+        const trophy = TROPHIES_ROSTER.find((t) => t.id === trophyId);
+        if (!trophy) return false;
+        set({
+          unlockedTrophies: [...currentUnlocked, trophyId],
+          pendingTrophyUnlock: trophy,
+        });
+        get().gainXp(50, `Trophy Unlocked: ${trophy.title}`, 'trophy');
+        return true;
+      },
+
+      dismissPendingTrophy: () => {
+        set({ pendingTrophyUnlock: null });
+      },
+
+      evaluateTrophies: (date?: string) => {
+        const targetDate = date || get().currentDate;
+        const log = get().getDailyLog(targetDate);
+        const profile = get().userProfile;
+        const targetProtein = profile?.weightKg ? Math.round(profile.weightKg * 2.0) : 140;
+
+        // 1. Solar Vanguard: 3 days in a row of sunlight
+        const logs = get().logsByDate;
+        const recentDates = Object.keys(logs).sort().slice(-3);
+        const has3DaySun = recentDates.length >= 3 && recentDates.every((d) => logs[d]?.habitsCompleted?.['sunlight']);
+        if (has3DaySun) get().unlockTrophy('solar_vanguard');
+
+        // 2. Iron Anchor: hit protein target
+        if (log.totalProteinLogged >= targetProtein && targetProtein > 0) {
+          get().unlockTrophy('iron_anchor');
+        }
+
+        // 3. Hydration Alchemist: 2.5L+
+        if (log.hydrationLiters >= 2.5) {
+          get().unlockTrophy('hydration_alchemist');
+        }
+
+        // 4. Desk Goblin: afternoon slump <= 3
+        const ritual = get().deskRitualsByDate[targetDate];
+        if (ritual?.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3) {
+          get().unlockTrophy('desk_goblin');
+        }
+
+        // 5. Midnight Gambler: caffeine after cutoff
+        if (ritual?.caffeineStatus === 'after_cutoff') {
+          get().unlockTrophy('midnight_gambler');
+        }
+      },
     }),
     {
       name: 'cyath-habit-store-v2',
@@ -2193,6 +2418,9 @@ export const useHabitStore = create<HabitStoreState>()(
             customRecipes: state.customRecipes,
             weightHistory: state.weightHistory,
             socialQuests: state.socialQuests,
+            isForgedStreak: state.isForgedStreak,
+            isLedgerSealedByDate: state.isLedgerSealedByDate,
+            unlockedTrophies: state.unlockedTrophies,
           };
         }
         return state;

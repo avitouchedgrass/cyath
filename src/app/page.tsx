@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { PixelShowcase, DISH_ITEMS, DishData } from '@/components/landing/PixelShowcase';
 import { TextType } from '@/components/reactbits/TextType';
@@ -38,6 +39,7 @@ const STEP_LOOP = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [currentDish, setCurrentDish] = useState<DishData>(DISH_ITEMS[0]);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [previewEnergy, setPreviewEnergy] = useState(8);
@@ -48,7 +50,18 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (userSession && !userSession.id.startsWith('guest_')) {
+      router.replace('/dashboard');
+    }
+  }, [userSession, router]);
+
+  if (mounted && userSession && !userSession.id.startsWith('guest_')) {
+    return (
+      <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">
+        Loading Sanctuary Cockpit...
+      </div>
+    );
+  }
 
   const isLoggedIn = mounted && !!userSession;
 

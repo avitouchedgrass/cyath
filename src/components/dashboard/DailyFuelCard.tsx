@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { Utensils, ArrowRight, Plus, Check, Scale, Loader2 } from 'lucide-react';
+import { haptics } from '@/lib/haptics';
+import { Utensils, ArrowRight, Plus, Check, Scale, Loader2, Sparkles } from 'lucide-react';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -13,10 +13,9 @@ interface DailyFuelCardProps {
 }
 
 const PRESET_MEALS = [
-  { label: 'Breakfast', protein: 30, calories: 350, desc: 'Eggs & Toast' },
-  { label: 'Lunch', protein: 40, calories: 460, desc: 'Meat / Fish' },
-  { label: 'Dinner', protein: 40, calories: 480, desc: 'Whole Foods' },
-  { label: 'Quick Fuel', protein: 20, calories: 160, desc: 'Protein Shake' },
+  { label: 'Balanced Plate', protein: 35, calories: 520, desc: 'Protein + Veg + Carb' },
+  { label: 'High Protein Anchor', protein: 50, calories: 460, desc: 'Steak / Chicken breast' },
+  { label: 'Light Quick Fuel', protein: 20, calories: 240, desc: 'Eggs / Greek yogurt' },
 ] as const;
 
 export function DailyFuelCard({
@@ -48,6 +47,7 @@ export function DailyFuelCard({
   // 1-Tap Preset Logging
   const handleLogPreset = (preset: typeof PRESET_MEALS[number]) => {
     retroAudio.playInspectConfirm();
+    haptics.tap();
     logMealToDay(
       {
         name: `${preset.label} (${preset.desc})`,
@@ -58,17 +58,19 @@ export function DailyFuelCard({
       },
       currentDate
     );
-    setFeedback(`+${preset.protein}g ${preset.label} logged!`);
+    setFeedback(`+${preset.protein}g ${preset.label} logged`);
     setTimeout(() => setFeedback(null), 3000);
   };
 
-  // Ambient 1-Line AI Meal Input
+  // Ambient Natural Language Food Logging (Primary Hero Input)
   const handleAmbientMealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = ambientMealText.trim();
     if (!text || isSubmittingMeal) return;
 
     setIsSubmittingMeal(true);
+    haptics.tap();
+
     try {
       const res = await fetch('/api/ai/parse-meal', {
         method: 'POST',
@@ -93,12 +95,13 @@ export function DailyFuelCard({
           currentDate
         );
         retroAudio.playInspectConfirm();
-        setFeedback(`Logged "${data.mealName || text}" (+${protein}g PRO)`);
+        haptics.success();
+        setFeedback(`Logged "${data.mealName || text}" (+${protein}g protein)`);
       } else {
         throw new Error('API parse error');
       }
     } catch {
-      // Offline fallback: log baseline 25g
+      // Offline smart fallback
       logMealToDay(
         {
           name: text,
@@ -110,7 +113,8 @@ export function DailyFuelCard({
         currentDate
       );
       retroAudio.playInspectConfirm();
-      setFeedback(`Logged "${text}" (+25g PRO)`);
+      haptics.success();
+      setFeedback(`Logged "${text}" (+25g protein estimated)`);
     } finally {
       setIsSubmittingMeal(false);
       setAmbientMealText('');
@@ -118,198 +122,172 @@ export function DailyFuelCard({
     }
   };
 
-  // Inline Weight Check-in
-  const handleWeightSubmit = (e: React.FormEvent) => {
+  // Weight check-in
+  const handleSaveWeight = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = parseFloat(weightInput);
-    if (isNaN(parsed) || parsed <= 0 || parsed > 300) return;
-
-    const result = logWeight(parsed, 'cockpit check-in', currentDate);
-    retroAudio.playInspectConfirm();
-    setIsEditingWeight(false);
-    if (result.xpAwarded > 0) {
-      setFeedback(`Weighed ${parsed} kg (+${result.xpAwarded} XP)`);
-    } else {
-      setFeedback(`Updated weight: ${parsed} kg`);
+    const val = parseFloat(weightInput);
+    if (!isNaN(val) && val > 30 && val < 300) {
+      retroAudio.playInspectConfirm();
+      haptics.tap();
+      logWeight(val, undefined, currentDate);
+      setIsEditingWeight(false);
+      setFeedback(`Weight updated: ${val.toFixed(1)} kg`);
+      setTimeout(() => setFeedback(null), 3000);
     }
-    setTimeout(() => setFeedback(null), 3000);
   };
 
   return (
-    <div
-      id="tour-fuel-anchor"
-      className="w-full rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] p-4 sm:p-5 shadow-[2px_2px_0px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/25 transition-all duration-200 flex flex-col gap-4"
-    >
-      {/* Complication Header: Title + Ratio Readout */}
-      <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#1A3629]/10">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-6 h-6 rounded-lg bg-[#FAF8F5] border border-[#1A3629]/10 flex items-center justify-center text-[#1A3629] shrink-0">
+    <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-5 sm:p-6 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-5">
+      
+      {/* Header & Target Summary */}
+      <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#FAF8F5] border border-[#1A3629]/15 flex items-center justify-center text-[#1A3629]">
             <Utensils className="w-3.5 h-3.5" />
           </div>
-          <h3 className="font-cabinet font-bold text-sm text-[#1A3629] tracking-tight truncate">
-            Daily Fuel Anchor
-          </h3>
+          <div>
+            <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629] tracking-tight leading-tight">
+              Daily Fuel &amp; Protein Floor
+            </h3>
+            <span className="font-sans text-xs text-[#4A5D4E]">
+              Whole-food calibrated nutrition
+            </span>
+          </div>
         </div>
 
-        <span className="font-mono text-xs font-semibold text-[#1A3629] bg-[#FAF8F5] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 tabular-nums shrink-0">
-          {currentProtein}g / {targetProtein}g
-        </span>
+        <div className="flex flex-col items-end">
+          <div className="flex items-baseline gap-1 font-mono">
+            <span className="font-cabinet font-extrabold text-xl text-[#1A3629] tabular-nums">
+              {currentProtein}
+            </span>
+            <span className="text-xs text-[#4A5D4E]">/ {targetProtein}g</span>
+          </div>
+          <span className="text-[10px] font-mono text-[#4A5D4E]">
+            {remaining > 0 ? `${remaining}g remaining` : 'Target Secured'}
+          </span>
+        </div>
       </div>
 
-      {/* Progress Bar & Status */}
+      {/* Progress Bar */}
       <div className="flex flex-col gap-1.5">
-        <div className="w-full h-2 bg-[#1A3629]/10 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/15 rounded-full overflow-hidden">
           <div
             className="h-full bg-[#1A3629] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
-
-        <div className="flex items-center justify-between text-xs pt-0.5">
-          <span className="font-sans text-[#4A5D4E] text-xs font-medium">
-            {remaining === 0 ? 'Daily protein target met ✓' : `${remaining}g protein remaining`}
-          </span>
-          <span className="font-mono text-xs font-semibold text-[#1A3629]">
-            {percent}%
-          </span>
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#4A5D4E]">
+          <span>{percent}% of daily floor</span>
+          <span>{loggedMealsCount} items logged today</span>
         </div>
       </div>
 
-      {/* Unified Fast Fuel Logging Section */}
-      <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10 flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
-            Quick Meal Presets
-          </span>
-          <span className="text-[10px] font-mono text-[#4A5D4E]">
-            1-tap log
-          </span>
+      {/* HERO FOOD INPUT: Natural Language First */}
+      <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-2">
+        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629] flex items-center gap-1.5">
+          <Sparkles className="w-3 h-3 text-[#1A3629]" />
+          <span>Natural Language Meal Log</span>
+        </label>
+        
+        <div className="flex items-center gap-2">
+          <input
+            id="natural-meal-input"
+            type="text"
+            value={ambientMealText}
+            onChange={(e) => setAmbientMealText(e.target.value)}
+            placeholder="e.g. 3 scrambled eggs with sourdough"
+            disabled={isSubmittingMeal}
+            className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:border-[#1A3629]"
+          />
+          <button
+            type="submit"
+            disabled={!ambientMealText.trim() || isSubmittingMeal}
+            className="px-4 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-40 flex items-center justify-center shrink-0 shadow-2xs"
+          >
+            {isSubmittingMeal ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <span>Calculate</span>
+            )}
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        {feedback && (
+          <div className="font-mono text-[11px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-3 py-1.5 rounded-xl animate-in fade-in">
+            {feedback}
+          </div>
+        )}
+      </form>
+
+      {/* 1-Tap Quick Plates (Fast Estimation Below) */}
+      <div className="flex flex-col gap-2">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+          1-Tap Quick Plates
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {PRESET_MEALS.map((preset) => (
             <button
               key={preset.label}
               type="button"
               onClick={() => handleLogPreset(preset)}
-              className="p-2 rounded-xl border border-[#1A3629]/12 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all text-left cursor-pointer group shadow-2xs"
+              className="p-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer flex flex-col text-left group shadow-2xs"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold leading-none">
+              <div className="flex items-center justify-between w-full">
+                <span className="font-cabinet font-bold text-xs text-[#1A3629] group-hover:text-[#FFFDF9]">
+                  {preset.label}
+                </span>
+                <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] group-hover:bg-[#FFFDF9] group-hover:text-[#1A3629] px-1.5 py-0.5 rounded">
                   +{preset.protein}g
                 </span>
-                <Plus className="w-3 h-3 opacity-60 group-hover:opacity-100" />
               </div>
-              <div className="font-sans text-[10px] text-[#4A5D4E] group-hover:text-[#FFFDF9]/80 mt-1 truncate">
-                {preset.label}
-              </div>
+              <span className="text-[10px] font-sans text-[#4A5D4E] group-hover:text-[#FFFDF9]/80 mt-0.5">
+                {preset.desc}
+              </span>
             </button>
           ))}
         </div>
-
-        {/* 1-Line Ambient AI Meal Input */}
-        <form onSubmit={handleAmbientMealSubmit} className="flex items-center gap-2 bg-[#FFFDF9] border border-[#1A3629]/12 rounded-xl p-1 focus-within:border-[#1A3629]/30 transition-all">
-          <input
-            type="text"
-            value={ambientMealText}
-            onChange={(e) => setAmbientMealText(e.target.value)}
-            placeholder="Log meal: e.g. 2 eggs + sourdough"
-            disabled={isSubmittingMeal}
-            className="flex-1 bg-transparent text-xs font-cabinet text-[#1A3629] placeholder:text-[#1A3629]/40 outline-none px-2"
-          />
-          <button
-            type="submit"
-            disabled={!ambientMealText.trim() || isSubmittingMeal}
-            className={`px-3 py-1 rounded-lg font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
-              ambientMealText.trim() && !isSubmittingMeal
-                ? 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] shadow-2xs'
-                : 'bg-[#1A3629]/20 text-[#FFFDF9]/60 cursor-not-allowed'
-            }`}
-          >
-            {isSubmittingMeal ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              <span>Log</span>
-            )}
-          </button>
-        </form>
       </div>
 
-      {/* Feedback Toast Banner */}
-      {feedback && (
-        <div className="py-1.5 px-2.5 rounded-xl bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs flex items-center gap-1.5 animate-in fade-in duration-150">
-          <Check className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-          <span className="truncate">{feedback}</span>
+      {/* Weight Check-In Strip */}
+      <div className="border-t border-[#1A3629]/10 pt-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Scale className="w-4 h-4 text-[#4A5D4E]" />
+          <span className="font-mono text-xs text-[#4A5D4E]">Current Weight:</span>
+          {isEditingWeight ? (
+            <form onSubmit={handleSaveWeight} className="flex items-center gap-1.5">
+              <input
+                type="number"
+                step="0.1"
+                value={weightInput}
+                onChange={(e) => setWeightInput(e.target.value)}
+                className="w-16 px-2 py-0.5 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629] text-center focus:outline-none"
+                autoFocus
+              />
+              <span className="text-xs font-mono text-[#4A5D4E]">kg</span>
+              <button
+                type="submit"
+                className="px-2 py-0.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[10px]"
+              >
+                Save
+              </button>
+            </form>
+          ) : (
+            <span className="font-mono text-xs font-bold text-[#1A3629]">
+              {userProfile?.weightKg ? `${userProfile.weightKg} kg` : 'Not recorded'}
+            </span>
+          )}
         </div>
-      )}
 
-      {/* Inline Weight Check-in Strip */}
-      <div className="py-2 px-3 rounded-xl bg-[#FAF8F5]/70 border border-[#1A3629]/8 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-2 text-[#1A3629]">
-          <Scale className="w-3.5 h-3.5 text-[#4A5D4E] shrink-0" />
-          <span className="font-mono text-xs font-medium text-[#4A5D4E]">
-            Weight:
-          </span>
-          <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-            {userProfile?.weightKg ? `${userProfile.weightKg} kg` : 'Not recorded'}
-          </span>
-        </div>
-
-        {isEditingWeight ? (
-          <form onSubmit={handleWeightSubmit} className="flex items-center gap-1">
-            <input
-              type="number"
-              step="0.1"
-              min="30"
-              max="300"
-              value={weightInput}
-              onChange={(e) => setWeightInput(e.target.value)}
-              placeholder="kg"
-              className="w-16 px-1.5 py-0.5 text-xs font-mono bg-[#FFFDF9] border border-[#1A3629]/20 rounded outline-none text-[#1A3629]"
-              autoFocus
-            />
-            <button
-              type="submit"
-              className="px-2 py-0.5 bg-[#1A3629] text-[#FFFDF9] text-[11px] font-cabinet font-bold rounded cursor-pointer hover:bg-[#2C4A3B]"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditingWeight(false)}
-              className="text-[11px] font-mono text-[#4A5D4E] hover:text-[#1A3629] px-1 cursor-pointer"
-            >
-              ✕
-            </button>
-          </form>
-        ) : (
+        {!isEditingWeight && (
           <button
             type="button"
-            onClick={() => {
-              setWeightInput(userProfile?.weightKg ? String(userProfile.weightKg) : '');
-              setIsEditingWeight(true);
-            }}
+            onClick={() => setIsEditingWeight(true)}
             className="text-[11px] font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer"
           >
-            {userProfile?.weightKg ? 'Update' : '+ Check-in'}
+            Update
           </button>
         )}
-      </div>
-
-      {/* Full Eating Ledger Navigation Link */}
-      <div className="pt-1 border-t border-[#1A3629]/8 flex items-center justify-between">
-        <span className="text-[11px] font-mono text-[#4A5D4E]">
-          {loggedMealsCount} meal{loggedMealsCount === 1 ? '' : 's'} logged today
-        </span>
-        <Link
-          href="/dashboard?tab=log"
-          className="inline-flex items-center gap-1 text-xs font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer group"
-        >
-          <span>Eating Ledger</span>
-          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
       </div>
     </div>
   );
 }
-

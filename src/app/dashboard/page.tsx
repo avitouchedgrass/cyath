@@ -1,29 +1,45 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { HeaderNav } from '@/components/landing/HeaderNav';
-import { useHabitStore } from '@/store/useHabitStore';
+import { useHabitStore, TROPHIES_ROSTER } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { haptics } from '@/lib/haptics';
 import { formatLocalDate } from '@/lib/dateUtils';
-import { LivingIslandHero, CircadianHorizonCurve } from '@/components/dashboard/LivingSkyCanopy';
+import { LivingIslandHero } from '@/components/dashboard/LivingSkyCanopy';
 import { CoreHabitsCard } from '@/components/dashboard/CoreHabitsCard';
 import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
-import { FuelTab } from '@/components/dashboard/FuelTab';
-import { DossierTab } from '@/components/dashboard/DossierTab';
+import { EveningSealButton } from '@/components/dashboard/EveningSealButton';
+import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
+import { SpecimenVaultDrawer } from '@/components/dashboard/SpecimenVaultDrawer';
+import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
-import { FileText, Plus, Utensils } from 'lucide-react';
-
+import {
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Clock,
+  Receipt,
+  FileText,
+  Shield,
+  X,
+  Check,
+} from 'lucide-react';
 
 function DashboardContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tabParam = searchParams?.get('tab') || 'today';
-  const activeTab = tabParam === 'fuel' ? 'log' : tabParam;
-
   const [mounted, setMounted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // Modal / Drawer States
+  const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const [vaultInitialTrophyId, setVaultInitialTrophyId] = useState<string | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+
   const hasCalibratedTodayRef = useRef(false);
 
   const {
@@ -33,13 +49,22 @@ function DashboardContent() {
     userSession,
     userProfile,
     streakCount,
-    streakFreezeStock,
+    isForgedStreak,
+    unlockedTrophies,
+    setCircadianSchedule,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
 
   useEffect(() => {
     setMounted(true);
+    setIsMuted(retroAudio.getMuted());
+
+    const handleMuteChange = (e: CustomEvent<{ isMuted: boolean }>) => {
+      setIsMuted(e.detail.isMuted);
+    };
+    window.addEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
+
     if (!hasCalibratedTodayRef.current) {
       hasCalibratedTodayRef.current = true;
       const today = formatLocalDate();
@@ -47,28 +72,50 @@ function DashboardContent() {
         setDate(today);
       }
     }
+
     if (isAuthenticated && (!userProfile || !userProfile.onboardingCompleted)) {
       router.push('/onboarding');
     }
+
+    return () => {
+      window.removeEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
+    };
   }, [isAuthenticated, userProfile, router, currentDate, setDate]);
 
   const todayDateStr = useMemo(() => formatLocalDate(), []);
   const isViewingToday = currentDate === todayDateStr;
   const todayLog = getDailyLog(currentDate);
 
-  const habitsDoneToday = useMemo(() => {
-    return todayLog?.habitsCompleted ? Object.values(todayLog.habitsCompleted).filter(Boolean).length : 0;
-  }, [todayLog]);
-  const isStreakSecured = habitsDoneToday > 0;
-
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const currentProtein = todayLog.totalProteinLogged || 0;
 
+  // Schedule modal state
+  const [tempWake, setTempWake] = useState(userProfile?.wakeTime || '07:30');
+  const [tempBed, setTempBed] = useState(userProfile?.bedTime || '23:30');
+
+  const handleToggleMute = () => {
+    const next = retroAudio.toggleMute();
+    setIsMuted(next);
+    haptics.tap();
+  };
+
+  const handleOpenVault = (trophyId?: string) => {
+    setVaultInitialTrophyId(trophyId || null);
+    setIsVaultOpen(true);
+  };
+
+  const handleSaveSchedule = (e: React.FormEvent) => {
+    e.preventDefault();
+    retroAudio.playInspectConfirm();
+    haptics.tap();
+    setCircadianSchedule(tempWake, tempBed);
+    setIsScheduleModalOpen(false);
+  };
 
   if (!mounted) {
     return (
       <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">
-        Loading Member Workspace...
+        Loading Sanctuary Cockpit...
       </div>
     );
   }
@@ -77,145 +124,245 @@ function DashboardContent() {
     <div className="min-h-screen bg-[#F4F0EA] text-[#1A3629] transition-colors duration-300 flex flex-col selection:bg-[#1A3629] selection:text-[#FFFDF9]">
       <HeaderNav />
 
-      {/* Main Member Workspace Container — Panoramic Cockpit Breadth */}
-      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-24 pb-32 flex flex-col gap-6">
+      {/* Celebratory Dropdown on Trophy Earned */}
+      <ItemGetBanner onOpenVault={handleOpenVault} />
+
+      {/* Main Sanctuary Cockpit Container */}
+      <main className="relative z-10 flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 pb-24 flex flex-col gap-6">
         
-        {/* Cockpit Status Header Row: Clean, Editorial, Quiet */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1A3629]/8 pb-4">
+        {/* Cockpit Header Row: Status, Ambient Schedule Chip, Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1A3629]/10 pb-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1A3629]">
-                {activeTab === 'today' && 'Daily Cockpit'}
-                {(activeTab === 'log' || activeTab === 'fuel') && 'Daily Nutrition Log'}
-                {activeTab === 'dossier' && 'Weekly Intelligence Dossier'}
+                Sanctuary Cockpit
               </h1>
 
-              {/* Subtle Streak Preservation Reminder */}
-              {streakCount > 0 && activeTab === 'today' && isViewingToday && (
-                isStreakSecured ? (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ECFDF5] border border-[#10B981]/30 text-[#065F46] font-cabinet font-bold text-xs shadow-2xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                    <span>{streakCount}-day streak</span>
-                    <span className="text-[10px] font-mono opacity-75">&middot; secured today</span>
+              {/* Streak Badge with Custom Flame */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
+                {isForgedStreak ? (
+                  <div className="w-4 h-4 relative">
+                    <Image
+                      src="/assets/trophies/flame_iron.png"
+                      alt="Forged Flame"
+                      fill
+                      className="object-contain select-none"
+                      style={{ imageRendering: 'pixelated' }}
+                    />
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#FFF7ED] border border-[#FDBA74]/60 text-[#9A3412] font-cabinet font-bold text-xs shadow-2xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C] animate-pulse" />
-                    <span>{streakCount}-day streak at stake</span>
-                    <span className="text-[10px] font-mono opacity-80">&middot; check 1 habit</span>
-                    {streakFreezeStock > 0 && (
-                      <span className="text-[10px] font-mono text-[#065F46] bg-[#FFFDF9] px-1.5 py-0.5 rounded-full border border-[#10B981]/20">
-                        {streakFreezeStock} freeze saved
-                      </span>
-                    )}
+                  <div className="w-4 h-4 relative">
+                    <Image
+                      src="/assets/trophies/flame_normal.png"
+                      alt="Streak Flame"
+                      fill
+                      className="object-contain select-none"
+                      style={{ imageRendering: 'pixelated' }}
+                    />
                   </div>
-                )
-              )}
+                )}
+                <span className="font-cabinet font-extrabold text-xs text-[#1A3629]">
+                  {streakCount} {streakCount === 1 ? 'Day' : 'Days'} {isForgedStreak ? 'Forged' : ''}
+                </span>
+              </div>
             </div>
 
-            <p className="text-xs text-[#4A5D4E] font-sans mt-0.5">
-              {activeTab === 'today' && (isViewingToday ? 'Full-screen living sanctuary diorama, daily habit ledger, and circadian rhythm.' : `Archived daily log for ${currentDate}.`)}
-              {(activeTab === 'log' || activeTab === 'fuel') && 'Log daily whole foods with AI, verify portions, and calibrate protein.'}
-              {activeTab === 'dossier' && '7-day energy patterns, recovery markers, and cadence consistency.'}
+            <p className="text-xs text-[#4A5D4E] font-sans">
+              {isViewingToday
+                ? 'Daily reactive habit canvas, whole-food fuel tracker, and circadian cadence.'
+                : `Archived log view for ${currentDate}.`}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Prominent Cockpit Log Button (Always visible on cockpit) */}
-            {activeTab === 'today' && (
-              <Link
-                id="cockpit-log-button"
-                href="/dashboard?tab=log"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet text-xs font-bold hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-xs active:scale-[0.99]"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Log Meal</span>
-              </Link>
-            )}
-
-            {/* Quick Dossier Modal Trigger */}
+          {/* Right Action Suite: Schedule Chip, Mute Toggle, Vault, Receipt, Dossier */}
+          <div className="flex items-center gap-2 flex-wrap">
+            
+            {/* Ambient Schedule Chip (1-Click Popover) */}
             <button
-              id="tour-dossier-button"
               type="button"
               onClick={() => {
                 retroAudio.playBlip();
+                haptics.tap();
+                setTempWake(userProfile?.wakeTime || '07:30');
+                setTempBed(userProfile?.bedTime || '23:30');
+                setIsScheduleModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-mono text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              title="Click to adjust your sleep and wake schedule"
+            >
+              <Clock className="w-3.5 h-3.5 text-[#4A5D4E]" />
+              <span>Wake {userProfile?.wakeTime || '07:30'} · Sleep {userProfile?.bedTime || '23:30'}</span>
+            </button>
+
+            {/* Audio Mute Toggle Button */}
+            <button
+              type="button"
+              onClick={handleToggleMute}
+              className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+              title={isMuted ? 'Sound is Muted (Click to Unmute)' : 'Sound is Active (Click to Mute)'}
+              aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+            >
+              {isMuted ? (
+                <VolumeX className="w-4 h-4 text-[#DC2626]" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-[#10B981]" />
+              )}
+            </button>
+
+            {/* Specimen Vault Trigger */}
+            <button
+              type="button"
+              onClick={() => handleOpenVault()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs group"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#D97706] group-hover:text-[#FCD34D]" />
+              <span>Vault ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
+            </button>
+
+            {/* Minimalist Receipt Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                haptics.tap();
+                setIsReceiptOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              <span>Receipt</span>
+            </button>
+
+            {/* 7-Day Dossier Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                haptics.tap();
                 setIsDossierOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet text-xs font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-all cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer shadow-2xs"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>7-Day Dossier</span>
             </button>
-
-            {!isViewingToday && (
-              <button
-                type="button"
-                onClick={() => {
-                  retroAudio.playBlip();
-                  setDate(todayDateStr);
-                }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-2xs"
-              >
-                Return to Today →
-              </button>
-            )}
           </div>
         </div>
 
-        {/* TAB 1: TODAY (Full-Screen Flanked Panoramic Cockpit) */}
-        {activeTab === 'today' && (
-          <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-8 items-start">
-              
-              {/* LEFT FLANK: Daily Focus Non-Negotiables & Desk Rituals */}
-              <div className="w-full lg:col-span-1 xl:col-span-3 order-2 xl:order-1 flex flex-col gap-6">
-                <CoreHabitsCard />
-              </div>
-
-              {/* CENTER STAGE: Monumental Cardless Living Sanctuary Island */}
-              <div className="w-full lg:col-span-2 xl:col-span-6 order-1 xl:order-2 flex flex-col items-center justify-center">
-                <LivingIslandHero />
-              </div>
-
-              {/* RIGHT FLANK: Circadian Horizon Curve & Daily Fuel Logging */}
-              <div className="w-full lg:col-span-1 xl:col-span-3 order-3 xl:order-3 flex flex-col gap-6">
-                <CircadianHorizonCurve />
-                <DailyFuelCard
-                  currentProtein={currentProtein}
-                  targetProtein={targetProtein}
-                  currentDate={currentDate}
-                />
-              </div>
-
-            </div>
+        {/* Consolidated Panoramic Grid: Mobile-First Ergonomics */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-150">
+          
+          {/* MOBILE: Center Stage Island Renders First (Compact ~150px) */}
+          {/* DESKTOP: Center Column (lg:col-span-4 lg:order-2) */}
+          <div className="w-full lg:col-span-4 order-1 lg:order-2 flex flex-col items-center justify-center">
+            <LivingIslandHero />
           </div>
-        )}
 
-
-        {/* TAB 2: LOG */}
-        {(activeTab === 'log' || activeTab === 'fuel') && (
-          <div className="w-full max-w-5xl mx-auto">
-            <FuelTab />
+          {/* MOBILE: Core Habits Card Renders Directly Below Island (Zero Scroll!) */}
+          {/* DESKTOP: Left Column (lg:col-span-4 lg:order-1) */}
+          <div className="w-full lg:col-span-4 order-2 lg:order-1 flex flex-col gap-4">
+            <CoreHabitsCard />
+            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
           </div>
-        )}
 
-        {/* TAB 3: DOSSIER & HISTORY */}
-        {activeTab === 'dossier' && (
-          <div className="w-full max-w-5xl mx-auto">
-            <DossierTab />
+          {/* MOBILE: Daily Fuel Card Renders Next */}
+          {/* DESKTOP: Right Column (lg:col-span-4 lg:order-3) */}
+          <div className="w-full lg:col-span-4 order-3 lg:order-3 flex flex-col gap-4">
+            <DailyFuelCard
+              currentProtein={currentProtein}
+              targetProtein={targetProtein}
+              currentDate={currentDate}
+            />
           </div>
-        )}
 
+        </div>
 
       </main>
 
-      {/* 7-Day Dossier Modal */}
+      {/* Specimen Vault Slide-Over Drawer */}
+      <SpecimenVaultDrawer
+        isOpen={isVaultOpen}
+        onClose={() => setIsVaultOpen(false)}
+        initialSelectedId={vaultInitialTrophyId}
+      />
+
+      {/* Minimalist Thermal Receipt Modal */}
+      <MinimalistReceiptModal
+        isOpen={isReceiptOpen}
+        onClose={() => setIsReceiptOpen(false)}
+      />
+
+      {/* 7-Day Intelligence Dossier Modal */}
       <WeeklyDossierModal
         isOpen={isDossierOpen}
         onClose={() => setIsDossierOpen(false)}
       />
-    </div>
 
+      {/* Schedule Adjustment Modal */}
+      {isScheduleModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[#1A3629]/40 backdrop-blur-xs animate-in fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsScheduleModalOpen(false);
+          }}
+        >
+          <div className="w-full max-w-sm bg-[#FFFDF9] border-2 border-[#1A3629] rounded-3xl p-6 shadow-[8px_8px_0px_#1A3629] flex flex-col gap-4 relative">
+            <button
+              type="button"
+              onClick={() => setIsScheduleModalOpen(false)}
+              className="absolute top-4 right-4 w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+
+            <div>
+              <h3 className="font-cabinet font-extrabold text-lg text-[#1A3629] tracking-tight">
+                Circadian Schedule
+              </h3>
+              <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
+                Sets your morning sunlight window, caffeine cutoff, and evening seal.
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveSchedule} className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Wake Time
+                </label>
+                <input
+                  type="time"
+                  value={tempWake}
+                  onChange={(e) => setTempWake(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/20 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Target Bedtime
+                </label>
+                <input
+                  type="time"
+                  value={tempBed}
+                  onChange={(e) => setTempBed(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-[#1A3629]/20 rounded-xl px-3 py-2 font-mono text-sm font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer mt-1"
+              >
+                Save Schedule
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

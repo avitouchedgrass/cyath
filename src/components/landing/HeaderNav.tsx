@@ -181,10 +181,9 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
   // Logged-in member navigation items
   const memberNavItems: NavItem[] = [
-    { name: "Today", href: "/dashboard?tab=today", id: "today", icon: Compass },
-    { name: "Log", href: "/dashboard?tab=log", id: "log", icon: Utensils },
+    { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
-    { name: "Dossier & History", href: "/dashboard?tab=dossier", id: "dossier", icon: FileText },
+    { name: "Profile", href: "/profile", id: "profile", icon: User },
   ];
 
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
@@ -223,32 +222,6 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
           {/* Right Action Cluster */}
           <div className="flex items-center gap-2 sm:gap-2.5 z-10">
-            {/* Command Palette Button */}
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
-              className="hidden lg:flex items-center gap-1.5 border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629]/6 px-3 rounded-full font-mono text-xs font-semibold shadow-xs transition-all cursor-pointer h-9 select-none"
-              title="Open Command Palette (Cmd+K / Ctrl+K)"
-              aria-label="Open Command Palette"
-            >
-              <span className="text-[10px] opacity-60">⌘</span>
-              <span>K</span>
-            </button>
-
-            {/* Invite Button for Members */}
-            {mounted && isLoggedIn && (
-              <button
-                type="button"
-                onClick={() => setIsInviteModalOpen(true)}
-                className="hidden sm:flex border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all items-center justify-center gap-1.5 cursor-pointer h-9 select-none shrink-0"
-                title="Invite Friends to Cyath"
-                aria-label="Invite friends to Cyath"
-              >
-                <Gift className="w-3.5 h-3.5 text-[#1A3629]/70 shrink-0" />
-                <span>Invite</span>
-              </button>
-            )}
-
             {/* Profile / App Entry Button */}
             {isLoggedIn ? (
               <Link

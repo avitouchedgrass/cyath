@@ -1,8 +1,8 @@
 import { ImageResponse } from 'next/og';
 
 export const size = {
-  width: 180,
-  height: 180,
+  width: 192,
+  height: 192,
 };
 export const contentType = 'image/png';
 
@@ -17,15 +17,27 @@ export default function AppleIcon() {
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#1A3629',
-          color: '#FFFDF9',
-          borderRadius: '36px',
-          fontWeight: '900',
-          fontSize: '110px',
-          fontFamily: 'monospace',
-          border: '8px solid #FFFDF9',
+          borderRadius: '42px',
         }}
       >
-        C
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '120px',
+            height: '120px',
+            border: '6px solid #C8E6C0',
+            borderRadius: '50%',
+            color: '#C8E6C0',
+            fontWeight: '900',
+            fontSize: '72px',
+            fontFamily: 'monospace',
+            letterSpacing: '-2px',
+          }}
+        >
+          C
+        </div>
       </div>
     ),
     {

@@ -400,6 +400,7 @@ export interface HabitStoreState {
   pendingAction: PendingUserAction | null;
   dailyProtocolsAcceptedByDate: Record<string, boolean>;
   dailyProtocolsCompletedByDate: Record<string, boolean>;
+  sleepGoalAwardedByDate: Record<string, boolean>;
   deskRitualsByDate: Record<string, DeskRitualData>;
   claimedDossiersByWeek: Record<string, boolean>;
   weightHistory: WeightEntry[];
@@ -647,6 +648,7 @@ export const useHabitStore = create<HabitStoreState>()(
       isForgedStreak: false,
       isReentryAvailable: false,
       isLedgerSealedByDate: {},
+      sleepGoalAwardedByDate: {},
       unlockedTrophies: [],
       trophyCounts: {},
       pendingTrophyUnlock: null,
@@ -1691,18 +1693,22 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
-        // Award XP on logging sleep telemetry
+        // Award XP on logging sleep telemetry — first log only
         if (prevSleep === 0 && hours > 0) {
           get().gainXp(25, 'Sleep Telemetry Logged', 'sleep');
         }
 
-        const hadSleep = prevSleep >= GOALS.sleepHours;
+        // One-time sleep goal bonus per day — cannot be farmed by toggling across the 7h mark
         const nowSleep = hours >= GOALS.sleepHours;
-
-        if (!hadSleep && nowSleep) {
+        const alreadyAwarded = !!get().sleepGoalAwardedByDate?.[targetDate];
+        if (nowSleep && !alreadyAwarded) {
+          set((state) => ({
+            sleepGoalAwardedByDate: {
+              ...state.sleepGoalAwardedByDate,
+              [targetDate]: true,
+            },
+          }));
           get().gainXp(XP_AWARDS.sleepGoal, 'Sleep Restoration Goal (7h+)', 'sleep');
-        } else if (hadSleep && !nowSleep) {
-          get().gainXp(-XP_AWARDS.sleepGoal, 'Sleep Goal Revoked', 'sleep');
         }
 
         get().syncWithSupabase(targetDate);

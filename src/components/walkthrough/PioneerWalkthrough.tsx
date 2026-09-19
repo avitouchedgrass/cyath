@@ -99,6 +99,14 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
       align: 'end',
     },
   },
+  {
+    popover: {
+      title: 'Install Cyath on Your Home Screen',
+      description:
+        '<strong>iOS (Safari):</strong> Tap the Share button ↗ at the bottom of your browser, then select <em>Add to Home Screen</em>.<br><br><strong>Android (Chrome):</strong> Tap the three-dot menu ⋮ at the top right, then tap <em>Add to Home Screen</em>.<br><br>You\'ll get the full app experience — no browser chrome, instant launch.',
+      align: 'center',
+    },
+  },
 ];
 
 export function PioneerWalkthrough() {

@@ -8,16 +8,14 @@ import { useHabitStore, TROPHIES_ROSTER } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { formatLocalDate } from '@/lib/dateUtils';
-import { LivingIslandHero } from '@/components/dashboard/LivingSkyCanopy';
+import { SanctuaryObservatory } from '@/components/dashboard/SanctuaryObservatory';
 import { CoreHabitsCard } from '@/components/dashboard/CoreHabitsCard';
 import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
-import { EveningSealButton } from '@/components/dashboard/EveningSealButton';
 import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
 import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfloor';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WaxSealCorkboard } from '@/components/dashboard/WaxSealCorkboard';
 import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
-import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
 import {
   Volume2,
   VolumeX,
@@ -295,11 +293,45 @@ function DashboardContent() {
             >
               <span>Reliquary ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
             </button>
+
+            {/* Zen Ambient Desk Display Button */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                haptics.tap();
+                setIsAmbientOpen(true);
+              }}
+              className="h-9 px-3.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+              title="Zen Ambient Desk Display (Hotkey A)"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Zen Ambience</span>
+            </button>
           </div>
         </div>
 
         {/* Mobile Cockpit Station Dock (Ergonomic Segmented Switcher for <1024px) */}
         <div role="tablist" aria-label="Dashboard sections" className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-1.5 my-1">
+          <button
+            role="tab"
+            aria-selected={mobileStation === 'island'}
+            aria-label="Floating island sanctuary"
+            type="button"
+            onClick={() => {
+              setMobileStation('island');
+              retroAudio.playBlip();
+              haptics.tap();
+            }}
+            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+              mobileStation === 'island'
+                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
+            }`}
+          >
+            <span aria-hidden="true">🏝️</span> Sanctuary
+          </button>
+
           <button
             role="tab"
             aria-selected={mobileStation === 'habits'}
@@ -317,25 +349,6 @@ function DashboardContent() {
             }`}
           >
             <span aria-hidden="true">⚡</span> Anchors
-          </button>
-
-          <button
-            role="tab"
-            aria-selected={mobileStation === 'island'}
-            aria-label="Floating island sanctuary"
-            type="button"
-            onClick={() => {
-              setMobileStation('island');
-              retroAudio.playBlip();
-              haptics.tap();
-            }}
-            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
-              mobileStation === 'island'
-                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
-                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
-            }`}
-          >
-            <span aria-hidden="true">🏝️</span> Island
           </button>
 
           <button
@@ -358,100 +371,52 @@ function DashboardContent() {
           </button>
         </div>
 
-        {/* Asymmetric Stage: Slim flanks frame a dominant center island column */}
+        {/* Touch Swipe & Terraced Architecture Container */}
         <div
-          className="w-full flex flex-col lg:flex-row items-start justify-between gap-5 xl:gap-8 animate-in fade-in duration-150"
+          className="w-full flex flex-col gap-8 animate-in fade-in duration-150"
           onTouchStart={(e) => { swipeTouchStartX.current = e.touches[0].clientX; }}
           onTouchEnd={(e) => {
             if (swipeTouchStartX.current === null) return;
             const dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
             swipeTouchStartX.current = null;
             if (Math.abs(dx) < 60) return;
-            const order: Array<'habits' | 'island' | 'fuel'> = ['habits', 'island', 'fuel'];
+            const order: Array<'island' | 'habits' | 'fuel'> = ['island', 'habits', 'fuel'];
             const idx = order.indexOf(mobileStation);
             if (dx < 0 && idx < order.length - 1) setMobileStation(order[idx + 1]);
             if (dx > 0 && idx > 0) setMobileStation(order[idx - 1]);
           }}
         >
-
-          {/* LEFT FLANK: Compact Habit Punch-Pad sidebar */}
-          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-2 lg:order-1 transition-[outline] duration-150 ${hotkeyFlash === 'habits' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
-            <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
-          </div>
-
-          {/* CENTER STAGE: Dominant focal column — island + day-end CTAs live here */}
-          <div className={`flex-1 min-w-[46%] w-full ${mobileStation === 'island' ? 'flex' : 'hidden lg:flex'} flex-col items-center justify-start gap-4 py-2 order-1 lg:order-2`}>
-            <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
-
-            {/* Day-close CTA cluster — naturally where the eye lands after the island */}
-            <div className="w-full max-w-sm flex flex-col gap-2.5">
-              {!isLedgerSealedByDate[currentDate] && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    retroAudio.playPaperRustle();
-                    haptics.tap();
-                    setJustSealedDate(null);
-                    setIsCorkboardOpen(true);
-                  }}
-                  className="w-full p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99]"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                      <PixelWaxSeal size={22} />
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-cabinet font-extrabold text-sm text-[#1A3629]">
-                        30-Day Guild Ledger
-                      </span>
-                      <span className="font-mono text-[11px] text-[#4A5D4E]">
-                        {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned
-                      </span>
-                    </div>
-                  </div>
-                  <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
-                    Board →
-                  </span>
-                </button>
-              )}
-
-              <EveningSealButton
-                onOpenReceipt={() => setIsReceiptOpen(true)}
-                onOpenCorkboard={(sealedDate) => {
-                  setJustSealedDate(sealedDate || currentDate);
-                  setIsCorkboardOpen(true);
-                }}
-              />
-
-              <button
-                type="button"
-                onClick={() => {
-                  retroAudio.playBlip();
-                  haptics.tap();
-                  setIsAmbientOpen(true);
-                }}
-                className="w-full px-4 py-2 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/80 hover:bg-[#1A3629] hover:text-[#FFFDF9] hover:border-[#1A3629] text-[#1A3629] font-mono text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 group"
-                title="Zen Ambient Desk Display (Press A)"
-              >
-                <Maximize2 className="w-3 h-3 text-emerald-600 group-hover:text-white" />
-                <span>Zen Desk Ambience</span>
-                <kbd className="ml-1 px-1.5 py-px bg-[#EAE4D9] group-hover:bg-white/20 border border-[#1A3629]/15 group-hover:border-white/30 rounded text-[10px] transition-colors">A</kbd>
-              </button>
-            </div>
-          </div>
-
-          {/* RIGHT FLANK: Daily Fuel — slim sidebar matching left */}
-          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-3 lg:order-3 transition-[outline] duration-150 ${hotkeyFlash === 'fuel' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
-            <DailyFuelCard
-              currentProtein={currentProtein}
-              targetProtein={targetProtein}
-              currentDate={currentDate}
+          {/* TIER 1: The Sanctuary Observatory (Panoramic Celestial Horizon) */}
+          <div className={`w-full ${mobileStation === 'island' ? 'block' : 'hidden lg:block'} transition-[outline] duration-150 ${hotkeyFlash === 'island' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''}`}>
+            <SanctuaryObservatory
+              onOpenSchedule={() => setIsScheduleModalOpen(true)}
+              onOpenReceipt={() => setIsReceiptOpen(true)}
+              onOpenCorkboard={(sealedDate) => {
+                setJustSealedDate(sealedDate || currentDate);
+                setIsCorkboardOpen(true);
+              }}
             />
           </div>
 
+          {/* TIER 2: Grounded Dual-Hearth Workspace (Daily Anchors & Fuel Consoles) */}
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+            {/* Left Hearth: Ritual Anchors & Mind-Body Keystones */}
+            <div className={`w-full lg:col-span-6 xl:col-span-5 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 transition-[outline] duration-150 ${hotkeyFlash === 'habits' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
+              <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
+            </div>
+
+            {/* Right Hearth: Daily Fuel & Nutritional Ledger */}
+            <div className={`w-full lg:col-span-6 xl:col-span-7 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 transition-[outline] duration-150 ${hotkeyFlash === 'fuel' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
+              <DailyFuelCard
+                currentProtein={currentProtein}
+                targetProtein={targetProtein}
+                currentDate={currentDate}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Archival Museum Specimen Reliquary Sub-Floor (Treatment 2 & Location 2) */}
+        {/* TIER 3: Archival Museum Specimen Reliquary Sub-Floor */}
         <SpecimenVaultSubfloor />
 
       </main>

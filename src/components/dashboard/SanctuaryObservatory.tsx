@@ -102,7 +102,13 @@ export function SanctuaryObservatory({
   }, [isLedgerSealedByDate, getDailyLog, todayStr]);
 
   return (
-    <div className="w-full h-full min-h-[580px] bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-7 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col justify-between relative overflow-hidden">
+    <div
+      className={
+        isLedgerOpen
+          ? 'w-full h-full min-h-[580px] bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-7 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col justify-between relative overflow-hidden animate-in fade-in duration-200'
+          : 'w-full h-full min-h-[640px] flex flex-col justify-between relative py-2 px-1 sm:px-2 animate-in fade-in duration-200'
+      }
+    >
       
       {/* ------------------------------------------------------------- */}
       {/* VIEW A: In-Place 30-Day Guild Ledger Overlay */}
@@ -209,10 +215,10 @@ export function SanctuaryObservatory({
 
             {/* Streak just below the title */}
             <div
-              className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/15 shadow-2xs"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs"
               title={`${streakCount} Day Habit Momentum Streak`}
             >
-              <div className="w-3.5 h-3.5 relative">
+              <div className="w-5 h-5 relative">
                 <Image
                   src={isForgedStreak ? '/assets/trophies/flame_iron.png' : '/assets/trophies/flame_normal.png'}
                   alt="Streak Flame"
@@ -225,7 +231,7 @@ export function SanctuaryObservatory({
                 {streakCount} {streakCount === 1 ? 'Day' : 'Days'} {isForgedStreak ? 'Forged' : 'Streak'}
               </span>
               {isForgedStreak && (
-                <span className="font-mono text-[9px] font-bold text-[#1E3A8A] bg-blue-100 px-1 py-0.2 rounded border border-blue-200">
+                <span className="font-mono text-[9px] font-bold text-[#1E3A8A] bg-blue-100 px-1.5 py-0.2 rounded border border-blue-200">
                   Kintsugi
                 </span>
               )}
@@ -248,23 +254,23 @@ export function SanctuaryObservatory({
             )}
           </div>
 
-          {/* Center: Monumental Floating Island Graphic */}
-          <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[300px]">
-            <div className="relative z-10 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px] lg:w-[460px] lg:h-[460px] xl:w-[500px] xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
+          {/* Center: Ginormous Floating Island Graphic */}
+          <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[340px] sm:min-h-[440px] lg:min-h-[540px] py-4">
+            <div className="relative z-10 w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] md:w-[520px] md:h-[520px] lg:w-[580px] lg:h-[580px] xl:w-[660px] xl:h-[660px] 2xl:w-[740px] 2xl:h-[740px] max-w-full flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
               {isLowEndDevice ? (
                 <Image
                   src={currentIsland.pngImage || currentIsland.image}
                   alt={currentIsland.name}
                   fill
                   priority
-                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 500px"
-                  className="object-contain drop-shadow-[0_16px_28px_rgba(26,54,41,0.14)] select-none"
+                  sizes="(max-width: 640px) 320px, (max-width: 1024px) 580px, 740px"
+                  className="object-contain drop-shadow-[0_20px_36px_rgba(26,54,41,0.16)] select-none"
                   style={{ imageRendering: 'pixelated' }}
                 />
               ) : (
                 <svg
                   viewBox="0 0 800 800"
-                  className="w-full h-full drop-shadow-[0_16px_28px_rgba(26,54,41,0.14)] select-none"
+                  className="w-full h-full drop-shadow-[0_20px_36px_rgba(26,54,41,0.16)] select-none"
                   shapeRendering="crispEdges"
                 >
                   <defs>
@@ -332,10 +338,10 @@ export function SanctuaryObservatory({
             </div>
 
             {/* Stepped Pixel Ground Shadow */}
-            <div className="relative flex flex-col items-center justify-center -mt-3 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
-              <div className="w-[240px] sm:w-[320px] md:w-[380px] xl:w-[440px] h-3.5 rounded-full bg-[#1A3629]/10" />
-              <div className="w-[160px] sm:w-[220px] md:w-[270px] xl:w-[310px] h-2.5 rounded-full bg-[#1A3629]/18 -mt-2.5" />
-              <div className="w-[90px] sm:w-[130px] md:w-[160px] xl:w-[180px] h-1.5 rounded-full bg-[#1A3629]/25 -mt-1.5" />
+            <div className="relative flex flex-col items-center justify-center -mt-6 sm:-mt-8 lg:-mt-10 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
+              <div className="w-[280px] sm:w-[380px] md:w-[460px] lg:w-[520px] xl:w-[600px] 2xl:w-[680px] h-4.5 rounded-full bg-[#1A3629]/10" />
+              <div className="w-[190px] sm:w-[260px] md:w-[320px] lg:w-[370px] xl:w-[430px] 2xl:w-[490px] h-3 rounded-full bg-[#1A3629]/16 -mt-3.5" />
+              <div className="w-[110px] sm:w-[150px] md:w-[190px] lg:w-[220px] xl:w-[260px] 2xl:w-[300px] h-2 rounded-full bg-[#1A3629]/24 -mt-2.5" />
             </div>
           </div>
 

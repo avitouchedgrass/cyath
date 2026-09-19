@@ -209,7 +209,7 @@ function DashboardContent() {
 
               {/* Streak Badge with Custom Flame */}
               <div
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs"
                 title={
                   isForgedStreak
                     ? 'Grace Re-entry: Streak was broken but restored through golden Kintsugi repair.'
@@ -217,7 +217,7 @@ function DashboardContent() {
                 }
               >
                 {isForgedStreak ? (
-                  <div className="w-4 h-4 relative">
+                  <div className="w-5 h-5 relative">
                     <Image
                       src="/assets/trophies/flame_iron.png"
                       alt="Forged Flame"
@@ -227,7 +227,7 @@ function DashboardContent() {
                     />
                   </div>
                 ) : (
-                  <div className="w-4 h-4 relative">
+                  <div className="w-5 h-5 relative">
                     <Image
                       src="/assets/trophies/flame_normal.png"
                       alt="Streak Flame"

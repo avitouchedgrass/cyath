@@ -36,6 +36,7 @@ function DashboardContent() {
   const [justSealedDate, setJustSealedDate] = useState<string | null>(null);
   const [isAmbientOpen, setIsAmbientOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [mobileStation, setMobileStation] = useState<'island' | 'habits' | 'fuel'>('island');
 
   const hasCalibratedTodayRef = useRef(false);
 
@@ -50,6 +51,9 @@ function DashboardContent() {
     unlockedTrophies,
     setCircadianSchedule,
     isLedgerSealedByDate,
+    habits,
+    toggleHabit,
+    setHydration,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -66,6 +70,40 @@ function DashboardContent() {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const activeTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (activeTag === 'input' || activeTag === 'textarea') return;
+
+      if (e.key === '1') {
+        e.preventDefault();
+        const sunHabit =
+          habits.find((h) => h.id === 'sunlight' || h.title?.toLowerCase().includes('sunlight')) ||
+          habits[0];
+        if (sunHabit) {
+          toggleHabit(sunHabit.id, currentDate);
+          retroAudio.playBlip();
+          haptics.tap();
+        }
+      }
+      if (e.key === '2') {
+        e.preventDefault();
+        const currentLog = getDailyLog(currentDate);
+        const nextWater = Number(((currentLog.hydrationLiters || 0) + 0.5).toFixed(1));
+        setHydration(nextWater, currentDate);
+        retroAudio.playInspectConfirm();
+        haptics.tap();
+      }
+      if (e.key === '3') {
+        e.preventDefault();
+        setMobileStation('fuel');
+        retroAudio.playBlip();
+        const fuelInput = document.getElementById('quick-protein-input');
+        if (fuelInput) fuelInput.focus();
+        else document.getElementById('daily-fuel-card')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        retroAudio.playPaperRustle();
+        haptics.tap();
+        setIsCorkboardOpen((prev) => !prev);
+      }
       if (e.key === 'v' || e.key === 'V') {
         e.preventDefault();
         handleOpenVault();
@@ -163,7 +201,14 @@ function DashboardContent() {
               </h1>
 
               {/* Streak Badge with Custom Flame */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
+              <div
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs"
+                title={
+                  isForgedStreak
+                    ? 'Grace Re-entry: Streak was broken but restored through golden Kintsugi repair.'
+                    : `${streakCount} Day Habit Momentum Streak`
+                }
+              >
                 {isForgedStreak ? (
                   <div className="w-4 h-4 relative">
                     <Image
@@ -188,6 +233,14 @@ function DashboardContent() {
                 <span className="font-cabinet font-extrabold text-xs text-[#1A3629]">
                   {streakCount} {streakCount === 1 ? 'Day' : 'Days'} {isForgedStreak ? 'Forged' : ''}
                 </span>
+                {isForgedStreak && (
+                  <span
+                    className="font-mono text-[9.5px] font-bold text-[#1E3A8A] bg-blue-100/90 px-1.5 py-0.2 rounded-xs cursor-help border border-blue-200"
+                    title="Grace Re-entry: Streak restored with golden Kintsugi repair"
+                  >
+                    Kintsugi
+                  </span>
+                )}
               </div>
             </div>
 
@@ -198,8 +251,28 @@ function DashboardContent() {
             </p>
           </div>
 
-          {/* Minimal Essential Header Tools */}
-          <div className="flex items-center gap-2 flex-wrap self-start lg:self-auto">
+          {/* Minimal Essential Header Tools & Desktop Shortcuts */}
+          <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
+            {/* Desktop Keyboard Accelerators Strip */}
+            <div className="hidden xl:flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
+              <span className="text-[#1A3629]/60 font-semibold">Hotkeys:</span>
+              <span className="flex items-center gap-1 font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">1</kbd> Sun
+              </span>
+              <span>·</span>
+              <span className="flex items-center gap-1 font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">2</kbd> Water
+              </span>
+              <span>·</span>
+              <span className="flex items-center gap-1 font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">3</kbd> Fuel
+              </span>
+              <span>·</span>
+              <span className="flex items-center gap-1 font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">L</kbd> Ledger
+              </span>
+            </div>
+
             {/* Specimen Reliquary Sub-Floor Jump Button */}
             <button
               type="button"
@@ -211,11 +284,62 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Panoramic Spatial Layout: Cards Pushed to Edges, Monumental Island Center */}
+        {/* Mobile Cockpit Station Dock (Ergonomic Segmented Switcher for <1024px) */}
+        <div className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-1.5 my-1">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileStation('habits');
+              retroAudio.playBlip();
+              haptics.tap();
+            }}
+            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+              mobileStation === 'habits'
+                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
+            }`}
+          >
+            <span>⚡ Anchors</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMobileStation('island');
+              retroAudio.playBlip();
+              haptics.tap();
+            }}
+            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+              mobileStation === 'island'
+                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
+            }`}
+          >
+            <span>🏝️ Island</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMobileStation('fuel');
+              retroAudio.playBlip();
+              haptics.tap();
+            }}
+            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+              mobileStation === 'fuel'
+                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
+            }`}
+          >
+            <span>🥩 Fuel</span>
+          </button>
+        </div>
+
+        {/* Panoramic Spatial Layout: Desktop 3-Column Flanks, Mobile Focused Station */}
         <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 xl:gap-10 animate-in fade-in duration-150">
           
           {/* LEFT FLANK: Keystone Habits Punch-Pad, 30-Day Ledger & Evening Seal */}
-          <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-2 lg:order-1 flex flex-col gap-4">
+          <div className={`w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 order-2 lg:order-1`}>
             <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
 
             {/* Strategic 30-Day Guild Ledger Desk Station */}
@@ -257,7 +381,7 @@ function DashboardContent() {
           </div>
 
           {/* CENTER STAGE: Monumental Living Floating Island (Center of Attraction) */}
-          <div className="flex-1 w-full order-1 lg:order-2 flex flex-col items-center justify-center min-w-0 py-2">
+          <div className={`flex-1 w-full ${mobileStation === 'island' ? 'flex' : 'hidden lg:flex'} flex-col items-center justify-center min-w-0 py-2 order-1 lg:order-2`}>
             <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
 
             {/* Strategic Ambience Tab Mode Trigger */}
@@ -277,7 +401,7 @@ function DashboardContent() {
           </div>
 
           {/* RIGHT FLANK: Daily Fuel & Macro Floor (Pinned to Right Edge) */}
-          <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-3 lg:order-3 flex flex-col gap-4">
+          <div className={`w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 order-3 lg:order-3`}>
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}

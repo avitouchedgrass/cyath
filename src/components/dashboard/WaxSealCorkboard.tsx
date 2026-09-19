@@ -329,11 +329,14 @@ export function WaxSealCorkboard({
               </span>
               <span>Sealed Receipt</span>
             </span>
-            <span className="flex items-center gap-1.5">
+            <span
+              className="flex items-center gap-1.5 cursor-help"
+              title="Grace Re-entry: Streak was broken but restored through golden Kintsugi repair."
+            >
               <span className="w-3.5 h-4.5 bg-[#FFFDF7] border border-[#2B1F17]/30 rounded-xs inline-flex items-center justify-center shadow-2xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#334155]" />
               </span>
-              <span>Forged Re-Entry</span>
+              <span>Forged (Kintsugi)</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3.5 h-4.5 bg-[#2B1F17]/25 border border-dashed border-[#5C4838]/40 rounded-xs inline-block" />

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-19T17:53:00.000Z",
+  "title": "Design System: Cyath",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Japanese Evergreen Ink",
+        "canonical": "#1A3629",
+        "tonalRamp": ["#0D1B14", "#1A3629", "#2C4A3B", "#3D5E4D", "#527562", "#7A9E8A", "#B0CCC0", "#E4EFEA"]
+      },
+      "neutral-canvas": {
+        "role": "neutral",
+        "displayName": "Japanese Canvas Parchment",
+        "canonical": "#FAF8F5",
+        "tonalRamp": ["#2E2C29", "#5A5752", "#87837C", "#B5B0A8", "#D9D5CD", "#EBE7DF", "#F4F1EB", "#FAF8F5"]
+      },
+      "neutral-surface": {
+        "role": "neutral",
+        "displayName": "Pure Cream Surface",
+        "canonical": "#FFFDF9",
+        "tonalRamp": ["#333230", "#63615C", "#96928C", "#C4C0B8", "#E6E2D8", "#F5F1E6", "#FAF7EE", "#FFFDF9"]
+      },
+      "accent-gold": {
+        "role": "accent",
+        "displayName": "Kintsugi Seam Gold",
+        "canonical": "#F59E0B",
+        "tonalRamp": ["#451A03", "#78350F", "#92400E", "#B45309", "#D97706", "#F59E0B", "#FCD34D", "#FEF3C7"]
+      },
+      "tome-timber": {
+        "role": "surface",
+        "displayName": "Deep Book Timber",
+        "canonical": "#241A13",
+        "tonalRamp": ["#0F0A07", "#1E140E", "#241A13", "#3D2E24", "#5C4838", "#8A705B", "#BAA18B", "#E3D6C8"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Sans",
+        "purpose": "Hero headlines, Cockpit titles, and monument biomes."
+      },
+      "headline": {
+        "displayName": "Card Headline",
+        "purpose": "Component section headers and modal titles."
+      },
+      "body": {
+        "displayName": "Body Reading",
+        "purpose": "All descriptive, nutritional, and procedural text."
+      },
+      "label": {
+        "displayName": "Monospace Metrics",
+        "purpose": "Macro counts, timers, dates, and hotkey tags."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 8px 32px rgba(26,54,41,0.04)",
+        "purpose": "Soft ambient lift for parchment-grounded cards."
+      },
+      {
+        "name": "button-press",
+        "value": "0 1px 2px rgba(26,54,41,0.12)",
+        "purpose": "Tactile grounding for active button states."
+      },
+      {
+        "name": "book-elevation",
+        "value": "0 24px 70px rgba(10,7,5,0.55)",
+        "purpose": "Heavy physical shadow for the sliding guild ledger book."
+      }
+    ],
+    "motion": [
+      {
+        "name": "island-float",
+        "value": "8s ease-in-out infinite",
+        "purpose": "Gentle floating oscillation for living sanctuary biome."
+      },
+      {
+        "name": "drawer-slide",
+        "value": "300ms ease-in-out",
+        "purpose": "Physical sliding translation for the 30-day ledger drawer."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary interactive trigger in deep evergreen ink.",
+      "html": "<button class=\"ds-btn-primary\">Log Whole-Food Meal</button>",
+      "css": ".ds-btn-primary { background: #1A3629; color: #FFFDF9; padding: 10px 18px; font-family: 'Cabinet Grotesk', -apple-system, sans-serif; font-size: 13px; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; transition: background 0.15s, transform 0.15s; } .ds-btn-primary:hover { background: #2C4A3B; transform: scale(1.01); }"
+    },
+    {
+      "name": "Natural Meal Input Field",
+      "kind": "input",
+      "refersTo": "input-meal",
+      "description": "High-contrast meal logger with evergreen border.",
+      "html": "<input class=\"ds-input-meal\" type=\"text\" placeholder=\"e.g. 200g ribeye steak with sweet potato\" />",
+      "css": ".ds-input-meal { width: 100%; padding: 12px 16px; border: 2px solid #1A3629; background: #FFFDF9; border-radius: 12px; font-family: 'Cabinet Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: #1A3629; outline: none; }"
+    },
+    {
+      "name": "Sanctuary Hearth Card",
+      "kind": "card",
+      "refersTo": "card-sanctuary",
+      "description": "Tactile surface hearth with crisp forest border.",
+      "html": "<div class=\"ds-card-hearth\"><h3 class=\"ds-card-title\">Daily Ritual Anchors</h3><p class=\"ds-card-body\">3 of 3 habits completed today.</p></div>",
+      "css": ".ds-card-hearth { background: #FFFDF9; border: 1px solid rgba(26,54,41,0.15); border-radius: 24px; padding: 20px; box-shadow: 0 8px 32px rgba(26,54,41,0.04); } .ds-card-title { font-family: 'Cabinet Grotesk', sans-serif; font-size: 16px; font-weight: 800; color: #1A3629; margin: 0 0 6px 0; } .ds-card-body { font-family: 'Inter', sans-serif; font-size: 13px; color: #4A5D4E; margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Artisanal Guild Sanctuary",
+    "overview": "Cyath balances warm physical tactility with high-performance digital wellness tracking. Instead of cold biometric charts or sterile neon glass, the interface evokes a master craftsperson's workshop: warm Japanese parchment paper, deep pine evergreen inks, golden kintsugi repair seams, and an archival guild ledger tome bound with wax-sealed receipts.",
+    "keyCharacteristics": [
+      "Warm Parchment Grounding: Textured ivory and cream backgrounds (#FAF8F5, #FFFDF9).",
+      "Deep Evergreen & Sage Typography: Natural evergreen ink (#1A3629) providing calm, authoritative contrast.",
+      "Dual-Geometry Discipline: Rounded cards (rounded-2xl) for daily tools; sharp book edges (rounded-none) for archival tome.",
+      "Uncompromised Pixel Art: High-fidelity 16-bit sprites rendered with crisp edge rules (image-rendering: pixelated).",
+      "Tactile Web Audio Rituals: Rich synthesized auditory feedback for blips, rustles, confirms, and seals."
+    ],
+    "rules": [
+      {
+        "name": "The Rarity of Gold Rule",
+        "body": "Golden Kintsugi accents are reserved exclusively for earned achievements, streak repairs, and verified wax seals. They never appear as casual background decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Pitch-Black Rule",
+        "body": "Pure #000000 is strictly avoided for typography. Deep Evergreen (#1A3629) serves as the darkest ink, creating a softer, more organic reading posture.",
+        "section": "colors"
+      },
+      {
+        "name": "The Monospace Discipline Rule",
+        "body": "All numerical measurements, XP counters, timestamps, and hotkey accelerators are rendered in JetBrains Mono to preserve tabular vertical alignment across updates.",
+        "section": "typography"
+      },
+      {
+        "name": "The Deboss-Over-Shadow Rule",
+        "body": "Secondary containers and inactive states use recessed wells (bg-[#FAF8F5] with a 1px border) rather than floating elevation, giving the workspace a carved, physical feel.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve crisp pixel edges (image-rendering: pixelated) on all trophy relics, food plates, and island assets.",
+      "Do wrap continuous animations in motion-safe: utility prefixes to protect users with vestibular sensitivity.",
+      "Do provide screen-reader accessible labels on all natural language inputs and interactive receipt buttons.",
+      "Do maintain tabular monospace fonts for all numerical macros, dates, and level statistics."
+    ],
+    "donts": [
+      "Don't use pure black (#000000) for text or backgrounds; use Japanese Evergreen (#1A3629) and Parchment (#FAF8F5).",
+      "Don't use generic AI side-tab borders on card containers; use dedicated structural elements for book spines.",
+      "Don't use em-dashes or en-dashes in UI copy or documentation; use clear punctuation.",
+      "Don't let offscreen drawer box-shadows bleed onto the canvas; always apply opacity-0 invisible when closed."
+    ]
+  }
+}

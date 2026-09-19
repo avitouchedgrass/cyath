@@ -148,8 +148,9 @@ export function EveningSleepCard({
             <button
               type="button"
               onClick={onOpenSchedule}
-              className="font-cabinet font-bold text-[11px] text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
+              className="py-1 px-2.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#FFFDF9] font-cabinet font-bold text-[11px] text-[#1A3629] transition-colors cursor-pointer flex items-center gap-1 shadow-2xs relative before:absolute before:-inset-2 before:content-['']"
               title="Calibrate biological wake and sleep target"
+              aria-label="Calibrate biological wake and sleep target"
             >
               <span>Calibrate</span>
               <span className="text-[10px]">⚙</span>

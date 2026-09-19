@@ -117,7 +117,7 @@ export function SanctuaryObservatory({
           haptics.tap();
           onToggleLedger();
         }}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pl-1.5 pr-2.5 py-4 rounded-r-xl border-y border-r border-[#1A3629]/25 bg-[#FAF8F5] hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_4px_16px_rgba(26,54,41,0.12)] transition-all flex flex-col items-center gap-1 cursor-pointer group select-none"
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pl-2 pr-3 py-4 min-h-[56px] min-w-[34px] rounded-r-xl border-y border-r border-[#1A3629]/25 bg-[#FAF8F5] hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_4px_16px_rgba(26,54,41,0.12)] transition-all flex flex-col items-center gap-1 cursor-pointer group select-none before:absolute before:-inset-2 before:content-['']"
         title={isLedgerOpen ? 'Slide back to Living Island (◀)' : 'Slide open 30-Day Guild Ledger (▶)'}
         aria-label={isLedgerOpen ? 'Close 30-Day Ledger' : 'Open 30-Day Ledger'}
       >

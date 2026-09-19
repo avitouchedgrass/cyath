@@ -353,7 +353,7 @@ export function DailyFuelCard({
           <button
             type="button"
             onClick={() => setIsEditingWeight(true)}
-            className="text-xs font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer"
+            className="py-1 px-2.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] transition-colors cursor-pointer shadow-2xs relative before:absolute before:-inset-2 before:content-['']"
           >
             Update
           </button>

@@ -54,6 +54,25 @@ export function EveningSleepCard({
     return currentMinutes >= windowStart;
   }, [bedTime]);
 
+  const biologicalPhase = useMemo(() => {
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
+    const [bedHour, bedMin] = bedTime.split(':').map(Number);
+    const wakeMinutes = (wakeHour || 7) * 60 + (wakeMin || 30);
+    const bedMinutes = (bedHour || 23) * 60 + (bedMin || 30);
+    const eveningStart = bedMinutes - 180;
+
+    if (currentMinutes >= wakeMinutes && currentMinutes < eveningStart) {
+      return { label: 'Solar Alert', icon: '☀️', tagColor: 'text-[#1A3629] bg-[#E8F5E9] border-[#A5D6A7]' };
+    }
+    if (currentMinutes >= eveningStart && currentMinutes < bedMinutes) {
+      return { label: 'Wind-down', icon: '🌆', tagColor: 'text-[#B45309] bg-[#FEF3C7] border-[#FCD34D]' };
+    }
+    return { label: 'Rest Window', icon: '🌙', tagColor: 'text-[#1E3A8A] bg-[#DBEAFE] border-[#93C5FD]' };
+  }, [wakeTime, bedTime]);
+
   const isEligible = habitsDone || isEveningWindow;
 
   const handleStartCeremony = () => {
@@ -142,10 +161,16 @@ export function EveningSleepCard({
         {/* Right Slot: Sleep Target & Zen Ambience */}
         <div className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                Circadian Cadence
-              </span>
+            <div className="flex items-center justify-between gap-1 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                  Circadian Cadence
+                </span>
+                <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded border ${biologicalPhase.tagColor} flex items-center gap-1`}>
+                  <span>{biologicalPhase.icon}</span>
+                  <span>{biologicalPhase.label}</span>
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={onOpenSchedule}

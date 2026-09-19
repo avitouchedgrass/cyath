@@ -159,6 +159,17 @@
     }
   }
 
+  @keyframes receiptFeed {
+    0% {
+      transform: translateY(-70px) scale(0.96);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
   @keyframes deskRumble {
     0% { transform: translate(0, 0); }
     20% { transform: translate(-2px, 3px); }

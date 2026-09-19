@@ -519,6 +519,93 @@ class RetroAudioEngine {
     }
   }
 
+  // Register stepper motor feed clicks
+  public playPaperFeedTicks() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      for (let i = 0; i < 5; i++) {
+        const tickTime = now + i * 0.08;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(750 + (i % 2) * 150, tickTime);
+        gain.gain.setValueAtTime(0.04, tickTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, tickTime + 0.025);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(tickTime);
+        osc.stop(tickTime + 0.025);
+      }
+    } catch {}
+  }
+
+  // Molten wax thermal heating and compression hum
+  private waxHumOsc: OscillatorNode | null = null;
+  private waxHumGain: GainNode | null = null;
+
+  public startWaxHeatHum() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      this.stopWaxHeatHum();
+      const now = this.ctx.currentTime;
+      this.waxHumOsc = this.ctx.createOscillator();
+      this.waxHumGain = this.ctx.createGain();
+      this.waxHumOsc.type = 'triangle';
+      this.waxHumOsc.frequency.setValueAtTime(90, now);
+      this.waxHumOsc.frequency.linearRampToValueAtTime(180, now + 0.9);
+      this.waxHumGain.gain.setValueAtTime(0.03, now);
+      this.waxHumGain.gain.linearRampToValueAtTime(0.14, now + 0.9);
+      this.waxHumOsc.connect(this.waxHumGain);
+      this.waxHumGain.connect(this.ctx.destination);
+      this.waxHumOsc.start(now);
+    } catch {}
+  }
+
+  public stopWaxHeatHum() {
+    try {
+      if (this.waxHumGain && this.ctx) {
+        this.waxHumGain.gain.linearRampToValueAtTime(0.0001, this.ctx.currentTime + 0.05);
+      }
+      setTimeout(() => {
+        if (this.waxHumOsc) {
+          try { this.waxHumOsc.stop(); } catch {}
+          this.waxHumOsc.disconnect();
+          this.waxHumOsc = null;
+        }
+        if (this.waxHumGain) {
+          this.waxHumGain.disconnect();
+          this.waxHumGain = null;
+        }
+      }, 60);
+    } catch {}
+  }
+
+  // Metallic signet release clink
+  public playStampClink() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.07);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.07);
+    } catch {}
+  }
+
   // Ambient Sanctuary Soundscape Engine (Campfire & Forest Wind)
   private ambientGain: GainNode | null = null;
   private ambientSources: AudioNode[] = [];

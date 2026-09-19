@@ -35,6 +35,7 @@ export function DailyFuelCard({
   const [ambientMealText, setAmbientMealText] = useState('');
   const [isSubmittingMeal, setIsSubmittingMeal] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [weightError, setWeightError] = useState<string | null>(null);
 
   // Weight check-in state
   const [isEditingWeight, setIsEditingWeight] = useState(false);
@@ -103,7 +104,7 @@ export function DailyFuelCard({
         throw new Error('API parse error');
       }
     } catch {
-      // Fallback local logging
+      // Fallback local estimate — preserve user text, don't wipe it
       logMealToDay(
         {
           name: text,
@@ -116,8 +117,7 @@ export function DailyFuelCard({
       );
       retroAudio.playInspectConfirm();
       haptics.success();
-      setAmbientMealText('');
-      setFeedback(`Logged: ${text} (+25g protein)`);
+      setFeedback(`Estimated: ${text} (+25g protein)`);
       setTimeout(() => setFeedback(null), 3500);
     } finally {
       setIsSubmittingMeal(false);
@@ -133,8 +133,11 @@ export function DailyFuelCard({
       haptics.tap();
       logWeight(val, undefined, currentDate);
       setIsEditingWeight(false);
+      setWeightError(null);
       setFeedback(`Weight updated: ${val.toFixed(1)} kg`);
       setTimeout(() => setFeedback(null), 3000);
+    } else {
+      setWeightError('Enter a value between 30–300 kg');
     }
   };
 
@@ -183,7 +186,7 @@ export function DailyFuelCard({
 
       {/* HERO FOOD INPUT: Natural Language Command Bar */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-2">
-        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs text-[#1A3629]">
+        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
           Log Meal or Ingredient
         </label>
         
@@ -301,25 +304,30 @@ export function DailyFuelCard({
         <div className="flex items-center gap-1.5">
           <span className="font-sans text-xs text-[#4A5D4E]">Current Weight:</span>
           {isEditingWeight ? (
-            <form onSubmit={handleSaveWeight} className="flex items-center gap-1.5">
-              <input
-                type="number"
-                step="0.1"
-                min="30"
-                max="300"
-                aria-label="Current body weight in kilograms"
-                value={weightInput}
-                onChange={(e) => setWeightInput(e.target.value)}
-                className="w-16 px-2 py-0.5 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629] text-center focus:outline-none"
-                autoFocus
-              />
-              <span className="text-xs font-mono text-[#4A5D4E]">kg</span>
-              <button
-                type="submit"
-                className="px-2 py-0.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[10px]"
-              >
-                Save
-              </button>
+            <form onSubmit={handleSaveWeight} className="flex flex-col gap-1">
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  step="0.1"
+                  min="30"
+                  max="300"
+                  aria-label="Current body weight in kilograms"
+                  value={weightInput}
+                  onChange={(e) => { setWeightInput(e.target.value); setWeightError(null); }}
+                  className="w-16 px-2 py-0.5 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629] text-center focus:outline-none"
+                  autoFocus
+                />
+                <span className="text-xs font-mono text-[#4A5D4E]">kg</span>
+                <button
+                  type="submit"
+                  className="px-2 py-0.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[10px]"
+                >
+                  Save
+                </button>
+              </div>
+              {weightError && (
+                <span className="font-mono text-[10px] text-[#DC2626]">{weightError}</span>
+              )}
             </form>
           ) : (
             <span className="font-mono text-xs font-bold text-[#1A3629]">

@@ -23,6 +23,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   } = useHabitStore();
 
   const [isSlotPickerOpen, setIsSlotPickerOpen] = useState(false);
+  const [undoToast, setUndoToast] = useState<{ habitId: string; title: string; timer: ReturnType<typeof setTimeout> } | null>(null);
 
   const currentLog = getDailyLog(currentDate);
   const ritual = deskRitualsByDate[currentDate] || {};
@@ -114,11 +115,21 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 25);
         }
       }
+
+      // Undo toast — only show when completing (not unchecking)
+      if (undoToast) clearTimeout(undoToast.timer);
+      const habitTitle = displayHabits.find(h => h.id === habitId)?.title || habitId;
+      const timer = setTimeout(() => setUndoToast(null), 4000);
+      setUndoToast({ habitId, title: habitTitle, timer });
     } else {
       retroAudio.playBlip();
+      if (undoToast?.habitId === habitId) {
+        clearTimeout(undoToast.timer);
+        setUndoToast(null);
+      }
     }
     toggleHabit(habitId, currentDate);
-  }, [currentLog.habitsCompleted, completedCount, displayHabits.length, toggleHabit, currentDate, isProteinMet]);
+  }, [currentLog.habitsCompleted, completedCount, displayHabits, toggleHabit, currentDate, isProteinMet, undoToast]);
 
   // Keyboard Shortcuts: 1, 2, 3, 4
   useEffect(() => {
@@ -277,6 +288,26 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           )}
         </div>
 
+      {/* Undo toast */}
+      {undoToast && (
+        <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] text-[11px] font-mono animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <span className="font-bold truncate">✓ {undoToast.title}</span>
+          <button
+            type="button"
+            onClick={() => {
+              clearTimeout(undoToast.timer);
+              setUndoToast(null);
+              retroAudio.playBlip();
+              haptics.tap();
+              toggleHabit(undoToast.habitId, currentDate);
+            }}
+            className="shrink-0 font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#FFFDF9]/70 hover:text-[#FFFDF9] transition-colors cursor-pointer"
+          >
+            Undo
+          </button>
+        </div>
+      )}
+
         {/* 1-Tap Afternoon Slump Check */}
         <div className="border-t border-[#1A3629]/10 pt-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -293,6 +324,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           <div className="grid grid-cols-3 gap-1.5">
             <button
               type="button"
+              title="Low energy: feeling slow, foggy, or dragging"
               onClick={() => handleEnergyRating(2)}
               className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
@@ -306,6 +338,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
 
             <button
               type="button"
+              title="Steady energy: manageable, no crash"
               onClick={() => handleEnergyRating(6)}
               className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
@@ -319,6 +352,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
 
             <button
               type="button"
+              title="Peak energy: sharp, strong, firing on all cylinders"
               onClick={() => handleEnergyRating(9)}
               className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7

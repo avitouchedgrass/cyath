@@ -29,6 +29,7 @@ function DashboardContent() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [hotkeyFlash, setHotkeyFlash] = useState<'habits' | 'fuel' | 'island' | null>(null);
 
   // Modal States
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
@@ -37,6 +38,12 @@ function DashboardContent() {
   const [isAmbientOpen, setIsAmbientOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [mobileStation, setMobileStation] = useState<'island' | 'habits' | 'fuel'>('island');
+  const swipeTouchStartX = useRef<number | null>(null);
+
+  const flashHotkey = (zone: 'habits' | 'fuel' | 'island') => {
+    setHotkeyFlash(zone);
+    setTimeout(() => setHotkeyFlash(null), 600);
+  };
 
   const hasCalibratedTodayRef = useRef(false);
 
@@ -80,6 +87,7 @@ function DashboardContent() {
           toggleHabit(sunHabit.id, currentDate);
           retroAudio.playBlip();
           haptics.tap();
+          flashHotkey('habits');
         }
       }
       if (e.key === '2') {
@@ -89,11 +97,13 @@ function DashboardContent() {
         setHydration(nextWater, currentDate);
         retroAudio.playInspectConfirm();
         haptics.tap();
+        flashHotkey('habits');
       }
       if (e.key === '3') {
         e.preventDefault();
         setMobileStation('fuel');
         retroAudio.playBlip();
+        flashHotkey('fuel');
         const fuelInput = document.getElementById('quick-protein-input');
         if (fuelInput) fuelInput.focus();
         else document.getElementById('daily-fuel-card')?.scrollIntoView({ behavior: 'smooth' });
@@ -253,8 +263,8 @@ function DashboardContent() {
 
           {/* Minimal Essential Header Tools & Desktop Shortcuts */}
           <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
-            {/* Desktop Keyboard Accelerators Strip */}
-            <div className="hidden xl:flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
+            {/* Desktop Keyboard Accelerators Strip — visible from lg up */}
+            <div className="hidden lg:flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
               <span className="text-[#1A3629]/60 font-semibold">Hotkeys:</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">1</kbd> Sun
@@ -349,10 +359,23 @@ function DashboardContent() {
         </div>
 
         {/* Asymmetric Stage: Slim flanks frame a dominant center island column */}
-        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-5 xl:gap-8 animate-in fade-in duration-150">
+        <div
+          className="w-full flex flex-col lg:flex-row items-start justify-between gap-5 xl:gap-8 animate-in fade-in duration-150"
+          onTouchStart={(e) => { swipeTouchStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            if (swipeTouchStartX.current === null) return;
+            const dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
+            swipeTouchStartX.current = null;
+            if (Math.abs(dx) < 60) return;
+            const order: Array<'habits' | 'island' | 'fuel'> = ['habits', 'island', 'fuel'];
+            const idx = order.indexOf(mobileStation);
+            if (dx < 0 && idx < order.length - 1) setMobileStation(order[idx + 1]);
+            if (dx > 0 && idx > 0) setMobileStation(order[idx - 1]);
+          }}
+        >
 
           {/* LEFT FLANK: Compact Habit Punch-Pad sidebar */}
-          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-2 lg:order-1`}>
+          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-2 lg:order-1 transition-[outline] duration-150 ${hotkeyFlash === 'habits' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
             <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
           </div>
 
@@ -418,7 +441,7 @@ function DashboardContent() {
           </div>
 
           {/* RIGHT FLANK: Daily Fuel — slim sidebar matching left */}
-          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-3 lg:order-3`}>
+          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-3 lg:order-3 transition-[outline] duration-150 ${hotkeyFlash === 'fuel' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}

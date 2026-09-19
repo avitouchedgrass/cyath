@@ -133,7 +133,10 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
 
         {/* Momentum & Level Badge */}
         <div className="flex items-center gap-2 mt-1">
-          <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] shadow-2xs">
+          <span
+            title="Tier = island biome stage (10 total). Level = your XP rank within this tier."
+            className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] shadow-2xs cursor-help"
+          >
             Tier {currentIsland.tier} · Level {progress.level}
           </span>
           <span className="font-mono text-xs font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/25 px-2 py-0.5 rounded-full">
@@ -143,7 +146,10 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
 
         {/* Re-entry Badge if Kintsugi Forged */}
         {isForgedStreak && (
-          <div className="mt-1 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 shadow-2xs animate-in fade-in">
+          <div
+            title="Kintsugi: Japanese art of repairing broken things with gold. Your streak was broken but restored — the gap day is logged retroactively and your momentum continues."
+            className="mt-1 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 shadow-2xs animate-in fade-in cursor-help"
+          >
             <span className="font-mono text-xs font-bold text-[#2563EB]">
               Forged Re-Entry · Golden Kintsugi Active
             </span>

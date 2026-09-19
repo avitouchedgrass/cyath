@@ -92,21 +92,22 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
               </span>
             </div>
 
-            <span
-              className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 ${
-                isAlreadySealed
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                  : 'bg-red-50 border-red-200 text-[#991B1B]'
-              }`}
-            >
-              {!isAlreadySealed && <Sparkles className="w-2.5 h-2.5 text-amber-500" />}
-              <span>{isAlreadySealed ? 'Archived & Verified' : '+50 XP Available'}</span>
-            </span>
+            {isAlreadySealed ? (
+              <span className="font-mono text-[9px] font-bold uppercase tracking-wide text-emerald-700/70 flex items-center gap-1">
+                <ShieldCheck className="w-2.5 h-2.5" />
+                Archived
+              </span>
+            ) : (
+              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 bg-red-50 border-red-200 text-[#991B1B]">
+                <Sparkles className="w-2.5 h-2.5 text-amber-500" />
+                +50 XP Available
+              </span>
+            )}
           </div>
 
           <span className="font-mono text-xs text-[#4A5D4E] mt-0.5 leading-relaxed">
             {isAlreadySealed
-              ? `Manifest archived. Next first light scheduled for ${wakeTime}.`
+              ? `Manifest archived. Next first light at ${wakeTime}. Miss a day? Kintsugi re-entry lets you log it retroactively.`
               : 'Execute the daily closing ritual: print thermal receipt & melt wax seal.'}
           </span>
         </div>
@@ -115,6 +116,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
           <button
             type="button"
             onClick={handleStartCeremony}
+            title={isAlreadySealed ? "View your 30-day habit ledger — each pinned seal is a completed day" : "Begin the daily closing ceremony to seal today's log and earn XP"}
             className={`w-full py-2.5 px-4 rounded-xl font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-98 ${
               isAlreadySealed
                 ? 'border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'

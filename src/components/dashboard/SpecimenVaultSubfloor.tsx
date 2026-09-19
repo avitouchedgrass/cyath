@@ -136,12 +136,9 @@ export function SpecimenVaultSubfloor() {
               </span>
 
               <div className="flex items-center gap-1.5 mt-1 z-10">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-[#4A5D4E]">
+                <span className={`text-[10px] font-mono uppercase tracking-wider ${trophy.isShame && isUnlocked ? 'text-red-700 font-bold' : 'text-[#4A5D4E]'}`}>
                   {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Encrypted'}
                 </span>
-                {trophy.isShame && isUnlocked && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                )}
               </div>
             </button>
           );

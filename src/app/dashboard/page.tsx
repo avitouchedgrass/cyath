@@ -20,7 +20,6 @@ import {
   Volume2,
   VolumeX,
   X,
-  Maximize2,
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -262,24 +261,20 @@ function DashboardContent() {
           {/* Minimal Essential Header Tools & Desktop Shortcuts */}
           <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
             {/* Desktop Keyboard Accelerators Strip (visible from lg up) */}
-            <div className="hidden lg:flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
-              <span className="text-[#1A3629]/60 font-semibold">Hotkeys:</span>
+            <div className="hidden lg:flex items-center gap-3 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3.5 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
+              <span className="text-[#1A3629]/60 font-semibold">Hotkeys</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">1</kbd> Sun
               </span>
-              <span>·</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">2</kbd> Water
               </span>
-              <span>·</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">3</kbd> Fuel
               </span>
-              <span>·</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">L</kbd> Ledger
               </span>
-              <span>·</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">A</kbd> Zen
               </span>
@@ -289,7 +284,7 @@ function DashboardContent() {
             <button
               type="button"
               onClick={handleOpenVault}
-              className="h-9 px-4 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-2"
+              className="h-9 px-4 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-2"
             >
               <span>Reliquary ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
             </button>
@@ -302,10 +297,9 @@ function DashboardContent() {
                 haptics.tap();
                 setIsAmbientOpen(true);
               }}
-              className="h-9 px-3.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+              className="h-9 px-4 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center justify-center"
               title="Zen Ambient Desk Display (Hotkey A)"
             >
-              <Maximize2 className="w-3.5 h-3.5" />
               <span>Zen Ambience</span>
             </button>
           </div>

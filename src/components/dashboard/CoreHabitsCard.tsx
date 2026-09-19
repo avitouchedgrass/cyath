@@ -5,7 +5,7 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { Check, Battery, BatteryMedium, BatteryLow, Droplets } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export interface CoreHabitsCardProps {
   onOpenSchedule?: () => void;
@@ -171,7 +171,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   return (
     <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       {/* Card Header & Circadian Schedule */}
-      <div className="flex items-center justify-between gap-2 pb-2 border-b border-[#1A3629]/10">
+      <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#1A3629]/10">
         <div className="flex flex-col min-w-0">
           <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
             Daily Ritual Anchors
@@ -180,33 +180,24 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             <button
               type="button"
               onClick={onOpenSchedule}
-              className="mt-0.5 text-left cursor-pointer transition-colors group"
-              title="Click to calibrate wake and sleep schedule (+25 XP)"
+              className="text-left cursor-pointer text-xs font-sans text-[#4A5D4E] hover:text-[#1A3629] transition-colors mt-0.5"
+              title="Calibrate circadian wake and sleep schedule"
             >
-              <div className="flex items-center gap-1.5">
-                <span className="font-mono text-[10px] text-[#4A5D4E] group-hover:text-[#1A3629]">
-                  {userProfile?.wakeTime || '07:30'} to {userProfile?.bedTime || '23:30'}
-                </span>
-                <span className="px-1.5 py-0.5 rounded bg-[#1A3629]/8 group-hover:bg-[#1A3629] text-[#1A3629] group-hover:text-[#FFFDF9] text-[9px] font-cabinet font-bold uppercase tracking-wider transition-colors">
-                  Edit
-                </span>
-              </div>
+              <span>{userProfile?.wakeTime || '07:30'} to {userProfile?.bedTime || '23:30'} (Adjust)</span>
             </button>
           ) : (
-            <span className="font-mono text-[10px] text-[#4A5D4E] mt-0.5">
+            <span className="font-mono text-xs text-[#4A5D4E] mt-0.5">
               {userProfile?.wakeTime || '07:30'} to {userProfile?.bedTime || '23:30'}
             </span>
           )}
         </div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/12 font-mono text-xs font-bold text-[#1A3629] shrink-0">
-          <span className="text-[#10B981]">{completedCount}</span>
-          <span className="opacity-30">/</span>
-          <span>{displayHabits.length} Secured</span>
-        </div>
+        <span className="font-mono text-xs font-bold text-[#1A3629] shrink-0">
+          {completedCount} of {displayHabits.length} Secured
+        </span>
       </div>
 
-      {/* 1-Tap Habit Buttons */}
-      <div className="flex flex-col gap-2">
+      {/* Tactile Habit Rows */}
+      <div className="flex flex-col divide-y divide-[#1A3629]/10">
         {displayHabits.map((habit) => {
           const isDone = habit.isDone;
 
@@ -215,16 +206,16 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               key={habit.id}
               type="button"
               onClick={(e) => handleToggle(habit.id, e)}
-              className={`w-full p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center gap-3 text-left group active:scale-[0.99] ${
+              className={`w-full py-3 px-2 rounded-xl flex items-center gap-3.5 text-left transition-colors cursor-pointer group active:scale-[0.99] ${
                 isDone
-                  ? 'border-emerald-600/30 bg-[#FAF8F5]'
-                  : 'border-[#1A3629]/12 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5]'
+                  ? 'bg-transparent text-[#1A3629]/80'
+                  : 'hover:bg-[#FAF8F5]'
               }`}
             >
               <div className={`w-7 h-7 rounded-lg border transition-all duration-200 flex items-center justify-center shrink-0 shadow-2xs ${
                 isDone
-                  ? 'border-emerald-700 bg-emerald-700 text-[#FFFDF9]'
-                  : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/30 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
               }`}>
                 {isDone ? (
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
@@ -234,7 +225,9 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               </div>
 
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="font-cabinet font-extrabold text-xs sm:text-sm tracking-tight text-[#1A3629] leading-tight">
+                <span className={`font-cabinet font-extrabold text-xs sm:text-sm tracking-tight leading-tight ${
+                  isDone ? 'line-through text-[#1A3629]/60' : 'text-[#1A3629]'
+                }`}>
                   {habit.title}
                 </span>
                 <span className="text-[11px] font-sans text-[#4A5D4E] leading-snug mt-0.5">
@@ -243,11 +236,11 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               </div>
 
               {isDone ? (
-                <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-emerald-700 font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200">
+                <span className="shrink-0 font-mono text-[11px] text-[#065F46] font-bold">
                   Secured
                 </span>
               ) : (
-                <span className="shrink-0 font-mono text-[10px] text-[#4A5D4E]/70 group-hover:text-[#1A3629] font-medium">
+                <span className="shrink-0 font-mono text-[11px] text-[#4A5D4E]/60 group-hover:text-[#1A3629]">
                   Press {habit.keyNumber}
                 </span>
               )}
@@ -257,18 +250,20 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
 
         {/* Add 4th Slot Trigger if not configured */}
         {!customDefinition && (
-          <button
-            type="button"
-            onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
-            className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-          >
-            <span>+ Add 4th Custom Power Habit</span>
-          </button>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
+              className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 hover:border-[#1A3629]/40 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <span>+ Add 4th Custom Power Habit</span>
+            </button>
+          </div>
         )}
 
         {/* Custom Slot Picker Dropdown */}
         {isSlotPickerOpen && !customDefinition && (
-          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-2 animate-in fade-in duration-150">
+          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-2 mt-2">
             <span className="font-cabinet font-bold text-xs text-[#1A3629]">
               Choose 4th Habit Lever
             </span>
@@ -283,7 +278,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                     setCustomHabitSlot(item.id);
                     setIsSlotPickerOpen(false);
                   }}
-                  className="p-2.5 rounded-lg border border-[#1A3629]/12 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] transition-all text-left cursor-pointer"
+                  className="p-2.5 rounded-lg border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] transition-all text-left cursor-pointer"
                 >
                   <span>{item.shortLabel}</span>
                 </button>
@@ -293,26 +288,25 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         )}
       </div>
 
-      {/* Interactive Hydration Flask Punch Strip */}
-      <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 font-cabinet font-bold text-xs text-[#1A3629]">
-            <Droplets className="w-3.5 h-3.5 text-blue-600" />
-            <span>Hydration Flask Gauge</span>
-          </div>
-          <span className="font-mono text-xs font-bold text-[#1A3629]">
+      {/* Hydration Flask Gauge */}
+      <div className="pt-3 border-t border-[#1A3629]/10 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-cabinet font-bold text-[#1A3629]">
+            Hydration Gauge
+          </span>
+          <span className="font-mono font-bold text-[#1A3629]">
             {(currentLog.hydrationLiters || 0).toFixed(1)} / 2.5 L
           </span>
         </div>
 
-        <div className="w-full h-2 bg-[#FFFDF9] border border-[#1A3629]/10 rounded-full overflow-hidden shadow-inner">
+        <div className="w-full h-2 bg-[#1A3629]/10 rounded-full overflow-hidden">
           <div
             className="h-full bg-blue-600 rounded-full transition-all duration-500"
             style={{ width: `${Math.min(100, Math.round(((currentLog.hydrationLiters || 0) / 2.5) * 100))}%` }}
           />
         </div>
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2 pt-0.5">
           <button
             type="button"
             onClick={() => {
@@ -321,7 +315,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               retroAudio.playInspectConfirm();
               haptics.tap();
             }}
-            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 shadow-2xs"
+            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
             title="Log 0.5 Liters of water (Hotkey 2)"
           >
             <span>+0.5L</span>
@@ -336,7 +330,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               retroAudio.playInspectConfirm();
               haptics.tap();
             }}
-            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1 active:scale-98 shadow-2xs"
+            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
             title="Log 1.0 Liter of water"
           >
             <span>+1.0L</span>
@@ -364,14 +358,14 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         </div>
       )}
 
-      {/* 1-Tap Afternoon Slump Check */}
+      {/* Energy Level Check */}
       <div className="border-t border-[#1A3629]/10 pt-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-cabinet font-bold text-[#1A3629]">
             Energy Level Check
           </span>
           {ritual.afternoonSlumpScore && (
-            <span className="font-mono text-[10px] text-[#10B981] font-bold">
+            <span className="font-mono text-xs text-[#065F46] font-bold">
               {ritual.afternoonSlumpScore}/10 Recorded
             </span>
           )}
@@ -382,13 +376,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             type="button"
             title="Low energy: feeling slow, foggy, or dragging"
             onClick={() => handleEnergyRating(2)}
-            className={`py-2 px-2 rounded-xl border text-[11px] font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs active:scale-98 ${
+            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
               ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
                 ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
             }`}
           >
-            <BatteryLow className="w-3.5 h-3.5 text-[#DC2626]" />
             Slump
           </button>
 
@@ -396,13 +389,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             type="button"
             title="Steady energy: manageable, no crash"
             onClick={() => handleEnergyRating(6)}
-            className={`py-2 px-2 rounded-xl border text-[11px] font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs active:scale-98 ${
+            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
               ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
                 ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
             }`}
           >
-            <BatteryMedium className="w-3.5 h-3.5 text-[#D97706]" />
             Steady
           </button>
 
@@ -410,13 +402,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             type="button"
             title="Peak energy: sharp, strong, firing on all cylinders"
             onClick={() => handleEnergyRating(9)}
-            className={`py-2 px-2 rounded-xl border text-[11px] font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer shadow-2xs active:scale-98 ${
+            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
               ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
                 ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
             }`}
           >
-            <Battery className="w-3.5 h-3.5 text-[#10B981]" />
             Peak
           </button>
         </div>

@@ -78,72 +78,37 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
 
   return (
     <>
-      <div className="w-full flex flex-col gap-3 p-4 sm:p-5 rounded-2xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_8px_30px_rgba(26,54,41,0.04)] animate-in fade-in duration-200">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between gap-1 flex-wrap">
-            <div className="flex items-center gap-1.5">
-              {isAlreadySealed ? (
-                <ShieldCheck className="w-4 h-4 text-emerald-700" />
-              ) : (
-                <ScrollText className="w-4 h-4 text-[#991B1B]" />
-              )}
-              <span className="font-cabinet font-black text-sm text-[#1A3629] tracking-tight">
-                {isAlreadySealed ? 'Daily Ledger Sealed' : 'Evening Seal Ceremony'}
-              </span>
-            </div>
-
-            {isAlreadySealed ? (
-              <span className="font-mono text-[9px] font-bold uppercase tracking-wide text-emerald-700/70 flex items-center gap-1">
-                <ShieldCheck className="w-2.5 h-2.5" />
-                Archived
-              </span>
-            ) : (
-              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 bg-red-50 border-red-200 text-[#991B1B]">
-                <Sparkles className="w-2.5 h-2.5 text-amber-500" />
-                +50 XP Available
-              </span>
-            )}
-          </div>
-
-          <span className="font-mono text-xs text-[#4A5D4E] mt-0.5 leading-relaxed">
+      <div className="w-full flex flex-col gap-2 pt-1">
+        <button
+          type="button"
+          onClick={handleStartCeremony}
+          title={isAlreadySealed ? "View your 30-day habit ledger" : "Begin the daily closing ceremony to seal today's log and earn XP"}
+          className={`w-full h-11 px-5 rounded-full font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] ${
+            isAlreadySealed
+              ? 'border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              : 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] hover:shadow-md'
+          }`}
+        >
+          <span>
             {isAlreadySealed
-              ? `Manifest archived. Next first light at ${wakeTime}. Miss a day? Kintsugi re-entry lets you log it retroactively.`
-              : 'Execute the daily closing ritual: print thermal receipt & melt wax seal.'}
+              ? `Daily Ledger Sealed (${pinnedCount} of 30)`
+              : 'Begin Seal Ceremony (+50 XP)'}
           </span>
-        </div>
+        </button>
 
-        <div className="flex flex-col gap-2">
+        {isAlreadySealed && onOpenReceipt && (
           <button
             type="button"
-            onClick={handleStartCeremony}
-            title={isAlreadySealed ? "View your 30-day habit ledger: each pinned seal is a completed day" : "Begin the daily closing ceremony to seal today's log and earn XP"}
-            className={`w-full py-2.5 px-4 rounded-xl font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-98 ${
-              isAlreadySealed
-                ? 'border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-                : 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] hover:shadow-md'
-            }`}
+            onClick={() => {
+              retroAudio.playBlip();
+              haptics.tap();
+              onOpenReceipt();
+            }}
+            className="w-full py-1 text-center font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer hover:underline"
           >
-            <span>
-              {isAlreadySealed
-                ? `Inspect 30-Day Guild Ledger (${pinnedCount}/30 Pinned)`
-                : 'Begin Seal Ceremony (+50 XP)'}
-            </span>
+            Inspect Thermal Receipt →
           </button>
-
-          {isAlreadySealed && onOpenReceipt && (
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                onOpenReceipt();
-              }}
-              className="w-full py-1 text-center font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer hover:underline"
-            >
-              Inspect 58mm Thermal Receipt →
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* The Immersive Desk Ritual Overlay */}

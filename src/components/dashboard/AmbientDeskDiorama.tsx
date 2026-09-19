@@ -32,6 +32,22 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
   const [isSoundscapeOn, setIsSoundscapeOn] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedOverride = localStorage.getItem('cyath_low_power_island');
+    if (savedOverride !== null) {
+      setIsLowEndDevice(savedOverride === 'true');
+      return;
+    }
+    const cores = navigator.hardwareConcurrency || 8;
+    const memory = (navigator as any).deviceMemory || 8;
+    if (cores <= 4 || memory < 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIsLowEndDevice(true);
+    }
+  }, []);
+
   // Live clock
   useEffect(() => {
     if (!isOpen) return;
@@ -179,30 +195,55 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
         {/* Floating Island Hero */}
         <div className="relative flex flex-col items-center justify-center animate-[bounce_5s_ease-in-out_infinite]">
           <div className="w-[300px] sm:w-[380px] lg:w-[440px] aspect-square relative flex items-center justify-center filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
-            <Image
-              src={currentIsland.image}
-              alt={currentIsland.name}
-              fill
-              priority
-              sizes="440px"
-              className="object-contain select-none"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            {isForgedStreak && (
+            {isLowEndDevice ? (
+              <Image
+                src={currentIsland.image}
+                alt={currentIsland.name}
+                fill
+                priority
+                sizes="440px"
+                className="object-contain select-none"
+                style={{ imageRendering: 'pixelated' }}
+              />
+            ) : (
               <svg
-                viewBox="0 0 100 100"
-                className="pointer-events-none absolute inset-0 w-full h-full select-none"
+                viewBox="0 0 800 800"
+                className="w-full h-full select-none"
                 shapeRendering="crispEdges"
-                aria-hidden="true"
               >
-                <path
-                  d="M48 68 L52 74 L50 82 L54 88 M52 74 L60 76 L66 82"
-                  stroke="#F59E0B"
-                  strokeWidth="1.2"
-                  fill="none"
-                  strokeDasharray="2 1"
-                  className="filter drop-shadow-[0_0_4px_#FBBF24]"
+                <defs>
+                  <filter id="ambient-gold-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#F59E0B" floodOpacity="0.9" />
+                  </filter>
+                </defs>
+
+                <image
+                  href={currentIsland.image}
+                  width="800"
+                  height="800"
+                  style={{ imageRendering: 'pixelated' }}
                 />
+
+                {isForgedStreak && (
+                  <g id="ambient-kintsugi-seams" filter="url(#ambient-gold-glow)">
+                    <path
+                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
+                      stroke="#F59E0B"
+                      strokeWidth="5"
+                      strokeLinecap="square"
+                      strokeLinejoin="miter"
+                      fill="none"
+                    />
+                    <path
+                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
+                      stroke="#FFFBEB"
+                      strokeWidth="2"
+                      strokeLinecap="square"
+                      strokeLinejoin="miter"
+                      fill="none"
+                    />
+                  </g>
+                )}
               </svg>
             )}
           </div>

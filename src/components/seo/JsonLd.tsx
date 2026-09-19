@@ -1,5 +1,4 @@
 import React from 'react';
-import { Recipe } from '@/lib/recipes';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 
@@ -166,83 +165,6 @@ export function BreadcrumbsJsonLd({ items }: { items: { name: string; item: stri
       position: index + 1,
       name: crumb.name,
       item: crumb.item.startsWith('http') ? crumb.item : `${SITE_URL}${crumb.item}`,
-    })),
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-function buildRecipeSchema(recipe: Recipe) {
-  const imageUrl = recipe.image.startsWith('http')
-    ? recipe.image
-    : `${SITE_URL}${recipe.image}`;
-  const recipeUrl = `${SITE_URL}/recipes/${encodeURIComponent(recipe.id)}`;
-
-  return {
-    '@type': 'Recipe',
-    name: recipe.name,
-    headline: recipe.subtitle || recipe.name,
-    description: recipe.description,
-    url: recipeUrl,
-    image: [imageUrl],
-    recipeCategory: recipe.category,
-    recipeCuisine: 'Healthy Whole-Food',
-    author: {
-      '@type': 'Organization',
-      name: 'Cyath Health',
-      url: SITE_URL,
-    },
-    prepTime: `PT${recipe.prepTimeMinutes}M`,
-    cookTime: `PT${recipe.prepTimeMinutes}M`,
-    totalTime: `PT${recipe.prepTimeMinutes}M`,
-    keywords: (recipe.tags || []).join(', '),
-    recipeYield: '1 serving',
-    nutrition: {
-      '@type': 'NutritionInformation',
-      calories: `${recipe.calories} calories`,
-      proteinContent: `${recipe.protein} g`,
-      carbohydrateContent: `${recipe.carbs} g`,
-      fatContent: `${recipe.fats} g`,
-    },
-    recipeIngredient: recipe.ingredients.map((i) => `${i.amount} ${i.item}`),
-    recipeInstructions: recipe.instructions.map((inst, idx) => ({
-      '@type': 'HowToStep',
-      position: idx + 1,
-      name: `Step ${idx + 1}`,
-      text: inst,
-      url: `${recipeUrl}#step-${idx + 1}`,
-      image: imageUrl,
-    })),
-  };
-}
-
-export function SingleRecipeJsonLd({ recipe }: { recipe: Recipe }) {
-  const schema = {
-    '@context': 'https://schema.org',
-    ...buildRecipeSchema(recipe),
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-export function RecipeListJsonLd({ recipes }: { recipes: Recipe[] }) {
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    itemListElement: recipes.map((recipe, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: buildRecipeSchema(recipe),
     })),
   };
 

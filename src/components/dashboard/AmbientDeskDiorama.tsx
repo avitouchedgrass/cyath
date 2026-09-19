@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
-import { SanctuaryIslandSprite } from '@/components/dashboard/SanctuaryIslandSprite';
+import Image from 'next/image';
 import { calculateLevel } from '@/lib/progression/engine';
 import { getIslandTier } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
@@ -178,14 +178,33 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 px-4">
         {/* Floating Island Hero */}
         <div className="relative flex flex-col items-center justify-center animate-[bounce_5s_ease-in-out_infinite]">
-          <div className="w-[300px] sm:w-[380px] lg:w-[440px] aspect-square flex items-center justify-center filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
-            <SanctuaryIslandSprite
-              tier={currentIsland.tier}
-              lifecycleState="active"
-              hasKintsugiSeams={isForgedStreak}
-              size={420}
-              className="w-full h-full"
+          <div className="w-[300px] sm:w-[380px] lg:w-[440px] aspect-square relative flex items-center justify-center filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
+            <Image
+              src={currentIsland.image}
+              alt={currentIsland.name}
+              fill
+              priority
+              sizes="440px"
+              className="object-contain select-none"
+              style={{ imageRendering: 'pixelated' }}
             />
+            {isForgedStreak && (
+              <svg
+                viewBox="0 0 100 100"
+                className="pointer-events-none absolute inset-0 w-full h-full select-none"
+                shapeRendering="crispEdges"
+                aria-hidden="true"
+              >
+                <path
+                  d="M48 68 L52 74 L50 82 L54 88 M52 74 L60 76 L66 82"
+                  stroke="#F59E0B"
+                  strokeWidth="1.2"
+                  fill="none"
+                  strokeDasharray="2 1"
+                  className="filter drop-shadow-[0_0_4px_#FBBF24]"
+                />
+              </svg>
+            )}
           </div>
 
           {/* Island Horizon Shadow */}

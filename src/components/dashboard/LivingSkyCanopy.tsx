@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { ISLAND_TIERS, getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { SanctuaryIslandSprite, IslandLifecycleState } from './SanctuaryIslandSprite';
+
+export type IslandLifecycleState = 'active' | 'embers' | 'mist' | 'dormant';
 
 interface LivingIslandHeroProps {
   onOpenReceipt?: () => void;
@@ -59,57 +61,55 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
       return 'bg-[radial-gradient(circle_at_center,_rgba(251,191,36,0.22)_0%,_rgba(245,215,160,0.08)_45%,_transparent_75%)]';
     }
     if (phaseId === 'peak_clarity' || phaseId === 'secondary_focus') {
-      return 'bg-[radial-gradient(circle_at_center,_rgba(245,215,160,0.20)_0%,_rgba(26,54,41,0.02)_55%,_transparent_75%)]';
+      return 'bg-[radial-gradient(circle_at_center,_rgba(96,165,250,0.18)_0%,_rgba(219,234,254,0.06)_45%,_transparent_75%)]';
     }
     if (phaseId === 'postprandial_dip' || phaseId === 'cortisol_winddown') {
-      return 'bg-[radial-gradient(circle_at_center,_rgba(217,119,6,0.18)_0%,_rgba(26,54,41,0.03)_50%,_transparent_75%)]';
+      return 'bg-[radial-gradient(circle_at_center,_rgba(249,115,22,0.18)_0%,_rgba(254,215,170,0.08)_45%,_transparent_75%)]';
     }
-    return 'bg-[radial-gradient(circle_at_center,_rgba(99,102,241,0.14)_0%,_rgba(26,54,41,0.04)_55%,_transparent_75%)]';
+    return 'bg-[radial-gradient(circle_at_center,_rgba(30,41,59,0.22)_0%,_rgba(51,65,85,0.08)_45%,_transparent_75%)]';
   }, [circadian.currentPhase.id]);
 
   const handleReentry = () => {
     retroAudio.playTierUpgrade();
     haptics.heavy();
-    activateReentryProtocol(currentDate);
+    activateReentryProtocol();
   };
 
   return (
-    <div
-      id="living-island-stage"
-      className="w-full relative flex flex-col items-center justify-center select-none py-2"
-    >
-      {/* Dynamic Circadian Horizon Aura Behind Island */}
-      <div 
-        className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[520px] lg:w-[640px] h-[400px] sm:h-[520px] lg:h-[640px] rounded-full ${horizonAuraClass} blur-2xl transition-all duration-1000`}
+    <div className="relative w-full flex flex-col items-center justify-center text-center">
+      {/* Ambient Circadian Horizon Glow */}
+      <div
+        className={`pointer-events-none absolute -inset-10 sm:-inset-16 rounded-full blur-3xl opacity-70 transition-all duration-1000 ${horizonAuraClass}`}
         aria-hidden="true"
       />
 
-      {/* Sanctuary Stage Header with Inline Ambient Lore */}
-      <div className="relative z-20 flex flex-col items-center text-center gap-1.5 mb-2 max-w-md">
-        <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#1A3629] tracking-tight">
+      {/* Floating Island Identification Banner */}
+      <div className="relative z-10 flex flex-col items-center gap-1 mb-2 sm:mb-4">
+        <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-[#1A3629] drop-shadow-xs">
           {currentIsland.name}
         </h2>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] font-sans text-xs shadow-2xs">
-          <span className="font-cabinet font-bold text-[#1A3629]">Tier {currentIsland.tier}</span>
-          <span className="opacity-30">·</span>
-          <span className="font-mono text-[#4A5D4E]">Level {progress.level}</span>
-          <span className="opacity-30">·</span>
-          {isForgedStreak ? (
-            <span className="flex items-center gap-1 text-[#2563EB] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-pulse" />
-              <span>Forged Streak ({streakCount}d)</span>
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-[#065F46] font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-              <span>{streakCount}d Momentum</span>
-            </span>
-          )}
+        {/* Momentum & Level Badge */}
+        <div className="flex items-center gap-2 mt-1">
+          <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] shadow-2xs">
+            Tier {currentIsland.tier} · Level {progress.level}
+          </span>
+          <span className="font-mono text-xs font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/25 px-2 py-0.5 rounded-full">
+            ● {streakCount}d Momentum
+          </span>
         </div>
 
-        {/* Inline Environmental Lore Readout (No covering modal) */}
-        <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed px-4">
+        {/* Re-entry Badge if Kintsugi Forged */}
+        {isForgedStreak && (
+          <div className="mt-1 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 shadow-2xs animate-in fade-in">
+            <span className="font-mono text-xs font-bold text-[#2563EB]">
+              Forged Re-Entry · Golden Kintsugi Active
+            </span>
+          </div>
+        )}
+
+        {/* Environmental Lore (Always visible, no popup needed) */}
+        <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] max-w-md mt-1 leading-relaxed">
           {currentIsland.description}
         </p>
 
@@ -135,14 +135,49 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
         <div
           className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] md:w-[380px] md:h-[380px] lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px] 2xl:w-[500px] 2xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
         >
-          {/* Procedural Vector Pixel Island */}
-          <SanctuaryIslandSprite
-            tier={currentIsland.tier}
-            lifecycleState={lifecycleState}
-            hasKintsugiSeams={isForgedStreak || streakCount >= 5}
-            size={440}
-            className="drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)]"
+          {/* Handcrafted High-Definition Pixel Island */}
+          <Image
+            src={currentIsland.image}
+            alt={currentIsland.name}
+            fill
+            priority
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 400px, 500px"
+            className={`object-contain drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)] select-none transition-all duration-700 ${
+              lifecycleState === 'mist'
+                ? 'grayscale-[60%] contrast-[0.92] brightness-[0.96]'
+                : lifecycleState === 'embers'
+                ? 'sepia-[0.20] saturate-[1.12] hue-rotate-[-8deg]'
+                : ''
+            }`}
+            style={{ imageRendering: 'pixelated' }}
           />
+
+          {/* Dormant / Mist Fog Shroud Overlay */}
+          {lifecycleState === 'mist' && (
+            <div
+              className="pointer-events-none absolute inset-x-4 bottom-8 h-24 bg-gradient-to-t from-slate-200/50 via-slate-100/25 to-transparent backdrop-blur-[1px] rounded-full animate-pulse"
+              aria-hidden="true"
+            />
+          )}
+
+          {/* Golden Kintsugi Fracture Seams Overlay (For Forged Streaks) */}
+          {(isForgedStreak || streakCount >= 5) && (
+            <svg
+              viewBox="0 0 100 100"
+              className="pointer-events-none absolute inset-0 w-full h-full select-none"
+              shapeRendering="crispEdges"
+              aria-hidden="true"
+            >
+              <path
+                d="M48 68 L52 74 L50 82 L54 88 M52 74 L60 76 L66 82"
+                stroke="#F59E0B"
+                strokeWidth="1.2"
+                fill="none"
+                strokeDasharray="2 1"
+                className="filter drop-shadow-[0_0_3px_#FBBF24]"
+              />
+            </svg>
+          )}
         </div>
 
         {/* Natural Floating Ground Shadow */}

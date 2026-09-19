@@ -303,7 +303,7 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
       </div>
 
       {/* Sanctuary Evolution Meter */}
-      <div className="w-full max-w-sm flex flex-col items-center gap-2 mt-1 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)]">
+      <div className="w-full flex flex-col items-center gap-2 mt-1 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)]">
         {/* Level XP Meter */}
         <div className="w-full flex flex-col gap-1.5">
           <div className="w-full h-1.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">

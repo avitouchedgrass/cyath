@@ -339,75 +339,77 @@ function DashboardContent() {
           </button>
         </div>
 
-        {/* Panoramic Spatial Layout: Desktop 3-Column Flanks, Mobile Focused Station */}
-        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 xl:gap-10 animate-in fade-in duration-150">
-          
-          {/* LEFT FLANK: Keystone Habits Punch-Pad, 30-Day Ledger & Evening Seal */}
-          <div className={`w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 order-2 lg:order-1`}>
-            <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
+        {/* Asymmetric Stage: Slim flanks frame a dominant center island column */}
+        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-5 xl:gap-8 animate-in fade-in duration-150">
 
-            {/* Strategic 30-Day Guild Ledger Desk Station (Distilled: Only displayed when not yet sealed) */}
-            {!isLedgerSealedByDate[currentDate] && (
+          {/* LEFT FLANK: Compact Habit Punch-Pad sidebar */}
+          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-2 lg:order-1`}>
+            <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
+          </div>
+
+          {/* CENTER STAGE: Dominant focal column — island + day-end CTAs live here */}
+          <div className={`flex-1 min-w-[46%] w-full ${mobileStation === 'island' ? 'flex' : 'hidden lg:flex'} flex-col items-center justify-start gap-4 py-2 order-1 lg:order-2`}>
+            <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
+
+            {/* Day-close CTA cluster — naturally where the eye lands after the island */}
+            <div className="w-full max-w-sm flex flex-col gap-2.5">
+              {!isLedgerSealedByDate[currentDate] && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    retroAudio.playPaperRustle();
+                    haptics.tap();
+                    setJustSealedDate(null);
+                    setIsCorkboardOpen(true);
+                  }}
+                  className="w-full p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99]"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                      <PixelWaxSeal size={22} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-cabinet font-extrabold text-sm text-[#1A3629]">
+                        30-Day Guild Ledger
+                      </span>
+                      <span className="font-mono text-[11px] text-[#4A5D4E]">
+                        {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned
+                      </span>
+                    </div>
+                  </div>
+                  <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
+                    Board →
+                  </span>
+                </button>
+              )}
+
+              <EveningSealButton
+                onOpenReceipt={() => setIsReceiptOpen(true)}
+                onOpenCorkboard={(sealedDate) => {
+                  setJustSealedDate(sealedDate || currentDate);
+                  setIsCorkboardOpen(true);
+                }}
+              />
+
               <button
                 type="button"
                 onClick={() => {
-                  retroAudio.playPaperRustle();
+                  retroAudio.playBlip();
                   haptics.tap();
-                  setJustSealedDate(null);
-                  setIsCorkboardOpen(true);
+                  setIsAmbientOpen(true);
                 }}
-                className="w-full p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99] animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                className="w-full px-4 py-2 rounded-full border border-[#1A3629]/12 bg-[#FFFDF9]/80 hover:bg-[#1A3629] hover:text-[#FFFDF9] hover:border-[#1A3629] text-[#1A3629] font-mono text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                title="Zen Ambient Desk Display (Press A)"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <PixelWaxSeal size={28} />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">
-                      30-Day Guild Ledger
-                    </span>
-                    <span className="font-mono text-[11px] text-[#4A5D4E] truncate">
-                      {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned · Tap to inspect board
-                    </span>
-                  </div>
-                </div>
-                <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
-                  Board →
-                </span>
+                <Maximize2 className="w-3 h-3 text-emerald-600 group-hover:text-white" />
+                <span>Zen Desk Ambience</span>
+                <kbd className="ml-1 px-1.5 py-px bg-[#EAE4D9] group-hover:bg-white/20 border border-[#1A3629]/15 group-hover:border-white/30 rounded text-[10px] transition-colors">A</kbd>
               </button>
-            )}
-
-            <EveningSealButton
-              onOpenReceipt={() => setIsReceiptOpen(true)}
-              onOpenCorkboard={(sealedDate) => {
-                setJustSealedDate(sealedDate || currentDate);
-                setIsCorkboardOpen(true);
-              }}
-            />
+            </div>
           </div>
 
-          {/* CENTER STAGE: Monumental Living Floating Island (Center of Attraction) */}
-          <div className={`flex-1 w-full ${mobileStation === 'island' ? 'flex' : 'hidden lg:flex'} flex-col items-center justify-center min-w-0 py-2 order-1 lg:order-2`}>
-            <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
-
-            {/* Strategic Ambience Tab Mode Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                setIsAmbientOpen(true);
-              }}
-              className="mt-3 px-5 py-2.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/90 hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold shadow-2xs hover:shadow-md transition-all cursor-pointer flex items-center gap-2 active:scale-98 group"
-              title="Zen Ambient Desk Display (Press A)"
-            >
-              <Maximize2 className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white" />
-              <span>Zen Desk Ambience (Press A)</span>
-            </button>
-          </div>
-
-          {/* RIGHT FLANK: Daily Fuel & Macro Floor (Pinned to Right Edge) */}
-          <div className={`w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 order-3 lg:order-3`}>
+          {/* RIGHT FLANK: Daily Fuel — slim sidebar matching left */}
+          <div className={`w-full lg:w-[260px] xl:w-[280px] 2xl:w-[300px] shrink-0 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 order-3 lg:order-3`}>
             <DailyFuelCard
               currentProtein={currentProtein}
               targetProtein={targetProtein}

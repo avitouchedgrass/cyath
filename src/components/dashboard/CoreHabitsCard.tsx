@@ -159,42 +159,39 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       {/* Card Header & Circadian Schedule */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
-              Daily Anchors
-            </h3>
-            {onOpenSchedule ? (
-              <button
-                type="button"
-                onClick={onOpenSchedule}
-                className="mt-0.5 text-left cursor-pointer transition-colors group"
-                title="Click to calibrate wake/sleep schedule (+25 XP)"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
-                    Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'}
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-md bg-[#1A3629]/8 group-hover:bg-[#1A3629] text-[#1A3629] group-hover:text-[#FFFDF9] text-[9px] font-cabinet font-bold uppercase tracking-wider transition-colors">
-                    Edit
-                  </span>
-                </div>
-              </button>
-            ) : (
-              <span className="font-mono text-[11px] text-[#4A5D4E] mt-0.5">
-                Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'}
-              </span>
-            )}
-          </div>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/12 font-mono text-xs font-bold text-[#1A3629]">
-            <span className="text-[#10B981]">{completedCount}</span>
-            <span className="opacity-30">/</span>
-            <span>{displayHabits.length} Complete</span>
-          </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col min-w-0">
+          <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
+            Daily Anchors
+          </h3>
+          {onOpenSchedule ? (
+            <button
+              type="button"
+              onClick={onOpenSchedule}
+              className="mt-0.5 text-left cursor-pointer transition-colors group"
+              title="Click to calibrate wake/sleep schedule (+25 XP)"
+            >
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-[10px] text-[#4A5D4E] group-hover:text-[#1A3629]">
+                  {userProfile?.wakeTime || '07:30'} – {userProfile?.bedTime || '23:30'}
+                </span>
+                <span className="px-1 py-px rounded bg-[#1A3629]/8 group-hover:bg-[#1A3629] text-[#1A3629] group-hover:text-[#FFFDF9] text-[9px] font-cabinet font-bold uppercase tracking-wider transition-colors">
+                  Edit
+                </span>
+              </div>
+            </button>
+          ) : (
+            <span className="font-mono text-[10px] text-[#4A5D4E] mt-0.5">
+              {userProfile?.wakeTime || '07:30'} – {userProfile?.bedTime || '23:30'}
+            </span>
+          )}
+        </div>
+        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/12 font-mono text-xs font-bold text-[#1A3629] shrink-0">
+          <span className="text-[#10B981]">{completedCount}</span>
+          <span className="opacity-30">/</span>
+          <span>{displayHabits.length}</span>
         </div>
       </div>
 
@@ -208,38 +205,36 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               key={habit.id}
               type="button"
               onClick={(e) => handleToggle(habit.id, e)}
-              className={`w-full p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 text-left group active:scale-[0.99] ${
+              className={`w-full p-2.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center gap-2.5 text-left group active:scale-[0.99] ${
                 isDone
-                  ? 'border-[#1A3629]/15 bg-[#FAF8F5]/80 text-[#1A3629]'
-                  : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5] shadow-[0_2px_8px_rgba(26,54,41,0.02)]'
+                  ? 'border-[#1A3629]/15 bg-[#FAF8F5]/80'
+                  : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5]'
               }`}
             >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className={`w-7 h-7 rounded-lg border transition-all duration-200 flex items-center justify-center shrink-0 ${
-                  isDone
-                    ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                    : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
-                }`}>
-                  {isDone ? (
-                    <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  ) : (
-                    <span className="font-mono text-xs font-bold">{habit.keyNumber}</span>
-                  )}
-                </div>
-
-                <div className="flex flex-col min-w-0">
-                  <span className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629]">
-                    {habit.title}
-                  </span>
-                  <span className="text-xs font-sans text-[#4A5D4E] leading-snug">
-                    {habit.subtitle}
-                  </span>
-                </div>
+              <div className={`w-6 h-6 rounded-md border transition-all duration-200 flex items-center justify-center shrink-0 ${
+                isDone
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
+              }`}>
+                {isDone ? (
+                  <Check className="w-3 h-3 stroke-[3]" />
+                ) : (
+                  <span className="font-mono text-[10px] font-bold">{habit.keyNumber}</span>
+                )}
               </div>
 
-              <div className={`shrink-0 font-mono text-[10px] uppercase tracking-wider ${isDone ? 'text-emerald-800 font-bold' : 'text-[#4A5D4E]/80'}`}>
-                {habit.statusLabel}
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="font-cabinet font-bold text-xs tracking-tight text-[#1A3629] leading-tight">
+                  {habit.title}
+                </span>
+                <span className="text-[10px] font-sans text-[#4A5D4E] leading-snug">
+                  {habit.subtitle}
+                </span>
               </div>
+
+              {isDone && (
+                <span className="shrink-0 font-mono text-[9px] uppercase tracking-wider text-emerald-700 font-bold">✓</span>
+              )}
             </button>
           );
         })}
@@ -283,54 +278,56 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         </div>
 
         {/* 1-Tap Afternoon Slump Check */}
-        <div className="border-t border-[#1A3629]/10 pt-4 flex flex-col gap-2.5">
+        <div className="border-t border-[#1A3629]/10 pt-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-              Afternoon Energy Check
+            <span className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
+              Energy Check
             </span>
-            <span className="font-mono text-[11px] text-[#4A5D4E]">
-              {ritual.afternoonSlumpScore ? `Logged ${ritual.afternoonSlumpScore}/10` : '1-tap check'}
-            </span>
+            {ritual.afternoonSlumpScore && (
+              <span className="font-mono text-[10px] text-[#10B981] font-bold">
+                {ritual.afternoonSlumpScore}/10
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             <button
               type="button"
               onClick={() => handleEnergyRating(2)}
-              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
+              className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
                   ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
                   : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
-              <BatteryLow className="w-3.5 h-3.5 text-[#DC2626]" />
-              <span>Slump</span>
+              <BatteryLow className="w-3 h-3 text-[#DC2626]" />
+              Slump
             </button>
 
             <button
               type="button"
               onClick={() => handleEnergyRating(6)}
-              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
+              className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
                   ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
                   : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
-              <BatteryMedium className="w-3.5 h-3.5 text-[#D97706]" />
-              <span>Steady</span>
+              <BatteryMedium className="w-3 h-3 text-[#D97706]" />
+              Steady
             </button>
 
             <button
               type="button"
               onClick={() => handleEnergyRating(9)}
-              className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
+              className={`py-2 rounded-lg border text-[10px] font-cabinet font-bold flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
                 ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
                   ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
                   : 'border-[#1A3629]/12 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
               }`}
             >
-              <Battery className="w-3.5 h-3.5 text-[#10B981]" />
-              <span>Peak</span>
+              <Battery className="w-3 h-3 text-[#10B981]" />
+              Peak
             </button>
           </div>
         </div>

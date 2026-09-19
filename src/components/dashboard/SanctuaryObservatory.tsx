@@ -299,7 +299,15 @@ export function SanctuaryObservatory({
             : '-translate-x-full opacity-0 invisible pointer-events-none'
         }`}
       >
-        <div className="w-full h-full min-h-[540px] bg-[#3D2E24] border-l-8 border-l-[#1E140E] border-y-4 border-r-4 border-[#241A13] rounded-none p-4 sm:p-6 shadow-[0_24px_70px_rgba(10,7,5,0.55)] flex flex-col justify-between relative overflow-hidden">
+        <div className="w-full h-full min-h-[540px] bg-[#3D2E24] border-4 border-[#241A13] rounded-none pl-8 sm:pl-10 pr-4 sm:pr-6 py-4 sm:py-6 shadow-[0_24px_70px_rgba(10,7,5,0.55)] flex flex-col justify-between relative overflow-hidden">
+          {/* Authentic Structural Book Spine Binding on Left Edge */}
+          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-7 bg-[#1E140E] border-r-2 border-[#241A13] flex flex-col justify-around items-center py-8 pointer-events-none z-20 shadow-[inset_-2px_0_6px_rgba(0,0,0,0.4)]">
+            <div className="w-3.5 h-1 rounded-xs bg-[#FAF8F5]/20 border border-[#FAF8F5]/10" />
+            <div className="w-3.5 h-1 rounded-xs bg-[#FAF8F5]/20 border border-[#FAF8F5]/10" />
+            <div className="w-3.5 h-1 rounded-xs bg-[#FAF8F5]/20 border border-[#FAF8F5]/10" />
+            <div className="w-3.5 h-1 rounded-xs bg-[#FAF8F5]/20 border border-[#FAF8F5]/10" />
+          </div>
+
           {/* Custom Corkboard Backdrop SVG for Rich Tactile Texture */}
           <CorkboardBackdropSvg />
 

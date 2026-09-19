@@ -180,6 +180,9 @@ export function DailyFuelCard({
 
       {/* 3. Highlighted Contrast Meal Input */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-1.5">
+        <label htmlFor="natural-meal-input" className="sr-only">
+          Describe whole-food meal or fuel to log
+        </label>
         <div className="relative flex items-center">
           <input
             id="natural-meal-input"
@@ -188,7 +191,9 @@ export function DailyFuelCard({
             onChange={(e) => setAmbientMealText(e.target.value)}
             placeholder="e.g. 200g ribeye steak with sweet potato"
             disabled={isSubmittingMeal}
-            className="w-full pl-3.5 pr-26 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:ring-3 focus:ring-[#1A3629]/15 shadow-xs transition-all duration-200"
+            maxLength={200}
+            aria-label="Describe whole-food meal or fuel to log"
+            className="w-full pl-3.5 pr-26 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:ring-3 focus:ring-[#1A3629]/15 shadow-xs transition-all duration-200"
           />
           <button
             type="submit"
@@ -204,7 +209,11 @@ export function DailyFuelCard({
         </div>
 
         {feedback && (
-          <div className="font-mono text-[11px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-3 py-1.5 rounded-xl animate-in fade-in">
+          <div
+            role="status"
+            aria-live="polite"
+            className="font-mono text-[11px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-3 py-1.5 rounded-xl animate-in fade-in"
+          >
             {feedback}
           </div>
         )}

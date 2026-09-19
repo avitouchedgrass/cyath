@@ -205,6 +205,9 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             <button
               key={habit.id}
               type="button"
+              role="checkbox"
+              aria-checked={isDone}
+              aria-label={`${habit.title}: ${habit.statusLabel}. ${habit.subtitle}`}
               onClick={(e) => handleToggle(habit.id, e)}
               className={`w-full py-3 px-2 rounded-xl flex items-center gap-3.5 text-left transition-colors cursor-pointer group active:scale-[0.99] ${
                 isDone

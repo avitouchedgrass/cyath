@@ -158,7 +158,7 @@ export function SanctuaryObservatory({
 
         {/* Center: Ginormous Floating Island Graphic (Calibrated for zero-scroll fit) */}
         <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[320px] sm:min-h-[400px] lg:min-h-[460px] xl:min-h-[520px] 2xl:min-h-[580px] py-1">
-          <div className="relative z-10 w-[320px] h-[320px] sm:w-[420px] h-[420px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] xl:w-[620px] xl:h-[620px] 2xl:w-[680px] 2xl:h-[680px] max-w-full flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
+          <div className="relative z-10 w-[320px] h-[320px] sm:w-[420px] h-[420px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] xl:w-[620px] xl:h-[620px] 2xl:w-[680px] 2xl:h-[680px] max-w-full flex items-center justify-center motion-safe:animate-[islandFloat_8s_ease-in-out_infinite] motion-reduce:animate-none transition-all duration-300">
             {isLowEndDevice ? (
               <Image
                 src={currentIsland.pngImage || currentIsland.image}
@@ -240,7 +240,7 @@ export function SanctuaryObservatory({
           </div>
 
           {/* Stepped Pixel Ground Shadow */}
-          <div className="relative flex flex-col items-center justify-center -mt-6 sm:-mt-8 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
+          <div className="relative flex flex-col items-center justify-center -mt-6 sm:-mt-8 pointer-events-none motion-safe:animate-[shadowFloat_8s_ease-in-out_infinite] motion-reduce:animate-none">
             <div className="w-[280px] sm:w-[380px] md:w-[440px] lg:w-[480px] xl:w-[540px] 2xl:w-[580px] h-3.5 rounded-full bg-[#1A3629]/10" />
             <div className="w-[180px] sm:w-[260px] md:w-[300px] lg:w-[330px] xl:w-[370px] 2xl:w-[400px] h-2.5 rounded-full bg-[#1A3629]/16 -mt-2.5" />
             <div className="w-[100px] sm:w-[150px] md:w-[170px] lg:w-[190px] xl:w-[220px] 2xl:w-[240px] h-1.5 rounded-full bg-[#1A3629]/24 -mt-1.5" />
@@ -352,6 +352,7 @@ export function SanctuaryObservatory({
                       clipPath: SAWTOOTH_CLIP,
                       transform: `rotate(${naturalTilt}deg)`,
                     }}
+                    aria-label={`${slot.dateStr}: ${slot.isSealed ? 'Sealed with wax, click to inspect receipt' : slot.isToday ? 'Today, unsealed' : 'Unsealed'}`}
                     className={`aspect-[4/5] rounded-none border flex flex-col items-center justify-between p-1 sm:p-1.5 transition-all duration-150 cursor-pointer text-center relative select-none ${
                       slot.isSealed
                         ? 'border-[#2B1F17]/30 bg-[#FFFDF7] hover:border-[#1A3629] shadow-[0_2px_6px_rgba(0,0,0,0.15)] hover:scale-105 hover:rotate-0'

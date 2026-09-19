@@ -197,7 +197,7 @@ function DashboardContent() {
       <ItemGetBanner onOpenVault={handleOpenVault} />
 
       {/* Main Sanctuary Cockpit Container (Edge-to-Edge Spatial Architecture) */}
-      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-8 xl:px-12 pt-24 pb-28 flex flex-col gap-8">
+      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-8 xl:px-12 pt-24 pb-6 flex flex-col gap-8">
         
         {/* Cockpit Header Row: Status & Minimal Ambient Tools */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
@@ -350,10 +350,10 @@ function DashboardContent() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start animate-in fade-in duration-150">
           
           {/* LEFT 50%: Monumental Living Island & In-Place 30-Day Ledger */}
-          <div className={`w-full lg:col-span-6 xl:col-span-6 lg:sticky lg:top-24 h-fit ${
-            mobileStation === 'island' ? 'block' : 'hidden lg:block'
+          <div className={`w-full lg:col-span-6 xl:col-span-6 lg:sticky lg:top-24 lg:min-h-[calc(100vh-7.5rem)] flex flex-col justify-between ${
+            mobileStation === 'island' ? 'block' : 'hidden lg:flex'
           } transition-[outline] duration-150 ${
-            hotkeyFlash === 'island' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''
+            hotkeyFlash === 'island' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30' : ''
           }`}>
             <SanctuaryObservatory
               isLedgerOpen={isCorkboardOpen}

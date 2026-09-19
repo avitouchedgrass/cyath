@@ -106,9 +106,9 @@ export function SanctuaryObservatory({
   }, [isLedgerSealedByDate, getDailyLog, todayStr]);
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between py-1 px-1 sm:px-2 overflow-hidden rounded-3xl">
+    <div className="relative w-full flex-1 flex flex-col justify-between py-1 px-1 sm:px-2">
       {/* ------------------------------------------------------------- */}
-      {/* Leftmost Sideways Toggle Arrow Handle */}
+      {/* Leftmost Sideways Toggle Arrow Handle - Pushed to Screen Edge */}
       {/* ------------------------------------------------------------- */}
       <button
         type="button"
@@ -117,7 +117,7 @@ export function SanctuaryObservatory({
           haptics.tap();
           onToggleLedger();
         }}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-40 px-1.5 py-3 rounded-r-xl border-y border-r border-[#1A3629]/20 bg-[#FFFDF9]/90 hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-2xs transition-all flex flex-col items-center gap-1 cursor-pointer group select-none backdrop-blur-xs"
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pl-1.5 pr-2.5 py-4 rounded-r-xl border-y border-r border-[#1A3629]/25 bg-[#FAF8F5] hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_4px_16px_rgba(26,54,41,0.12)] transition-all flex flex-col items-center gap-1 cursor-pointer group select-none"
         title={isLedgerOpen ? 'Slide back to Living Island (◀)' : 'Slide open 30-Day Guild Ledger (▶)'}
         aria-label={isLedgerOpen ? 'Close 30-Day Ledger' : 'Open 30-Day Ledger'}
       >
@@ -157,15 +157,15 @@ export function SanctuaryObservatory({
         </div>
 
         {/* Center: Ginormous Floating Island Graphic (Calibrated for zero-scroll fit) */}
-        <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[260px] sm:min-h-[320px] lg:min-h-[380px] py-1">
-          <div className="relative z-10 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px] lg:w-[460px] lg:h-[460px] xl:w-[500px] xl:h-[500px] 2xl:w-[540px] 2xl:h-[540px] max-w-full flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
+        <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[320px] sm:min-h-[400px] lg:min-h-[460px] xl:min-h-[520px] 2xl:min-h-[580px] py-1">
+          <div className="relative z-10 w-[320px] h-[320px] sm:w-[420px] h-[420px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] xl:w-[620px] xl:h-[620px] 2xl:w-[680px] 2xl:h-[680px] max-w-full flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
             {isLowEndDevice ? (
               <Image
                 src={currentIsland.pngImage || currentIsland.image}
                 alt={currentIsland.name}
                 fill
                 priority
-                sizes="(max-width: 640px) 280px, (max-width: 1024px) 460px, 540px"
+                sizes="(max-width: 640px) 320px, (max-width: 1024px) 540px, 680px"
                 className="object-contain drop-shadow-[0_20px_32px_rgba(26,54,41,0.16)] select-none"
                 style={{ imageRendering: 'pixelated' }}
               />
@@ -240,10 +240,10 @@ export function SanctuaryObservatory({
           </div>
 
           {/* Stepped Pixel Ground Shadow */}
-          <div className="relative flex flex-col items-center justify-center -mt-4 sm:-mt-6 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
-            <div className="w-[240px] sm:w-[320px] md:w-[380px] lg:w-[420px] xl:w-[460px] 2xl:w-[500px] h-3.5 rounded-full bg-[#1A3629]/10" />
-            <div className="w-[160px] sm:w-[220px] md:w-[260px] lg:w-[290px] xl:w-[320px] 2xl:w-[350px] h-2.5 rounded-full bg-[#1A3629]/16 -mt-2.5" />
-            <div className="w-[90px] sm:w-[130px] md:w-[150px] lg:w-[170px] xl:w-[190px] 2xl:w-[210px] h-1.5 rounded-full bg-[#1A3629]/24 -mt-1.5" />
+          <div className="relative flex flex-col items-center justify-center -mt-6 sm:-mt-8 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
+            <div className="w-[280px] sm:w-[380px] md:w-[440px] lg:w-[480px] xl:w-[540px] 2xl:w-[580px] h-3.5 rounded-full bg-[#1A3629]/10" />
+            <div className="w-[180px] sm:w-[260px] md:w-[300px] lg:w-[330px] xl:w-[370px] 2xl:w-[400px] h-2.5 rounded-full bg-[#1A3629]/16 -mt-2.5" />
+            <div className="w-[100px] sm:w-[150px] md:w-[170px] lg:w-[190px] xl:w-[220px] 2xl:w-[240px] h-1.5 rounded-full bg-[#1A3629]/24 -mt-1.5" />
           </div>
         </div>
 
@@ -293,22 +293,24 @@ export function SanctuaryObservatory({
       {/* Slides from the left and covers the island as a whole */}
       {/* ------------------------------------------------------------- */}
       <div
-        className={`absolute inset-0 z-30 transition-transform duration-300 ease-in-out ${
-          isLedgerOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
+        className={`absolute inset-0 z-30 transition-all duration-300 ease-in-out ${
+          isLedgerOpen
+            ? 'translate-x-0 opacity-100 visible pointer-events-auto'
+            : '-translate-x-full opacity-0 invisible pointer-events-none'
         }`}
       >
-        <div className="w-full h-full min-h-[540px] bg-[#3D2E24] border-4 border-[#241A13] rounded-3xl p-4 sm:p-6 shadow-[0_24px_60px_rgba(10,7,5,0.45)] flex flex-col justify-between relative overflow-hidden">
+        <div className="w-full h-full min-h-[540px] bg-[#3D2E24] border-l-8 border-l-[#1E140E] border-y-4 border-r-4 border-[#241A13] rounded-none p-4 sm:p-6 shadow-[0_24px_70px_rgba(10,7,5,0.55)] flex flex-col justify-between relative overflow-hidden">
           {/* Custom Corkboard Backdrop SVG for Rich Tactile Texture */}
           <CorkboardBackdropSvg />
 
           {/* Ledger Header */}
           <div className="relative z-10 flex items-center justify-between pb-3 border-b-2 border-[#3D2E24]/20">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-[#2B1F17] bg-[#FFFDF9]/95 border-2 border-[#2B1F17]/20 px-3 py-1 rounded-full shadow-2xs">
+              <span className="font-mono text-xs font-bold text-[#2B1F17] bg-[#FFFDF9]/95 border-2 border-[#2B1F17]/20 px-3 py-1 rounded-none shadow-2xs">
                 {pinnedCount} of 30 Sealed
               </span>
               {isForgedStreak && (
-                <span className="font-mono text-[10px] font-bold text-[#1E3A8A] bg-blue-100/95 border-2 border-blue-300 px-2.5 py-0.5 rounded-full">
+                <span className="font-mono text-[10px] font-bold text-[#1E3A8A] bg-blue-100/95 border-2 border-blue-300 px-2.5 py-0.5 rounded-none">
                   Kintsugi Active
                 </span>
               )}
@@ -321,16 +323,16 @@ export function SanctuaryObservatory({
                 haptics.tap();
                 onToggleLedger();
               }}
-              className="h-8 px-3.5 rounded-full border-2 border-[#241A13] bg-[#FFFDF9] hover:bg-[#241A13] hover:text-[#FFFDF9] text-[#241A13] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+              className="h-8 px-3.5 rounded-none border-2 border-[#241A13] bg-[#FFFDF9] hover:bg-[#241A13] hover:text-[#FFFDF9] text-[#241A13] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
             >
               <span>Return to Island</span>
               <span className="text-[10px]">✕</span>
             </button>
           </div>
 
-          {/* 30-Day Receipt Grid on Cork Board */}
+          {/* 30-Day Receipt Grid on Cork Board - Sharp Book Style */}
           <div className="relative z-10 flex-1 flex flex-col justify-center my-2">
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#B8A994]/80 border-2 border-[#3D2E24]/35 shadow-[inset_0_4px_16px_rgba(43,31,23,0.3)] grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2.5 backdrop-blur-[0.5px]">
+            <div className="p-3 sm:p-4 rounded-none bg-[#B8A994]/80 border-2 border-[#3D2E24]/35 shadow-[inset_0_4px_16px_rgba(43,31,23,0.3)] grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2.5 backdrop-blur-[0.5px]">
               {rollingDays.map((slot) => {
                 const naturalTilt = ((slot.dayNumber % 5) - 2) * 0.75;
                 return (
@@ -350,7 +352,7 @@ export function SanctuaryObservatory({
                       clipPath: SAWTOOTH_CLIP,
                       transform: `rotate(${naturalTilt}deg)`,
                     }}
-                    className={`aspect-[4/5] rounded-xs border flex flex-col items-center justify-between p-1 sm:p-1.5 transition-all duration-150 cursor-pointer text-center relative select-none ${
+                    className={`aspect-[4/5] rounded-none border flex flex-col items-center justify-between p-1 sm:p-1.5 transition-all duration-150 cursor-pointer text-center relative select-none ${
                       slot.isSealed
                         ? 'border-[#2B1F17]/30 bg-[#FFFDF7] hover:border-[#1A3629] shadow-[0_2px_6px_rgba(0,0,0,0.15)] hover:scale-105 hover:rotate-0'
                         : slot.isToday

@@ -54,25 +54,6 @@ export function EveningSleepCard({
     return currentMinutes >= windowStart;
   }, [bedTime]);
 
-  const biologicalPhase = useMemo(() => {
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
-    const [bedHour, bedMin] = bedTime.split(':').map(Number);
-    const wakeMinutes = (wakeHour || 7) * 60 + (wakeMin || 30);
-    const bedMinutes = (bedHour || 23) * 60 + (bedMin || 30);
-    const eveningStart = bedMinutes - 180;
-
-    if (currentMinutes >= wakeMinutes && currentMinutes < eveningStart) {
-      return { label: 'Solar Alert', icon: '☀️', tagColor: 'text-[#1A3629] bg-[#E8F5E9] border-[#A5D6A7]' };
-    }
-    if (currentMinutes >= eveningStart && currentMinutes < bedMinutes) {
-      return { label: 'Wind-down', icon: '🌆', tagColor: 'text-[#B45309] bg-[#FEF3C7] border-[#FCD34D]' };
-    }
-    return { label: 'Rest Window', icon: '🌙', tagColor: 'text-[#1E3A8A] bg-[#DBEAFE] border-[#93C5FD]' };
-  }, [wakeTime, bedTime]);
-
   const isEligible = habitsDone || isEveningWindow;
 
   const handleStartCeremony = () => {
@@ -158,76 +139,53 @@ export function EveningSleepCard({
           </div>
         </div>
 
-        {/* Right Slot: Sleep Target & Zen Ambience */}
+        {/* Right Slot: Circadian Cadence */}
         <div className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-1 flex-wrap">
-              <div className="flex items-center gap-1.5">
-                <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                  Circadian Cadence
-                </span>
-                <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded border ${biologicalPhase.tagColor} flex items-center gap-1`}>
-                  <span>{biologicalPhase.icon}</span>
-                  <span>{biologicalPhase.label}</span>
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={onOpenSchedule}
-                className="font-cabinet font-bold text-[11px] text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
-                title="Calibrate biological wake and sleep target"
-              >
-                <span>Calibrate</span>
-                <span className="text-[10px]">⚙</span>
-              </button>
-            </div>
-
-            {/* Structured Wake & Sleep Target Chips */}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={onOpenSchedule}
-                className="p-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-0.5 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
-                title="Adjust Wake Target"
-              >
-                <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
-                  <span>☀️</span>
-                  <span>Wake Target</span>
-                </div>
-                <span className="font-mono text-xs font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
-                  {wakeTime}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={onOpenSchedule}
-                className="p-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-0.5 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
-                title="Adjust Rest Target"
-              >
-                <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
-                  <span>🌙</span>
-                  <span>Rest Target</span>
-                </div>
-                <span className="font-mono text-xs font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
-                  {bedTime}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-1">
+          <div className="flex items-center justify-between">
+            <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+              Circadian Cadence
+            </span>
             <button
               type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                onOpenAmbient();
-              }}
-              className="w-full py-2 px-3 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs text-[#1A3629] transition-all cursor-pointer text-center shadow-2xs"
-              title="Open full-screen Zen ambient living desk diorama (Hotkey A)"
+              onClick={onOpenSchedule}
+              className="font-cabinet font-bold text-[11px] text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
+              title="Calibrate biological wake and sleep target"
             >
-              Zen Ambience Display
+              <span>Calibrate</span>
+              <span className="text-[10px]">⚙</span>
+            </button>
+          </div>
+
+          {/* Structured Wake & Sleep Target Chips */}
+          <div className="grid grid-cols-2 gap-2 my-auto">
+            <button
+              type="button"
+              onClick={onOpenSchedule}
+              className="p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-1 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
+              title="Adjust Wake Target"
+            >
+              <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                <span>☀️</span>
+                <span>Wake Target</span>
+              </div>
+              <span className="font-mono text-sm font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
+                {wakeTime}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenSchedule}
+              className="p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-1 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
+              title="Adjust Rest Target"
+            >
+              <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                <span>🌙</span>
+                <span>Rest Target</span>
+              </div>
+              <span className="font-mono text-sm font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
+                {bedTime}
+              </span>
             </button>
           </div>
         </div>

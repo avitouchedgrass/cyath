@@ -289,8 +289,11 @@ function DashboardContent() {
         </div>
 
         {/* Mobile Cockpit Station Dock (Ergonomic Segmented Switcher for <1024px) */}
-        <div className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-1.5 my-1">
+        <div role="tablist" aria-label="Dashboard sections" className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-1.5 my-1">
           <button
+            role="tab"
+            aria-selected={mobileStation === 'habits'}
+            aria-label="Daily Anchors habits"
             type="button"
             onClick={() => {
               setMobileStation('habits');
@@ -303,10 +306,13 @@ function DashboardContent() {
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span>⚡ Anchors</span>
+            <span aria-hidden="true">⚡</span> Anchors
           </button>
 
           <button
+            role="tab"
+            aria-selected={mobileStation === 'island'}
+            aria-label="Floating island sanctuary"
             type="button"
             onClick={() => {
               setMobileStation('island');
@@ -319,10 +325,13 @@ function DashboardContent() {
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span>🏝️ Island</span>
+            <span aria-hidden="true">🏝️</span> Island
           </button>
 
           <button
+            role="tab"
+            aria-selected={mobileStation === 'fuel'}
+            aria-label="Daily fuel and protein"
             type="button"
             onClick={() => {
               setMobileStation('fuel');
@@ -335,7 +344,7 @@ function DashboardContent() {
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span>🥩 Fuel</span>
+            <span aria-hidden="true">🥩</span> Fuel
           </button>
         </div>
 

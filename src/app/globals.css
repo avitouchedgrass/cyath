@@ -262,19 +262,22 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-.pixel-art {
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-
 img {
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -moz-user-select: none;
+}
+
+img.pixel-art {
   pointer-events: none;
+}
+
+.pixel-art {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .font-cabinet {
@@ -348,12 +351,7 @@ img {
 
 /* Accessibility: Intentional graceful reduced-motion alternatives */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* Silence continuous floating and ambient oscillating loops */
+  /* Silence continuous infinite floating and ambient oscillating loops only */
   .animate-\[bounce_1\.5s_infinite\],
   .animate-spin,
   [class*="animate-island-float"],
@@ -366,9 +364,10 @@ img {
     animation: none !important;
   }
 
-  /* Preserve fast, accessible feedback on interactive state transitions */
+  /* Snap all transitions to near-instant so state changes still communicate */
   * {
     transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

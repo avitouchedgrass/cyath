@@ -139,32 +139,37 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       
       {/* Header & Target Summary */}
-      <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
-        <div className="flex flex-col">
-          <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
-            Daily Fuel &amp; Protein
-          </h3>
-        </div>
+      <div className="flex items-center justify-between">
+        <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
+          Daily Fuel &amp; Protein
+        </h3>
 
         <div className="flex flex-col items-end">
           <div className="flex items-baseline gap-1 font-mono">
-            <span className="font-cabinet font-extrabold text-2xl text-[#1A3629] tabular-nums">
+            <span className="font-cabinet font-extrabold text-xl text-[#1A3629] tabular-nums">
               {currentProtein}
             </span>
-            <span className="text-xs font-sans text-[#4A5D4E]">/ {targetProtein}g</span>
+            <span className="text-[10px] font-sans text-[#4A5D4E]">/ {targetProtein}g</span>
           </div>
-          <span className="text-[11px] font-sans text-[#4A5D4E]">
-            {remaining > 0 ? `${remaining}g to floor` : 'Target secured'}
+          <span className="text-[10px] font-sans text-[#4A5D4E]">
+            {remaining > 0 ? `${remaining}g to floor` : 'Secured'}
           </span>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="flex flex-col gap-1.5">
-        <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">
+        <div
+          role="progressbar"
+          aria-label="Daily protein progress"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden"
+        >
           <div
             className="h-full bg-[#1A3629] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${percent}%` }}
@@ -188,9 +193,9 @@ export function DailyFuelCard({
             type="text"
             value={ambientMealText}
             onChange={(e) => setAmbientMealText(e.target.value)}
-            placeholder="e.g. 3 scrambled eggs with sourdough"
+            placeholder="e.g. 3 scrambled eggs wild"
             disabled={isSubmittingMeal}
-            className="w-full pl-4 pr-24 py-3.5 rounded-xl border-[1.5px] border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-3 focus:ring-[#1A3629]/10 shadow-[0_2px_12px_rgba(26,54,41,0.04)] transition-all duration-200"
+            className="w-full pl-3 pr-20 py-2.5 rounded-xl border-[1.5px] border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-3 focus:ring-[#1A3629]/10 transition-all duration-200"
           />
           <button
             type="submit"
@@ -212,10 +217,10 @@ export function DailyFuelCard({
         )}
       </form>
 
-      {/* 1-Tap Pantry Plates (Proposal D) */}
+      {/* 1-Tap Pantry Plates */}
       <div className="flex flex-col gap-2">
-        <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-          1-Tap Pantry Plates
+        <span className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
+          Quick Plates
         </span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {PRESET_MEALS.map((preset) => (
@@ -300,6 +305,9 @@ export function DailyFuelCard({
               <input
                 type="number"
                 step="0.1"
+                min="30"
+                max="300"
+                aria-label="Current body weight in kilograms"
                 value={weightInput}
                 onChange={(e) => setWeightInput(e.target.value)}
                 className="w-16 px-2 py-0.5 rounded-lg border border-[#1A3629]/30 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629] text-center focus:outline-none"

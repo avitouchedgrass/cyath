@@ -17,10 +17,12 @@ import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfl
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WaxSealCorkboard } from '@/components/dashboard/WaxSealCorkboard';
 import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
+import { WaxSealSvg } from '@/components/dashboard/WaxSealSvg';
 import {
   Volume2,
   VolumeX,
   X,
+  Maximize2,
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -47,6 +49,7 @@ function DashboardContent() {
     isForgedStreak,
     unlockedTrophies,
     setCircadianSchedule,
+    isLedgerSealedByDate,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -196,63 +199,12 @@ function DashboardContent() {
           </div>
 
           {/* Minimal Essential Header Tools */}
-          <div className="flex items-center gap-1.5 p-1 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs flex-wrap self-start lg:self-auto">
-            
-            {/* Ambient Schedule Chip */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                setTempWake(userProfile?.wakeTime || '07:30');
-                setTempBed(userProfile?.bedTime || '23:30');
-                setIsScheduleModalOpen(true);
-              }}
-              className="h-8 inline-flex items-center px-3 rounded-full hover:bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer"
-              title="Click to adjust your sleep and wake schedule"
-            >
-              <span>Wake {userProfile?.wakeTime || '07:30'} · Sleep {userProfile?.bedTime || '23:30'}</span>
-            </button>
-
-            <div className="h-4 w-px bg-[#1A3629]/12" />
-
-            {/* 30-Day Ledger Board Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                setJustSealedDate(null);
-                setIsCorkboardOpen(true);
-              }}
-              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
-            >
-              <span>30-Day Ledger</span>
-            </button>
-
-            <div className="h-4 w-px bg-[#1A3629]/12" />
-
-            {/* Ambient Monitor-2 Mode Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playBlip();
-                haptics.tap();
-                setIsAmbientOpen(true);
-              }}
-              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
-              title="Ambient Monitor-2 Mode (Press A)"
-            >
-              <span>Ambient (A)</span>
-            </button>
-
-            <div className="h-4 w-px bg-[#1A3629]/12" />
-
+          <div className="flex items-center gap-2 flex-wrap self-start lg:self-auto">
             {/* Specimen Reliquary Sub-Floor Jump Button */}
             <button
               type="button"
               onClick={handleOpenVault}
-              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
+              className="h-9 px-4 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-2"
             >
               <span>Reliquary ({unlockedTrophies.length}/{TROPHIES_ROSTER.length})</span>
             </button>
@@ -262,9 +214,39 @@ function DashboardContent() {
         {/* Panoramic Spatial Layout: Cards Pushed to Edges, Monumental Island Center */}
         <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 xl:gap-10 animate-in fade-in duration-150">
           
-          {/* LEFT FLANK: Keystone Habits Punch-Pad & Evening Seal (Pinned to Left Edge) */}
+          {/* LEFT FLANK: Keystone Habits Punch-Pad, 30-Day Ledger & Evening Seal */}
           <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-2 lg:order-1 flex flex-col gap-4">
-            <CoreHabitsCard />
+            <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
+
+            {/* Strategic 30-Day Guild Ledger Desk Station */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playPaperRustle();
+                haptics.tap();
+                setJustSealedDate(null);
+                setIsCorkboardOpen(true);
+              }}
+              className="w-full p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99] animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                  <WaxSealSvg size={32} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">
+                    30-Day Guild Ledger
+                  </span>
+                  <span className="font-mono text-[11px] text-[#4A5D4E] truncate">
+                    {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned · Tap to inspect board
+                  </span>
+                </div>
+              </div>
+              <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
+                Board →
+              </span>
+            </button>
+
             <EveningSealButton
               onOpenReceipt={() => setIsReceiptOpen(true)}
               onOpenCorkboard={(sealedDate) => {
@@ -277,6 +259,21 @@ function DashboardContent() {
           {/* CENTER STAGE: Monumental Living Floating Island (Center of Attraction) */}
           <div className="flex-1 w-full order-1 lg:order-2 flex flex-col items-center justify-center min-w-0 py-2">
             <LivingIslandHero onOpenReceipt={() => setIsReceiptOpen(true)} />
+
+            {/* Strategic Ambience Tab Mode Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                haptics.tap();
+                setIsAmbientOpen(true);
+              }}
+              className="mt-3 px-5 py-2.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/90 hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold shadow-2xs hover:shadow-md transition-all cursor-pointer flex items-center gap-2 active:scale-98 group"
+              title="Zen Ambient Desk Display (Press A)"
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white" />
+              <span>Zen Desk Ambience (Press A)</span>
+            </button>
           </div>
 
           {/* RIGHT FLANK: Daily Fuel & Macro Floor (Pinned to Right Edge) */}

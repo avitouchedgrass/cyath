@@ -56,7 +56,7 @@ export function DailyFuelCard({
         protein: preset.protein,
         calories: preset.calories,
         ingredients: [{ item: preset.desc, amount: '1 serving' }],
-        suggestedSprite: '/assets/food/generic-plate.webp',
+        suggestedSprite: '/assets/food/generic-plate.png',
       },
       currentDate
     );
@@ -89,42 +89,42 @@ export function DailyFuelCard({
             name: data.mealName || text,
             protein,
             calories,
-            carbs: data.carbs,
-            fats: data.fats,
-            ingredients: data.ingredients || [{ item: text, amount: '1 serving' }],
-            suggestedSprite: data.suggestedSprite || '/assets/food/generic-plate.webp',
+            ingredients: [{ item: text, amount: '1 portion' }],
+            suggestedSprite: '/assets/food/generic-plate.png',
           },
           currentDate
         );
         retroAudio.playInspectConfirm();
         haptics.success();
-        setFeedback(`Logged "${data.mealName || text}" (+${protein}g protein)`);
+        setAmbientMealText('');
+        setFeedback(`Logged: ${data.mealName || text} (+${protein}g protein)`);
+        setTimeout(() => setFeedback(null), 3500);
       } else {
         throw new Error('API parse error');
       }
     } catch {
-      // Offline smart fallback
+      // Fallback local logging
       logMealToDay(
         {
           name: text,
           protein: 25,
-          calories: 320,
-          ingredients: [{ item: text, amount: '1 serving' }],
-          suggestedSprite: '/assets/food/generic-plate.webp',
+          calories: 350,
+          ingredients: [{ item: text, amount: '1 portion' }],
+          suggestedSprite: '/assets/food/generic-plate.png',
         },
         currentDate
       );
       retroAudio.playInspectConfirm();
       haptics.success();
-      setFeedback(`Logged "${text}" (+25g protein estimated)`);
+      setAmbientMealText('');
+      setFeedback(`Logged: ${text} (+25g protein)`);
+      setTimeout(() => setFeedback(null), 3500);
     } finally {
       setIsSubmittingMeal(false);
-      setAmbientMealText('');
-      setTimeout(() => setFeedback(null), 3500);
     }
   };
 
-  // Weight check-in
+  // Weight Check-in
   const handleSaveWeight = (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(weightInput);
@@ -139,7 +139,7 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       
       {/* Header & Target Summary */}
       <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
@@ -147,9 +147,6 @@ export function DailyFuelCard({
           <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
             Daily Fuel &amp; Protein
           </h3>
-          <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-            Calibrated whole-food nutrition
-          </span>
         </div>
 
         <div className="flex flex-col items-end">

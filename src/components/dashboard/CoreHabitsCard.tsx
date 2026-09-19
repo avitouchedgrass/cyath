@@ -7,7 +7,11 @@ import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { Check, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
 
-export function CoreHabitsCard() {
+export interface CoreHabitsCardProps {
+  onOpenSchedule?: () => void;
+}
+
+export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   const {
     currentDate,
     getDailyLog,
@@ -137,7 +141,7 @@ export function CoreHabitsCard() {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       {/* Habits Card Surface */}
       <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
         
@@ -147,9 +151,20 @@ export function CoreHabitsCard() {
             <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
               Daily Anchors
             </h3>
-            <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              3 quick habits to ground your day
-            </span>
+            {onOpenSchedule ? (
+              <button
+                type="button"
+                onClick={onOpenSchedule}
+                className="font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] mt-0.5 text-left cursor-pointer transition-colors"
+                title="Click to calibrate wake/sleep schedule (+25 XP)"
+              >
+                Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'} <span className="underline decoration-dotted text-[10px]">edit</span>
+              </button>
+            ) : (
+              <span className="font-mono text-[11px] text-[#4A5D4E] mt-0.5">
+                Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'}
+              </span>
+            )}
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/12 font-mono text-xs font-bold text-[#1A3629]">

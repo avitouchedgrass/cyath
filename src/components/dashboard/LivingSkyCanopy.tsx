@@ -180,7 +180,7 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
           {isLowEndDevice ? (
             /* LOW END DEVICE FALLBACK: Pure high-res PNG without rot/SVG shader overhead */
             <Image
-              src={currentIsland.image}
+              src={currentIsland.pngImage || currentIsland.image}
               alt={currentIsland.name}
               fill
               priority
@@ -228,7 +228,7 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
 
               {/* Base Island inside SVG */}
               <image
-                href={currentIsland.image}
+                href={currentIsland.svgImage || currentIsland.image}
                 width="800"
                 height="800"
                 filter={
@@ -277,31 +277,22 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
         {/* Natural Floating Ground Shadow */}
         <div className="w-[200px] sm:w-[280px] md:w-[320px] lg:w-[350px] xl:w-[380px] h-3.5 sm:h-4.5 rounded-full bg-[#1A3629]/15 blur-[6px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
 
-        {/* Low-End Device Status Text & Mode Switcher */}
-        <div className="mt-2.5 flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E]/80 flex-wrap justify-center">
-          {isLowEndDevice ? (
-            <span className="flex items-center gap-1.5 text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-full">
-              <span className="text-amber-600">●</span>
-              <span>
-                {hardwareDetails || 'Low-end device detected'} · Native PNG active (Rot shaders bypassed)
-              </span>
+        {/* Low-End Fallback Explanation (Displayed only when on low-end device or simulated) */}
+        {isLowEndDevice && (
+          <div className="mt-2.5 flex items-center gap-2 font-mono text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 px-3 py-1 rounded-full shadow-2xs animate-in fade-in">
+            <span className="text-amber-600 font-bold">●</span>
+            <span>
+              Low-power hardware profile ({hardwareDetails || 'constrained CPU/RAM'}) · Shaders bypassed, PNG active
             </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-[#065F46] bg-emerald-50 border border-[#10B981]/25 px-2.5 py-0.5 rounded-full">
-              <span className="text-emerald-500">●</span>
-              <span>Native SVG Pipeline · Color Matrix Rot &amp; Kintsugi Active</span>
-            </span>
-          )}
-
-          <button
-            type="button"
-            onClick={toggleSpecMode}
-            className="text-[10px] underline hover:text-[#1A3629] cursor-pointer text-[#4A5D4E]"
-            title="Click to toggle between SVG Shader Mode and Low-End PNG Fallback"
-          >
-            {isLowEndDevice ? 'Force SVG Mode' : 'Simulate Low-Spec PNG'}
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={toggleSpecMode}
+              className="text-[10px] underline hover:text-amber-950 ml-1 cursor-pointer font-bold"
+            >
+              Force SVG
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Sanctuary Evolution Meter (Cleaned of redundant pills) */}

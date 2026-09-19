@@ -1631,6 +1631,11 @@ export const useHabitStore = create<HabitStoreState>()(
           },
         }));
 
+        // Award XP on logging sleep telemetry
+        if (prevSleep === 0 && hours > 0) {
+          get().gainXp(25, 'Sleep Telemetry Logged', 'sleep');
+        }
+
         const hadSleep = prevSleep >= GOALS.sleepHours;
         const nowSleep = hours >= GOALS.sleepHours;
 
@@ -2443,6 +2448,7 @@ export const useHabitStore = create<HabitStoreState>()(
           onboardingCompleted: true,
         };
         get().updateUserProfile({ ...currentProfile, wakeTime, bedTime });
+        get().gainXp(25, 'Circadian Rhythm Schedule Set', 'circadian');
       },
 
       setCustomHabitSlot: (habitId: string) => {

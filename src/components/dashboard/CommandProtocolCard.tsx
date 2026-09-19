@@ -135,13 +135,10 @@ export function CommandProtocolCard() {
 
       <div className="pt-3 border-t border-[#1A3629]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-wrap text-xs font-cabinet">
-          {protocol.recipeSlug && (
-            <Link
-              href={`/playbook?tab=recipes&inspect=${protocol.recipeSlug}`}
-              className="font-bold text-[#1A3629] hover:text-[#065F46] underline transition-colors cursor-pointer"
-            >
-              Paired Fuel: {protocol.recipeTitle || 'Nutritional Pairing'} →
-            </Link>
+          {protocol.recipeTitle && (
+            <span className="font-bold text-[#1A3629]">
+              Fuel Synergy: {protocol.recipeTitle}
+            </span>
           )}
 
           <Link

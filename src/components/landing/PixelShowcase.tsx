@@ -184,7 +184,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     e.preventDefault();
     e.stopPropagation();
     retroAudio.playInspectConfirm();
-    router.push(`/playbook?tab=recipes&inspect=${encodeURIComponent(currentDish.recipeId)}`);
+    router.push('/dashboard');
   };
 
   const handleToggleSound = (e: React.MouseEvent) => {
@@ -270,7 +270,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
         {/* Refined Inspect Recipe Pill Badge */}
         <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-all duration-300 group-hover:-translate-y-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-md text-[#1A3629] shadow-[0_4px_16px_rgba(26,54,41,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] whitespace-nowrap">
           <span className="font-cabinet font-bold text-xs sm:text-sm">
-            Inspect Recipe <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
+            Launch Cockpit <span className="text-[#2C4A3B] font-medium">· {currentDish.name} →</span>
           </span>
         </div>
 

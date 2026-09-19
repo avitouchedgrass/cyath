@@ -54,10 +54,10 @@ export function QuickFuelDock() {
         </div>
 
         <Link
-          href="/playbook?tab=recipes"
+          href="/playbook"
           className="px-3.5 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold shadow-[2px_2px_0px_#1A3629] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0"
         >
-          <span>Recipes & Fuel →</span>
+          <span>Focus Playbook →</span>
         </Link>
       </div>
 

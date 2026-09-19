@@ -50,10 +50,10 @@ export default function NotFound() {
               Open Daily Planner →
             </Link>
             <Link
-              href="/playbook?tab=recipes"
+              href="/playbook"
               className="w-full py-3 px-4 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629] hover:bg-[#EBE5DC] font-semibold text-xs transition-colors block text-center cursor-pointer"
             >
-              Browse Recipes
+              Focus Protocols
             </Link>
             <Link
               href="/"

@@ -15,8 +15,8 @@ interface BreadcrumbsProps {
 
 const DEFAULT_ROUTE_MAP: Record<string, string> = {
   'Playbook': '/playbook',
-  'Fuel Recipes': '/playbook?tab=recipes',
-  'Guided Routines': '/playbook?tab=protocols',
+  'Focus Protocols': '/playbook',
+  'Guided Routines': '/playbook',
   'Daily Insights': '/dashboard?tab=dossier',
   'Dossier': '/dashboard?tab=dossier',
   'Sanctuary': '/dashboard?tab=today',

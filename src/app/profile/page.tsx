@@ -342,8 +342,8 @@ export default function ProfilePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/playbook?tab=recipes" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Whole-Food Fuel Recipes</span>
+                  <Link href="/playbook" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Focus &amp; Circadian Playbook</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
@@ -414,7 +414,7 @@ export default function ProfilePage() {
                 Getting Started Walkthrough
               </h3>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
-                Replay the interactive guide to habit tracking, recipes, and island progression.
+                Replay the interactive guide to habit tracking, focus protocols, and island progression.
               </p>
             </div>
           </div>

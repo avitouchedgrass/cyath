@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
-import { Gift, Bot, Compass, Utensils, BookOpen, FileText, User } from "lucide-react";
+import { Gift, Bot, Compass, BookOpen, User } from "lucide-react";
 import { useScroll } from "framer-motion";
 
 interface HeaderNavProps {
@@ -32,9 +32,6 @@ function FloatingPillNav({
   isScrolled: boolean;
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const rawTab = searchParams?.get('tab') || 'today';
-  const currentTab = rawTab === 'fuel' ? 'log' : rawTab;
 
   return (
     <nav 
@@ -47,13 +44,10 @@ function FloatingPillNav({
       }`}
     >
       {isLoggedIn ? (
-        // Member App Tabs
         memberNavItems.map((item) => {
           const isActive = item.id === 'playbook'
             ? pathname.startsWith('/playbook')
-            : item.id === 'log'
-            ? pathname === '/dashboard' && currentTab === 'fuel'
-            : pathname === '/dashboard' && currentTab !== 'fuel';
+            : pathname === '/dashboard';
 
           return (
             <Link 
@@ -100,9 +94,6 @@ function MobileBottomDock({
   memberNavItems: NavItem[];
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const rawTab = searchParams?.get('tab') || 'today';
-  const currentTab = rawTab === 'fuel' ? 'log' : rawTab;
 
   return (
     <nav
@@ -115,9 +106,7 @@ function MobileBottomDock({
           ? pathname.startsWith('/playbook')
           : item.id === 'profile'
           ? pathname.startsWith('/profile')
-          : item.id === 'log'
-          ? pathname === '/dashboard' && currentTab === 'fuel'
-          : pathname === '/dashboard' && currentTab !== 'fuel';
+          : pathname === '/dashboard';
 
         return (
           <Link
@@ -186,13 +175,11 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   // Logged-in member navigation items
   const memberNavItems: NavItem[] = [
     { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
-    { name: "Log", href: "/dashboard?tab=fuel", id: "log", icon: Utensils },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
   ];
 
   const mobileMemberNavItems: NavItem[] = [
     { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
-    { name: "Log", href: "/dashboard?tab=fuel", id: "log", icon: Utensils },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
     { name: "Profile", href: "/profile", id: "profile", icon: User },
   ];

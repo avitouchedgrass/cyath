@@ -11,8 +11,7 @@ import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { WeightTrackerModal } from '@/components/dashboard/WeightTrackerModal';
-import { SocialQuestsModal } from '@/components/progression/SocialQuestsModal';
-import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Share2, Scale, ShieldCheck, Download, ExternalLink, FileText } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Scale, ShieldCheck, Download, ExternalLink, FileText } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -42,7 +41,6 @@ export default function ProfilePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
-  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -393,39 +391,6 @@ export default function ProfilePage() {
 
         </div>
 
-        {/* Sanctuary Community Quests Card */}
-        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#10B981]/25 flex items-center justify-center shrink-0">
-              <Share2 className="w-5 h-5 text-[#065F46]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
-                  Community Quests · Follow Cyath
-                </h3>
-                <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded-full">
-                  +100 XP Total
-                </span>
-              </div>
-              <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
-                Connect on LinkedIn and Instagram to support the project and claim non-repeatable calibration bonuses.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              retroAudio.playInspectConfirm();
-              setIsSocialModalOpen(true);
-            }}
-            className="px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
-          >
-            <span>Open Social Quests (+100 XP)</span>
-          </button>
-        </div>
-
         {/* Getting Started Walkthrough Launcher Card */}
         <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
@@ -686,10 +651,6 @@ export default function ProfilePage() {
         onClose={() => setIsWeightModalOpen(false)}
       />
 
-      <SocialQuestsModal
-        isOpen={isSocialModalOpen}
-        onClose={() => setIsSocialModalOpen(false)}
-      />
 
     </div>
   );

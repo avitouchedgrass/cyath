@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
 import { Gift, Bot, Compass, Utensils, BookOpen, FileText } from "lucide-react";
+import { useScroll } from "framer-motion";
 
 interface HeaderNavProps {
   onOpenAuth?: (mode?: 'login' | 'signup') => void;
@@ -141,21 +142,18 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   const { userSession } = useHabitStore();
   const isLoggedIn = mounted && !!userSession;
 
+  const { scrollY } = useScroll();
+
   useEffect(() => {
     setMounted(true);
     if (typeof document !== 'undefined') {
       document.documentElement.classList.remove('dark');
     }
 
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 15);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return scrollY.on("change", (latest) => {
+      setIsScrolled(latest > 15);
+    });
+  }, [scrollY]);
 
   // Close mobile menu on route change
   useEffect(() => {

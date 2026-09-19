@@ -16,9 +16,6 @@ export function SiteFooter({ className = '' }: SiteFooterProps) {
             <Link href="/" className="font-pixel font-bold text-2xl tracking-wider lowercase text-[#1A3629] hover:opacity-80 transition-opacity">
               cyath
             </Link>
-            <span className="px-2.5 py-0.5 rounded-full border-2 bg-[#FFFDF9] border-[#1A3629] text-[#1A3629] text-[10px] font-mono font-bold">
-              v1.0 Retro
-            </span>
           </div>
           <p className="text-xs font-cabinet font-medium max-w-sm leading-relaxed text-[#2C4A3B]">
             A science-backed daily habit and metabolic nutrition journal built on frictionless 30-second check-ins, whole-food high-protein recipes, circadian protocols, and energy pattern discoveries.

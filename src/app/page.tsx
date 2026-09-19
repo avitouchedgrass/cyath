@@ -13,27 +13,27 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 
 const STEP_LOOP = [
   {
-    step: '01',
-    badge: 'Step 01 · Routines',
+    id: 'routines',
+    badge: 'Daily Anchors',
     title: 'Choose a Daily Routine',
     description:
-      'Start with science-backed daily routines you can actually stick to—like Morning Sunlight, High-Protein Meals, and Restful Sleep Wind-Downs.',
+      'Start with science-backed daily routines you can actually stick to, including Morning Sunlight, High-Protein Meals, and Restful Sleep Wind-Downs.',
     highlights: ['Simple daily habits', 'Personalized protein targets', 'Zero overwhelming clutter'],
   },
   {
-    step: '02',
-    badge: 'Step 02 · 30-Sec Check-in',
+    id: 'checkin',
+    badge: '30-Sec Log',
     title: 'Fast, Frictionless Daily Check-In',
     description:
       'No barcode scanning or weighing every gram. Tap quick steppers (+15g, +30g protein), track your water, and rate how energized you feel in under a minute.',
-    highlights: ['Quick one-tap logging', 'Easy 1–10 mood & energy check', 'No tracking burnout'],
+    highlights: ['Quick one-tap logging', 'Easy 1 to 10 mood & energy check', 'No tracking burnout'],
   },
   {
-    step: '03',
-    badge: 'Step 03 · See Patterns',
+    id: 'patterns',
+    badge: 'Pattern Engine',
     title: 'Discover What Fuels Your Good Days',
     description:
-      'Cyath connects the dots between what you eat, how you sleep, and your peak focus days—so you know exactly which habits make you feel great.',
+      'Cyath connects the dots between what you eat, how you sleep, and your peak focus days: so you know exactly which habits make you feel great.',
     highlights: ['Clear food-to-energy insights', 'Interactive visual charts', 'Real momentum without guesswork'],
   },
 ];
@@ -114,9 +114,9 @@ export default function Home() {
                 />
               </div>
               
-              {/* Editorial Body Text in Cabinet Grotesk */}
+              {/* Editorial Body Text in Cabinet Grotesk (under 20 words) */}
               <p className="font-cabinet font-medium text-base sm:text-lg leading-relaxed mt-6 max-w-xl text-[#2C4A3B]">
-                Log whole-food fuel, track daily routines in 30 seconds, and let our simple pattern engine uncover what drives your best energy days.
+                Log whole-food fuel, track daily routines in 30 seconds, and let our pattern engine uncover your peak energy days.
               </p>
 
               {/* Primary & Secondary Refined CTAs with Tactile Weight */}
@@ -126,7 +126,7 @@ export default function Home() {
                     type="button"
                     className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-[0_2px_8px_rgba(26,54,41,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#224736] hover:shadow-[0_4px_16px_rgba(26,54,41,0.22)] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
-                    {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
+                    {isLoggedIn ? "Visit Your Dashboard" : "Begin Calibration"}
                   </button>
                 </Link>
 
@@ -138,125 +138,6 @@ export default function Home() {
                     Explore Methodology
                   </button>
                 </Link>
-              </div>
-
-              {/* Bottom Metric Inset Micro-Cards */}
-              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 pt-6 border-t border-[#1A3629]/10 w-full">
-                
-                {/* Micro-Card 1: Streak Heatmap Preview */}
-                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
-                        7-Day Streak
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#10B981]">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                        Active
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1.5 items-center mb-1">
-                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                        <span key={i} className="text-[9px] font-mono font-bold text-center text-[#1A3629]/45 select-none">
-                          {day}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-7 gap-1.5">
-                      {[1, 0.7, 0.85, 1, 0.6, 1, 1].map((opacity, i) => (
-                        <span 
-                          key={i} 
-                          className={`h-3.5 rounded-xs transition-transform hover:scale-110 ${i === 6 ? 'bg-[#10B981]' : 'bg-[#1A3629]'}`}
-                          style={{ opacity: i === 6 ? 1 : opacity }} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
-                      Streak Heatmaps
-                    </div>
-                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
-                      Gentle consistency
-                    </div>
-                  </div>
-                </div>
-
-                {/* Micro-Card 2: Macro Fueling Preview */}
-                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] overflow-hidden shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
-                        Macro Calibrated
-                      </span>
-                      <span className="text-[10px] font-mono font-bold text-[#1A3629]/70">
-                        16-Bit Fuel
-                      </span>
-                    </div>
-                    <div 
-                      key={currentDish.id}
-                      className="font-mono font-black text-base tabular-nums tracking-tight mb-2 whitespace-nowrap animate-stat-flip text-[#1A3629]"
-                    >
-                      {currentDish.protein} PRO · {currentDish.calories} KCAL
-                    </div>
-                    {/* Sleek Segmented Macro Indicator Bar */}
-                    <div className="h-2 w-full rounded-full bg-[#1A3629]/10 overflow-hidden flex gap-0.5 p-0.5" title="Macro balance ratio">
-                      <div className="h-full rounded-full bg-[#1A3629] transition-all duration-500" style={{ width: '48%' }} />
-                      <div className="h-full rounded-full bg-[#3A6B52] transition-all duration-500" style={{ width: '32%' }} />
-                      <div className="h-full rounded-full bg-[#A3B899] transition-all duration-500" style={{ width: '20%' }} />
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
-                      Whole-Food Fuel
-                    </div>
-                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
-                      16-bit hearty dishes
-                    </div>
-                  </div>
-                </div>
-
-                {/* Micro-Card 3: Discovery Rating */}
-                <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
-                        Biometric Link
-                      </span>
-                      <span className="text-[10px] font-mono font-bold text-[#10B981]">
-                        +18% Peak
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
-                        <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS
-                      </div>
-                      {/* Mini Correlation Sparkline */}
-                      <svg className="w-12 h-4 overflow-visible" viewBox="0 0 48 16" fill="none" aria-hidden="true">
-                        <path 
-                          d="M2 13 L12 11 L24 9 L34 5 L44 2" 
-                          stroke="#1A3629" 
-                          strokeWidth="1.75" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                        />
-                        <circle cx="44" cy="2" r="2.25" fill="#10B981" />
-                      </svg>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-[#1A3629]/10 overflow-hidden">
-                      <div className="h-full rounded-full bg-[#10B981]" style={{ width: '87%' }} />
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
-                      Energy Links
-                    </div>
-                    <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
-                      Routine × mood insights
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
             </div>
@@ -274,6 +155,129 @@ export default function Home() {
         </section>
 
         {/* ========================================================================= */}
+        {/* 1.5 TACTILE VERIFICATION SHELF: Live Biometric Proof */}
+        {/* ========================================================================= */}
+        <section className="px-6 lg:px-12 py-8 sm:py-10 border-b border-[#1A3629]/10 bg-[#FFFDF9]/60 backdrop-blur-xs">
+          <div className="w-full max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              {/* Micro-Card 1: Streak Heatmap Preview */}
+              <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                      7-Day Streak
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#10B981]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                      Active
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-1.5 items-center mb-1">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+                      <span key={i} className="text-[9px] font-mono font-bold text-center text-[#1A3629]/45 select-none">
+                        {day}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1.5">
+                    {[1, 0.7, 0.85, 1, 0.6, 1, 1].map((opacity, i) => (
+                      <span 
+                        key={i} 
+                        className={`h-3.5 rounded-xs transition-transform hover:scale-110 ${i === 6 ? 'bg-[#10B981]' : 'bg-[#1A3629]'}`}
+                        style={{ opacity: i === 6 ? 1 : opacity }} 
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
+                    Streak Heatmaps
+                  </div>
+                  <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
+                    Gentle consistency
+                  </div>
+                </div>
+              </div>
+
+              {/* Micro-Card 2: Macro Fueling Preview */}
+              <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-5 flex flex-col justify-between min-h-[132px] overflow-hidden shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                      Macro Calibrated
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-[#1A3629]/70">
+                      16-Bit Fuel
+                    </span>
+                  </div>
+                  <div 
+                    key={currentDish.id}
+                    className="font-mono font-black text-base tabular-nums tracking-tight mb-2 whitespace-nowrap animate-stat-flip text-[#1A3629]"
+                  >
+                    {currentDish.protein} PRO · {currentDish.calories} KCAL
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-[#1A3629]/10 overflow-hidden flex gap-0.5 p-0.5" title="Macro balance ratio">
+                    <div className="h-full rounded-full bg-[#1A3629] transition-all duration-500" style={{ width: '48%' }} />
+                    <div className="h-full rounded-full bg-[#3A6B52] transition-all duration-500" style={{ width: '32%' }} />
+                    <div className="h-full rounded-full bg-[#A3B899] transition-all duration-500" style={{ width: '20%' }} />
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
+                    Whole-Food Fuel
+                  </div>
+                  <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
+                    16-bit hearty dishes
+                  </div>
+                </div>
+              </div>
+
+              {/* Micro-Card 3: Discovery Rating */}
+              <div className="border border-[#1A3629]/12 bg-[#FFFDF9] rounded-2xl p-5 flex flex-col justify-between min-h-[132px] shadow-[0_2px_8px_rgba(26,54,41,0.03),inset_0_1px_0_rgba(255,255,255,0.9)] hover:border-[#1A3629]/25 hover:shadow-[0_4px_16px_rgba(26,54,41,0.06)] transition-all">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]/60">
+                      Biometric Link
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-[#10B981]">
+                      +18% Peak
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="font-mono font-bold text-sm tracking-tight text-[#1A3629] whitespace-nowrap">
+                      <span className="text-base font-black tabular-nums">{currentDish.focus}</span> FOCUS
+                    </div>
+                    <svg className="w-12 h-4 overflow-visible" viewBox="0 0 48 16" fill="none" aria-hidden="true">
+                      <path 
+                        d="M2 13 L12 11 L24 9 L34 5 L44 2" 
+                        stroke="#1A3629" 
+                        strokeWidth="1.75" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                      />
+                      <circle cx="44" cy="2" r="2.25" fill="#10B981" />
+                    </svg>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-[#1A3629]/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-[#10B981]" style={{ width: '87%' }} />
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <div className="font-cabinet font-bold text-sm uppercase tracking-wide text-[#1A3629]">
+                    Energy Links
+                  </div>
+                  <div className="font-mono text-xs mt-0.5 text-[#2C4A3B]">
+                    Routine × mood insights
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
         {/* 2. THE 3-STEP ROUTINE: "How Cyath Works" */}
         {/* ========================================================================= */}
         <section id="methodology" className="px-6 lg:px-12 py-20 sm:py-28 border-b border-[#1A3629]/10 bg-[#EFE9DF]">
@@ -281,9 +285,6 @@ export default function Home() {
             
             {/* Section Header */}
             <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">
-              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
-                Simple 3-Step Routine
-              </span>
               <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Built for Everyday Momentum
               </h2>
@@ -299,10 +300,10 @@ export default function Home() {
 
                 return (
                   <div
-                    key={item.step}
+                    key={item.id}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Step ${item.step}: ${item.title}`}
+                    aria-label={`${item.badge}: ${item.title}`}
                     onMouseEnter={() => setActiveStepIndex(idx)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -317,25 +318,22 @@ export default function Home() {
                     }`}
                   >
                     <div>
-                      {/* Step Number & Badge */}
+                      {/* Step Header Badge */}
                       <div className="flex items-center justify-between mb-6">
-                        <span className="font-mono text-3xl font-black tracking-tight tabular-nums text-[#1A3629]">
-                          {item.step}
-                        </span>
-                        <span className="px-3 py-1 rounded-full border border-[#1A3629]/15 text-[11px] font-mono font-bold uppercase tracking-wider bg-[#F4F0EA] text-[#1A3629]">
+                        <span className="px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold bg-[#F4F0EA] text-[#1A3629]">
                           {item.badge}
                         </span>
+                        {idx === 2 && (
+                          <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/30 bg-[#ECFDF5] text-[#047857] text-[10px] font-mono font-bold">
+                            Key Advantage
+                          </span>
+                        )}
                       </div>
 
-                      {/* Title & Tag */}
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 mt-0.5 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
-                          {item.step}
-                        </div>
-                        <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629]">
-                          {item.title}
-                        </h3>
-                      </div>
+                      {/* Title */}
+                      <h3 className="font-cabinet font-bold text-xl tracking-tight leading-snug text-[#1A3629] mb-3">
+                        {item.title}
+                      </h3>
 
                       {/* Description */}
                       <p className="text-sm font-cabinet font-medium leading-relaxed mb-6 text-[#2C4A3B]">
@@ -367,9 +365,6 @@ export default function Home() {
           <div className="w-full max-w-7xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
-                What You Get
-              </span>
               <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Designed for Daily Energy
               </h2>
@@ -381,13 +376,21 @@ export default function Home() {
             {/* Bento Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
-              {/* BENTO 1: Food & Focus Patterns (8 Cols) */}
-              <div className="lg:col-span-8 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
-                <div>
+              {/* BENTO 1: Food & Focus Patterns (8 Cols, Archival Grid Canvas) */}
+              <div className="lg:col-span-8 border border-[#1A3629]/15 bg-[#FAF6EE] shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:shadow-[0_8px_30px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+                <div 
+                  className="pointer-events-none absolute inset-0 opacity-25 mix-blend-multiply"
+                  style={{
+                    backgroundImage: 'radial-gradient(#1A3629 0.75px, transparent 0.75px)',
+                    backgroundSize: '16px 16px',
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="relative z-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
+                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#FFFDF9] text-[#1A3629] font-mono font-bold text-xs shadow-xs">
                           ↗
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
@@ -399,9 +402,9 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold shrink-0 bg-[#F4F0EA] text-[#1A3629]">
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold shrink-0 bg-[#FFFDF9] text-[#1A3629] shadow-xs">
                       <span>Strong Link:</span>
-                      <span className="tabular-nums">84% Match</span>
+                      <span className="tabular-nums text-[#10B981]">84% Match</span>
                     </div>
                   </div>
 
@@ -417,7 +420,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[#1A3629]/10 text-xs font-mono font-bold text-[#2C4A3B]">
+                <div className="relative z-10 flex items-center justify-between pt-4 border-t border-[#1A3629]/10 text-xs font-mono font-bold text-[#2C4A3B]">
                   <span>Daily habit &amp; meal insights</span>
                   <Link href="/correlations" className="hover:underline flex items-center gap-1 text-[#1A3629]">
                     <span>View All Insights →</span>
@@ -426,7 +429,7 @@ export default function Home() {
               </div>
 
               {/* BENTO 2: 16-Bit Food Fuel (4 Cols) */}
-              <div className="lg:col-span-4 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              <div className="lg:col-span-4 border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:shadow-[0_8px_30px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
@@ -462,42 +465,50 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* BENTO 3: Zero-Stress Streaks (4 Cols) */}
-              <div className="lg:col-span-4 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              {/* BENTO 3: Zero-Stress Streaks (4 Cols, Amber-Gold Accent Tile) */}
+              <div className="lg:col-span-4 border border-[#D97706]/25 bg-[#FAF5EB] shadow-[0_4px_20px_rgba(217,119,6,0.04)] hover:shadow-[0_8px_30px_rgba(217,119,6,0.08)] hover:border-[#D97706]/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
-                      ■
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl border border-[#D97706]/30 flex items-center justify-center shrink-0 bg-[#FFFDF9] text-[#D97706] font-mono font-bold text-xs shadow-xs">
+                        ■
+                      </div>
+                      <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
+                        Stress-Free Streaks
+                      </h3>
                     </div>
-                    <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
-                      Stress-Free Streaks
-                    </h3>
+                    <span className="px-2 py-0.5 rounded-full border border-[#D97706]/30 bg-[#FFFBEB] text-[#B45309] text-[10px] font-mono font-bold">
+                      Kintsugi
+                    </span>
                   </div>
                   <p className="text-xs sm:text-sm font-cabinet font-medium mb-6 text-[#2C4A3B]">
                     Gentle pixel shading shows your consistency without guilt trips if you take a day off.
                   </p>
 
-                  <div className="grid grid-cols-7 gap-1.5 p-3 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70">
+                  <div className="grid grid-cols-7 gap-1.5 p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FFFDF9]">
                     {Array.from({ length: 28 }).map((_, i) => {
-                      const opacity = [0.2, 0.45, 0.75, 0.9, 1.0, 0.6, 0.85][i % 7];
+                      const isGold = i === 13 || i === 20 || i === 27;
+                      const opacity = [0.25, 0.5, 0.75, 0.9, 1.0, 0.65, 0.85][i % 7];
                       return (
                         <div
                           key={i}
-                          className="h-5 rounded-md transition-opacity hover:opacity-100 bg-[#1A3629]"
-                          style={{ opacity }}
+                          className={`h-5 rounded-md transition-all hover:scale-110 ${isGold ? 'bg-[#D97706]' : 'bg-[#1A3629]'}`}
+                          style={{ opacity: isGold ? 1 : opacity }}
+                          title={`Day ${i + 1} Habit Check-in`}
                         />
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#1A3629]/10 text-[11px] font-mono font-bold text-[#2C4A3B]">
-                  28-Day Habit Activity
+                <div className="pt-4 border-t border-[#1A3629]/10 text-[11px] font-mono font-bold text-[#2C4A3B] flex items-center justify-between">
+                  <span>28-Day Habit Activity</span>
+                  <span className="text-[#D97706] font-bold">Forged Streak</span>
                 </div>
               </div>
 
-              {/* BENTO 4: Daily Energy Journal (8 Cols) */}
-              <div className="lg:col-span-8 border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] hover:shadow-[0_8px_24px_rgba(26,54,41,0.06)] hover:border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
+              {/* BENTO 4: Daily Energy Journal (8 Cols, Tactile Well Sliders) */}
+              <div className="lg:col-span-8 border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:shadow-[0_8px_30px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
@@ -512,10 +523,10 @@ export default function Home() {
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70 space-y-2">
+                    <div className="p-4.5 rounded-2xl border border-[#1A3629]/10 bg-[#EFE9DF]/80 shadow-inner space-y-2.5">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Daily Energy</span>
-                        <span className="tabular-nums">{previewEnergy} / 10</span>
+                        <span className="tabular-nums text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded-md border border-[#1A3629]/10">{previewEnergy} / 10</span>
                       </div>
                       <input
                         type="range"
@@ -528,10 +539,10 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="p-4 rounded-2xl border border-[#1A3629]/10 bg-[#F4F0EA]/70 space-y-2">
+                    <div className="p-4.5 rounded-2xl border border-[#1A3629]/10 bg-[#EFE9DF]/80 shadow-inner space-y-2.5">
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
                         <span>Focus Rating</span>
-                        <span className="tabular-nums">{previewFocus} / 10</span>
+                        <span className="tabular-nums text-[#1A3629] bg-[#FFFDF9] px-2 py-0.5 rounded-md border border-[#1A3629]/10">{previewFocus} / 10</span>
                       </div>
                       <input
                         type="range"
@@ -566,9 +577,6 @@ export default function Home() {
           <div className="w-full max-w-5xl mx-auto">
             
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="px-4 py-1.5 rounded-full border border-[#1A3629]/15 text-xs font-mono font-bold uppercase tracking-widest mb-4 inline-block bg-[#FFFDF9] text-[#1A3629] shadow-2xs">
-                The Difference
-              </span>
               <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1A3629]">
                 Why Old-School Apps Burn You Out
               </h2>
@@ -667,7 +675,7 @@ export default function Home() {
                   type="button"
                   className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center"
                 >
-                  {isLoggedIn ? "Visit Your Dashboard" : "Start Calibration — Free"}
+                  {isLoggedIn ? "Visit Your Dashboard" : "Begin Calibration"}
                 </button>
               </Link>
 

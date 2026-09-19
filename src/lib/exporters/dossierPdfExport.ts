@@ -295,7 +295,7 @@ export function generateClinicalDossierHtml(data: ClinicalDossierData): string {
         <td>Triggers Minimum Viable Re-entry Protocol</td>
       </tr>
       <tr>
-        <td class="mono">5.5h – 6.9h (Sub-Optimal)</td>
+        <td class="mono">5.5h - 6.9h (Sub-Optimal)</td>
         <td class="mono center">${between6And7h}</td>
         <td class="mono right">${Math.round((between6And7h / totalSleepDays) * 100)}%</td>
         <td>
@@ -304,7 +304,7 @@ export function generateClinicalDossierHtml(data: ClinicalDossierData): string {
         <td>Partial deep sleep debt; mid-afternoon dip risk</td>
       </tr>
       <tr>
-        <td class="mono">7.0h – 7.9h (Calibrated)</td>
+        <td class="mono">7.0h - 7.9h (Calibrated)</td>
         <td class="mono center">${between7And8h}</td>
         <td class="mono right">${Math.round((between7And8h / totalSleepDays) * 100)}%</td>
         <td>

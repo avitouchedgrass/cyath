@@ -169,7 +169,10 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+    <div
+      id="tour-core-habits"
+      className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+    >
       {/* Card Header & Circadian Schedule */}
       <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#1A3629]/10">
         <div className="flex flex-col min-w-0">

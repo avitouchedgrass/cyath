@@ -61,7 +61,7 @@ export function QuickFuelDock() {
         </Link>
       </div>
 
-      {/* Two Metric Rows — Stacked with generous spacing */}
+      {/* Two Metric Rows - Stacked with generous spacing */}
       <div className="flex flex-col gap-3.5">
         
         {/* Metric 1: Protein Anchor */}

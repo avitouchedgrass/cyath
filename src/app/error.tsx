@@ -55,7 +55,7 @@ export default function Error({
             Something unexpected occurred
           </h1>
           <p className="text-sm font-medium text-[#2C4A3B] leading-relaxed max-w-md mb-6">
-            Don&apos;t worry—your progress and data are safe. Cyath caught this runtime exception before it could affect your account.
+            Don&apos;t worry, your progress and data are safe. Cyath caught this runtime exception before it could affect your account.
           </p>
 
           {/* Diagnostic Code Box */}

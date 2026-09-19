@@ -186,7 +186,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
           <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-cabinet font-bold text-[#1A3629]">
-                Postprandial Energy Dip (1–10)
+                Postprandial Energy Dip (1-10)
               </span>
               <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 Severity {afternoonSlumpScore}/10

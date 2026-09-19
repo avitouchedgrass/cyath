@@ -31,7 +31,7 @@ const RECIPE_CATALOG_SUMMARY = RECIPES.map((r) =>
   `• ID: "${r.id}" | Name: "${r.name}" | Category: ${r.category} | Diet: ${r.dietType} | Protein: ${r.protein}g | Calories: ${r.calories} kcal | Prep: ${r.prepTimeMinutes}m | Key Ingredients: ${r.ingredients.map((i) => i.item).slice(0, 4).join(', ')}`
 ).join('\n');
 
-const STOVESAGE_SYSTEM_PROMPT = `You are Cyath AI Coach (StoveSage), a clear, helpful, and friendly nutrition and daily habit coach for Cyath.
+const STOVESAGE_SYSTEM_PROMPT = `You are Cyath AI Coach, a clear, helpful, and friendly nutrition and daily habit coach for Cyath.
 
 Your mission:
 1. Provide practical, evidence-based nutrition, exercise, and habit advice.
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
     if (!activeKey) {
       return NextResponse.json(
         {
-          error: 'Google Gemini API key required for StoveSage. Provide your free key from Google AI Studio (https://aistudio.google.com) or configure GEMINI_API_KEY.',
+          error: 'Google Gemini API key required for Cyath AI. Provide your free key from Google AI Studio (https://aistudio.google.com) or configure GEMINI_API_KEY.',
           requiresKey: true,
         },
         { status: 401 }
@@ -281,7 +281,7 @@ ${RECIPE_CATALOG_SUMMARY}`;
 
     if (!parsedResult) {
       return NextResponse.json(
-        { error: `StoveSage encountered a magical disturbance: ${lastError || 'Unable to generate response'}` },
+        { error: `Cyath AI encountered a disturbance: ${lastError || 'Unable to generate response'}` },
         { status: 502 }
       );
     }
@@ -314,7 +314,7 @@ ${RECIPE_CATALOG_SUMMARY}`;
     return NextResponse.json(parsedResult);
   } catch (error: any) {
     return NextResponse.json(
-      { error: error?.message || 'Failed to communicate with StoveSage' },
+      { error: error?.message || 'Failed to communicate with Cyath AI' },
       { status: 500 }
     );
   }

@@ -194,7 +194,7 @@ export function IslandBiomeGalleryModal({
           </div>
         </div>
 
-        {/* Thumbnail Selector Strip (Tiers 1–10) */}
+        {/* Thumbnail Selector Strip (Tiers 1-10) */}
         <div className="flex flex-col gap-2">
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
             SANCTUARY TIERS

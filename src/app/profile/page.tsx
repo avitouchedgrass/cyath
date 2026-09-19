@@ -12,7 +12,7 @@ import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { WeightTrackerModal } from '@/components/dashboard/WeightTrackerModal';
 import { SocialQuestsModal } from '@/components/progression/SocialQuestsModal';
-import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Share2, Scale } from 'lucide-react';
+import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Share2, Scale, ShieldCheck, Download, ExternalLink, FileText } from 'lucide-react';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -107,6 +107,29 @@ export default function ProfilePage() {
       console.error('Delete account error:', err);
       setIsProcessing(false);
       setShowDeleteModal(false);
+    }
+  };
+
+  const handleExportData = () => {
+    retroAudio.playInspectConfirm();
+    try {
+      const payload = {
+        userProfile,
+        logsByDate,
+        exportedAt: new Date().toISOString(),
+        version: 'cyath-v2.0-prod',
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cyath-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Data export error:', err);
     }
   };
 
@@ -430,6 +453,76 @@ export default function ProfilePage() {
             <Compass className="w-3.5 h-3.5" />
             <span>Launch Walkthrough Tour</span>
           </button>
+        </div>
+
+        {/* Trust, Privacy & Legal Terms */}
+        <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#1A3629]/10">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/15 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-[#1A3629]" />
+              </div>
+              <div>
+                <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
+                  Trust, Privacy &amp; Legal Terms
+                </h3>
+                <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5 max-w-xl leading-relaxed">
+                  Your circadian data, dietary logs, and habit streaks belong solely to you. Learn about our commitments or export your telemetry.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleExportData}
+              className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Ledger JSON</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5">
+            <Link
+              href="/privacy"
+              className="group p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#F4EDE0] hover:border-[#1A3629]/25 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#FFFDF9] border border-[#1A3629]/15 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-[#1A3629]" />
+                </div>
+                <div>
+                  <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
+                    Privacy Policy
+                  </h4>
+                  <p className="text-[11px] font-sans text-[#4A5D4E]">
+                    Read our zero-sale telemetry and encryption principles.
+                  </p>
+                </div>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
+            </Link>
+
+            <Link
+              href="/terms"
+              className="group p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#F4EDE0] hover:border-[#1A3629]/25 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#FFFDF9] border border-[#1A3629]/15 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-[#1A3629]" />
+                </div>
+                <div>
+                  <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
+                    Terms &amp; Conditions
+                  </h4>
+                  <p className="text-[11px] font-sans text-[#4A5D4E]">
+                    Fair-use terms and software agreement.
+                  </p>
+                </div>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
+            </Link>
+          </div>
         </div>
 
         {/* Danger Zone: Account & Data Reset */}

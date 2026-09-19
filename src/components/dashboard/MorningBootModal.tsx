@@ -127,7 +127,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
           <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-cabinet font-bold text-[#1A3629]">
-                Waking Alertness (1–10)
+                Waking Alertness (1-10)
               </span>
               <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 Level {restedRating}/10
@@ -163,7 +163,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
           >
             <div className="text-left">
               <span className="block text-xs font-cabinet font-bold leading-tight">
-                10–15m Morning Natural Daylight
+                10-15m Morning Natural Daylight
               </span>
               <span className="block text-[11px] font-sans text-[#4A5D4E] mt-0.5">
                 Resets master circadian clock &amp; clears adenosine

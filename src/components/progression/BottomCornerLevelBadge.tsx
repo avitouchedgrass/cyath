@@ -32,12 +32,12 @@ export function BottomCornerLevelBadge() {
   const progress = calculateLevel(totalXp);
 
   return (
-    <div className="fixed bottom-5 left-5 z-40 pointer-events-auto select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
+    <div className="fixed bottom-20 md:bottom-5 left-4 md:left-5 z-40 pointer-events-auto select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <Link
         id="xp-hud-badge-target"
         href="/dashboard?tab=today"
         className="flex items-center gap-3 px-3.5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-xs shadow-[0_4px_20px_rgba(26,54,41,0.08)] hover:shadow-[0_8px_25px_rgba(26,54,41,0.12)] hover:border-[#1A3629]/30 transition-all cursor-pointer group"
-        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) — Open Cockpit`}
+        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) · Open Cockpit`}
         aria-label={`Current Level: Level ${progress.level}`}
       >
         {/* Floating Level Badge Circle */}

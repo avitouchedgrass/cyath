@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition } from '@/store/useHabitStore';
+import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition, getTrophyMastery } from '@/store/useHabitStore';
 import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Lock, CheckCircle2, AlertTriangle, Shield } from 'lucide-react';
+import { X, Lock, CheckCircle2, AlertTriangle, Shield, Share2 } from 'lucide-react';
 
 interface SpecimenVaultDrawerProps {
   isOpen: boolean;
@@ -16,9 +16,10 @@ interface SpecimenVaultDrawerProps {
 type FilterCategory = 'all' | 'keystones' | 'streaks' | 'mastery' | 'shame';
 
 export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: SpecimenVaultDrawerProps) {
-  const { unlockedTrophies } = useHabitStore();
+  const { unlockedTrophies, trophyCounts } = useHabitStore();
   const [selectedTrophy, setSelectedTrophy] = useState<TrophyDefinition | null>(null);
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialSelectedId) {
@@ -180,6 +181,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                       trophyId={trophy.id}
                       tier={trophy.tier}
                       isUnlocked={isUnlocked}
+                      count={trophyCounts?.[trophy.id] || (isUnlocked ? 1 : 0)}
                       size={80}
                     />
                   </div>
@@ -252,67 +254,156 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                 trophyId={selectedTrophy.id}
                 tier={selectedTrophy.tier}
                 isUnlocked={unlockedTrophies.includes(selectedTrophy.id)}
+                count={trophyCounts?.[selectedTrophy.id] || (unlockedTrophies.includes(selectedTrophy.id) ? 1 : 0)}
                 size={340}
               />
             </div>
 
             {/* Right Side: Editorial Info & Lore */}
             <div className="flex-1 flex flex-col gap-4 text-left text-white max-w-lg">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90">
-                  {selectedTrophy.tier || (selectedTrophy.isShame ? 'Shame' : 'Standard')} Relic
-                </span>
-                {selectedTrophy.isShame && (
-                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" />
-                    <span>Satirical Shame</span>
-                  </span>
-                )}
-              </div>
+              {(() => {
+                const count = trophyCounts?.[selectedTrophy.id] || (unlockedTrophies.includes(selectedTrophy.id) ? 1 : 0);
+                const mastery = getTrophyMastery(count);
 
-              <div>
-                <h3 className="font-cabinet font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white leading-tight">
-                  {selectedTrophy.title}
-                </h3>
-                <p className="font-mono text-sm text-[#FCD34D] mt-1 font-semibold">
-                  {selectedTrophy.subtitle}
-                </p>
-              </div>
+                const handleShareTrophy = async () => {
+                  retroAudio.playInspectConfirm();
+                  haptics.tap();
+                  const shareText = `[Cyath Relic] ${selectedTrophy.title} (${mastery.label})\n${selectedTrophy.subtitle}\nDaily consistency on Cyath Sanctuary: https://cyath.space`;
 
-              <p className="font-sans text-sm sm:text-base text-white/80 leading-relaxed">
-                {selectedTrophy.description}
-              </p>
+                  if (typeof navigator !== 'undefined' && navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: `${selectedTrophy.title} · Cyath Relic`,
+                        text: shareText,
+                        url: typeof window !== 'undefined' ? window.location.origin : 'https://cyath.space',
+                      });
+                      return;
+                    } catch {}
+                  }
 
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/15 backdrop-blur-md flex flex-col gap-1 mt-2">
-                <span className="font-mono text-[11px] text-white/60 uppercase tracking-wider">
-                  Unlock Requirement
-                </span>
-                <span className="font-cabinet font-bold text-sm text-white">
-                  {selectedTrophy.unlockCondition}
-                </span>
-              </div>
+                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    try {
+                      await navigator.clipboard.writeText(shareText);
+                      setShareFeedback('Copied to clipboard!');
+                      setTimeout(() => setShareFeedback(null), 3000);
+                    } catch {}
+                  }
+                };
 
-              <div className="flex items-center gap-3 pt-2">
-                {unlockedTrophies.includes(selectedTrophy.id) ? (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-cabinet font-bold text-xs">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Unlocked &amp; Claimed</span>
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Locked Specimen</span>
-                  </div>
-                )}
+                return (
+                  <>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90">
+                        {selectedTrophy.tier || (selectedTrophy.isShame ? 'Shame' : 'Standard')} Relic
+                      </span>
+                      {unlockedTrophies.includes(selectedTrophy.id) && (
+                        <span className={`font-mono text-xs font-bold px-3 py-1 rounded-full border ${
+                          mastery.tier === 'gold'
+                            ? 'bg-amber-500/20 border-amber-400/50 text-amber-200'
+                            : mastery.tier === 'silver'
+                            ? 'bg-slate-300/20 border-slate-300/50 text-slate-100'
+                            : 'bg-white/10 border-white/20 text-amber-200/90'
+                        }`}>
+                          {mastery.label}
+                        </span>
+                      )}
+                      {selectedTrophy.isShame && (
+                        <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>Satirical Shame</span>
+                        </span>
+                      )}
+                    </div>
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedTrophy(null)}
-                  className="px-5 py-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white hover:text-[#1A3629] text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
-                >
-                  Back to Reliquary
-                </button>
-              </div>
+                    <div>
+                      <h3 className="font-cabinet font-extrabold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white leading-tight">
+                        {selectedTrophy.title}
+                      </h3>
+                      <p className="font-mono text-sm text-[#FCD34D] mt-1 font-semibold">
+                        {selectedTrophy.subtitle}
+                      </p>
+                    </div>
+
+                    <p className="font-sans text-sm sm:text-base text-white/80 leading-relaxed">
+                      {selectedTrophy.description}
+                    </p>
+
+                    {/* Mastery Multiplier Progression */}
+                    {unlockedTrophies.includes(selectedTrophy.id) && (
+                      <div className="p-3.5 rounded-2xl bg-white/5 border border-white/12 backdrop-blur-md flex flex-col gap-2">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-white/80 font-semibold">Mastery Multiplier:</span>
+                          <span className="text-amber-300 font-bold">
+                            {count}x Acquired · {mastery.multiplier}x Multiplier
+                          </span>
+                        </div>
+                        {mastery.nextThreshold ? (
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center justify-between text-[11px] font-mono text-white/60">
+                              <span>Next: {mastery.tier === 'standard' ? 'Silver (5x)' : 'Gold (20x)'}</span>
+                              <span>{count} / {mastery.nextThreshold}</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-black/40 overflow-hidden border border-white/10">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-300"
+                                style={{ width: `${mastery.progressToNext}%` }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] font-mono text-amber-300 font-bold">
+                            Maximum Gold Mastery Achieved (20x Multiplier Active)
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/15 backdrop-blur-md flex flex-col gap-1">
+                      <span className="font-mono text-[11px] text-white/60 uppercase tracking-wider">
+                        Unlock Requirement
+                      </span>
+                      <span className="font-cabinet font-bold text-sm text-white">
+                        {selectedTrophy.unlockCondition}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-2 flex-wrap">
+                      {unlockedTrophies.includes(selectedTrophy.id) ? (
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-cabinet font-bold text-xs">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Unlocked &amp; Claimed</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Locked Specimen</span>
+                        </div>
+                      )}
+
+                      {/* Share Trophy Button */}
+                      {unlockedTrophies.includes(selectedTrophy.id) && (
+                        <button
+                          type="button"
+                          onClick={handleShareTrophy}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-400/40 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-cabinet font-bold text-xs transition-colors cursor-pointer"
+                          title="Share Trophy"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span>{shareFeedback || 'Share Trophy'}</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTrophy(null)}
+                        className="px-5 py-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white hover:text-[#1A3629] text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
+                      >
+                        Back to Reliquary
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
           </div>

@@ -13,16 +13,34 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     element: '#tour-navigation',
     popover: {
       title: 'Navigation Hub',
-      description: 'Quickly switch between your Cockpit, Food Log, Playbook, and 7-Day Dossier.',
+      description: 'Quickly switch between your Cockpit, Food Log, Playbook, and Profile.',
       side: 'bottom',
       align: 'center',
     },
   },
   {
-    element: '#tour-living-sky',
+    element: '#tour-sanctuary-island',
     popover: {
       title: 'Living Sanctuary',
-      description: 'Your floating island grows and evolves as you stay consistent. Tap to view past biomes or share your sanctuary.',
+      description: 'Your floating island grows and evolves as you stay consistent. Watch chimney smoke drift and circadian lighting shift.',
+      side: 'bottom',
+      align: 'center',
+    },
+  },
+  {
+    element: '#tour-ledger-toggle',
+    popover: {
+      title: 'Station Switcher',
+      description: 'Toggle between your immersive Sanctuary Observatory and the rigorous Habit Ledger.',
+      side: 'bottom',
+      align: 'center',
+    },
+  },
+  {
+    element: '#tour-circadian-horizon',
+    popover: {
+      title: 'Circadian Horizon',
+      description: 'Real-time solar cadence and twilight progression calibrated to your natural circadian rhythm.',
       side: 'bottom',
       align: 'center',
     },
@@ -31,7 +49,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     element: '#tour-core-habits',
     popover: {
       title: 'Focus Habits',
-      description: 'Check off your 3 daily habits in seconds, plus quick morning and evening check-ins.',
+      description: 'Check off your daily keystone habits in seconds, plus quick morning and evening check-ins.',
       side: 'top',
       align: 'start',
     },
@@ -39,28 +57,19 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-fuel-anchor',
     popover: {
-      title: 'Daily Fuel Targets',
-      description: 'Tap quick presets or enter grams to ensure you hit your daily protein and water goals.',
+      title: 'Daily Fuel & Photo Scan',
+      description: 'Track protein and hydration targets, or tap Photo Scan to deconstruct whole-food meals with AI.',
       side: 'top',
       align: 'center',
     },
   },
   {
-    element: '#cockpit-log-button',
+    element: '#tour-specimen-vault',
     popover: {
-      title: 'Daily Nutrition Log',
-      description: 'Log whole-food dishes with natural text or camera photo scans with instant macro breakdowns.',
-      side: 'bottom',
+      title: 'Specimen Reliquary',
+      description: 'Inspect uniform pixel chalices, level up 5x Silver and 20x Gold masteries, and share your milestones.',
+      side: 'top',
       align: 'center',
-    },
-  },
-  {
-    element: '#tour-dossier-button',
-    popover: {
-      title: 'Weekly Dossier',
-      description: 'Track 7-day focus trends, afternoon slump reduction, and overall recovery scores.',
-      side: 'bottom',
-      align: 'end',
     },
   },
   {
@@ -75,7 +84,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-ai-coach',
     popover: {
-      title: 'StoveSage AI Coach',
+      title: 'Cyath AI Coach',
       description: 'Ask for personalized whole-food recipes, portion advice, or energy tips anytime.',
       side: 'top',
       align: 'end',
@@ -84,8 +93,8 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-nav-profile',
     popover: {
-      title: 'Sanctuary & Shields',
-      description: 'Check your streak freeze shields, invite friends to earn bonuses, and adjust account settings.',
+      title: 'Profile & Privacy',
+      description: 'Manage streak shields, view privacy and terms, and export your personal health ledger.',
       side: 'bottom',
       align: 'end',
     },

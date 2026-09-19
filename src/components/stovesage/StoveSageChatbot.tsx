@@ -111,12 +111,16 @@ export function StoveSageChatbot() {
     };
 
     window.addEventListener('open-ai-coach', handleOpenEvent);
+    window.addEventListener('cyath-ai-walkthrough-start', handleWalkthroughStart);
+    window.addEventListener('cyath-ai-walkthrough-end', handleWalkthroughEnd);
     window.addEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
     window.addEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('open-ai-coach', handleOpenEvent);
+      window.removeEventListener('cyath-ai-walkthrough-start', handleWalkthroughStart);
+      window.removeEventListener('cyath-ai-walkthrough-end', handleWalkthroughEnd);
       window.removeEventListener('stovesage-walkthrough-start', handleWalkthroughStart);
       window.removeEventListener('stovesage-walkthrough-end', handleWalkthroughEnd);
       window.removeEventListener('keydown', handleKeyDown);
@@ -473,7 +477,7 @@ export function StoveSageChatbot() {
   const todayLog = getDailyLog(currentDate);
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end pointer-events-auto select-none">
+    <div className="fixed bottom-20 md:bottom-5 right-4 md:right-5 z-40 flex flex-col items-end pointer-events-auto select-none">
       
       {/* Expanded Professional Coach Modal / Drawer */}
       {isOpen && (

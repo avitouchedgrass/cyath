@@ -26,7 +26,7 @@ Cyath eliminates tracking burnout and complex macro spreadsheets. Instead of req
 - **Omnivore**: Whole-food pasture-raised meats and poultry (e.g. Herb Grilled Chicken, Smoked Citrus Beef Taco Bowl, Homestyle Tariwala Chicken, Chettinad Pepper Chicken Kadai, Tawa Chicken Tikka, Sizzling Chicken Fajitas, Spanish Saffron Chicken Paella Skillet, Glazed Teriyaki Chicken Donburi, Tuscan Garlic Rosemary Steak, Greek Lemon Chicken Souvlaki, Seared Flank Steak with Herb Chimichurri).
 
 ## Key Terminology
-- **StoveSage / AI Coach**: The built-in nutrition and habit AI assistant that suggests meals and dashboard actions.
+- **Cyath AI Coach**: The built-in nutrition and habit AI assistant that suggests meals and dashboard actions.
 - **Floating Sanctuary**: The pixel-art island diorama that grows from Level 1 to Level 6+.
 - **Streak Freeze**: Automated rest day protector maintaining habit momentum without guilt.
 - **Focus Link Score**: The estimated metabolic score (e.g. 9.4/10) reflecting sustained cerebral energy without postprandial glucose crashes.

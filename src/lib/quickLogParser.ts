@@ -226,10 +226,10 @@ export function parseQuickLog(
     };
   }
 
-  if (['coach', 'stovesage', 'ask ai', 'ai coach'].includes(query)) {
+  if (['coach', 'cyath', 'cyath ai', 'ask ai', 'ai coach'].includes(query)) {
     return {
       type: 'TRIGGER_COACH',
-      title: 'Consult StoveSage AI Coach',
+      title: 'Consult Cyath AI Coach',
       description: 'Open conversational nutrition and habit advisor',
       badge: 'AI COACH',
       payload: {},
@@ -274,7 +274,7 @@ export function parseQuickLog(
   if (query.length >= 6 && query.includes(' ')) {
     return {
       type: 'AI_NATURAL_LANGUAGE',
-      title: `Parse with StoveSage · "${rawInput.trim()}"`,
+      title: `Parse with Cyath AI · "${rawInput.trim()}"`,
       description: `Extract meals, macros, or habits automatically with AI`,
       badge: 'AI FALLBACK',
       payload: { text: rawInput.trim() },

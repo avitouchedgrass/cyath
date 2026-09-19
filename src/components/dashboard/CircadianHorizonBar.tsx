@@ -67,7 +67,10 @@ export function CircadianHorizonBar() {
   };
 
   return (
-    <div className="w-full rounded-2xl border-2 border-[#1A3629] bg-[#FFFDF9] p-4 sm:p-5 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-3">
+    <div
+      id="tour-circadian-horizon"
+      className="w-full rounded-2xl border-2 border-[#1A3629] bg-[#FFFDF9] p-4 sm:p-5 shadow-[4px_4px_0px_#1A3629] flex flex-col gap-3"
+    >
       {/* Header Row: Phase Badge, Hours Since Wake, Alertness */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#1A3629]/15">
         <div className="flex items-center gap-2.5">

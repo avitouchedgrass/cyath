@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
-import { Gift, Bot, Compass, Utensils, BookOpen, FileText } from "lucide-react";
+import { Gift, Bot, Compass, Utensils, BookOpen, FileText, User } from "lucide-react";
 import { useScroll } from "framer-motion";
 
 interface HeaderNavProps {
@@ -51,7 +51,9 @@ function FloatingPillNav({
         memberNavItems.map((item) => {
           const isActive = item.id === 'playbook'
             ? pathname.startsWith('/playbook')
-            : pathname === '/dashboard' && (currentTab === item.id || (item.id === 'log' && currentTab === 'fuel'));
+            : item.id === 'log'
+            ? pathname === '/dashboard' && currentTab === 'fuel'
+            : pathname === '/dashboard' && currentTab !== 'fuel';
 
           return (
             <Link 
@@ -111,7 +113,11 @@ function MobileBottomDock({
         const IconComponent = item.icon;
         const isActive = item.id === 'playbook'
           ? pathname.startsWith('/playbook')
-          : pathname === '/dashboard' && (currentTab === item.id || (item.id === 'log' && currentTab === 'fuel'));
+          : item.id === 'profile'
+          ? pathname.startsWith('/profile')
+          : item.id === 'log'
+          ? pathname === '/dashboard' && currentTab === 'fuel'
+          : pathname === '/dashboard' && currentTab !== 'fuel';
 
         return (
           <Link
@@ -180,7 +186,15 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
   // Logged-in member navigation items
   const memberNavItems: NavItem[] = [
     { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
+    { name: "Log", href: "/dashboard?tab=fuel", id: "log", icon: Utensils },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
+  ];
+
+  const mobileMemberNavItems: NavItem[] = [
+    { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
+    { name: "Log", href: "/dashboard?tab=fuel", id: "log", icon: Utensils },
+    { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
+    { name: "Profile", href: "/profile", id: "profile", icon: User },
   ];
 
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
@@ -303,7 +317,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
       {/* Mobile Floating Bottom Dock for Logged-In Members */}
       {isLoggedIn && (
         <Suspense fallback={null}>
-          <MobileBottomDock memberNavItems={memberNavItems} />
+          <MobileBottomDock memberNavItems={mobileMemberNavItems} />
         </Suspense>
       )}
 

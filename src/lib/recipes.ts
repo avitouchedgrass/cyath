@@ -209,7 +209,7 @@ export const RECIPES: Recipe[] = [
     "instructions": [
       "Pound chicken breast to uniform 1/2-inch thickness for even searing.",
       "Rub chicken with olive oil, minced fresh herbs, sea salt, and black pepper.",
-      "Heat cast-iron pan to medium-high and sear chicken for 5–6 minutes per side until internal temp reaches 165°F.",
+      "Heat cast-iron pan to medium-high and sear chicken for 5-6 minutes per side until internal temp reaches 165°F.",
       "In the residual pan juices, toss spinach and arugula for 45 seconds until wilted.",
       "Slice chicken across the grain, serve atop greens with a fresh squeeze of lemon."
     ],
@@ -987,7 +987,7 @@ export const RECIPES: Recipe[] = [
     ],
     "instructions": [
       "Marinate chicken cubes with lemon juice, minced garlic, extra virgin olive oil, and Greek oregano.",
-      "Grill skewers over high heat for 8–10 minutes, rotating until charred and juicy.",
+      "Grill skewers over high heat for 8-10 minutes, rotating until charred and juicy.",
       "Warm pita on the grill for 30 seconds.",
       "Serve skewers alongside cold tzatziki, kalamata olives, and fresh cucumber slices."
     ],

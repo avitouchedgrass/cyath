@@ -7,7 +7,7 @@ import { CURATED_PROTOCOLS, ProtocolBlueprint } from '@/lib/protocols';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Plus, Check, Clock, Zap, Bot, Activity, Flame } from 'lucide-react';
+import { Plus, Check, Clock, Zap, Activity, Flame } from 'lucide-react';
 
 const PROTOCOL_CATEGORIES = ['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const;
 
@@ -123,119 +123,146 @@ function PlaybookContent() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredProtocols.map((proto) => {
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-7">
+              {filteredProtocols.map((proto, idx) => {
                 const isActive = activeProtocolIds.includes(proto.id);
+                const disciplineSeals: Record<string, { kanji: string; romaji: string; code: string }> = {
+                  Morning: { kanji: '朝', romaji: 'DAWN CADENCE', code: '01' },
+                  Focus: { kanji: '集', romaji: 'DEEP SPRINT', code: '02' },
+                  Sleep: { kanji: '眠', romaji: 'RESTORATION', code: '03' },
+                  Movement: { kanji: '動', romaji: 'POSTURE RESET', code: '04' },
+                };
+                const seal = disciplineSeals[proto.category] || { kanji: '規', romaji: 'PROTOCOL', code: `0${idx + 1}` };
 
                 return (
-                  <div
+                  <article
                     key={proto.id}
-                    className={`rounded-3xl border p-6 transition-all flex flex-col justify-between gap-5 shadow-[0_2px_12px_rgba(26,54,41,0.03)] ${
+                    className={`rounded-3xl border-2 p-6 sm:p-7 transition-all flex flex-col justify-between gap-6 relative overflow-hidden ${
                       isActive
-                        ? 'border-[#1A3629] bg-[#FAF8F5]'
-                        : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/25'
+                        ? 'border-[#1A3629] bg-[#FAF7F0] shadow-[0_12px_36px_rgba(26,54,41,0.08)] ring-1 ring-[#1A3629]/20'
+                        : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:border-[#1A3629]/35 hover:shadow-[0_10px_30px_rgba(26,54,41,0.05)]'
                     }`}
                   >
-                    <div className="flex flex-col gap-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md border border-[#1A3629]/30 bg-[#FAF6EE] text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]">
-                          {proto.category} Protocol
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
-                          +50 XP ON COMPLETION
-                        </span>
+                    {/* Top Architectural Header */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        {/* Woodblock Discipline Seal */}
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-[#C2410C]/10 border border-[#C2410C]/30 text-[#C2410C] flex items-center justify-center font-bold text-sm select-none shrink-0 shadow-2xs">
+                            <span>{seal.kanji}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-mono text-[10px] font-bold tracking-widest text-[#1A3629] uppercase">
+                              DOC № {seal.code} · {proto.category}
+                            </span>
+                            <span className="font-mono text-[9px] text-[#4A5D4E] tracking-wider uppercase">
+                              {seal.romaji}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Gold Wax Mint Badge */}
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A3629] border border-amber-400/40 text-amber-200 font-mono text-[10px] font-bold shadow-xs">
+                          <span className="text-amber-400">✦</span>
+                          <span>+50 XP MINT</span>
+                        </div>
                       </div>
 
-                      <div className="flex flex-col gap-1">
-                        <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
+                      {/* Title & Short Summary */}
+                      <div className="flex flex-col gap-1.5 pt-1">
+                        <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight leading-snug">
                           {proto.name}
-                        </h3>
-                        <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed">
+                        </h2>
+                        <p className="font-sans text-xs sm:text-[13px] text-[#2C4A3B] leading-relaxed">
                           {proto.shortSummary}
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3 font-mono text-xs text-[#4A5D4E]">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{proto.timeframe}</span>
+                      {/* Biological Mechanism Callout */}
+                      <div className="p-3 rounded-2xl bg-[#F4EDE0]/60 border-l-4 border-[#1A3629] text-xs font-sans text-[#1A3629] leading-relaxed">
+                        <span className="font-bold">Mechanism: </span>
+                        <span>{proto.whyItWorks}</span>
+                      </div>
+
+                      {/* Anchor Window & Cadence */}
+                      <div className="flex items-center gap-3 font-mono text-xs text-[#4A5D4E] bg-[#FFFDF9]/60 px-3 py-2 rounded-xl border border-[#1A3629]/10">
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-[#1A3629]" />
+                          <span className="font-bold text-[#1A3629]">{proto.timeframe}</span>
                         </span>
                         <span>·</span>
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1.5">
                           <Zap className="w-3.5 h-3.5 text-amber-600" />
                           <span>Calibrated Anchor</span>
                         </span>
                       </div>
 
-                      {/* Habits Included in Protocol */}
-                      <div className="flex flex-col gap-2 pt-2 border-t border-[#1A3629]/10">
-                        <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                          Protocol Anchors ({proto.habits.length}):
-                        </span>
-                        <div className="flex flex-col gap-1.5">
-                          {proto.habits.map((h, idx) => (
+                      {/* Protocol Anchors */}
+                      <div className="flex flex-col gap-2 pt-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-cabinet font-bold text-xs text-[#1A3629] uppercase tracking-wider">
+                            Protocol Anchors ({proto.habits.length})
+                          </span>
+                          <span className="font-mono text-[10px] text-[#4A5D4E]">
+                            Sequential Order
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          {proto.habits.map((h, stepIdx) => (
                             <div
-                              key={idx}
-                              className="flex items-center gap-2 p-2 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/8 text-xs font-mono text-[#1A3629]"
+                              key={stepIdx}
+                              className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/10 text-xs font-mono transition-colors hover:bg-[#F4F0EA]"
                             >
-                              <span className="w-4 h-4 rounded-full bg-[#1A3629]/10 flex items-center justify-center text-[10px] font-bold text-[#1A3629]">
-                                {idx + 1}
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-5 h-5 rounded-full bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs">
+                                  {stepIdx + 1}
+                                </span>
+                                <span className="font-bold text-[#1A3629]">{h.title}</span>
+                              </div>
+                              <span className="text-[10px] font-sans font-medium text-[#4A5D4E] bg-[#FFFDF9] px-2 py-0.5 rounded-md border border-[#1A3629]/10 shrink-0">
+                                {h.hint}
                               </span>
-                              <span className="font-bold">{h.title}</span>
-                              <span className="text-[10px] text-[#4A5D4E] ml-auto">({h.hint})</span>
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-[#1A3629]/15 flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-[#1A3629]/70">
-                        {proto.habits.length} Actions · Steady Focus
-                      </span>
+                    {/* Footer Actions */}
+                    <div className="pt-4 border-t border-[#1A3629]/15 flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-1.5 font-mono text-xs text-[#4A5D4E]">
+                        <Activity className="w-3.5 h-3.5 text-[#1A3629]" />
+                        <span>{proto.habits.length} Actions · Steady Focus</span>
+                      </div>
 
                       <button
                         type="button"
                         onClick={(e) => handleToggleProtocol(proto, e)}
-                        className={`px-4 py-2 rounded-full font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                        className={`px-5 py-2.5 rounded-2xl font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-xs select-none ${
                           isActive
-                            ? 'bg-[#1A3629] text-[#FFFDF9]'
-                            : 'bg-[#FAF8F5] border border-[#1A3629]/15 text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+                            ? 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B]'
+                            : 'bg-[#FFFDF9] border-2 border-[#1A3629] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
                         }`}
                       >
                         {isActive ? (
                           <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Active in Cockpit</span>
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Inscribed in Cockpit</span>
                           </>
                         ) : (
                           <>
                             <Plus className="w-3.5 h-3.5" />
-                            <span>Add to Cockpit</span>
+                            <span>Inscribe into Cockpit</span>
                           </>
                         )}
                       </button>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
           )}
-        </div>
-
-        {/* Floating AI Assistant Action */}
-        <div className="fixed bottom-6 right-6 z-40">
-          <button
-            type="button"
-            onClick={() => {
-              retroAudio.playInspectConfirm();
-              window.dispatchEvent(new CustomEvent('open-ai-coach'));
-            }}
-            className="px-4 py-2.5 rounded-full border border-[#1A3629]/15 bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-2xs transition-all cursor-pointer flex items-center gap-2 select-none"
-          >
-            <Bot className="w-4 h-4 text-[#C9A84C]" />
-            <span>Ask Sanctuary Guide AI</span>
-          </button>
         </div>
       </main>
     </div>

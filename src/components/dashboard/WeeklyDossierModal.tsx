@@ -169,7 +169,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
                   }`}
                 />
                 <span className="font-mono text-[10px] font-semibold text-[#1A3629]">
-                  {d.slumpScore !== undefined ? `${d.slumpScore}/10` : '—'}
+                  {d.slumpScore !== undefined ? `${d.slumpScore}/10` : '-'}
                 </span>
               </div>
             ))}

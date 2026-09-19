@@ -341,7 +341,7 @@ export function OmniDock() {
           </button>
         </div>
 
-        {/* Dedicated live parser detection preview row — eliminates any text collision */}
+        {/* Dedicated live parser detection preview row - eliminates any text collision */}
         {parsedCmd && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#ECFDF5] border border-[#10B981]/40 text-xs font-mono text-[#065F46] font-bold animate-in fade-in duration-150">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />

@@ -455,6 +455,7 @@ export interface HabitStoreState {
   isReentryAvailable: boolean;
   isLedgerSealedByDate: Record<string, boolean>;
   unlockedTrophies: string[];
+  trophyCounts: Record<string, number>;
   pendingTrophyUnlock: TrophyDefinition | null;
 
   setCircadianSchedule: (wakeTime: string, bedTime: string) => void;
@@ -462,8 +463,46 @@ export interface HabitStoreState {
   sealDailyLedger: (date?: string) => { success: boolean; xpAwarded: number };
   activateReentryProtocol: (date?: string) => { success: boolean; message: string };
   unlockTrophy: (trophyId: string) => boolean;
+  incrementTrophyCount: (trophyId: string) => void;
   dismissPendingTrophy: () => void;
   evaluateTrophies: (date?: string) => void;
+}
+
+export type TrophyMastery = 'standard' | 'silver' | 'gold';
+
+export function getTrophyMastery(count: number): {
+  tier: TrophyMastery;
+  multiplier: number;
+  label: string;
+  nextThreshold: number | null;
+  progressToNext: number;
+} {
+  const safeCount = Math.max(1, count || 1);
+  if (safeCount >= 20) {
+    return {
+      tier: 'gold',
+      multiplier: 20,
+      label: 'Gold Mastery (20x)',
+      nextThreshold: null,
+      progressToNext: 100,
+    };
+  }
+  if (safeCount >= 5) {
+    return {
+      tier: 'silver',
+      multiplier: 5,
+      label: 'Silver Mastery (5x)',
+      nextThreshold: 20,
+      progressToNext: Math.round(((safeCount - 5) / 15) * 100),
+    };
+  }
+  return {
+    tier: 'standard',
+    multiplier: 1,
+    label: 'Standard Tier (1x)',
+    nextThreshold: 5,
+    progressToNext: Math.round((safeCount / 5) * 100),
+  };
 }
 
 const getTodayString = () => formatLocalDate();
@@ -502,6 +541,7 @@ interface UserLocalProgressData {
   isForgedStreak?: boolean;
   isLedgerSealedByDate?: Record<string, boolean>;
   unlockedTrophies?: string[];
+  trophyCounts?: Record<string, number>;
 }
 
 const DEFAULT_SOCIAL_QUESTS: SocialQuestsState = {
@@ -541,6 +581,7 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       isForgedStreak: typeof data.isForgedStreak === 'boolean' ? data.isForgedStreak : (existing.isForgedStreak ?? false),
       isLedgerSealedByDate: data.isLedgerSealedByDate && typeof data.isLedgerSealedByDate === 'object' ? data.isLedgerSealedByDate : (existing.isLedgerSealedByDate ?? {}),
       unlockedTrophies: Array.isArray(data.unlockedTrophies) ? data.unlockedTrophies : (existing.unlockedTrophies ?? []),
+      trophyCounts: data.trophyCounts && typeof data.trophyCounts === 'object' ? data.trophyCounts : (existing.trophyCounts ?? {}),
     };
     localStorage.setItem(`cyath_user_progression_${userId}`, JSON.stringify(merged));
   } catch {}
@@ -553,7 +594,25 @@ const getUserLocalProgress = (userId: string): UserLocalProgressData | null => {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
-    return parsed;
+    return {
+      totalXp: typeof parsed.totalXp === 'number' && Number.isFinite(parsed.totalXp) ? Math.max(0, parsed.totalXp) : 0,
+      streakCount: typeof parsed.streakCount === 'number' && Number.isFinite(parsed.streakCount) ? Math.max(0, parsed.streakCount) : 0,
+      streakFreezeStock: typeof parsed.streakFreezeStock === 'number' && Number.isFinite(parsed.streakFreezeStock) ? Math.max(0, parsed.streakFreezeStock) : 1,
+      claimedMilestones: Array.isArray(parsed.claimedMilestones) ? parsed.claimedMilestones : [],
+      completedQuestIdsByDate: parsed.completedQuestIdsByDate && typeof parsed.completedQuestIdsByDate === 'object' ? parsed.completedQuestIdsByDate : {},
+      xpHistory: Array.isArray(parsed.xpHistory) ? parsed.xpHistory : [],
+      logsByDate: parsed.logsByDate && typeof parsed.logsByDate === 'object' ? parsed.logsByDate : {},
+      customRecipes: Array.isArray(parsed.customRecipes) ? parsed.customRecipes : [],
+      userProfile: parsed.userProfile !== undefined ? parsed.userProfile : null,
+      habits: Array.isArray(parsed.habits) && parsed.habits.length > 0 ? parsed.habits : DEFAULT_HABITS,
+      claimedDossiersByWeek: parsed.claimedDossiersByWeek && typeof parsed.claimedDossiersByWeek === 'object' ? parsed.claimedDossiersByWeek : {},
+      weightHistory: Array.isArray(parsed.weightHistory) ? parsed.weightHistory : [],
+      socialQuests: parsed.socialQuests && typeof parsed.socialQuests === 'object' ? parsed.socialQuests : DEFAULT_SOCIAL_QUESTS,
+      isForgedStreak: typeof parsed.isForgedStreak === 'boolean' ? parsed.isForgedStreak : false,
+      isLedgerSealedByDate: parsed.isLedgerSealedByDate && typeof parsed.isLedgerSealedByDate === 'object' ? parsed.isLedgerSealedByDate : {},
+      unlockedTrophies: Array.isArray(parsed.unlockedTrophies) ? parsed.unlockedTrophies : [],
+      trophyCounts: parsed.trophyCounts && typeof parsed.trophyCounts === 'object' ? parsed.trophyCounts : {},
+    };
   } catch {
     return null;
   }
@@ -589,6 +648,7 @@ export const useHabitStore = create<HabitStoreState>()(
       isReentryAvailable: false,
       isLedgerSealedByDate: {},
       unlockedTrophies: [],
+      trophyCounts: {},
       pendingTrophyUnlock: null,
 
       setDate: (date) => set({ currentDate: date }),
@@ -2228,11 +2288,17 @@ export const useHabitStore = create<HabitStoreState>()(
           get().updateUserProfile({ weightKg: newEntry.weightKg });
         }
 
-        // Award XP if first weigh-in of the day
-        const alreadyWeighedToday = currentHistory.some((e) => e.date === targetDate);
+        // Award XP on a weekly cadence (at most once every 7 days)
+        const targetMs = new Date(targetDate).getTime() || Date.now();
+        const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+        const hasWeighedInLastWeek = currentHistory.some((e) => {
+          const entryTime = e.date ? new Date(e.date).getTime() : e.timestamp;
+          return Math.abs(targetMs - entryTime) < ONE_WEEK_MS;
+        });
+
         let xpAwarded = 0;
-        if (!alreadyWeighedToday) {
-          get().gainXp(15, 'Biometric Calibration: Daily Weight Checked', 'weight_log');
+        if (!hasWeighedInLastWeek) {
+          get().gainXp(15, 'Biometric Calibration: Weekly Weight Checked', 'weight_log');
           xpAwarded = 15;
           retroAudio.playTierUpgrade();
         } else {
@@ -2511,15 +2577,54 @@ export const useHabitStore = create<HabitStoreState>()(
 
       unlockTrophy: (trophyId: string) => {
         const currentUnlocked = get().unlockedTrophies;
-        if (currentUnlocked.includes(trophyId)) return false;
+        const currentCounts = get().trophyCounts || {};
         const trophy = TROPHIES_ROSTER.find((t) => t.id === trophyId);
         if (!trophy) return false;
+
+        const isNewUnlock = !currentUnlocked.includes(trophyId);
+        const newCount = (currentCounts[trophyId] || (isNewUnlock ? 0 : 1)) + 1;
+        const updatedCounts = { ...currentCounts, [trophyId]: newCount };
+        const updatedUnlocked = isNewUnlock ? [...currentUnlocked, trophyId] : currentUnlocked;
+
         set({
-          unlockedTrophies: [...currentUnlocked, trophyId],
-          pendingTrophyUnlock: trophy,
+          unlockedTrophies: updatedUnlocked,
+          trophyCounts: updatedCounts,
+          pendingTrophyUnlock: isNewUnlock ? trophy : get().pendingTrophyUnlock,
         });
-        get().gainXp(50, `Trophy Unlocked: ${trophy.title}`, 'trophy');
-        return true;
+
+        if (isNewUnlock) {
+          get().gainXp(50, `Trophy Unlocked: ${trophy.title}`, 'trophy');
+        } else if (newCount === 5) {
+          get().gainXp(150, `Silver Mastery (5x Multiplier): ${trophy.title}`, 'trophy');
+        } else if (newCount === 20) {
+          get().gainXp(500, `Gold Mastery (20x Multiplier): ${trophy.title}`, 'trophy');
+        }
+        return isNewUnlock;
+      },
+
+      incrementTrophyCount: (trophyId: string) => {
+        const currentCounts = get().trophyCounts || {};
+        const currentUnlocked = get().unlockedTrophies;
+        const trophy = TROPHIES_ROSTER.find((t) => t.id === trophyId);
+        if (!trophy) return;
+
+        const isNewUnlock = !currentUnlocked.includes(trophyId);
+        const newCount = (currentCounts[trophyId] || (isNewUnlock ? 0 : 1)) + 1;
+        const updatedCounts = { ...currentCounts, [trophyId]: newCount };
+        const updatedUnlocked = isNewUnlock ? [...currentUnlocked, trophyId] : currentUnlocked;
+
+        set({
+          unlockedTrophies: updatedUnlocked,
+          trophyCounts: updatedCounts,
+        });
+
+        if (isNewUnlock) {
+          get().gainXp(50, `Trophy Unlocked: ${trophy.title}`, 'trophy');
+        } else if (newCount === 5) {
+          get().gainXp(150, `Silver Mastery (5x Multiplier): ${trophy.title}`, 'trophy');
+        } else if (newCount === 20) {
+          get().gainXp(500, `Gold Mastery (20x Multiplier): ${trophy.title}`, 'trophy');
+        }
       },
 
       dismissPendingTrophy: () => {
@@ -2631,6 +2736,7 @@ export const useHabitStore = create<HabitStoreState>()(
             isForgedStreak: state.isForgedStreak,
             isLedgerSealedByDate: state.isLedgerSealedByDate,
             unlockedTrophies: state.unlockedTrophies,
+            trophyCounts: state.trophyCounts,
           };
         }
         return state;

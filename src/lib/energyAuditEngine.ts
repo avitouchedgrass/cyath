@@ -87,7 +87,7 @@ export function calculateEnergyAudit(answers: EnergyAuditAnswers): EnergyAuditRe
       title: 'Midday Whole-Food Protein Anchor',
       protocolId: 'midday-protein-anchor',
       mechanism:
-        'Replaces heavy starches with 30–40g protein to prevent blood sugar spikes and afternoon sluggishness.',
+        'Replaces heavy starches with 30-40g protein to prevent blood sugar spikes and afternoon sluggishness.',
       expectedGainHours: 1.0,
     };
     secondaryLevers.push('Post-Lunch 10-Minute Walk', 'Evening Screen Dimming');

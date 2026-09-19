@@ -327,7 +327,7 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: '✦',
-      title: 'Consult StoveSage AI Coach',
+      title: 'Consult Cyath AI Coach',
       description: 'Ask meal ideas or habit recommendations',
       badge: 'COACH',
       action: () => {
@@ -485,7 +485,7 @@ export function CommandPalette() {
   // AI Natural Language Fallback
   const executeAiNaturalLanguage = async (text: string) => {
     setIsAiLoading(true);
-    setFeedbackMessage('Consulting StoveSage natural language parser...');
+    setFeedbackMessage('Consulting Cyath AI natural language parser...');
     try {
       const response = await fetch('/api/ai/stovesage', {
         method: 'POST',
@@ -531,7 +531,7 @@ export function CommandPalette() {
 
         retroAudio.playInspectConfirm();
         xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 12);
-        setFeedbackMessage(`Logged ${appliedCount} action(s) via StoveSage Intelligence`);
+        setFeedbackMessage(`Logged ${appliedCount} action(s) via Cyath AI Intelligence`);
         setTimeout(() => setIsOpen(false), 900);
       } else {
         setFeedbackMessage(data.reply ? `Advice: ${data.reply.slice(0, 70)}...` : 'Log processed.');
@@ -645,7 +645,7 @@ export function CommandPalette() {
             <div className="px-5 py-2.5 bg-[#FAF6EE] border-b border-[#1A3629]/10 flex items-center justify-between text-xs font-mono text-[#1A3629]">
               <span className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#1A3629] animate-pulse" />
-                {feedbackMessage || 'Consulting StoveSage AI intelligence...'}
+                {feedbackMessage || 'Consulting Cyath AI intelligence...'}
               </span>
               {isAiLoading && <span className="opacity-60 uppercase tracking-widest text-[10px]">PARSING</span>}
             </div>
@@ -702,7 +702,7 @@ export function CommandPalette() {
                   NO EXACT MATCH
                 </div>
                 <p className="font-cabinet text-sm text-[#1A3629]/70">
-                  Type a natural language log (e.g. &ldquo;ate 3 eggs and toast&rdquo;) to parse with StoveSage.
+                  Type a natural language log (e.g. &ldquo;ate 3 eggs and toast&rdquo;) to parse with Cyath AI.
                 </p>
               </div>
             ) : (

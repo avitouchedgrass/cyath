@@ -111,6 +111,7 @@ export function SanctuaryObservatory({
       {/* Leftmost Sideways Toggle Arrow Handle - Pushed to Screen Edge */}
       {/* ------------------------------------------------------------- */}
       <button
+        id="tour-ledger-toggle"
         type="button"
         onClick={() => {
           retroAudio.playPaperRustle();
@@ -132,7 +133,7 @@ export function SanctuaryObservatory({
       {/* ------------------------------------------------------------- */}
       {/* VIEW B: Monumental Living Island (Default Unboxed View) */}
       {/* ------------------------------------------------------------- */}
-      <div className="w-full flex-1 flex flex-col justify-between gap-2">
+      <div id="tour-sanctuary-island" className="w-full flex-1 flex flex-col justify-between gap-2">
         {/* Top: Compact Title (Streak pill removed per design directive) */}
         <div className="flex flex-col items-center text-center gap-1 pt-1">
           <h1 className="font-cabinet font-black text-xl sm:text-2xl lg:text-3xl tracking-tight text-[#1A3629]">

@@ -16,10 +16,13 @@ import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
 import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfloor';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
+import { PixelStreakFlame } from '@/components/ui/PixelStreakFlame';
 import {
   Volume2,
   VolumeX,
   X,
+  Compass,
+  Zap,
 } from 'lucide-react';
 
 function DashboardContent() {
@@ -216,27 +219,7 @@ function DashboardContent() {
                     : `${streakCount} Day Habit Momentum Streak`
                 }
               >
-                {isForgedStreak ? (
-                  <div className="w-5 h-5 relative">
-                    <Image
-                      src="/assets/trophies/flame_iron.png"
-                      alt="Forged Flame"
-                      fill
-                      className="object-contain select-none"
-                      style={{ imageRendering: 'pixelated' }}
-                    />
-                  </div>
-                ) : (
-                  <div className="w-5 h-5 relative">
-                    <Image
-                      src="/assets/trophies/flame_normal.png"
-                      alt="Streak Flame"
-                      fill
-                      className="object-contain select-none"
-                      style={{ imageRendering: 'pixelated' }}
-                    />
-                  </div>
-                )}
+                <PixelStreakFlame isForged={isForgedStreak} size={18} />
                 <span className="font-cabinet font-extrabold text-xs text-[#1A3629]">
                   {streakCount} {streakCount === 1 ? 'Day' : 'Days'} {isForgedStreak ? 'Forged' : ''}
                 </span>
@@ -323,7 +306,8 @@ function DashboardContent() {
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span>🏝️</span> Sanctuary Island
+            <Compass className="w-3.5 h-3.5 shrink-0" />
+            <span>Sanctuary Island</span>
           </button>
 
           <button
@@ -342,7 +326,8 @@ function DashboardContent() {
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span>⚡</span> Daily Console
+            <Zap className="w-3.5 h-3.5 shrink-0" />
+            <span>Daily Console</span>
           </button>
         </div>
 

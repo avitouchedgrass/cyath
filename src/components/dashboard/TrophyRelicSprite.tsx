@@ -8,6 +8,7 @@ export interface TrophyRelicSpriteProps {
   trophyId: string;
   tier?: TrophyTier;
   isUnlocked?: boolean;
+  count?: number;
   size?: number; // size in px, defaults to 80
   className?: string;
 }
@@ -82,12 +83,21 @@ export function TrophyRelicSprite({
   trophyId,
   tier = 'Gold',
   isUnlocked = true,
+  count,
   size = 80,
   className = '',
 }: TrophyRelicSpriteProps) {
   // If not unlocked, use the Locked Stone Gray palette and the Padlock emblem
   const activeTier: TrophyTier = isUnlocked ? tier : 'Locked';
   const palette = TIER_PALETTES[activeTier] || TIER_PALETTES.Gold;
+
+  const safeCount = count && count > 0 ? count : (isUnlocked ? 1 : 0);
+  const isSilverMastery = safeCount >= 5 && safeCount < 20;
+  const isGoldMastery = safeCount >= 20;
+
+  const badgeBorder = isGoldMastery ? '#F59E0B' : isSilverMastery ? '#CBD5E1' : '#B45309';
+  const badgeFill = isGoldMastery ? '#451A03' : isSilverMastery ? '#1E293B' : '#1C1917';
+  const badgeText = isGoldMastery ? '#FDE047' : isSilverMastery ? '#F8FAFC' : '#FDBA74';
 
   return (
     <svg
@@ -200,6 +210,39 @@ export function TrophyRelicSprite({
 
         {/* Distinct Emblem Inside Center Medallion */}
         {renderTrophyAmulet(isUnlocked ? trophyId : 'locked', palette)}
+
+        {/* Small Pixelated Circle Badge: Acquisition Multiplier Count */}
+        {isUnlocked && safeCount > 0 && (
+          <g>
+            {/* Pill / Circular Plate on Plinth Base */}
+            <rect x="41" y="47" width="18" height="12" rx="3" fill="#000000" opacity="0.6" />
+            <rect
+              x="40"
+              y="46"
+              width="18"
+              height="12"
+              rx="3"
+              fill={badgeFill}
+              stroke={badgeBorder}
+              strokeWidth="1.2"
+            />
+            {(isGoldMastery || isSilverMastery) && (
+              <rect x="41" y="47" width="2" height="1" fill="#FFFFFF" opacity="0.8" />
+            )}
+            <text
+              x="49"
+              y="54.5"
+              textAnchor="middle"
+              fill={badgeText}
+              fontSize="6"
+              fontFamily="monospace"
+              fontWeight="bold"
+              letterSpacing="-0.5"
+            >
+              {`x${safeCount}`}
+            </text>
+          </g>
+        )}
       </g>
     </svg>
   );

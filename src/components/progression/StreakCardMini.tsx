@@ -64,7 +64,7 @@ export function StreakCardMini() {
               {day.label}
             </span>
             <span className="font-mono text-xs font-bold leading-none mt-1">
-              {day.hasActivity ? '✓' : day.isToday ? '·' : '—'}
+              {day.hasActivity ? '✓' : day.isToday ? '·' : '-'}
             </span>
           </div>
         ))}

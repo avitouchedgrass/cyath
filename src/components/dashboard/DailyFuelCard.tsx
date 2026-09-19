@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, Camera } from 'lucide-react';
 import { PixelMealPlate } from '@/components/dashboard/PixelMealPlate';
+import { PhotoMealScannerModal } from '@/components/dashboard/PhotoMealScannerModal';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -38,6 +39,7 @@ export function DailyFuelCard({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [weightError, setWeightError] = useState<string | null>(null);
   const [isMealsExpanded, setIsMealsExpanded] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   // Weight check-in state
   const [isEditingWeight, setIsEditingWeight] = useState(false);
@@ -143,13 +145,32 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4">
+    <div
+      id="tour-fuel-anchor"
+      className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4"
+    >
       
       {/* 1. Title & Header */}
       <div className="flex items-center justify-between pb-1">
-        <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
-          Log Food
-        </h3>
+        <div className="flex items-center gap-2.5">
+          <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
+            Log Food
+          </h3>
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playBlip();
+              haptics.tap();
+              setIsPhotoModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#1A3629]/15 bg-[#FAF6EE] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] text-[11px] font-cabinet font-bold transition-all cursor-pointer shadow-2xs group select-none"
+            title="Scan whole-food plate with camera photo"
+            aria-label="Scan meal photo"
+          >
+            <Camera className="w-3.5 h-3.5 text-[#059669] group-hover:text-[#FFFDF9] transition-colors" />
+            <span>Scan Photo</span>
+          </button>
+        </div>
         <span className="font-mono text-xs font-bold text-[#1A3629]">
           {percent}% Target
         </span>
@@ -359,6 +380,12 @@ export function DailyFuelCard({
           </button>
         )}
       </div>
+
+      {/* Photo Meal Scanner Modal */}
+      <PhotoMealScannerModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+      />
     </div>
   );
 }

@@ -22,13 +22,13 @@ export function StoveSageBriefingCard() {
 
   return (
     <section 
-      aria-label="StoveSage Daily Intelligence Briefing"
+      aria-label="Cyath AI Daily Intelligence Briefing"
       className="w-full border-2 border-[#1A3629] bg-[#FFFDF9] rounded-2xl p-5 shadow-[3px_3px_0px_#1A3629] flex flex-col gap-4 transition-all"
     >
       <div className="flex items-start justify-between gap-3 border-b border-[#1A3629]/15 pb-3">
         <div>
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] block mb-0.5">
-            StoveSage · Intelligence Briefing
+            Cyath AI · Intelligence Briefing
           </span>
           <h3 className="font-cabinet font-bold text-lg text-[#1A3629] leading-tight">
             {briefing.greeting}

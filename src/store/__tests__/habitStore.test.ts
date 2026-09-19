@@ -483,10 +483,17 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(result2.success).toBe(true);
     expect(result2.deltaKg).toBe(0.4);
     expect(result2.trend).toBe('up');
-    // Already weighed today, so no duplicate XP
+    // Already weighed this week, so no duplicate XP
     expect(result2.xpAwarded).toBe(0);
     expect(useHabitStore.getState().totalXp).toBe(initialXp + 15);
     expect(useHabitStore.getState().userProfile?.weightKg).toBe(74.8);
+
+    // Third weigh-in 8 days later: eligible for next weekly calibration XP
+    const nextWeekDate = '2026-09-28';
+    const result3 = useHabitStore.getState().logWeight(74.2, 'next week weigh-in', nextWeekDate);
+    expect(result3.success).toBe(true);
+    expect(result3.xpAwarded).toBe(15);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 30);
   });
 
   it('claims social follow rewards for LinkedIn and Instagram with foolproof non-repeatable anti-duplication', () => {

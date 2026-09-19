@@ -46,6 +46,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         title: 'Morning Light',
         subtitle: '10–20 mins outside (wake up your eyes)',
         isDone: !!currentLog.habitsCompleted?.['sunlight'],
+        statusLabel: !!currentLog.habitsCompleted?.['sunlight'] ? 'Completed' : 'Pending',
       },
       {
         id: 'hydration',
@@ -53,13 +54,17 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         title: 'Hydration Target',
         subtitle: `${(currentLog.hydrationLiters || 0).toFixed(1)}L / 2.5L logged (sip up!)`,
         isDone: (currentLog.hydrationLiters || 0) >= 2.5 || !!currentLog.habitsCompleted?.['hydration'],
+        statusLabel: (currentLog.hydrationLiters || 0) >= 2.5 || !!currentLog.habitsCompleted?.['hydration'] ? 'Completed' : 'Pending',
       },
       {
         id: 'protein_target',
         keyNumber: 3,
         title: 'Whole-Food Protein',
-        subtitle: `${currentProtein}g / ${targetProtein}g daily target (fuel for focus)`,
-        isDone: isProteinMet || !!currentLog.habitsCompleted?.['protein_target'],
+        subtitle: isProteinMet
+          ? `${currentProtein}g / ${targetProtein}g daily target (floor secured)`
+          : `${currentProtein}g / ${targetProtein}g daily target (${targetProtein - currentProtein}g to floor)`,
+        isDone: isProteinMet,
+        statusLabel: isProteinMet ? 'Completed' : currentProtein > 0 ? `${currentProtein}g Logged` : 'Pending',
       },
     ];
 
@@ -70,6 +75,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         title: customDefinition.title,
         subtitle: 'Custom power lever',
         isDone: !!currentLog.habitsCompleted?.[customDefinition.id],
+        statusLabel: !!currentLog.habitsCompleted?.[customDefinition.id] ? 'Completed' : 'Pending',
       });
     }
 
@@ -81,6 +87,18 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   }, [displayHabits]);
 
   const handleToggle = useCallback((habitId: string, event?: React.MouseEvent) => {
+    // If user clicks protein habit while not yet met, jump focus to the fuel input
+    if (habitId === 'protein_target' && !isProteinMet) {
+      haptics.tap();
+      retroAudio.playBlip();
+      const input = document.getElementById('natural-meal-input');
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     const isDone = !!currentLog.habitsCompleted?.[habitId];
     haptics.tap();
 
@@ -100,7 +118,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       retroAudio.playBlip();
     }
     toggleHabit(habitId, currentDate);
-  }, [currentLog.habitsCompleted, completedCount, displayHabits.length, toggleHabit, currentDate]);
+  }, [currentLog.habitsCompleted, completedCount, displayHabits.length, toggleHabit, currentDate, isProteinMet]);
 
   // Keyboard Shortcuts: 1, 2, 3, 4
   useEffect(() => {
@@ -141,12 +159,10 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
-      {/* Habits Card Surface */}
-      <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-5 animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+      {/* Card Header & Circadian Schedule */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
               Daily Anchors
@@ -155,10 +171,17 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               <button
                 type="button"
                 onClick={onOpenSchedule}
-                className="font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] mt-0.5 text-left cursor-pointer transition-colors"
+                className="mt-0.5 text-left cursor-pointer transition-colors group"
                 title="Click to calibrate wake/sleep schedule (+25 XP)"
               >
-                Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'} <span className="underline decoration-dotted text-[10px]">edit</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
+                    Wake {userProfile?.wakeTime || '07:30'} ⇄ Sleep {userProfile?.bedTime || '23:30'}
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-md bg-[#1A3629]/8 group-hover:bg-[#1A3629] text-[#1A3629] group-hover:text-[#FFFDF9] text-[9px] font-cabinet font-bold uppercase tracking-wider transition-colors">
+                    Edit
+                  </span>
+                </div>
               </button>
             ) : (
               <span className="font-mono text-[11px] text-[#4A5D4E] mt-0.5">
@@ -173,63 +196,64 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             <span>{displayHabits.length} Complete</span>
           </div>
         </div>
+      </div>
 
-        {/* 1-Tap Habit Buttons */}
-        <div className="flex flex-col gap-2">
-          {displayHabits.map((habit) => {
-            const isDone = habit.isDone;
+      {/* 1-Tap Habit Buttons */}
+      <div className="flex flex-col gap-2">
+        {displayHabits.map((habit) => {
+          const isDone = habit.isDone;
 
-            return (
-              <button
-                key={habit.id}
-                type="button"
-                onClick={(e) => handleToggle(habit.id, e)}
-                className={`w-full p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 text-left group active:scale-[0.99] ${
-                  isDone
-                    ? 'border-[#1A3629]/15 bg-[#FAF8F5]/80 text-[#1A3629]'
-                    : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5] shadow-[0_2px_8px_rgba(26,54,41,0.02)]'
-                }`}
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className={`w-7 h-7 rounded-lg border transition-all duration-200 flex items-center justify-center shrink-0 ${
-                    isDone
-                      ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                      : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
-                  }`}>
-                    {isDone ? (
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    ) : (
-                      <span className="font-mono text-xs font-bold">{habit.keyNumber}</span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629] truncate">
-                      {habit.title}
-                    </span>
-                    <span className="text-xs font-sans text-[#4A5D4E] truncate">
-                      {habit.subtitle}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-[#4A5D4E]/80">
-                  {isDone ? 'Completed' : 'Pending'}
-                </div>
-              </button>
-            );
-          })}
-
-          {/* Add 4th Slot Trigger if not configured */}
-          {!customDefinition && (
+          return (
             <button
+              key={habit.id}
               type="button"
-              onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
-              className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              onClick={(e) => handleToggle(habit.id, e)}
+              className={`w-full p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 text-left group active:scale-[0.99] ${
+                isDone
+                  ? 'border-[#1A3629]/15 bg-[#FAF8F5]/80 text-[#1A3629]'
+                  : 'border-[#1A3629]/10 bg-[#FFFDF9] hover:border-[#1A3629]/30 hover:bg-[#FAF8F5] shadow-[0_2px_8px_rgba(26,54,41,0.02)]'
+              }`}
             >
-              <span>+ Add 4th Custom Power Habit</span>
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className={`w-7 h-7 rounded-lg border transition-all duration-200 flex items-center justify-center shrink-0 ${
+                  isDone
+                    ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                    : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
+                }`}>
+                  {isDone ? (
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  ) : (
+                    <span className="font-mono text-xs font-bold">{habit.keyNumber}</span>
+                  )}
+                </div>
+
+                <div className="flex flex-col min-w-0">
+                  <span className="font-cabinet font-bold text-sm tracking-tight text-[#1A3629]">
+                    {habit.title}
+                  </span>
+                  <span className="text-xs font-sans text-[#4A5D4E] leading-snug">
+                    {habit.subtitle}
+                  </span>
+                </div>
+              </div>
+
+              <div className={`shrink-0 font-mono text-[10px] uppercase tracking-wider ${isDone ? 'text-emerald-800 font-bold' : 'text-[#4A5D4E]/80'}`}>
+                {habit.statusLabel}
+              </div>
             </button>
-          )}
+          );
+        })}
+
+        {/* Add 4th Slot Trigger if not configured */}
+        {!customDefinition && (
+          <button
+            type="button"
+            onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
+            className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <span>+ Add 4th Custom Power Habit</span>
+          </button>
+        )}
 
           {/* Custom Slot Picker Dropdown */}
           {isSlotPickerOpen && !customDefinition && (
@@ -311,6 +335,5 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -217,7 +217,7 @@ export function DailyFuelCard({
         <span className="font-cabinet font-bold text-xs text-[#1A3629]">
           1-Tap Pantry Plates
         </span>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {PRESET_MEALS.map((preset) => (
             <button
               key={preset.label}

@@ -173,9 +173,9 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
       </div>
 
       {/* Center Stage: Monumental Hero Island */}
-      <div className="relative z-10 flex flex-col items-center justify-center my-2 sm:my-3">
+      <div className="relative z-10 flex flex-col items-center justify-center my-1 sm:my-2">
         <div
-          className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] md:w-[380px] md:h-[380px] lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px] 2xl:w-[500px] 2xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
+          className="relative z-10 w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] md:w-[340px] md:h-[340px] lg:w-[360px] lg:h-[360px] xl:w-[400px] xl:h-[400px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
         >
           {isLowEndDevice ? (
             /* LOW END DEVICE FALLBACK: Pure high-res PNG without rot/SVG shader overhead */
@@ -184,15 +184,15 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
               alt={currentIsland.name}
               fill
               priority
-              sizes="(max-width: 640px) 280px, (max-width: 1024px) 400px, 500px"
-              className="object-contain drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)] select-none"
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 400px"
+              className="object-contain drop-shadow-[0_12px_20px_rgba(26,54,41,0.12)] select-none"
               style={{ imageRendering: 'pixelated' }}
             />
           ) : (
             /* STANDARD / HIGH-END: Full Native SVG Vector Pipeline with feColorMatrix Rot Shaders & Kintsugi */
             <svg
               viewBox="0 0 800 800"
-              className="w-full h-full drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)] select-none"
+              className="w-full h-full drop-shadow-[0_12px_20px_rgba(26,54,41,0.12)] select-none"
               shapeRendering="crispEdges"
             >
               <defs>
@@ -274,8 +274,15 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
           )}
         </div>
 
-        {/* Natural Floating Ground Shadow */}
-        <div className="w-[200px] sm:w-[280px] md:w-[320px] lg:w-[350px] xl:w-[380px] h-3.5 sm:h-4.5 rounded-full bg-[#1A3629]/15 blur-[6px] animate-[shadowFloat_8s_ease-in-out_infinite] mt-2 pointer-events-none" />
+        {/* Authentic Stepped Pixel Ground Shadow (No artificial Gaussian blur) */}
+        <div className="relative flex flex-col items-center justify-center -mt-2 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
+          {/* Stepped pixel rim layer */}
+          <div className="w-[200px] sm:w-[260px] md:w-[290px] h-3 rounded-full bg-[#1A3629]/10" />
+          {/* Stepped pixel core layer */}
+          <div className="w-[140px] sm:w-[180px] md:w-[210px] h-2 rounded-full bg-[#1A3629]/18 -mt-2.5" />
+          {/* Focal apex shadow */}
+          <div className="w-[80px] sm:w-[100px] md:w-[120px] h-1 rounded-full bg-[#1A3629]/25 -mt-1.5" />
+        </div>
 
         {/* Low-End Fallback Explanation (Displayed only when on low-end device or simulated) */}
         {isLowEndDevice && (
@@ -295,8 +302,8 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
         )}
       </div>
 
-      {/* Sanctuary Evolution Meter (Cleaned of redundant pills) */}
-      <div className="w-full max-w-sm flex flex-col items-center gap-2 mt-2 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)]">
+      {/* Sanctuary Evolution Meter */}
+      <div className="w-full max-w-sm flex flex-col items-center gap-2 mt-1 bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)]">
         {/* Level XP Meter */}
         <div className="w-full flex flex-col gap-1.5">
           <div className="w-full h-1.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">
@@ -318,32 +325,6 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
           </div>
         )}
       </div>
-
-      {/* Tactile Perforated Thermal Receipt Stub */}
-      {onOpenReceipt && (
-        <button
-          type="button"
-          onClick={() => {
-            retroAudio.playBlip();
-            haptics.tap();
-            onOpenReceipt();
-          }}
-          className="mt-3.5 inline-flex items-center px-4 py-2 rounded-xl border border-dashed border-[#1A3629]/25 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] shadow-2xs transition-all cursor-pointer group"
-          title="Click to print and inspect daily thermal receipt"
-        >
-          <span className="font-mono text-xs font-bold tracking-tight">
-            RECEIPT · {completedHabitsCount}/3 ANCHORS · {currentLog.totalProteinLogged || 0}g
-          </span>
-        </button>
-      )}
-
-      {/* Sub-Floor Descent Indicator */}
-      <a
-        href="#specimen-reliquary"
-        className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] text-[#4A5D4E]/80 hover:text-[#1A3629] transition-colors cursor-pointer"
-      >
-        <span>Specimen Reliquary Sub-Floor ↓</span>
-      </a>
     </div>
   );
 }

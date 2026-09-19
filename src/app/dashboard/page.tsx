@@ -271,6 +271,10 @@ function DashboardContent() {
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">
                 <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">L</kbd> Ledger
               </span>
+              <span>·</span>
+              <span className="flex items-center gap-1 font-bold text-[#1A3629]">
+                <kbd className="px-1.5 py-0.2 bg-[#EAE4D9] border border-[#1A3629]/20 rounded-xs text-[10px]">A</kbd> Zen
+              </span>
             </div>
 
             {/* Specimen Reliquary Sub-Floor Jump Button */}
@@ -342,34 +346,36 @@ function DashboardContent() {
           <div className={`w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 order-2 lg:order-1`}>
             <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
 
-            {/* Strategic 30-Day Guild Ledger Desk Station */}
-            <button
-              type="button"
-              onClick={() => {
-                retroAudio.playPaperRustle();
-                haptics.tap();
-                setJustSealedDate(null);
-                setIsCorkboardOpen(true);
-              }}
-              className="w-full p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99] animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-11 h-11 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                  <PixelWaxSeal size={28} />
+            {/* Strategic 30-Day Guild Ledger Desk Station (Distilled: Only displayed when not yet sealed) */}
+            {!isLedgerSealedByDate[currentDate] && (
+              <button
+                type="button"
+                onClick={() => {
+                  retroAudio.playPaperRustle();
+                  haptics.tap();
+                  setJustSealedDate(null);
+                  setIsCorkboardOpen(true);
+                }}
+                className="w-full p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:border-[#1A3629]/30 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99] animate-[slideInLeftSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-11 h-11 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                    <PixelWaxSeal size={28} />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">
+                      30-Day Guild Ledger
+                    </span>
+                    <span className="font-mono text-[11px] text-[#4A5D4E] truncate">
+                      {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned · Tap to inspect board
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">
-                    30-Day Guild Ledger
-                  </span>
-                  <span className="font-mono text-[11px] text-[#4A5D4E] truncate">
-                    {Object.values(isLedgerSealedByDate).filter(Boolean).length} / 30 Pinned · Tap to inspect board
-                  </span>
-                </div>
-              </div>
-              <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
-                Board →
-              </span>
-            </button>
+                <span className="font-mono text-xs font-bold text-[#1A3629] group-hover:translate-x-0.5 transition-transform shrink-0">
+                  Board →
+                </span>
+              </button>
+            )}
 
             <EveningSealButton
               onOpenReceipt={() => setIsReceiptOpen(true)}

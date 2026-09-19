@@ -462,3 +462,12 @@ img {
 .driver-popover.cyath-driver-popover .driver-popover-arrow-side-right {
   border-left-color: #FFFDF9 !important;
 }
+
+/* Custom scrollbar suppression utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

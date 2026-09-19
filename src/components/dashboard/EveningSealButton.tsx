@@ -25,6 +25,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
 
   const currentLog = getDailyLog(currentDate);
   const isAlreadySealed = !!isLedgerSealedByDate[currentDate];
+  const pinnedCount = Object.values(isLedgerSealedByDate).filter(Boolean).length;
 
   const wakeTime = userProfile?.wakeTime || '07:30';
   const bedTime = userProfile?.bedTime || '23:30';
@@ -122,7 +123,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
           >
             <span>
               {isAlreadySealed
-                ? 'Inspect 30-Day Guild Ledger'
+                ? `Inspect 30-Day Guild Ledger (${pinnedCount}/30 Pinned)`
                 : 'Begin Seal Ceremony (+50 XP)'}
             </span>
           </button>

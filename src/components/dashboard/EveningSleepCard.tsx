@@ -141,23 +141,54 @@ export function EveningSleepCard({
 
         {/* Right Slot: Sleep Target & Zen Ambience */}
         <div className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
-          <div className="flex flex-col gap-0.5">
-            <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-              Circadian Schedule
-            </span>
-            <button
-              type="button"
-              onClick={onOpenSchedule}
-              className="text-left cursor-pointer text-xs font-sans text-[#4A5D4E] hover:text-[#1A3629] transition-colors"
-              title="Click to calibrate wake and bedtime target"
-            >
-              <span className="font-mono text-xs font-bold text-[#1A3629]">
-                {wakeTime} to {bedTime}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                Circadian Cadence
               </span>
-              <span className="ml-1.5 text-[10px] text-[#4A5D4E] underline">
-                (Adjust)
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={onOpenSchedule}
+                className="font-cabinet font-bold text-[11px] text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
+                title="Calibrate biological wake and sleep target"
+              >
+                <span>Calibrate</span>
+                <span className="text-[10px]">⚙</span>
+              </button>
+            </div>
+
+            {/* Structured Wake & Sleep Target Chips */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={onOpenSchedule}
+                className="p-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-0.5 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
+                title="Adjust Wake Target"
+              >
+                <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                  <span>☀️</span>
+                  <span>Wake Target</span>
+                </div>
+                <span className="font-mono text-xs font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
+                  {wakeTime}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onOpenSchedule}
+                className="p-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-0.5 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
+                title="Adjust Rest Target"
+              >
+                <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                  <span>🌙</span>
+                  <span>Rest Target</span>
+                </div>
+                <span className="font-mono text-xs font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
+                  {bedTime}
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="pt-1">
@@ -168,7 +199,7 @@ export function EveningSleepCard({
                 haptics.tap();
                 onOpenAmbient();
               }}
-              className="w-full py-2.5 px-3 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs text-[#1A3629] transition-all cursor-pointer text-center shadow-2xs"
+              className="w-full py-2 px-3 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs text-[#1A3629] transition-all cursor-pointer text-center shadow-2xs"
               title="Open full-screen Zen ambient living desk diorama (Hotkey A)"
             >
               Zen Ambience Display

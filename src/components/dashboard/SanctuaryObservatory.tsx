@@ -131,9 +131,9 @@ export function SanctuaryObservatory({
   return (
     <section 
       aria-label="Sanctuary Observatory"
-      className="relative w-full rounded-3xl bg-[#FFFDF9]/80 border border-[#1A3629]/15 p-5 sm:p-7 xl:p-8 backdrop-blur-sm shadow-[0_8px_32px_rgba(26,54,41,0.04)] overflow-hidden"
+      className="relative w-full rounded-3xl bg-[#FFFDF9]/85 border border-[#1A3629]/15 p-5 sm:p-7 xl:p-8 backdrop-blur-md shadow-[0_8px_32px_rgba(26,54,41,0.04)] overflow-hidden"
     >
-      {/* Dynamic Circadian Horizon Aura in background */}
+      {/* Dynamic Circadian Horizon Aura */}
       <div
         className={`pointer-events-none absolute -inset-20 rounded-full blur-3xl opacity-60 transition-all duration-1000 ${horizonAuraClass}`}
         aria-hidden="true"
@@ -141,7 +141,9 @@ export function SanctuaryObservatory({
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 items-center">
         
-        {/* BAY 1 (Left, col-span-3): Circadian Chrono-Compass & Biological Rhythm */}
+        {/* ========================================================================= */}
+        {/* BAY 1 (Left, col-span-3): Circadian Chrono-Compass */}
+        {/* ========================================================================= */}
         <div className="lg:col-span-3 flex flex-col gap-3.5 order-2 lg:order-1">
           <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
             <div className="flex items-center gap-2">
@@ -154,45 +156,57 @@ export function SanctuaryObservatory({
               type="button"
               onClick={onOpenSchedule}
               className="text-[10px] font-mono font-bold text-[#4A5D4E] hover:text-[#1A3629] underline cursor-pointer"
-              title="Calibrate circadian wake & bed hours"
+              title="Calibrate circadian wake and bed hours"
             >
               Calibrate
             </button>
           </div>
 
-          {/* Current Solar / Biological Phase Pill */}
-          <div className="p-3 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs flex flex-col gap-1.5">
+          {/* Active Phase Card with Solar Arc Indicator */}
+          <div className="p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1">
-                <Sun className="w-3 h-3 text-amber-600" />
-                Active Phase
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1.5">
+                <Sun className="w-3.5 h-3.5 text-amber-600" />
+                Active Biological Phase
               </span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
+            
             <span className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
               {circadian.currentPhase.name}
             </span>
+            
             <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed">
               {circadian.currentPhase.hourlyDirective}
             </p>
+
+            {/* Micro 24-Hour Solar Timeline Ribbon */}
+            <div className="mt-1 pt-2 border-t border-[#1A3629]/8 flex flex-col gap-1">
+              <div className="flex items-center justify-between font-mono text-[10px] text-[#4A5D4E]">
+                <span>Phase Window</span>
+                <span className="font-bold text-[#1A3629]">{circadian.currentPhase.timeRange}</span>
+              </div>
+              <div className="w-full h-1.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-500/80 rounded-full transition-all duration-500" 
+                  style={{ width: `${Math.min(100, Math.max(10, circadian.alertnessScore))}%` }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Schedule Window & Phase Countdown */}
+          {/* Schedule Window */}
           <div className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10 flex flex-col gap-1 text-xs">
             <div className="flex items-center justify-between font-mono text-[11px] text-[#1A3629]">
-              <span className="flex items-center gap-1 font-semibold text-[#4A5D4E]">
-                <Clock className="w-3 h-3 text-[#1A3629]/60" /> Day Window
+              <span className="flex items-center gap-1.5 font-semibold text-[#4A5D4E]">
+                <Clock className="w-3 h-3 text-[#1A3629]/60" /> Schedule Window
               </span>
-              <span className="font-bold">{wakeTime} – {bedTime}</span>
-            </div>
-            <div className="flex items-center justify-between font-mono text-[11px] text-[#4A5D4E] pt-1 border-t border-[#1A3629]/6">
-              <span>Phase Window</span>
-              <span className="font-semibold text-[#1A3629]">{circadian.currentPhase.timeRange}</span>
+              <span className="font-bold">{wakeTime} to {bedTime}</span>
             </div>
           </div>
 
           {/* Streak Momentum Status */}
-          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs">
+          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 relative">
                 <Image
@@ -218,12 +232,18 @@ export function SanctuaryObservatory({
           </div>
         </div>
 
+        {/* ========================================================================= */}
         {/* BAY 2 (Center, col-span-6): The Monumental Floating Island Hero */}
+        {/* ========================================================================= */}
         <div className="lg:col-span-6 flex flex-col items-center justify-center text-center order-1 lg:order-2">
           
-          {/* Biome Name & Level Badges */}
+          {/* Biome Name & Level Header */}
           <div className="flex flex-col items-center gap-1 mb-1">
-            <h1 className="font-cabinet font-extrabold text-3xl sm:text-4xl xl:text-5xl tracking-tight text-[#1A3629] drop-shadow-xs">
+            <span className="font-mono text-[9.5px] uppercase tracking-widest text-[#1A3629]/50 select-none">
+              Sanctuary Meridian · Sector 01
+            </span>
+
+            <h1 className="font-cabinet font-black text-3xl sm:text-4xl xl:text-5xl tracking-tight text-[#1A3629] drop-shadow-xs">
               {currentIsland.name}
             </h1>
 
@@ -373,7 +393,9 @@ export function SanctuaryObservatory({
           </div>
         </div>
 
-        {/* BAY 3 (Right, col-span-3): Evolution Progression & Daily Closure Station */}
+        {/* ========================================================================= */}
+        {/* BAY 3 (Right, col-span-3): Evolution & Guild Closure Station */}
+        {/* ========================================================================= */}
         <div className="lg:col-span-3 flex flex-col gap-3.5 order-3">
           <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
             <div className="flex items-center gap-2">
@@ -383,7 +405,7 @@ export function SanctuaryObservatory({
               </h2>
             </div>
             <span className="font-mono text-[10px] text-[#4A5D4E]">
-              Tier {currentIsland.tier}/10
+              Tier {currentIsland.tier} of 10
             </span>
           </div>
 
@@ -398,7 +420,7 @@ export function SanctuaryObservatory({
               </span>
             </div>
             
-            <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/12 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/12 rounded-full overflow-hidden shadow-inner">
               <div
                 className="h-full bg-[#1A3629] rounded-full transition-all duration-700 ease-out"
                 style={{ width: `${Math.min(100, Math.max(0, progress.progressPercent))}%` }}
@@ -426,7 +448,7 @@ export function SanctuaryObservatory({
               haptics.tap();
               onOpenCorkboard();
             }}
-            className="w-full p-3 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs hover:border-[#1A3629]/30 hover:shadow-xs transition-all flex items-center justify-between cursor-pointer group text-left"
+            className="w-full p-3 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/12 shadow-2xs hover:border-[#1A3629]/30 hover:shadow-xs transition-all flex items-center justify-between cursor-pointer group text-left active:scale-[0.99]"
             title="Inspect 30-Day Guild Wax-Seal Ledger (Hotkey L)"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -438,7 +460,7 @@ export function SanctuaryObservatory({
                   30-Day Guild Ledger
                 </span>
                 <span className="font-mono text-[10px] text-[#4A5D4E]">
-                  {pinnedCount} / 30 Seals Pinned
+                  {pinnedCount} of 30 Seals Pinned
                 </span>
               </div>
             </div>

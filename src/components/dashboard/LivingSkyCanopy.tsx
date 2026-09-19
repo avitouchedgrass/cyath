@@ -147,7 +147,7 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
         {/* Re-entry Badge if Kintsugi Forged */}
         {isForgedStreak && (
           <div
-            title="Kintsugi: Japanese art of repairing broken things with gold. Your streak was broken but restored — the gap day is logged retroactively and your momentum continues."
+            title="Kintsugi: Japanese art of repairing broken things with gold. Your streak was broken but restored: the gap day is logged retroactively and your momentum continues."
             className="mt-1 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 shadow-2xs animate-in fade-in cursor-help"
           >
             <span className="font-mono text-xs font-bold text-[#2563EB]">

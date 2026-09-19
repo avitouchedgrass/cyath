@@ -261,7 +261,7 @@ function DashboardContent() {
 
           {/* Minimal Essential Header Tools & Desktop Shortcuts */}
           <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
-            {/* Desktop Keyboard Accelerators Strip — visible from lg up */}
+            {/* Desktop Keyboard Accelerators Strip (visible from lg up) */}
             <div className="hidden lg:flex items-center gap-2 font-mono text-[11px] text-[#4A5D4E] bg-[#FFFDF9]/80 px-3 py-1.5 rounded-full border border-[#1A3629]/12 shadow-2xs">
               <span className="text-[#1A3629]/60 font-semibold">Hotkeys:</span>
               <span className="flex items-center gap-1 font-bold text-[#1A3629]">

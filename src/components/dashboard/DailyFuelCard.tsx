@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, Utensils } from 'lucide-react';
 import { PixelMealPlate } from '@/components/dashboard/PixelMealPlate';
 
 interface DailyFuelCardProps {
@@ -65,7 +65,7 @@ export function DailyFuelCard({
     setTimeout(() => setFeedback(null), 3000);
   };
 
-  // Ambient Natural Language Food Logging (Primary Hero Input)
+  // Ambient Natural Language Food Logging
   const handleAmbientMealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = ambientMealText.trim();
@@ -104,7 +104,7 @@ export function DailyFuelCard({
         throw new Error('API parse error');
       }
     } catch {
-      // Fallback local estimate — preserve user text, don't wipe it
+      // Fallback local estimate - preserve user text, don't wipe it
       logMealToDay(
         {
           name: text,
@@ -137,18 +137,21 @@ export function DailyFuelCard({
       setFeedback(`Weight updated: ${val.toFixed(1)} kg`);
       setTimeout(() => setFeedback(null), 3000);
     } else {
-      setWeightError('Enter a value between 30–300 kg');
+      setWeightError('Enter a value between 30 and 300 kg');
     }
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
       
       {/* Header & Target Summary */}
-      <div className="flex items-center justify-between">
-        <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
-          Daily Fuel &amp; Protein
-        </h3>
+      <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+        <div className="flex items-center gap-2">
+          <Utensils className="w-4 h-4 text-[#1A3629]" />
+          <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
+            Daily Whole-Food Fuel
+          </h3>
+        </div>
 
         <div className="flex flex-col items-end">
           <div className="flex items-baseline gap-1 font-mono">
@@ -157,13 +160,13 @@ export function DailyFuelCard({
             </span>
             <span className="text-[10px] font-sans text-[#4A5D4E]">/ {targetProtein}g</span>
           </div>
-          <span className="text-[10px] font-sans text-[#4A5D4E]">
-            {remaining > 0 ? `${remaining}g to floor` : 'Secured'}
+          <span className="text-[10px] font-mono text-[#4A5D4E]">
+            {remaining > 0 ? `${remaining}g to floor` : 'Target Secured'}
           </span>
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar with Tactile Groove */}
       <div className="flex flex-col gap-1.5">
         <div
           role="progressbar"
@@ -171,7 +174,7 @@ export function DailyFuelCard({
           aria-valuenow={percent}
           aria-valuemin={0}
           aria-valuemax={100}
-          className="w-full h-2 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden"
+          className="w-full h-2.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden shadow-inner"
         >
           <div
             className="h-full bg-[#1A3629] rounded-full transition-all duration-500 ease-out"
@@ -179,7 +182,7 @@ export function DailyFuelCard({
           />
         </div>
         <div className="flex items-center justify-between font-mono text-[11px] text-[#4A5D4E]">
-          <span>{percent}% of daily floor</span>
+          <span>{percent}% of daily target</span>
           <span>{loggedMealsCount} {loggedMealsCount === 1 ? 'item' : 'items'} logged today</span>
         </div>
       </div>
@@ -187,7 +190,7 @@ export function DailyFuelCard({
       {/* HERO FOOD INPUT: Natural Language Command Bar */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-2">
         <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
-          Log Meal or Ingredient
+          Log Meal or Whole-Food Ingredients
         </label>
         
         <div className="relative flex items-center">
@@ -196,14 +199,14 @@ export function DailyFuelCard({
             type="text"
             value={ambientMealText}
             onChange={(e) => setAmbientMealText(e.target.value)}
-            placeholder="e.g. 3 scrambled eggs wild"
+            placeholder="e.g. 200g ribeye steak with sweet potato"
             disabled={isSubmittingMeal}
-            className="w-full pl-3 pr-20 py-2.5 rounded-xl border-[1.5px] border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-3 focus:ring-[#1A3629]/10 transition-all duration-200"
+            className="w-full pl-3 pr-24 py-2.5 rounded-xl border-[1.5px] border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-3 focus:ring-[#1A3629]/10 transition-all duration-200"
           />
           <button
             type="submit"
             disabled={!ambientMealText.trim() || isSubmittingMeal}
-            className="absolute right-1.5 px-3.5 py-2 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs"
+            className="absolute right-1.5 px-3.5 py-1.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs active:scale-98"
           >
             {isSubmittingMeal ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -223,7 +226,7 @@ export function DailyFuelCard({
       {/* 1-Tap Pantry Plates */}
       <div className="flex flex-col gap-2">
         <span className="font-cabinet font-bold text-[10px] uppercase tracking-wide text-[#4A5D4E]">
-          Quick Plates
+          Quick Calibrated Plates
         </span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {PRESET_MEALS.map((preset) => (
@@ -231,7 +234,7 @@ export function DailyFuelCard({
               key={preset.label}
               type="button"
               onClick={() => handleLogPreset(preset)}
-              className="px-3 py-2 rounded-xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 group shadow-2xs"
+              className="px-3.5 py-2 rounded-xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 group shadow-2xs active:scale-98"
               title={preset.desc}
             >
               <PixelMealPlate mealName={preset.desc} size={24} />
@@ -258,7 +261,7 @@ export function DailyFuelCard({
         </div>
 
         {currentLog.loggedMeals && currentLog.loggedMeals.length > 0 ? (
-          <div className="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1">
+          <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
             {currentLog.loggedMeals.map((meal) => (
               <div
                 key={meal.id}

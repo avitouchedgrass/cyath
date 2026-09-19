@@ -116,7 +116,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
           <button
             type="button"
             onClick={handleStartCeremony}
-            title={isAlreadySealed ? "View your 30-day habit ledger — each pinned seal is a completed day" : "Begin the daily closing ceremony to seal today's log and earn XP"}
+            title={isAlreadySealed ? "View your 30-day habit ledger: each pinned seal is a completed day" : "Begin the daily closing ceremony to seal today's log and earn XP"}
             className={`w-full py-2.5 px-4 rounded-xl font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-98 ${
               isAlreadySealed
                 ? 'border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'

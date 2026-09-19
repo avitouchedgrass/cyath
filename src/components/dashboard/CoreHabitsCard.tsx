@@ -5,7 +5,7 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { Check } from 'lucide-react';
+import { Check, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
 
 export interface CoreHabitsCardProps {
   onOpenSchedule?: () => void;
@@ -288,56 +288,6 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         )}
       </div>
 
-      {/* Hydration Flask Gauge */}
-      <div className="pt-3 border-t border-[#1A3629]/10 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-cabinet font-bold text-[#1A3629]">
-            Hydration Gauge
-          </span>
-          <span className="font-mono font-bold text-[#1A3629]">
-            {(currentLog.hydrationLiters || 0).toFixed(1)} / 2.5 L
-          </span>
-        </div>
-
-        <div className="w-full h-2 bg-[#1A3629]/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-600 rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, Math.round(((currentLog.hydrationLiters || 0) / 2.5) * 100))}%` }}
-          />
-        </div>
-
-        <div className="flex items-center gap-2 pt-0.5">
-          <button
-            type="button"
-            onClick={() => {
-              const next = Number(((currentLog.hydrationLiters || 0) + 0.5).toFixed(1));
-              setHydration(next, currentDate);
-              retroAudio.playInspectConfirm();
-              haptics.tap();
-            }}
-            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
-            title="Log 0.5 Liters of water (Hotkey 2)"
-          >
-            <span>+0.5L</span>
-            <kbd className="px-1.5 py-px text-[9px] bg-black/5 rounded">2</kbd>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const next = Number(((currentLog.hydrationLiters || 0) + 1.0).toFixed(1));
-              setHydration(next, currentDate);
-              retroAudio.playInspectConfirm();
-              haptics.tap();
-            }}
-            className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
-            title="Log 1.0 Liter of water"
-          >
-            <span>+1.0L</span>
-          </button>
-        </div>
-      </div>
-
       {/* Undo toast */}
       {undoToast && (
         <div className="flex items-center justify-between gap-2 px-3.5 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] text-[11px] font-mono animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-md">
@@ -358,59 +308,117 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         </div>
       )}
 
-      {/* Energy Level Check */}
-      <div className="border-t border-[#1A3629]/10 pt-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-cabinet font-bold text-[#1A3629]">
-            Energy Level Check
-          </span>
-          {ritual.afternoonSlumpScore && (
-            <span className="font-mono text-xs text-[#065F46] font-bold">
-              {ritual.afternoonSlumpScore}/10 Recorded
+      {/* Bottom Half: Left = Water Tab, Right = Energy Levels with Battery SVGs */}
+      <div className="pt-3 border-t border-[#1A3629]/10 grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+        
+        {/* Left Side: Water / Hydration Tab */}
+        <div className="flex flex-col justify-between gap-2 p-3 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-cabinet font-bold text-[#1A3629]">
+              Hydration Gauge
             </span>
-          )}
+            <span className="font-mono font-bold text-[#1A3629]">
+              {(currentLog.hydrationLiters || 0).toFixed(1)} / 2.5 L
+            </span>
+          </div>
+
+          <div className="w-full h-2 bg-[#1A3629]/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-600 rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(100, Math.round(((currentLog.hydrationLiters || 0) / 2.5) * 100))}%` }}
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                const next = Number(((currentLog.hydrationLiters || 0) + 0.5).toFixed(1));
+                setHydration(next, currentDate);
+                retroAudio.playInspectConfirm();
+                haptics.tap();
+              }}
+              className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+              title="Log 0.5 Liters of water (Hotkey 2)"
+            >
+              <span>+0.5L</span>
+              <kbd className="px-1.5 py-px text-[9px] bg-black/5 rounded">2</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const next = Number(((currentLog.hydrationLiters || 0) + 1.0).toFixed(1));
+                setHydration(next, currentDate);
+                retroAudio.playInspectConfirm();
+                haptics.tap();
+              }}
+              className="flex-1 py-1.5 px-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+              title="Log 1.0 Liter of water"
+            >
+              <span>+1.0L</span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            title="Low energy: feeling slow, foggy, or dragging"
-            onClick={() => handleEnergyRating(2)}
-            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
-              ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
-                ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-            }`}
-          >
-            Slump
-          </button>
+        {/* Right Side: Energy Levels with Battery SVGs */}
+        <div className="flex flex-col justify-between gap-2 p-3 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-cabinet font-bold text-[#1A3629]">
+              Energy Levels
+            </span>
+            {ritual.afternoonSlumpScore && (
+              <span className="font-mono text-xs text-[#065F46] font-bold">
+                {ritual.afternoonSlumpScore}/10
+              </span>
+            )}
+          </div>
 
-          <button
-            type="button"
-            title="Steady energy: manageable, no crash"
-            onClick={() => handleEnergyRating(6)}
-            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
-              ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
-                ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-            }`}
-          >
-            Steady
-          </button>
+          <div className="grid grid-cols-3 gap-1.5 pt-1">
+            <button
+              type="button"
+              title="Low energy: feeling slow, foggy, or dragging"
+              onClick={() => handleEnergyRating(2)}
+              className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
+                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              }`}
+            >
+              <BatteryLow className="w-3.5 h-3.5 text-[#DC2626]" />
+              <span>Slump</span>
+            </button>
 
-          <button
-            type="button"
-            title="Peak energy: sharp, strong, firing on all cylinders"
-            onClick={() => handleEnergyRating(9)}
-            className={`py-2 px-2 rounded-xl border text-xs font-cabinet font-bold text-center transition-all cursor-pointer shadow-2xs active:scale-98 ${
-              ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
-                ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
-                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-            }`}
-          >
-            Peak
-          </button>
+            <button
+              type="button"
+              title="Steady energy: manageable, no crash"
+              onClick={() => handleEnergyRating(6)}
+              className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
+                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              }`}
+            >
+              <BatteryMedium className="w-3.5 h-3.5 text-[#D97706]" />
+              <span>Steady</span>
+            </button>
+
+            <button
+              type="button"
+              title="Peak energy: sharp, strong, firing on all cylinders"
+              onClick={() => handleEnergyRating(9)}
+              className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
+                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
+                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                  : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              }`}
+            >
+              <Battery className="w-3.5 h-3.5 text-[#10B981]" />
+              <span>Peak</span>
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   );

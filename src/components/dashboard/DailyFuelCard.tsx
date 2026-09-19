@@ -17,6 +17,7 @@ const PRESET_MEALS = [
   { label: 'Balanced Plate', protein: 35, calories: 520, desc: 'Protein + Veg + Carb' },
   { label: 'High Protein Anchor', protein: 50, calories: 460, desc: 'Steak / Chicken breast' },
   { label: 'Light Quick Fuel', protein: 20, calories: 240, desc: 'Eggs / Greek yogurt' },
+  { label: 'Refuel Shake', protein: 30, calories: 260, desc: 'Greek yogurt & whey' },
 ] as const;
 
 export function DailyFuelCard({
@@ -36,6 +37,7 @@ export function DailyFuelCard({
   const [isSubmittingMeal, setIsSubmittingMeal] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [weightError, setWeightError] = useState<string | null>(null);
+  const [isMealsExpanded, setIsMealsExpanded] = useState(false);
 
   // Weight check-in state
   const [isEditingWeight, setIsEditingWeight] = useState(false);
@@ -104,7 +106,6 @@ export function DailyFuelCard({
         throw new Error('API parse error');
       }
     } catch {
-      // Fallback local estimate - preserve user text, don't wipe it
       logMealToDay(
         {
           name: text,
@@ -142,28 +143,19 @@ export function DailyFuelCard({
   };
 
   return (
-    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4 animate-[slideInRightSpring_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+    <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col gap-4">
       
-      {/* Header & Target Summary */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#1A3629]/10">
+      {/* 1. Title & Header */}
+      <div className="flex items-center justify-between pb-1">
         <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
-          Daily Whole-Food Fuel
+          Log Food
         </h3>
-
-        <div className="flex flex-col items-end">
-          <div className="flex items-baseline gap-1 font-mono">
-            <span className="font-cabinet font-extrabold text-xl text-[#1A3629] tabular-nums">
-              {currentProtein}
-            </span>
-            <span className="text-xs font-sans text-[#4A5D4E]">/ {targetProtein}g</span>
-          </div>
-          <span className="text-[11px] font-mono text-[#4A5D4E]">
-            {remaining > 0 ? `${remaining}g to floor` : 'Target Secured'}
-          </span>
-        </div>
+        <span className="font-mono text-xs font-bold text-[#1A3629]">
+          {percent}% Target
+        </span>
       </div>
 
-      {/* Progress Bar with Tactile Groove */}
+      {/* 2. Progress Bar immediately below title */}
       <div className="flex flex-col gap-1.5">
         <div
           role="progressbar"
@@ -171,25 +163,23 @@ export function DailyFuelCard({
           aria-valuenow={percent}
           aria-valuemin={0}
           aria-valuemax={100}
-          className="w-full h-2.5 bg-[#FAF8F5] border border-[#1A3629]/10 rounded-full overflow-hidden shadow-inner"
+          className="w-full h-2.5 bg-[#1A3629]/10 rounded-full overflow-hidden"
         >
           <div
             className="h-full bg-[#1A3629] rounded-full transition-all duration-500 ease-out"
             style={{ width: `${percent}%` }}
           />
         </div>
-        <div className="flex items-center justify-between font-mono text-[11px] text-[#4A5D4E]">
-          <span>{percent}% of daily target</span>
-          <span>{loggedMealsCount} {loggedMealsCount === 1 ? 'item' : 'items'} logged today</span>
+
+        {/* Amount logged stated below progress bar */}
+        <div className="flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
+          <span className="font-semibold text-[#1A3629]">{currentProtein}g logged of {targetProtein}g floor</span>
+          <span>{remaining > 0 ? `${remaining}g to floor` : 'Floor Secured'}</span>
         </div>
       </div>
 
-      {/* HERO FOOD INPUT: Natural Language Command Bar */}
+      {/* 3. Highlighted Contrast Meal Input */}
       <form onSubmit={handleAmbientMealSubmit} className="flex flex-col gap-1.5">
-        <label htmlFor="natural-meal-input" className="font-cabinet font-bold text-xs text-[#1A3629]">
-          Log Meal or Whole Foods
-        </label>
-        
         <div className="relative flex items-center">
           <input
             id="natural-meal-input"
@@ -198,12 +188,12 @@ export function DailyFuelCard({
             onChange={(e) => setAmbientMealText(e.target.value)}
             placeholder="e.g. 200g ribeye steak with sweet potato"
             disabled={isSubmittingMeal}
-            className="w-full pl-3 pr-24 py-2.5 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] hover:border-[#1A3629]/50 hover:bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/70 focus:outline-none focus:border-[#1A3629] focus:bg-[#FFFDF9] focus:ring-2 focus:ring-[#1A3629]/10 transition-all duration-200"
+            className="w-full pl-3.5 pr-26 py-3 rounded-xl border-2 border-[#1A3629] bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:ring-3 focus:ring-[#1A3629]/15 shadow-xs transition-all duration-200"
           />
           <button
             type="submit"
             disabled={!ambientMealText.trim() || isSubmittingMeal}
-            className="absolute right-1.5 px-3.5 py-1.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs active:scale-98"
+            className="absolute right-1.5 px-4 py-2 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs active:scale-98"
           >
             {isSubmittingMeal ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -220,22 +210,22 @@ export function DailyFuelCard({
         )}
       </form>
 
-      {/* 1-Tap Pantry Plates */}
+      {/* 4. 4 Boxes of Quick Calibrated Plates */}
       <div className="flex flex-col gap-1.5">
         <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-          Quick Calibrated Plates
+          Quick Calibrated
         </span>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {PRESET_MEALS.map((preset) => (
             <button
               key={preset.label}
               type="button"
               onClick={() => handleLogPreset(preset)}
-              className="px-3 py-1.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 group shadow-2xs active:scale-98"
+              className="p-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex flex-col items-center text-center gap-1.5 group shadow-2xs active:scale-98"
               title={preset.desc}
             >
-              <PixelMealPlate mealName={preset.desc} size={22} />
-              <span className="font-cabinet font-bold text-xs group-hover:text-[#FFFDF9]">
+              <PixelMealPlate mealName={preset.desc} size={28} />
+              <span className="font-cabinet font-bold text-[11px] leading-tight group-hover:text-[#FFFDF9]">
                 {preset.label}
               </span>
               <span className="font-mono text-[10px] font-bold text-[#065F46] bg-[#ECFDF5] group-hover:bg-white/15 group-hover:text-white px-1.5 py-0.5 rounded border border-[#10B981]/20 group-hover:border-white/20">
@@ -246,55 +236,69 @@ export function DailyFuelCard({
         </div>
       </div>
 
-      {/* Today's Logged Fuel Feed */}
-      <div className="flex flex-col gap-2 pt-3 border-t border-[#1A3629]/10">
-        <div className="flex items-center justify-between">
+      {/* 5. Subtle Arrow Accordion for Today's Logged Meals */}
+      <div className="pt-2 border-t border-[#1A3629]/10 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            retroAudio.playBlip();
+            haptics.tap();
+            setIsMealsExpanded((prev) => !prev);
+          }}
+          className="w-full py-2 px-3 rounded-xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629]/5 text-[#1A3629] transition-all flex items-center justify-between cursor-pointer group"
+          aria-expanded={isMealsExpanded}
+        >
           <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-            Today's Logged Fuel
+            Today's Logged Meals ({loggedMealsCount})
           </span>
-          <span className="font-mono text-[11px] text-[#4A5D4E]">
-            {currentLog.loggedMeals?.length || 0} {currentLog.loggedMeals?.length === 1 ? 'meal' : 'meals'}
-          </span>
-        </div>
-
-        {currentLog.loggedMeals && currentLog.loggedMeals.length > 0 ? (
-          <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
-            {currentLog.loggedMeals.map((meal) => (
-              <div
-                key={meal.id}
-                className="flex items-center justify-between gap-2.5 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs transition-colors hover:border-[#1A3629]/20"
-              >
-                <PixelMealPlate mealName={meal.name} size={36} />
-                <div className="flex flex-col min-w-0 flex-1">
-                  <span className="font-cabinet font-bold text-[#1A3629] truncate">
-                    {meal.name}
-                  </span>
-                  <div className="flex items-center gap-2 font-mono text-[10px] text-[#4A5D4E]">
-                    <span className="text-[#065F46] font-bold">+{meal.protein}g protein</span>
-                    <span>/</span>
-                    <span>{meal.calories} kcal</span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    retroAudio.playBlip();
-                    haptics.tap();
-                    removeMealFromDay(meal.id, currentDate);
-                  }}
-                  className="w-6 h-6 rounded-md hover:bg-[#DC2626]/10 text-[#4A5D4E] hover:text-[#DC2626] transition-colors flex items-center justify-center cursor-pointer shrink-0"
-                  title="Remove meal entry"
-                  aria-label={`Remove ${meal.name}`}
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+          <div className="flex items-center gap-1 font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
+            <span>{isMealsExpanded ? 'Collapse' : 'Inspect'}</span>
+            <span className={`transition-transform duration-200 font-bold ${isMealsExpanded ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
           </div>
-        ) : (
-          <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/12 bg-[#FAF8F5]/50 text-center font-sans text-xs text-[#4A5D4E]">
-            No meals logged yet today. Use the natural search bar or quick plates above.
+        </button>
+
+        {isMealsExpanded && (
+          <div className="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-1 animate-in fade-in duration-200">
+            {currentLog.loggedMeals && currentLog.loggedMeals.length > 0 ? (
+              currentLog.loggedMeals.map((meal) => (
+                <div
+                  key={meal.id}
+                  className="flex items-center justify-between gap-2.5 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs transition-colors hover:border-[#1A3629]/20"
+                >
+                  <PixelMealPlate mealName={meal.name} size={32} />
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="font-cabinet font-bold text-[#1A3629] truncate">
+                      {meal.name}
+                    </span>
+                    <div className="flex items-center gap-2 font-mono text-[10px] text-[#4A5D4E]">
+                      <span className="text-[#065F46] font-bold">+{meal.protein}g protein</span>
+                      <span>/</span>
+                      <span>{meal.calories} kcal</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playBlip();
+                      haptics.tap();
+                      removeMealFromDay(meal.id, currentDate);
+                    }}
+                    className="w-6 h-6 rounded-md hover:bg-[#DC2626]/10 text-[#4A5D4E] hover:text-[#DC2626] transition-colors flex items-center justify-center cursor-pointer shrink-0"
+                    title="Remove meal entry"
+                    aria-label={`Remove ${meal.name}`}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/12 bg-[#FAF8F5]/50 text-center font-sans text-xs text-[#4A5D4E]">
+                No meals logged yet today. Use the search bar or quick plates above.
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -11,10 +11,10 @@ import { formatLocalDate } from '@/lib/dateUtils';
 import { SanctuaryObservatory } from '@/components/dashboard/SanctuaryObservatory';
 import { CoreHabitsCard } from '@/components/dashboard/CoreHabitsCard';
 import { DailyFuelCard } from '@/components/dashboard/DailyFuelCard';
+import { EveningSleepCard } from '@/components/dashboard/EveningSleepCard';
 import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
 import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfloor';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
-import { WaxSealCorkboard } from '@/components/dashboard/WaxSealCorkboard';
 import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
 import {
   Volume2,
@@ -28,13 +28,13 @@ function DashboardContent() {
   const [isMuted, setIsMuted] = useState(false);
   const [hotkeyFlash, setHotkeyFlash] = useState<'habits' | 'fuel' | 'island' | null>(null);
 
-  // Modal States
+  // Modal & Station States
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [isCorkboardOpen, setIsCorkboardOpen] = useState(false);
   const [justSealedDate, setJustSealedDate] = useState<string | null>(null);
   const [isAmbientOpen, setIsAmbientOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [mobileStation, setMobileStation] = useState<'island' | 'habits' | 'fuel'>('island');
+  const [mobileStation, setMobileStation] = useState<'island' | 'console'>('island');
   const swipeTouchStartX = useRef<number | null>(null);
 
   const flashHotkey = (zone: 'habits' | 'fuel' | 'island') => {
@@ -98,10 +98,10 @@ function DashboardContent() {
       }
       if (e.key === '3') {
         e.preventDefault();
-        setMobileStation('fuel');
+        setMobileStation('console');
         retroAudio.playBlip();
         flashHotkey('fuel');
-        const fuelInput = document.getElementById('quick-protein-input');
+        const fuelInput = document.getElementById('natural-meal-input');
         if (fuelInput) fuelInput.focus();
         else document.getElementById('daily-fuel-card')?.scrollIntoView({ behavior: 'smooth' });
       }
@@ -305,109 +305,111 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Mobile Cockpit Station Dock (Ergonomic Segmented Switcher for <1024px) */}
-        <div role="tablist" aria-label="Dashboard sections" className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-1.5 my-1">
+        {/* Mobile Cockpit Station Switcher (Option B: 2 Stations) */}
+        <div role="tablist" aria-label="Dashboard views" className="lg:hidden w-full sticky top-18 z-20 p-1.5 bg-[#EAE4D9]/95 backdrop-blur-md rounded-2xl border border-[#1A3629]/15 shadow-sm flex items-center justify-between gap-2 my-1">
           <button
             role="tab"
             aria-selected={mobileStation === 'island'}
-            aria-label="Floating island sanctuary"
+            aria-label="Sanctuary Island"
             type="button"
             onClick={() => {
               setMobileStation('island');
               retroAudio.playBlip();
               haptics.tap();
             }}
-            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+            className={`flex-1 py-2 px-3 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
               mobileStation === 'island'
                 ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span aria-hidden="true">🏝️</span> Sanctuary
+            <span>🏝️</span> Sanctuary Island
           </button>
 
           <button
             role="tab"
-            aria-selected={mobileStation === 'habits'}
-            aria-label="Daily Anchors habits"
+            aria-selected={mobileStation === 'console'}
+            aria-label="Daily Operator Console"
             type="button"
             onClick={() => {
-              setMobileStation('habits');
+              setMobileStation('console');
               retroAudio.playBlip();
               haptics.tap();
             }}
-            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
-              mobileStation === 'habits'
+            className={`flex-1 py-2 px-3 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+              mobileStation === 'console'
                 ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
                 : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
             }`}
           >
-            <span aria-hidden="true">⚡</span> Anchors
-          </button>
-
-          <button
-            role="tab"
-            aria-selected={mobileStation === 'fuel'}
-            aria-label="Daily fuel and protein"
-            type="button"
-            onClick={() => {
-              setMobileStation('fuel');
-              retroAudio.playBlip();
-              haptics.tap();
-            }}
-            className={`flex-1 py-2 px-2.5 rounded-xl font-cabinet font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
-              mobileStation === 'fuel'
-                ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
-                : 'text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-black/5'
-            }`}
-          >
-            <span aria-hidden="true">🥩</span> Fuel
+            <span>⚡</span> Daily Console
           </button>
         </div>
 
-        {/* Touch Swipe & Terraced Architecture Container */}
-        <div
-          className="w-full flex flex-col gap-8 animate-in fade-in duration-150"
-          onTouchStart={(e) => { swipeTouchStartX.current = e.touches[0].clientX; }}
-          onTouchEnd={(e) => {
-            if (swipeTouchStartX.current === null) return;
-            const dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
-            swipeTouchStartX.current = null;
-            if (Math.abs(dx) < 60) return;
-            const order: Array<'island' | 'habits' | 'fuel'> = ['island', 'habits', 'fuel'];
-            const idx = order.indexOf(mobileStation);
-            if (dx < 0 && idx < order.length - 1) setMobileStation(order[idx + 1]);
-            if (dx > 0 && idx > 0) setMobileStation(order[idx - 1]);
-          }}
-        >
-          {/* TIER 1: The Sanctuary Observatory (Panoramic Celestial Horizon) */}
-          <div className={`w-full ${mobileStation === 'island' ? 'block' : 'hidden lg:block'} transition-[outline] duration-150 ${hotkeyFlash === 'island' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''}`}>
+        {/* Main Split Horizon Layout: Left 50% Island/Ledger, Right 50% 3 Stacked Cards */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start animate-in fade-in duration-150">
+          
+          {/* LEFT 50%: Monumental Living Island & In-Place 30-Day Ledger */}
+          <div className={`w-full lg:col-span-6 xl:col-span-6 lg:sticky lg:top-24 h-fit ${
+            mobileStation === 'island' ? 'block' : 'hidden lg:block'
+          } transition-[outline] duration-150 ${
+            hotkeyFlash === 'island' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''
+          }`}>
             <SanctuaryObservatory
-              onOpenSchedule={() => setIsScheduleModalOpen(true)}
-              onOpenReceipt={() => setIsReceiptOpen(true)}
-              onOpenCorkboard={(sealedDate) => {
-                setJustSealedDate(sealedDate || currentDate);
-                setIsCorkboardOpen(true);
+              isLedgerOpen={isCorkboardOpen}
+              onToggleLedger={() => {
+                retroAudio.playPaperRustle();
+                haptics.tap();
+                setIsCorkboardOpen((prev) => !prev);
               }}
+              onOpenReceipt={() => setIsReceiptOpen(true)}
+              justSealedDate={justSealedDate}
             />
           </div>
 
-          {/* TIER 2: Grounded Dual-Hearth Workspace (Daily Anchors & Fuel Consoles) */}
-          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
-            {/* Left Hearth: Ritual Anchors & Mind-Body Keystones */}
-            <div className={`w-full lg:col-span-6 xl:col-span-5 ${mobileStation === 'habits' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 transition-[outline] duration-150 ${hotkeyFlash === 'habits' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
-              <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
-            </div>
-
-            {/* Right Hearth: Daily Fuel & Nutritional Ledger */}
-            <div className={`w-full lg:col-span-6 xl:col-span-7 ${mobileStation === 'fuel' ? 'flex' : 'hidden lg:flex'} flex-col gap-4 transition-[outline] duration-150 ${hotkeyFlash === 'fuel' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-2xl' : ''}`}>
+          {/* RIGHT 50%: 3 Stacked Operator Cards */}
+          <div className={`w-full lg:col-span-6 xl:col-span-6 ${
+            mobileStation === 'console' ? 'flex' : 'hidden lg:flex'
+          } flex-col gap-6`}>
+            
+            {/* CARD 1: Log Food */}
+            <div className={`w-full transition-[outline] duration-150 ${
+              hotkeyFlash === 'fuel' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''
+            }`}>
               <DailyFuelCard
                 currentProtein={currentProtein}
                 targetProtein={targetProtein}
                 currentDate={currentDate}
               />
             </div>
+
+            {/* CARD 2: Evening Ledger & Sleep / Zen */}
+            <div className="w-full">
+              <EveningSleepCard
+                onOpenSchedule={() => setIsScheduleModalOpen(true)}
+                onOpenReceipt={() => setIsReceiptOpen(true)}
+                onToggleCorkboard={() => {
+                  retroAudio.playPaperRustle();
+                  haptics.tap();
+                  setIsCorkboardOpen((prev) => !prev);
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                    setMobileStation('island');
+                  }
+                }}
+                onOpenAmbient={() => setIsAmbientOpen(true)}
+                isCorkboardOpen={isCorkboardOpen}
+              />
+            </div>
+
+            {/* CARD 3: Daily Ritual Anchors */}
+            <div className={`w-full transition-[outline] duration-150 ${
+              hotkeyFlash === 'habits' ? 'outline outline-2 outline-offset-2 outline-[#1A3629]/30 rounded-3xl' : ''
+            }`}>
+              <CoreHabitsCard onOpenSchedule={() => setIsScheduleModalOpen(true)} />
+            </div>
+
           </div>
+
         </div>
 
         {/* TIER 3: Archival Museum Specimen Reliquary Sub-Floor */}
@@ -434,16 +436,6 @@ function DashboardContent() {
       <MinimalistReceiptModal
         isOpen={isReceiptOpen}
         onClose={() => setIsReceiptOpen(false)}
-      />
-
-      {/* 30-Day Guild Wax-Seal Corkboard */}
-      <WaxSealCorkboard
-        isOpen={isCorkboardOpen}
-        onClose={() => {
-          setIsCorkboardOpen(false);
-          setJustSealedDate(null);
-        }}
-        justSealedDate={justSealedDate}
       />
 
       {/* Monitor-2 Ambient Living Desk Diorama */}

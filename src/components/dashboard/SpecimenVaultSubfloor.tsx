@@ -104,7 +104,11 @@ export function SpecimenVaultSubfloor() {
                 haptics.tap();
                 setSelectedTrophy(trophy);
               }}
-              className="flex flex-col items-center p-4 rounded-2xl border border-[#1A3629]/12 bg-[#FAF7F0] hover:bg-[#FFFDF9] hover:border-[#1A3629]/30 transition-all cursor-pointer group shadow-[inset_0_2px_8px_rgba(26,54,41,0.04)] text-center relative overflow-hidden"
+              className={`flex flex-col items-center p-4 rounded-2xl border transition-all cursor-pointer group text-center relative overflow-hidden ${
+                isUnlocked
+                  ? 'border-[#1A3629]/15 bg-[#FAF7F0] hover:bg-[#FFFDF9] hover:border-[#1A3629]/30 shadow-[inset_0_2px_8px_rgba(26,54,41,0.04)]'
+                  : 'border-dashed border-[#1A3629]/15 bg-[#EAE5DC]/60 opacity-40 grayscale hover:opacity-60 transition-opacity'
+              }`}
             >
               {/* Recessed Plinth Alcove Backing */}
               <div
@@ -121,7 +125,9 @@ export function SpecimenVaultSubfloor() {
               />
 
               {/* Uniform Pixel Art Trophy Chalice */}
-              <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center mb-2.5 z-10 group-hover:scale-105 transition-transform duration-200">
+              <div className={`w-20 h-20 sm:w-24 sm:h-24 relative flex items-center justify-center mb-2.5 z-10 ${
+                isUnlocked ? 'group-hover:scale-105 transition-transform duration-200' : 'opacity-60'
+              }`}>
                 <TrophyRelicSprite
                   trophyId={trophy.id}
                   tier={trophy.tier}
@@ -131,13 +137,17 @@ export function SpecimenVaultSubfloor() {
               </div>
 
               {/* Engraved Plinth Nameplate */}
-              <span className="font-cabinet font-extrabold text-xs text-[#1A3629] line-clamp-1 w-full group-hover:text-[#2C4A3B] transition-colors z-10">
+              <span className={`font-cabinet font-extrabold text-xs line-clamp-1 w-full z-10 ${
+                isUnlocked ? 'text-[#1A3629] group-hover:text-[#2C4A3B] transition-colors' : 'text-[#1A3629]/40'
+              }`}>
                 {isUnlocked ? trophy.title : 'Locked Specimen'}
               </span>
 
               <div className="flex items-center gap-1.5 mt-1 z-10">
-                <span className={`text-[10px] font-mono uppercase tracking-wider ${trophy.isShame && isUnlocked ? 'text-red-700 font-bold' : 'text-[#4A5D4E]'}`}>
-                  {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Encrypted'}
+                <span className={`text-[10px] font-mono uppercase tracking-wider ${
+                  isUnlocked ? (trophy.isShame ? 'text-red-700 font-bold' : 'text-[#4A5D4E]') : 'text-[#4A5D4E]/40'
+                }`}>
+                  {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Locked'}
                 </span>
               </div>
             </button>

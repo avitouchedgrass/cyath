@@ -5,23 +5,25 @@ import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { ISLAND_TIERS, getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
-import { calculateCircadianStatus } from '@/lib/circadianEngine';
+import { formatLocalDate } from '@/lib/dateUtils';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { EveningSealButton } from '@/components/dashboard/EveningSealButton';
+import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
 
 export type IslandLifecycleState = 'active' | 'embers' | 'mist' | 'dormant';
 
 interface SanctuaryObservatoryProps {
-  onOpenSchedule: () => void;
+  isLedgerOpen: boolean;
+  onToggleLedger: () => void;
   onOpenReceipt: () => void;
-  onOpenCorkboard: (sealedDate?: string) => void;
+  justSealedDate?: string | null;
 }
 
 export function SanctuaryObservatory({
-  onOpenSchedule,
+  isLedgerOpen,
+  onToggleLedger,
   onOpenReceipt,
-  onOpenCorkboard,
+  justSealedDate = null,
 }: SanctuaryObservatoryProps) {
   const {
     totalXp,
@@ -29,7 +31,6 @@ export function SanctuaryObservatory({
     getDailyLog,
     streakCount,
     isForgedStreak,
-    userProfile,
     activateReentryProtocol,
     isLedgerSealedByDate,
   } = useHabitStore();
@@ -54,69 +55,22 @@ export function SanctuaryObservatory({
     return 'active';
   }, [streakCount, completedHabitsCount]);
 
-  const wakeTime = userProfile?.wakeTime || '07:30';
-  const bedTime = userProfile?.bedTime || '23:30';
-
-  const circadian = useMemo(() => {
-    return calculateCircadianStatus({
-      wakeTimeStr: wakeTime,
-      bedtimeTargetStr: bedTime,
-    });
-  }, [wakeTime, bedTime]);
-
-  const horizonAuraClass = useMemo(() => {
-    const phaseId = circadian.currentPhase.id;
-    if (phaseId === 'photonic_reset') {
-      return 'bg-[radial-gradient(circle_at_center,_rgba(251,191,36,0.22)_0%,_rgba(245,215,160,0.08)_45%,_transparent_75%)]';
-    }
-    if (phaseId === 'peak_clarity' || phaseId === 'secondary_focus') {
-      return 'bg-[radial-gradient(circle_at_center,_rgba(96,165,250,0.18)_0%,_rgba(219,234,254,0.06)_45%,_transparent_75%)]';
-    }
-    if (phaseId === 'postprandial_dip' || phaseId === 'cortisol_winddown') {
-      return 'bg-[radial-gradient(circle_at_center,_rgba(249,115,22,0.18)_0%,_rgba(254,215,170,0.08)_45%,_transparent_75%)]';
-    }
-    return 'bg-[radial-gradient(circle_at_center,_rgba(30,41,59,0.22)_0%,_rgba(51,65,85,0.08)_45%,_transparent_75%)]';
-  }, [circadian.currentPhase.id]);
-
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
-  const [hardwareDetails, setHardwareDetails] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
     const savedOverride = localStorage.getItem('cyath_low_power_island');
     if (savedOverride !== null) {
-      const isManualLow = savedOverride === 'true';
-      setIsLowEndDevice(isManualLow);
-      if (isManualLow) setHardwareDetails('Manual low-power mode active');
+      setIsLowEndDevice(savedOverride === 'true');
       return;
     }
-
     const cores = navigator.hardwareConcurrency || 8;
     const memory = (navigator as any).deviceMemory || 8;
-    const isLowCores = cores <= 4;
-    const isLowMemory = memory < 4;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (isLowCores || isLowMemory || prefersReducedMotion) {
+    if (cores <= 4 || memory < 4 || prefersReducedMotion) {
       setIsLowEndDevice(true);
-      const reason = isLowCores && isLowMemory
-        ? `Low-spec device (${cores} cores, ${memory}GB RAM)`
-        : isLowCores
-        ? `Low-spec device (${cores} CPU cores)`
-        : isLowMemory
-        ? `Low-spec device (${memory}GB RAM)`
-        : 'Reduced motion preference active';
-      setHardwareDetails(reason);
     }
   }, []);
-
-  const toggleSpecMode = () => {
-    const next = !isLowEndDevice;
-    setIsLowEndDevice(next);
-    localStorage.setItem('cyath_low_power_island', next ? 'true' : 'false');
-    setHardwareDetails(next ? 'Manual low-power mode active' : null);
-  };
 
   const handleReentry = () => {
     retroAudio.playTierUpgrade();
@@ -126,115 +80,167 @@ export function SanctuaryObservatory({
 
   const pinnedCount = Object.values(isLedgerSealedByDate).filter(Boolean).length;
 
+  // Rolling 30 days calculation for the in-place ledger
+  const todayStr = formatLocalDate();
+  const rollingDays = useMemo(() => {
+    const list = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = formatLocalDate(d);
+      const isSealed = !!isLedgerSealedByDate[dateStr];
+      const log = getDailyLog(dateStr);
+      list.push({
+        dateStr,
+        dayNumber: d.getDate(),
+        isToday: dateStr === todayStr,
+        isSealed,
+        isForged: !!log.isForgedReentry,
+      });
+    }
+    return list;
+  }, [isLedgerSealedByDate, getDailyLog, todayStr]);
+
   return (
-    <section 
-      aria-label="Sanctuary Observatory"
-      className="relative w-full py-4 sm:py-6 overflow-hidden"
-    >
-      {/* Dynamic Circadian Horizon Aura */}
-      <div
-        className={`pointer-events-none absolute -inset-24 rounded-full blur-3xl opacity-50 transition-all duration-1000 ${horizonAuraClass}`}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 xl:gap-10 items-center">
-        
-        {/* ========================================================================= */}
-        {/* BAY 1 (Left, col-span-3): Circadian Chrono-Compass */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-3 flex flex-col gap-4 order-2 lg:order-1">
-          <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
-            <h2 className="font-cabinet font-extrabold text-sm text-[#1A3629] tracking-tight">
-              Circadian Cadence
-            </h2>
-            <button
-              type="button"
-              onClick={onOpenSchedule}
-              className="text-xs font-cabinet font-bold text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer"
-              title="Calibrate circadian wake and bed hours"
-            >
-              Calibrate
-            </button>
-          </div>
-
-          {/* Active Biological Phase */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629] tracking-tight">
-                {circadian.currentPhase.name}
-              </span>
-              <span className="font-mono text-xs font-bold text-[#1A3629]/70">
-                {circadian.currentPhase.timeRange}
-              </span>
-            </div>
-            
-            <p className="font-sans text-xs text-[#4A5D4E] leading-relaxed">
-              {circadian.currentPhase.hourlyDirective}
-            </p>
-
-            {/* Micro 24-Hour Solar Timeline Ribbon */}
-            <div className="w-full h-1.5 bg-[#1A3629]/10 rounded-full overflow-hidden mt-1">
-              <div 
-                className="h-full bg-[#1A3629] rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min(100, Math.max(10, circadian.alertnessScore))}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Schedule Window */}
-          <div className="flex items-center justify-between text-xs pt-3 border-t border-[#1A3629]/10">
-            <span className="font-sans text-[#4A5D4E]">Target Schedule</span>
-            <span className="font-mono text-xs font-bold text-[#1A3629]">{wakeTime} to {bedTime}</span>
-          </div>
-
-          {/* Streak Momentum Status */}
-          <div className="flex items-center justify-between pt-3 border-t border-[#1A3629]/10">
-            <span className="font-sans text-xs text-[#4A5D4E]">Consistency</span>
+    <div className="w-full h-full min-h-[580px] bg-[#FFFDF9] border border-[#1A3629]/15 rounded-3xl p-5 sm:p-7 shadow-[0_8px_32px_rgba(26,54,41,0.04)] flex flex-col justify-between relative overflow-hidden">
+      
+      {/* ------------------------------------------------------------- */}
+      {/* VIEW A: In-Place 30-Day Guild Ledger Overlay */}
+      {/* ------------------------------------------------------------- */}
+      {isLedgerOpen ? (
+        <div className="w-full flex-1 flex flex-col justify-between gap-4 animate-in fade-in duration-200">
+          {/* Ledger Header with Switched Layout */}
+          <div className="flex items-center justify-between pb-3 border-b border-[#1A3629]/10">
+            {/* Top-Left: # of 30 Sealed Badge */}
             <div className="flex items-center gap-2">
-              <span className="font-cabinet font-extrabold text-sm text-[#1A3629]">
-                {streakCount} {streakCount === 1 ? 'Day' : 'Days'}
+              <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FAF8F5] border border-[#1A3629]/15 px-3 py-1 rounded-full shadow-2xs">
+                {pinnedCount} of 30 Sealed
               </span>
               {isForgedStreak && (
                 <span className="font-mono text-[10px] font-bold text-[#B45309] bg-[#FFFBEB] border border-[#D97706]/30 px-2 py-0.5 rounded-md">
+                  Kintsugi Active
+                </span>
+              )}
+            </div>
+
+            {/* Top-Right: Closing Trigger */}
+            <button
+              type="button"
+              onClick={onToggleLedger}
+              className="h-8 px-3.5 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1"
+            >
+              <span>Return to Sanctuary</span>
+              <span className="text-[10px]">✕</span>
+            </button>
+          </div>
+
+          {/* 30-Day Grid */}
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/12 grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2.5">
+              {rollingDays.map((slot) => (
+                <button
+                  key={slot.dateStr}
+                  type="button"
+                  onClick={() => {
+                    if (slot.isSealed) {
+                      retroAudio.playInspectConfirm();
+                      haptics.tap();
+                      onOpenReceipt();
+                    } else {
+                      retroAudio.playBlip();
+                    }
+                  }}
+                  className={`aspect-square rounded-xl border flex flex-col items-center justify-between p-1.5 transition-all duration-150 cursor-pointer text-center relative ${
+                    slot.isSealed
+                      ? 'border-[#1A3629]/30 bg-[#FFFDF9] hover:border-[#1A3629] shadow-2xs hover:scale-105'
+                      : slot.isToday
+                      ? 'border-[#1A3629]/40 bg-[#FFFDF9]/60 hover:bg-[#FFFDF9]'
+                      : 'border-[#1A3629]/8 bg-[#FAF8F5]/60 hover:bg-[#FAF8F5]'
+                  }`}
+                  title={`${slot.dateStr}: ${slot.isSealed ? 'Sealed (Click to view receipt)' : 'Unsealed'}`}
+                >
+                  <span className={`font-mono text-[10px] font-bold ${slot.isToday ? 'text-[#1A3629]' : 'text-[#4A5D4E]/70'}`}>
+                    {slot.dayNumber}
+                  </span>
+
+                  <div className="flex-1 flex items-center justify-center my-0.5">
+                    {slot.isSealed ? (
+                      <div className="transform scale-90">
+                        <PixelWaxSeal size={20} />
+                      </div>
+                    ) : (
+                      <span className="text-[9px] font-mono text-[#1A3629]/20">
+                        {slot.isToday ? 'Today' : ''}
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="text-[8px] font-mono text-[#4A5D4E]/60 uppercase">
+                    {slot.isSealed ? 'Done' : 'Open'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Ledger Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/10 text-xs font-sans text-[#4A5D4E]">
+            <span>Click any sealed day to inspect thermal receipt</span>
+            <button
+              type="button"
+              onClick={onToggleLedger}
+              className="font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer"
+            >
+              Back to Living Island →
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ------------------------------------------------------------- */
+        /* VIEW B: Monumental Floating Island (Default) */
+        /* ------------------------------------------------------------- */
+        <div className="w-full flex-1 flex flex-col justify-between gap-4 animate-in fade-in duration-200">
+          
+          {/* Top: Title above island + Streak just below */}
+          <div className="flex flex-col items-center text-center gap-1.5 pt-1">
+            <h1 className="font-cabinet font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight text-[#1A3629]">
+              {currentIsland.name}
+            </h1>
+
+            {/* Streak just below the title */}
+            <div
+              className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#1A3629]/15 shadow-2xs"
+              title={`${streakCount} Day Habit Momentum Streak`}
+            >
+              <div className="w-3.5 h-3.5 relative">
+                <Image
+                  src={isForgedStreak ? '/assets/trophies/flame_iron.png' : '/assets/trophies/flame_normal.png'}
+                  alt="Streak Flame"
+                  fill
+                  className="object-contain select-none"
+                  style={{ imageRendering: 'pixelated' }}
+                />
+              </div>
+              <span className="font-cabinet font-extrabold text-xs text-[#1A3629]">
+                {streakCount} {streakCount === 1 ? 'Day' : 'Days'} {isForgedStreak ? 'Forged' : 'Streak'}
+              </span>
+              {isForgedStreak && (
+                <span className="font-mono text-[9px] font-bold text-[#1E3A8A] bg-blue-100 px-1 py-0.2 rounded border border-blue-200">
                   Kintsugi
                 </span>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* BAY 2 (Center, col-span-6): The Monumental Floating Island Hero */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-6 flex flex-col items-center justify-center text-center order-1 lg:order-2">
-          
-          {/* Biome Name & Tier/Level */}
-          <div className="flex flex-col items-center gap-1 mb-2">
-            <h1 className="font-cabinet font-black text-3xl sm:text-4xl xl:text-5xl tracking-tight text-[#1A3629]">
-              {currentIsland.name}
-            </h1>
-
-            <div className="flex items-center gap-3 text-xs font-mono font-bold text-[#1A3629]">
-              <span>Tier {currentIsland.tier}</span>
-              <span>Level {progress.level}</span>
-              <span className="text-[#047857]">{streakCount}d Active</span>
-            </div>
-
-            {/* Environmental Narrative Lore */}
-            <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] max-w-md mt-1 leading-relaxed">
-              {currentIsland.description}
-            </p>
 
             {/* Dormant Mist Banner if Streak Broken */}
             {streakCount === 0 && (
-              <div className="mt-2 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
+              <div className="mt-1 flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
                 <span className="font-sans text-xs text-[#4A5D4E]">
                   Sanctuary in Dormant Mist
                 </span>
                 <button
                   type="button"
                   onClick={handleReentry}
-                  className="px-3 py-1 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer"
+                  className="px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[11px] hover:bg-[#2C4A3B] transition-colors cursor-pointer"
                 >
                   Forged Re-Entry
                 </button>
@@ -242,16 +248,16 @@ export function SanctuaryObservatory({
             )}
           </div>
 
-          {/* Monumental Floating Island Graphic */}
-          <div className="relative flex flex-col items-center justify-center my-2">
-            <div className="relative z-10 w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[440px] md:h-[440px] lg:w-[480px] lg:h-[480px] xl:w-[530px] xl:h-[530px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
+          {/* Center: Monumental Floating Island Graphic */}
+          <div className="relative flex-1 flex flex-col items-center justify-center my-auto min-h-[300px]">
+            <div className="relative z-10 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px] lg:w-[460px] lg:h-[460px] xl:w-[500px] xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300">
               {isLowEndDevice ? (
                 <Image
                   src={currentIsland.pngImage || currentIsland.image}
                   alt={currentIsland.name}
                   fill
                   priority
-                  sizes="(max-width: 640px) 300px, (max-width: 1024px) 440px, 530px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 500px"
                   className="object-contain drop-shadow-[0_16px_28px_rgba(26,54,41,0.14)] select-none"
                   style={{ imageRendering: 'pixelated' }}
                 />
@@ -321,97 +327,57 @@ export function SanctuaryObservatory({
                       />
                     </g>
                   )}
-
-                  {lifecycleState === 'mist' && (
-                    <g id="sanctuary-mist-overlay" opacity="0.65">
-                      <rect x="180" y="580" width="440" height="24" rx="12" fill="#CBD5E1" opacity="0.35" />
-                      <rect x="240" y="630" width="320" height="18" rx="9" fill="#E2E8F0" opacity="0.25" />
-                    </g>
-                  )}
                 </svg>
               )}
             </div>
 
-            {/* Stepped Pixel Ground Shadow scaled for monumental island */}
+            {/* Stepped Pixel Ground Shadow */}
             <div className="relative flex flex-col items-center justify-center -mt-3 pointer-events-none animate-[shadowFloat_8s_ease-in-out_infinite]">
               <div className="w-[240px] sm:w-[320px] md:w-[380px] xl:w-[440px] h-3.5 rounded-full bg-[#1A3629]/10" />
               <div className="w-[160px] sm:w-[220px] md:w-[270px] xl:w-[310px] h-2.5 rounded-full bg-[#1A3629]/18 -mt-2.5" />
               <div className="w-[90px] sm:w-[130px] md:w-[160px] xl:w-[180px] h-1.5 rounded-full bg-[#1A3629]/25 -mt-1.5" />
             </div>
-
-            {isLowEndDevice && (
-              <div className="mt-2 flex items-center gap-2 font-mono text-[10px] text-amber-900 bg-amber-50/90 border border-amber-200 px-2.5 py-0.5 rounded-full shadow-2xs">
-                <span>Low-power mode (PNG)</span>
-                <button
-                  type="button"
-                  onClick={toggleSpecMode}
-                  className="underline hover:text-amber-950 cursor-pointer font-bold"
-                >
-                  Force SVG
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* BAY 3 (Right, col-span-3): Evolution & Guild Closure Station */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-3 flex flex-col gap-4 order-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
-            <h2 className="font-cabinet font-extrabold text-sm text-[#1A3629] tracking-tight">
-              Sanctuary Evolution
-            </h2>
-            <span className="font-mono text-xs font-bold text-[#1A3629]">
-              Level {progress.level}
-            </span>
           </div>
 
-          {/* Level XP Progress */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-sans text-[#4A5D4E]">Level Progress</span>
-              <span className="font-mono font-bold text-[#1A3629]">
-                {Math.round(progress.progressPercent)}%
+          {/* Bottom: Current Tier and Level above Progress Bar */}
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-[#1A3629]/10">
+            <div className="flex items-baseline justify-between">
+              {/* Tier with a teeny tiny bit less contrast */}
+              <span className="font-cabinet font-semibold text-xs sm:text-sm text-[#4A5D4E]">
+                Tier {currentIsland.tier}
+              </span>
+
+              {/* Level with bold contrast emphasis */}
+              <span className="font-cabinet font-black text-base sm:text-lg text-[#1A3629]">
+                Level {progress.level}
               </span>
             </div>
-            
-            <div className="w-full h-2 bg-[#1A3629]/10 rounded-full overflow-hidden">
+
+            {/* Progress Bar */}
+            <div className="w-full h-2.5 bg-[#1A3629]/10 rounded-full overflow-hidden">
               <div
                 className="h-full bg-[#1A3629] rounded-full transition-all duration-700 ease-out"
                 style={{ width: `${Math.min(100, Math.max(0, progress.progressPercent))}%` }}
               />
             </div>
 
-            <div className="flex items-center justify-between font-mono text-[10px] text-[#4A5D4E]">
+            {/* Progress XP details + Quick Ledger Toggle */}
+            <div className="flex items-center justify-between font-mono text-[11px] text-[#4A5D4E]">
               <span>{progress.currentLevelXp} / {progress.xpForNextLevel} XP</span>
-              {nextIsland && <span>Next: {nextIsland.name}</span>}
+              <button
+                type="button"
+                onClick={onToggleLedger}
+                className="font-cabinet font-bold text-[#1A3629] hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <span>30-Day Ledger ({pinnedCount}/30)</span>
+                <span>→</span>
+              </button>
             </div>
           </div>
 
-          {/* 30-Day Guild Ledger Action */}
-          <button
-            type="button"
-            onClick={() => {
-              retroAudio.playPaperRustle();
-              haptics.tap();
-              onOpenCorkboard();
-            }}
-            className="w-full h-11 px-4 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#FAF5ED] hover:border-[#1A3629]/40 text-[#1A3629] font-cabinet font-bold text-xs transition-all flex items-center justify-between cursor-pointer shadow-2xs"
-            title="Inspect 30-Day Guild Wax-Seal Ledger (Hotkey L)"
-          >
-            <span>30-Day Guild Ledger</span>
-            <span className="font-mono text-xs font-bold text-[#1A3629]/70">{pinnedCount} of 30 Sealed</span>
-          </button>
-
-          {/* Evening Seal Ceremony Action */}
-          <EveningSealButton
-            onOpenReceipt={onOpenReceipt}
-            onOpenCorkboard={onOpenCorkboard}
-          />
         </div>
+      )}
 
-      </div>
-    </section>
+    </div>
   );
 }

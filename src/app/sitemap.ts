@@ -1,5 +1,4 @@
-import { MetadataRoute } from 'next';
-import { RECIPES } from '@/lib/recipes';
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
@@ -14,40 +13,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: [`${baseUrl}/assets/cyath-hero-preview.png`],
     },
     {
-      url: `${baseUrl}/playbook`,
+      url: `${baseUrl}/dashboard`,
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: 'always',
       priority: 0.95,
     },
     {
-      url: `${baseUrl}/recipes`,
+      url: `${baseUrl}/playbook`,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.9,
-      images: [`${baseUrl}/assets/food/greek-salmon-1.0.webp`],
     },
     {
       url: `${baseUrl}/protocols`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.9,
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/correlations`,
       lastModified: currentDate,
       changeFrequency: 'daily',
-      priority: 0.85,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/sanctuary`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: currentDate,
-      changeFrequency: 'always',
       priority: 0.8,
     },
     {
@@ -70,17 +62,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const recipeRoutes: MetadataRoute.Sitemap = RECIPES.map((recipe) => ({
-    url: `${baseUrl}/recipes/${encodeURIComponent(recipe.id)}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly',
-    priority: 0.85,
-    images: [
-      recipe.image.startsWith('http')
-        ? recipe.image
-        : `${baseUrl}${recipe.image}`,
-    ],
-  }));
-
-  return [...staticRoutes, ...recipeRoutes];
+  return staticRoutes;
 }

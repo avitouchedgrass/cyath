@@ -137,7 +137,7 @@ export function CommandProtocolCard() {
         <div className="flex items-center gap-3 flex-wrap text-xs font-cabinet">
           {protocol.recipeSlug && (
             <Link
-              href={`/recipes/${protocol.recipeSlug}`}
+              href={`/playbook?tab=recipes&inspect=${protocol.recipeSlug}`}
               className="font-bold text-[#1A3629] hover:text-[#065F46] underline transition-colors cursor-pointer"
             >
               Paired Fuel: {protocol.recipeTitle || 'Nutritional Pairing'} →

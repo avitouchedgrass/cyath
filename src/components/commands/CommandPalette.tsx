@@ -267,16 +267,16 @@ export function CommandPalette() {
     });
 
     items.push({
-      id: 'nav-recipes',
+      id: 'nav-playbook',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: '↗',
-      title: 'Browse Whole-Food Recipes',
-      description: 'Explore high-protein catalog and portion scales',
+      title: 'Open Habit & Fuel Playbook',
+      description: 'Explore circadian protocols and nutritional methodology',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
-        router.push('/recipes');
+        router.push('/playbook');
       },
     });
 

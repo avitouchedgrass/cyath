@@ -5,6 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { Loader2, X } from 'lucide-react';
+import { PixelMealPlate } from '@/components/dashboard/PixelMealPlate';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -228,6 +229,7 @@ export function DailyFuelCard({
               className="px-3 py-2 rounded-xl border border-[#1A3629]/12 bg-[#FAF8F5] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 group shadow-2xs"
               title={preset.desc}
             >
+              <PixelMealPlate mealName={preset.desc} size={24} />
               <span className="font-cabinet font-bold text-xs group-hover:text-[#FFFDF9]">
                 {preset.label}
               </span>
@@ -255,8 +257,9 @@ export function DailyFuelCard({
             {currentLog.loggedMeals.map((meal) => (
               <div
                 key={meal.id}
-                className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs transition-colors hover:border-[#1A3629]/20"
+                className="flex items-center justify-between gap-2.5 p-2.5 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs transition-colors hover:border-[#1A3629]/20"
               >
+                <PixelMealPlate mealName={meal.name} size={36} />
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="font-cabinet font-bold text-[#1A3629] truncate">
                     {meal.name}

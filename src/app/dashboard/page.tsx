@@ -15,7 +15,8 @@ import { EveningSealButton } from '@/components/dashboard/EveningSealButton';
 import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
 import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfloor';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
-import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
+import { WaxSealCorkboard } from '@/components/dashboard/WaxSealCorkboard';
+import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
 import {
   Volume2,
   VolumeX,
@@ -29,7 +30,9 @@ function DashboardContent() {
 
   // Modal States
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
-  const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const [isCorkboardOpen, setIsCorkboardOpen] = useState(false);
+  const [justSealedDate, setJustSealedDate] = useState<string | null>(null);
+  const [isAmbientOpen, setIsAmbientOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   const hasCalibratedTodayRef = useRef(false);
@@ -63,6 +66,11 @@ function DashboardContent() {
       if (e.key === 'v' || e.key === 'V') {
         e.preventDefault();
         handleOpenVault();
+      }
+      if (e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        retroAudio.playBlip();
+        setIsAmbientOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -208,17 +216,34 @@ function DashboardContent() {
 
             <div className="h-4 w-px bg-[#1A3629]/12" />
 
-            {/* Weekly Review Trigger */}
+            {/* 30-Day Ledger Board Trigger */}
             <button
               type="button"
               onClick={() => {
                 retroAudio.playBlip();
                 haptics.tap();
-                setIsDossierOpen(true);
+                setJustSealedDate(null);
+                setIsCorkboardOpen(true);
               }}
               className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
             >
-              <span>Weekly Review</span>
+              <span>30-Day Ledger</span>
+            </button>
+
+            <div className="h-4 w-px bg-[#1A3629]/12" />
+
+            {/* Ambient Monitor-2 Mode Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playBlip();
+                haptics.tap();
+                setIsAmbientOpen(true);
+              }}
+              className="h-8 inline-flex items-center px-3 rounded-full text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer"
+              title="Ambient Monitor-2 Mode (Press A)"
+            >
+              <span>Ambient (A)</span>
             </button>
 
             <div className="h-4 w-px bg-[#1A3629]/12" />
@@ -240,7 +265,13 @@ function DashboardContent() {
           {/* LEFT FLANK: Keystone Habits Punch-Pad & Evening Seal (Pinned to Left Edge) */}
           <div className="w-full lg:w-[330px] xl:w-[370px] 2xl:w-[400px] shrink-0 order-2 lg:order-1 flex flex-col gap-4">
             <CoreHabitsCard />
-            <EveningSealButton onOpenReceipt={() => setIsReceiptOpen(true)} />
+            <EveningSealButton
+              onOpenReceipt={() => setIsReceiptOpen(true)}
+              onOpenCorkboard={(sealedDate) => {
+                setJustSealedDate(sealedDate || currentDate);
+                setIsCorkboardOpen(true);
+              }}
+            />
           </div>
 
           {/* CENTER STAGE: Monumental Living Floating Island (Center of Attraction) */}
@@ -285,10 +316,20 @@ function DashboardContent() {
         onClose={() => setIsReceiptOpen(false)}
       />
 
-      {/* 7-Day Intelligence Dossier Modal */}
-      <WeeklyDossierModal
-        isOpen={isDossierOpen}
-        onClose={() => setIsDossierOpen(false)}
+      {/* 30-Day Guild Wax-Seal Corkboard */}
+      <WaxSealCorkboard
+        isOpen={isCorkboardOpen}
+        onClose={() => {
+          setIsCorkboardOpen(false);
+          setJustSealedDate(null);
+        }}
+        justSealedDate={justSealedDate}
+      />
+
+      {/* Monitor-2 Ambient Living Desk Diorama */}
+      <AmbientDeskDiorama
+        isOpen={isAmbientOpen}
+        onClose={() => setIsAmbientOpen(false)}
       />
 
       {/* Schedule Adjustment Modal */}

@@ -12,9 +12,10 @@ import { X, Copy, Check, Download, ShieldCheck } from 'lucide-react';
 interface MinimalistReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
+  dateOverride?: string;
 }
 
-export function MinimalistReceiptModal({ isOpen, onClose }: MinimalistReceiptModalProps) {
+export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: MinimalistReceiptModalProps) {
   const {
     currentDate,
     getDailyLog,
@@ -28,7 +29,8 @@ export function MinimalistReceiptModal({ isOpen, onClose }: MinimalistReceiptMod
   const [copied, setCopied] = useState(false);
   const receiptCardRef = useRef<HTMLDivElement>(null);
 
-  const currentLog = getDailyLog(currentDate);
+  const activeDate = dateOverride || currentDate;
+  const currentLog = getDailyLog(activeDate);
   const progress = calculateLevel(totalXp);
   const currentIsland = getIslandTier(progress.level);
 
@@ -36,7 +38,7 @@ export function MinimalistReceiptModal({ isOpen, onClose }: MinimalistReceiptMod
   const isSunlightDone = !!currentLog.habitsCompleted?.['sunlight'];
   const proteinLogged = currentLog.totalProteinLogged || 0;
   const hydrationLogged = (currentLog.hydrationLiters || 0).toFixed(1);
-  const isSealed = !!isLedgerSealedByDate[currentDate];
+  const isSealed = !!isLedgerSealedByDate[activeDate];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,7 +78,7 @@ export function MinimalistReceiptModal({ isOpen, onClose }: MinimalistReceiptMod
     ctx.fillText('CYATH · DAILY RECEIPT', 320, 70);
 
     ctx.font = 'bold 14px monospace';
-    ctx.fillText(`DATE: ${currentDate.toUpperCase()} // LEVEL ${progress.level}`, 320, 100);
+    ctx.fillText(`DATE: ${activeDate.toUpperCase()} // LEVEL ${progress.level}`, 320, 100);
 
     // Divider line
     ctx.strokeStyle = '#1A3629';
@@ -193,7 +195,7 @@ export function MinimalistReceiptModal({ isOpen, onClose }: MinimalistReceiptMod
             Cyath Cadence Receipt
           </h2>
           <span className="font-mono text-xs text-[#1A3629]/70 mt-0.5">
-            {currentDate} · Level {progress.level}
+            {activeDate} · Level {progress.level}
           </span>
         </div>
 

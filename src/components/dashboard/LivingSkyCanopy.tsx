@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
 import { ISLAND_TIERS, getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
+import { SanctuaryIslandSprite, IslandLifecycleState } from './SanctuaryIslandSprite';
 
 interface LivingIslandHeroProps {
   onOpenReceipt?: () => void;
@@ -37,6 +37,13 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
   const isFuelDone = (currentLog.totalProteinLogged || 0) >= 100 || !!currentLog.habitsCompleted?.['protein_target'];
 
   const completedHabitsCount = (isSunlightDone ? 1 : 0) + (isHydrationDone ? 1 : 0) + (isFuelDone ? 1 : 0);
+
+  // Dynamic 48-Hour Lifecycle State (Active -> Embers -> Mist Dormancy -> Kintsugi)
+  const lifecycleState: IslandLifecycleState = useMemo(() => {
+    if (streakCount === 0) return 'mist';
+    if (completedHabitsCount === 0) return 'embers';
+    return 'active';
+  }, [streakCount, completedHabitsCount]);
 
   // Dynamic Circadian Horizon Aura
   const circadian = useMemo(() => {
@@ -128,15 +135,13 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
         <div
           className="relative z-10 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] md:w-[380px] md:h-[380px] lg:w-[400px] lg:h-[400px] xl:w-[460px] xl:h-[460px] 2xl:w-[500px] 2xl:h-[500px] flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-all duration-300"
         >
-          {/* Base Pixel Island */}
-          <Image
-            src={currentIsland.image}
-            alt={currentIsland.name}
-            fill
-            priority
-            sizes="(max-width: 640px) 280px, (max-width: 1024px) 400px, 500px"
-            className="object-contain drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)] select-none"
-            style={{ imageRendering: 'pixelated' }}
+          {/* Procedural Vector Pixel Island */}
+          <SanctuaryIslandSprite
+            tier={currentIsland.tier}
+            lifecycleState={lifecycleState}
+            hasKintsugiSeams={isForgedStreak || streakCount >= 5}
+            size={440}
+            className="drop-shadow-[0_25px_45px_rgba(26,54,41,0.20)]"
           />
         </div>
 

@@ -130,12 +130,12 @@ export default function Home() {
                   </button>
                 </Link>
 
-                <Link href="/recipes" className="w-full sm:w-auto">
+                <Link href="/playbook" className="w-full sm:w-auto">
                   <button
                     type="button"
                     className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF5ED] shadow-[0_2px_6px_rgba(26,54,41,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
-                    Browse Recipes
+                    Explore Methodology
                   </button>
                 </Link>
               </div>
@@ -455,10 +455,10 @@ export default function Home() {
                 </div>
 
                 <Link
-                  href="/recipes"
+                  href="/playbook"
                   className="mt-6 inline-flex items-center justify-between w-full text-xs font-mono font-bold pt-4 border-t border-[#1A3629]/10 hover:text-[#3A6B52] transition-colors"
                 >
-                  <span>Browse Recipes Catalog →</span>
+                  <span>Explore Playbook →</span>
                 </Link>
               </div>
 
@@ -671,12 +671,12 @@ export default function Home() {
                 </button>
               </Link>
 
-              <Link href="/recipes" className="w-full sm:w-auto">
+              <Link href="/playbook" className="w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-full bg-[#FFFDF9] text-[#1A3629] border border-[#1A3629]/20 hover:border-[#1A3629]/40 hover:bg-[#FAF6EE] shadow-2xs active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center"
                 >
-                  Browse Recipes
+                  Explore Playbook
                 </button>
               </Link>
             </div>

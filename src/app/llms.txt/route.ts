@@ -16,7 +16,7 @@ Cyath eliminates tracking burnout and complex macro spreadsheets. Instead of req
 ## Primary Routes
 - /: Landing page, 3-step routine breakdown, interactive scatter plot preview, and 16-bit dish showcase.
 - /dashboard: Daily habit checklist, quick macro steppers (+15g, +30g protein), hydration gauge, energy journal, and 28-day activity heatmap.
-- /recipes: Catalog of 31+ high-protein, steady-carb, and keto-clean whole-food dishes with dynamic portion multipliers (0.5x, 1.0x, 1.5x, 2.0x), ingredient lists, cooking instructions, and computer-vision meal scanner.
+- /playbook: Evidence-based circadian protocols, whole-food nutrition guides, and daily metabolic anchors.
 - /protocols: Evidence-based daily routines (Morning Activation, Deep REM Sleep, High-Performance Focus, Metabolic Balance, Physical Recovery) with 1-tap activation into the user's checklist.
 - /correlations: Live statistical scatter matrix and Pearson correlation coefficient calculations (e.g. Protein × Focus, Sleep × Energy, Hydration × Mood).
 - /sanctuary: 16-bit floating island diorama that levels up and unlocks dynamic features as users build daily consistency.

@@ -61,7 +61,7 @@ export function StoveSageBriefingCard() {
       <div className="pt-2 border-t border-[#1A3629]/15 flex flex-col gap-3">
         {briefing.recommendedRecipeSlug ? (
           <Link
-            href={`/recipes/${briefing.recommendedRecipeSlug}`}
+            href={`/playbook?tab=recipes&inspect=${briefing.recommendedRecipeSlug}`}
             className="text-xs font-cabinet font-bold text-[#1A3629] hover:text-[#065F46] underline transition-colors cursor-pointer"
           >
             Recommended Fuel: {briefing.recommendedRecipeTitle} →

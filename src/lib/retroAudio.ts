@@ -189,6 +189,44 @@ class RetroAudioEngine {
     }
   }
 
+  // Heavy tactile wax seal pinning sound (retro video game THWACK)
+  public playPinThwack() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Heavy low impact thump
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(38, now + 0.14);
+      gain.gain.setValueAtTime(0.32, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+
+      // Sharp snap/rivet strike
+      const snap = this.ctx.createOscillator();
+      const snapGain = this.ctx.createGain();
+      snap.type = 'square';
+      snap.frequency.setValueAtTime(820, now);
+      snap.frequency.exponentialRampToValueAtTime(110, now + 0.05);
+      snapGain.gain.setValueAtTime(0.18, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      snap.connect(snapGain);
+      snapGain.connect(this.ctx.destination);
+      snap.start(now);
+      snap.stop(now + 0.06);
+    } catch {
+      // Ignore
+    }
+  }
+
   // Dynamic harmonic pitch for data point physics and slider interaction
   public playPitch(freq: number, duration = 0.08) {
     if (this.isMuted) return;

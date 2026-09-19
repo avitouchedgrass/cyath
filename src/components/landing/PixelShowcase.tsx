@@ -184,7 +184,7 @@ export function PixelShowcase({ onDishChange, className = '' }: PixelShowcasePro
     e.preventDefault();
     e.stopPropagation();
     retroAudio.playInspectConfirm();
-    router.push(`/recipes?inspect=${encodeURIComponent(currentDish.recipeId)}`);
+    router.push(`/playbook?tab=recipes&inspect=${encodeURIComponent(currentDish.recipeId)}`);
   };
 
   const handleToggleSound = (e: React.MouseEvent) => {

@@ -175,7 +175,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
   // Public visitor navigation items
   const publicNavItems: NavItem[] = [
-    { name: "Recipes", href: "/playbook?tab=recipes" },
+    { name: "Playbook", href: "/playbook" },
     { name: "Methodology", href: "/#methodology" },
   ];
 

@@ -8,9 +8,10 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 interface EveningSealButtonProps {
   onOpenReceipt?: () => void;
+  onOpenCorkboard?: (sealedDate?: string) => void;
 }
 
-export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
+export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSealButtonProps) {
   const {
     currentDate,
     getDailyLog,
@@ -50,7 +51,11 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
 
   const handleSeal = (e: React.MouseEvent) => {
     if (isAlreadySealed) {
-      if (onOpenReceipt) onOpenReceipt();
+      if (onOpenCorkboard) {
+        onOpenCorkboard(currentDate);
+      } else if (onOpenReceipt) {
+        onOpenReceipt();
+      }
       return;
     }
 
@@ -65,8 +70,14 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
 
     setTimeout(() => {
       setIsSealing(false);
-      if (onOpenReceipt) onOpenReceipt();
-    }, 1200);
+      retroAudio.playPinThwack();
+      haptics.success();
+      if (onOpenCorkboard) {
+        onOpenCorkboard(currentDate);
+      } else if (onOpenReceipt) {
+        onOpenReceipt();
+      }
+    }, 1000);
   };
 
   if (!isEligible && !isAlreadySealed) {
@@ -87,28 +98,44 @@ export function EveningSealButton({ onOpenReceipt }: EveningSealButtonProps) {
         <span className="font-sans text-xs text-[#4A5D4E] mt-0.5 leading-relaxed">
           {isAlreadySealed
             ? `First light scheduled for ${wakeTime} tomorrow.`
-            : 'Lock in today’s habit streak and mint your calendar coin.'}
+            : 'Lock in today’s habit streak and pin your guild wax medal.'}
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={handleSeal}
-        disabled={isSealing}
-        className={`w-full py-2.5 px-4 rounded-xl font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center shadow-2xs ${
-          isAlreadySealed
-            ? 'border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
-            : 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B]'
-        }`}
-      >
-        <span>
-          {isAlreadySealed
-            ? 'View Thermal Receipt'
-            : isSealing
-            ? 'Sealing...'
-            : 'Seal Ledger (+50 XP)'}
-        </span>
-      </button>
+      <div className="flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={handleSeal}
+          disabled={isSealing}
+          className={`w-full py-2.5 px-4 rounded-xl font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center shadow-2xs ${
+            isAlreadySealed
+              ? 'border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+              : 'bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B]'
+          }`}
+        >
+          <span>
+            {isAlreadySealed
+              ? 'Open 30-Day Ledger Board'
+              : isSealing
+              ? 'Pinning Wax Seal...'
+              : 'Seal Ledger (+50 XP)'}
+          </span>
+        </button>
+
+        {isAlreadySealed && onOpenReceipt && (
+          <button
+            type="button"
+            onClick={() => {
+              retroAudio.playBlip();
+              haptics.tap();
+              onOpenReceipt();
+            }}
+            className="w-full py-1 text-center font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer hover:underline"
+          >
+            Inspect Thermal Receipt
+          </button>
+        )}
+      </div>
     </div>
   );
 }

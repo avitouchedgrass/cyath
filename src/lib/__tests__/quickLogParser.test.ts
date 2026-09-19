@@ -96,7 +96,7 @@ describe('parseQuickLog', () => {
 
       const r2 = parseQuickLog('goto recipes', mockHabits);
       expect(r2?.type).toBe('NAVIGATE');
-      expect(r2?.payload.path).toBe('/recipes');
+      expect(r2?.payload.path).toBe('/playbook');
     });
 
     it('falls back to AI parser for natural language phrases', () => {

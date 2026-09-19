@@ -13,7 +13,7 @@ export function GlobalJsonLd() {
     description: 'A 16-bit retro neobrutalist metabolic health platform combining behavioral habit tracking, whole-food recipes, and daily energy insights.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE_URL}/recipes?q={search_term_string}`,
+      target: `${SITE_URL}/playbook?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };

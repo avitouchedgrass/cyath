@@ -39,22 +39,22 @@ export function CoreHabitsCard() {
       {
         id: 'sunlight',
         keyNumber: 1,
-        title: 'Morning Sunlight',
-        subtitle: '10–20 mins within wake window',
+        title: 'Morning Light',
+        subtitle: '10–20 mins outside (wake up your eyes)',
         isDone: !!currentLog.habitsCompleted?.['sunlight'],
       },
       {
         id: 'hydration',
         keyNumber: 2,
         title: 'Hydration Target',
-        subtitle: `${(currentLog.hydrationLiters || 0).toFixed(1)}L / 2.5L logged`,
+        subtitle: `${(currentLog.hydrationLiters || 0).toFixed(1)}L / 2.5L logged (sip up!)`,
         isDone: (currentLog.hydrationLiters || 0) >= 2.5 || !!currentLog.habitsCompleted?.['hydration'],
       },
       {
         id: 'protein_target',
         keyNumber: 3,
         title: 'Whole-Food Protein',
-        subtitle: `${currentProtein}g / ${targetProtein}g daily floor`,
+        subtitle: `${currentProtein}g / ${targetProtein}g daily target (fuel for focus)`,
         isDone: isProteinMet || !!currentLog.habitsCompleted?.['protein_target'],
       },
     ];
@@ -145,10 +145,10 @@ export function CoreHabitsCard() {
         <div className="flex items-center justify-between border-b border-[#1A3629]/10 pb-4">
           <div className="flex flex-col">
             <h3 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
-              Keystone Levers
+              Daily Anchors
             </h3>
             <span className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              Daily foundational anchors
+              3 quick habits to ground your day
             </span>
           </div>
 
@@ -247,7 +247,7 @@ export function CoreHabitsCard() {
         <div className="border-t border-[#1A3629]/10 pt-4 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
             <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-              Afternoon Energy Cadence
+              Afternoon Energy Check
             </span>
             <span className="font-mono text-[11px] text-[#4A5D4E]">
               {ritual.afternoonSlumpScore ? `Logged ${ritual.afternoonSlumpScore}/10` : '1-tap check'}

@@ -56,6 +56,7 @@ export interface DailyLogData {
   isDownscaled?: boolean;
   quickPlateType?: string | null;
   retentionCohortDay?: number;
+  isForgedReentry?: boolean;
 }
 
 export interface DeskRitualData {

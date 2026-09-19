@@ -42,29 +42,29 @@ export function SiteFooter({ className = '' }: SiteFooterProps) {
               <Link href="/protocols" className="hover:underline">Guided Routines</Link>
             </li>
             <li>
-              <Link href="/recipes" className="hover:underline">Whole-Food Recipes</Link>
+              <Link href="/playbook" className="hover:underline">Playbook &amp; Methodology</Link>
             </li>
           </ul>
         </div>
 
-        {/* Popular Recipes */}
+        {/* Keystone Levers */}
         <div className="space-y-3">
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Fuel Recipes</div>
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Keystone Levers</div>
           <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
             <li>
-              <Link href="/recipes/herb-grilled-chicken" className="hover:underline">Herb Grilled Chicken</Link>
+              <span className="text-[#2C4A3B]/80">Morning Photons</span>
             </li>
             <li>
-              <Link href="/recipes/truffle-tagliatelle-pasta" className="hover:underline">Truffle Tagliatelle</Link>
+              <span className="text-[#2C4A3B]/80">Cellular Hydration</span>
             </li>
             <li>
-              <Link href="/recipes/greek-lemon-salmon" className="hover:underline">Greek Lemon Salmon</Link>
+              <span className="text-[#2C4A3B]/80">Whole-Food Protein</span>
             </li>
             <li>
-              <Link href="/recipes/paneer-tikka-bowl" className="hover:underline">Paneer Tikka Bowl</Link>
+              <span className="text-[#2C4A3B]/80">Evening Seal Ceremony</span>
             </li>
             <li>
-              <Link href="/recipes" className="text-[#1A3629] font-black hover:underline">Explore All 42 Recipes →</Link>
+              <Link href="/dashboard" className="text-[#1A3629] font-black hover:underline">Open Cockpit →</Link>
             </li>
           </ul>
         </div>

@@ -17,7 +17,7 @@ import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfl
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { WaxSealCorkboard } from '@/components/dashboard/WaxSealCorkboard';
 import { AmbientDeskDiorama } from '@/components/dashboard/AmbientDeskDiorama';
-import { WaxSealSvg } from '@/components/dashboard/WaxSealSvg';
+import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
 import {
   Volume2,
   VolumeX,
@@ -231,7 +231,7 @@ function DashboardContent() {
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-11 h-11 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/12 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                  <WaxSealSvg size={32} />
+                  <PixelWaxSeal size={28} />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">

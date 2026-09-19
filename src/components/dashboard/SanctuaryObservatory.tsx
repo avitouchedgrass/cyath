@@ -362,7 +362,7 @@ export function SanctuaryObservatory({
                     }`}
                     title={`${slot.dateStr}: ${slot.isSealed ? 'Sealed (Click to view receipt)' : 'Unsealed'}`}
                   >
-                    <span className={`font-mono text-[9px] sm:text-[10px] font-bold ${slot.isToday ? 'text-[#1A3629]' : 'text-[#2B1F17]/70'}`}>
+                    <span className={`font-mono text-[9px] sm:text-[10px] font-bold ${slot.isToday ? 'text-[#1A3629]' : 'text-[#2B1F17]'}`}>
                       {slot.dayNumber}
                     </span>
 
@@ -372,13 +372,13 @@ export function SanctuaryObservatory({
                           <PixelWaxSeal size={18} />
                         </div>
                       ) : (
-                        <span className="text-[8px] font-mono text-[#2B1F17]/30">
+                        <span className="text-[8px] font-mono font-bold text-[#5C4838]">
                           {slot.isToday ? 'Today' : ''}
                         </span>
                       )}
                     </div>
 
-                    <span className="text-[7px] sm:text-[8px] font-mono text-[#2B1F17]/60 uppercase">
+                    <span className="text-[7px] sm:text-[8px] font-mono font-bold text-[#3D2E24] uppercase">
                       {slot.isSealed ? 'Done' : 'Open'}
                     </span>
                   </button>
@@ -388,7 +388,7 @@ export function SanctuaryObservatory({
           </div>
 
           {/* Ledger Footer */}
-          <div className="relative z-10 flex items-center justify-between pt-2 border-t-2 border-[#3D2E24]/20 text-xs font-sans text-[#433226]">
+          <div className="relative z-10 flex items-center justify-between pt-2 border-t-2 border-[#3D2E24]/20 text-xs font-sans text-[#2B1F17] font-medium">
             <span>Click any sealed day to inspect receipt</span>
             <button
               type="button"

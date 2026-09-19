@@ -80,11 +80,11 @@ export function EveningSleepCard({
           Evening Ledger &amp; Cadence
         </h3>
         <span className="font-mono text-xs font-bold text-[#1A3629]">
-          {isAlreadySealed ? 'Sealed for Today' : isEligible ? 'Ceremony Available' : 'Day Cadence'}
+          {isAlreadySealed ? 'Sealed for Today' : isEligible ? 'Ready to Seal' : 'Active Daytime'}
         </span>
       </div>
 
-      {/* Dual Bay: Left = Evening Ledger / Seal, Right = Sleep & Zen */}
+      {/* Dual Bay: Left = Evening Ledger / Seal, Right = Circadian Cadence */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
         
         {/* Left Slot: Evening Seal & Ledger Trigger */}
@@ -93,12 +93,12 @@ export function EveningSleepCard({
             <span className="font-cabinet font-bold text-xs text-[#1A3629]">
               30-Day Guild Ledger
             </span>
-            <p className="font-sans text-[11px] text-[#4A5D4E] leading-snug">
+            <p className="font-sans text-[11px] text-[#3D4D41] leading-snug font-medium">
               {isAlreadySealed
-                ? `${pinnedCount} of 30 days sealed with wax.`
+                ? `${pinnedCount} of 30 days verified and sealed with wax.`
                 : isEligible
-                ? 'Wrap today with thermal receipt and seal.'
-                : 'Locks at evening wrap window (3h before bedtime).'}
+                ? 'Ready to archive today with thermal receipt and wax seal.'
+                : 'Unlocks in the evening (3 hours before target bedtime).'}
             </p>
           </div>
 
@@ -131,7 +131,7 @@ export function EveningSleepCard({
               <button
                 type="button"
                 onClick={onOpenReceipt}
-                className="text-center font-mono text-[10px] text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer hover:underline py-0.5"
+                className="text-center font-mono text-[10px] text-[#2B3A2F] hover:text-[#1A3629] font-medium cursor-pointer hover:underline py-0.5"
               >
                 Inspect Thermal Receipt
               </button>

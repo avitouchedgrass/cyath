@@ -304,8 +304,8 @@ export function DailyFuelCard({
                 </div>
               ))
             ) : (
-              <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/12 bg-[#FAF8F5]/50 text-center font-sans text-xs text-[#4A5D4E]">
-                No meals logged yet today. Use the search bar or quick plates above.
+              <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/15 bg-[#FAF8F5]/80 text-center font-sans text-xs text-[#2B3A2F] font-medium">
+                No meals logged yet today. Type a meal above or choose a Quick Calibrated plate.
               </div>
             )}
           </div>

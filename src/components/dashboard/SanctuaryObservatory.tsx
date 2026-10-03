@@ -3,13 +3,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
-import { ISLAND_TIERS, getIslandTier } from '@/lib/progression/config';
+import { ISLAND_TIERS, getIslandTier, getSuiteTiers } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { formatLocalDate } from '@/lib/dateUtils';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
 import { CorkboardBackdropSvg } from '@/components/dashboard/CorkboardBackdropSvg';
+import { PixelChevronLeft, PixelChevronRight, PixelX } from '@/components/common/PixelIcons';
 
 const SAWTOOTH_CLIP =
   'polygon(0% 0%, 100% 0%, 100% calc(100% - 6px), 95% 100%, 90% calc(100% - 6px), 85% 100%, 80% calc(100% - 6px), 75% 100%, 70% calc(100% - 6px), 65% 100%, 60% calc(100% - 6px), 55% 100%, 50% calc(100% - 6px), 45% 100%, 40% calc(100% - 6px), 35% 100%, 30% calc(100% - 6px), 25% 100%, 20% calc(100% - 6px), 15% 100%, 10% calc(100% - 6px), 5% 100%, 0% calc(100% - 6px))';
@@ -37,13 +38,20 @@ export function SanctuaryObservatory({
     isForgedStreak,
     activateReentryProtocol,
     isLedgerSealedByDate,
+    userProfile,
   } = useHabitStore();
 
+  const activeSuite = userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian';
+  const activeTiers = getSuiteTiers(activeSuite);
+
   const progress = useMemo(() => calculateLevel(totalXp), [totalXp]);
-  const currentIsland = useMemo(() => getIslandTier(progress.level), [progress.level]);
+  const currentIsland = useMemo(
+    () => getIslandTier(progress.level, activeSuite),
+    [progress.level, activeSuite]
+  );
   const nextIsland = useMemo(() => {
-    return ISLAND_TIERS.find((t) => t.tier === currentIsland.tier + 1) || null;
-  }, [currentIsland.tier]);
+    return activeTiers.find((t) => t.tier === currentIsland.tier + 1) || null;
+  }, [currentIsland.tier, activeTiers]);
 
   const currentLog = getDailyLog(currentDate);
 
@@ -119,11 +127,11 @@ export function SanctuaryObservatory({
           onToggleLedger();
         }}
         className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pl-2 pr-3 py-4 min-h-[56px] min-w-[34px] rounded-r-xl border-y border-r border-[#1A3629]/25 bg-[#FAF8F5] hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_4px_16px_rgba(26,54,41,0.12)] transition-all flex flex-col items-center gap-1 cursor-pointer group select-none before:absolute before:-inset-2 before:content-['']"
-        title={isLedgerOpen ? 'Slide back to Living Island (◀)' : 'Slide open 30-Day Guild Ledger (▶)'}
+        title={isLedgerOpen ? 'Slide back to Living Island' : 'Slide open 30-Day Guild Ledger'}
         aria-label={isLedgerOpen ? 'Close 30-Day Ledger' : 'Open 30-Day Ledger'}
       >
-        <span className="font-mono text-xs font-bold transition-transform duration-200 group-hover:scale-110">
-          {isLedgerOpen ? '◀' : '▶'}
+        <span className="font-mono text-xs font-bold transition-transform duration-200 group-hover:scale-110 flex items-center justify-center">
+          {isLedgerOpen ? <PixelChevronLeft size={12} color="currentColor" /> : <PixelChevronRight size={12} color="currentColor" />}
         </span>
         <span className="[writing-mode:vertical-rl] font-cabinet font-extrabold text-[9px] tracking-wider uppercase opacity-70 group-hover:opacity-100">
           {isLedgerOpen ? 'Island' : 'Ledger'}
@@ -197,13 +205,10 @@ export function SanctuaryObservatory({
                         0    0    0    1 0"
                     />
                   </filter>
-                  <filter id="sanctuary-gold-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#F59E0B" floodOpacity="0.85" />
-                  </filter>
                 </defs>
 
                 <image
-                  href={currentIsland.svgImage || currentIsland.image}
+                  href={currentIsland.pngImage || currentIsland.image}
                   width="800"
                   height="800"
                   filter={
@@ -215,27 +220,6 @@ export function SanctuaryObservatory({
                   }
                   style={{ imageRendering: 'pixelated' }}
                 />
-
-                {(isForgedStreak || streakCount >= 5) && (
-                  <g id="kintsugi-gold-seams" filter="url(#sanctuary-gold-glow)">
-                    <path
-                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                      stroke="#F59E0B"
-                      strokeWidth="5"
-                      strokeLinecap="square"
-                      strokeLinejoin="miter"
-                      fill="none"
-                    />
-                    <path
-                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                      stroke="#FFFBEB"
-                      strokeWidth="2"
-                      strokeLinecap="square"
-                      strokeLinejoin="miter"
-                      fill="none"
-                    />
-                  </g>
-                )}
               </svg>
             )}
           </div>
@@ -335,7 +319,7 @@ export function SanctuaryObservatory({
               className="h-8 px-3.5 rounded-none border-2 border-[#241A13] bg-[#FFFDF9] hover:bg-[#241A13] hover:text-[#FFFDF9] text-[#241A13] font-cabinet font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
             >
               <span>Return to Island</span>
-              <span className="text-[10px]">✕</span>
+              <PixelX size={10} color="currentColor" />
             </button>
           </div>
 

@@ -5,12 +5,29 @@ import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition, getTrophyMastery } fr
 import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Share2, AlertTriangle, Check } from 'lucide-react';
+import {
+  PixelX,
+  PixelCheck,
+  PixelAlert,
+  PixelUpload,
+  PixelCopy,
+  PixelSparkles,
+} from '@/components/common/PixelIcons';
+import {
+  downloadTrophyPng,
+  shareTrophyImage,
+  TrophyExportData,
+} from '@/lib/exporters/trophyCanvasExport';
 
-type FilterCategory = 'all' | 'keystones' | 'streaks' | 'mastery' | 'shame';
+type FilterCategory = 'all' | 'sanctuary' | 'seals' | 'biometrics' | 'fuel' | 'streaks' | 'shame';
 
-export function SpecimenVaultSubfloor() {
-  const { unlockedTrophies, trophyCounts } = useHabitStore();
+export interface SpecimenVaultSubfloorProps {
+  onRequireAuth?: () => void;
+}
+
+export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorProps = {}) {
+  const { unlockedTrophies, trophyCounts, userSession } = useHabitStore();
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
   const [selectedTrophy, setSelectedTrophy] = useState<TrophyDefinition | null>(null);
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
@@ -20,23 +37,7 @@ export function SpecimenVaultSubfloor() {
 
   const filteredTrophies = useMemo(() => {
     if (activeCategory === 'all') return TROPHIES_ROSTER;
-    if (activeCategory === 'shame') return TROPHIES_ROSTER.filter((t) => t.isShame);
-    if (activeCategory === 'keystones') {
-      return TROPHIES_ROSTER.filter((t) =>
-        ['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light'].includes(t.id)
-      );
-    }
-    if (activeCategory === 'streaks') {
-      return TROPHIES_ROSTER.filter((t) =>
-        ['streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
-      );
-    }
-    // mastery
-    return TROPHIES_ROSTER.filter(
-      (t) =>
-        !t.isShame &&
-        !['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light', 'streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
-    );
+    return TROPHIES_ROSTER.filter((t) => t.category === activeCategory);
   }, [activeCategory]);
 
   return (
@@ -56,7 +57,7 @@ export function SpecimenVaultSubfloor() {
             </span>
           </div>
           <p className="font-sans text-xs text-[#4A5D4E] mt-1">
-            Uniform archival chalices minted through habit consistency and circadian discipline.
+            Uniform archival chalices minted through habit consistency, daily seals, and living island ascension.
           </p>
         </div>
 
@@ -64,11 +65,13 @@ export function SpecimenVaultSubfloor() {
         <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#E2DBD0] border border-[#1A3629]/12 self-start md:self-auto flex-wrap">
           {(
             [
-              { id: 'all', label: 'All (20)' },
-              { id: 'keystones', label: 'Keystones' },
-              { id: 'streaks', label: 'Streaks' },
-              { id: 'mastery', label: 'Mastery' },
-              { id: 'shame', label: 'Shame' },
+              { id: 'all', label: `All (${totalCount})` },
+              { id: 'sanctuary', label: 'Sanctuary (5)' },
+              { id: 'seals', label: 'Daily Seals (5)' },
+              { id: 'biometrics', label: 'Biometrics (5)' },
+              { id: 'fuel', label: 'Fuel (5)' },
+              { id: 'streaks', label: 'Streaks (3)' },
+              { id: 'shame', label: 'Shame (2)' },
             ] as const
           ).map((cat) => (
             <button
@@ -176,7 +179,7 @@ export function SpecimenVaultSubfloor() {
               className="absolute -top-4 right-0 sm:right-4 w-10 h-10 rounded-full border border-white/20 bg-black/40 text-white hover:bg-white hover:text-[#1A3629] transition-colors flex items-center justify-center cursor-pointer z-20"
               aria-label="Close inspection"
             >
-              <X className="w-5 h-5" />
+              <PixelX size={16} color="currentColor" />
             </button>
 
             {/* Left Side: Monumental Cardless Floating Chalice */}
@@ -197,43 +200,14 @@ export function SpecimenVaultSubfloor() {
 
               {(() => {
                 const count = trophyCounts?.[selectedTrophy.id] || (unlockedTrophies.includes(selectedTrophy.id) ? 1 : 0);
-                const mastery = getTrophyMastery(count);
-
-                const handleShareTrophy = async () => {
-                  retroAudio.playInspectConfirm();
-                  haptics.tap();
-                  const shareText = `[Cyath Relic] ${selectedTrophy.title} (${mastery.label})\n${selectedTrophy.subtitle}\nDaily consistency on Cyath Sanctuary: https://cyath.space`;
-
-                  if (typeof navigator !== 'undefined' && navigator.share) {
-                    try {
-                      await navigator.share({
-                        title: `${selectedTrophy.title} · Cyath Relic`,
-                        text: shareText,
-                        url: typeof window !== 'undefined' ? window.location.origin : 'https://cyath.space',
-                      });
-                      return;
-                    } catch {}
-                  }
-
-                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                    try {
-                      await navigator.clipboard.writeText(shareText);
-                      setShareFeedback('Copied to clipboard!');
-                      setTimeout(() => setShareFeedback(null), 3000);
-                    } catch {}
-                  }
-                };
-
                 return (
-                  <>
-                    <TrophyRelicSprite
-                      trophyId={selectedTrophy.id}
-                      tier={selectedTrophy.tier}
-                      isUnlocked={unlockedTrophies.includes(selectedTrophy.id)}
-                      count={count}
-                      size={340}
-                    />
-                  </>
+                  <TrophyRelicSprite
+                    trophyId={selectedTrophy.id}
+                    tier={selectedTrophy.tier}
+                    isUnlocked={unlockedTrophies.includes(selectedTrophy.id)}
+                    count={count}
+                    size={340}
+                  />
                 );
               })()}
             </div>
@@ -244,29 +218,34 @@ export function SpecimenVaultSubfloor() {
                 const count = trophyCounts?.[selectedTrophy.id] || (unlockedTrophies.includes(selectedTrophy.id) ? 1 : 0);
                 const mastery = getTrophyMastery(count);
 
+                const getExportData = (): TrophyExportData => ({
+                  id: selectedTrophy.id,
+                  title: selectedTrophy.title,
+                  subtitle: selectedTrophy.subtitle,
+                  description: selectedTrophy.description,
+                  tier: selectedTrophy.tier,
+                  isShame: selectedTrophy.isShame,
+                  count,
+                  masteryLabel: mastery.label,
+                  masteryTier: mastery.tier,
+                });
+
+                const handleDownloadTrophy = async () => {
+                  retroAudio.playInspectConfirm();
+                  haptics.tap();
+                  await downloadTrophyPng(getExportData());
+                };
+
                 const handleShareTrophy = async () => {
                   retroAudio.playInspectConfirm();
                   haptics.tap();
-                  const shareText = `[Cyath Relic] ${selectedTrophy.title} (${mastery.label})\n${selectedTrophy.subtitle}\nDaily consistency on Cyath Sanctuary: https://cyath.space`;
-
-                  if (typeof navigator !== 'undefined' && navigator.share) {
-                    try {
-                      await navigator.share({
-                        title: `${selectedTrophy.title} · Cyath Relic`,
-                        text: shareText,
-                        url: typeof window !== 'undefined' ? window.location.origin : 'https://cyath.space',
-                      });
-                      return;
-                    } catch {}
+                  const res = await shareTrophyImage(getExportData());
+                  if (res.method === 'download' || res.method === 'native') {
+                    setShareFeedback('Card Exported!');
+                  } else {
+                    setShareFeedback('Copied!');
                   }
-
-                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                    try {
-                      await navigator.clipboard.writeText(shareText);
-                      setShareFeedback('Copied to clipboard!');
-                      setTimeout(() => setShareFeedback(null), 3000);
-                    } catch {}
-                  }
+                  setTimeout(() => setShareFeedback(null), 3000);
                 };
 
                 return (
@@ -287,8 +266,8 @@ export function SpecimenVaultSubfloor() {
                         </span>
                       )}
                       {selectedTrophy.isShame && (
-                        <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
+                        <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1.5">
+                          <PixelAlert size={12} color="#FCA5A5" />
                           <span>Satirical Shame</span>
                         </span>
                       )}
@@ -358,23 +337,34 @@ export function SpecimenVaultSubfloor() {
                       )}
 
                       {unlockedTrophies.includes(selectedTrophy.id) && (
-                        <button
-                          type="button"
-                          onClick={handleShareTrophy}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 font-cabinet font-bold text-xs transition-colors cursor-pointer"
-                        >
-                          {shareFeedback ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>{shareFeedback}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Share2 className="w-3.5 h-3.5" />
-                              <span>Share Trophy</span>
-                            </>
-                          )}
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={handleDownloadTrophy}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            <PixelUpload size={14} color="#FFFDF9" />
+                            <span>Download PNG</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleShareTrophy}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 font-cabinet font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            {shareFeedback ? (
+                              <>
+                                <PixelCheck size={14} color="#6EE7B7" />
+                                <span>{shareFeedback}</span>
+                              </>
+                            ) : (
+                              <>
+                                <PixelSparkles size={14} color="#FDE047" />
+                                <span>Share Relic Card</span>
+                              </>
+                            )}
+                          </button>
+                        </>
                       )}
 
                       <button

@@ -1,21 +1,31 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier } from '@/lib/progression/config';
+import {
+  ISLAND_TIERS,
+  IslandTier,
+  getIslandTier,
+  getNextIslandTier,
+  getSuiteTiers,
+} from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
+import { useHabitStore } from '@/store/useHabitStore';
 
 interface FloatingIslandStageProps {
   currentLevel: number;
 }
 
 export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) {
-  const currentIsland = getIslandTier(currentLevel);
-  const nextIsland = getNextIslandTier(currentLevel);
+  const { userProfile } = useHabitStore();
+  const activeSuite = userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian';
+  const activeTiers = getSuiteTiers(activeSuite);
+  const currentIsland = getIslandTier(currentLevel, activeSuite);
+  const nextIsland = getNextIslandTier(currentLevel, activeSuite);
   const [inspectedTier, setInspectedTier] = useState<IslandTier | null>(null);
 
   useEffect(() => {
     const preloader = () => {
-      ISLAND_TIERS.forEach((tier) => {
+      activeTiers.forEach((tier) => {
         const img = new Image();
         img.src = tier.image;
       });
@@ -30,7 +40,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
         return () => clearTimeout(timer);
       }
     }
-  }, []);
+  }, [activeTiers]);
 
   const displayedIsland = inspectedTier || currentIsland;
   const isUnlocked = currentLevel >= displayedIsland.minLevel;
@@ -42,7 +52,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
       <div className="w-full flex items-center justify-between z-10 border-b border-[#1A3629]/10 pb-4">
         <div className="flex items-center gap-2.5">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full border border-[#D97706]/30">
-            Tier {displayedIsland.tier} of {ISLAND_TIERS.length}
+            Tier {displayedIsland.tier} of {activeTiers.length}
           </span>
           {isCurrent && (
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded-full border border-[#10B981]/30">
@@ -80,7 +90,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
           className="relative z-10 w-64 sm:w-84 md:w-96 max-w-full aspect-square flex items-center justify-center animate-[islandFloat_8s_ease-in-out_infinite] transition-transform duration-500 select-none"
           onContextMenu={(e) => e.preventDefault()}
         >
-          {ISLAND_TIERS.map((tier) => {
+          {activeTiers.map((tier) => {
             const isSelected = tier.tier === displayedIsland.tier;
             const isTierUnlocked = currentLevel >= tier.minLevel;
 
@@ -144,7 +154,7 @@ export function FloatingIslandStage({ currentLevel }: FloatingIslandStageProps) 
       {/* Minimalist 10-Tier Scrubber Strip */}
       <div className="w-full z-10 pt-5 border-t border-[#1A3629]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 max-w-full">
-          {ISLAND_TIERS.map((tier) => {
+          {activeTiers.map((tier) => {
             const unlocked = currentLevel >= tier.minLevel;
             const active = displayedIsland.tier === tier.tier;
 

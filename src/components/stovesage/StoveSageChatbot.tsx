@@ -7,7 +7,17 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe, findClosestRecipe } from '@/lib/recipes';
 import { generateRetroFramedBadge } from '@/lib/imageStylizer';
-import { Sparkles, X, RotateCcw, KeyRound, ArrowRight, Check, Send, Bot } from 'lucide-react';
+import {
+  PixelX,
+  PixelRefresh,
+  PixelKey,
+  PixelArrowRight,
+  PixelCheck,
+  PixelSend,
+  PixelBot,
+  PixelPlus,
+} from '@/components/common/PixelIcons';
+import { PixelSpark } from '@/components/common/PixelSpark';
 
 interface ChatAction {
   type: 'ADD_HABIT' | 'ADD_RECIPE' | 'SET_METRIC' | 'LOG_RECIPE';
@@ -487,7 +497,7 @@ export function StoveSageChatbot() {
           <div className="p-4 bg-[#FAF6EE] border-b border-[#1A3629]/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center font-bold text-sm shrink-0">
-                <Bot className="w-4 h-4 text-[#10B981]" />
+                <PixelBot size={16} color="#10B981" />
               </div>
               <div>
                 <h3 className="font-cabinet font-bold text-sm text-[#1A3629] flex items-center gap-2 leading-none">
@@ -511,7 +521,7 @@ export function StoveSageChatbot() {
                 title="Reset conversation"
                 aria-label="Reset conversation"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <PixelRefresh size={14} color="#1A3629" />
               </button>
 
               <button
@@ -523,7 +533,7 @@ export function StoveSageChatbot() {
                 title="Configure custom API key (optional)"
                 aria-label="API Key settings"
               >
-                <KeyRound className="w-3.5 h-3.5" />
+                <PixelKey size={14} color={showKeyInput ? '#FFFDF9' : '#1A3629'} />
               </button>
 
               <button
@@ -535,7 +545,7 @@ export function StoveSageChatbot() {
                 className="w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629] font-mono text-xs font-bold transition-colors flex items-center justify-center cursor-pointer ml-1"
                 aria-label="Close AI Coach"
               >
-                ✕
+                <PixelX size={12} color="currentColor" />
               </button>
             </div>
           </div>
@@ -665,8 +675,9 @@ export function StoveSageChatbot() {
                                 )}
                                 {act.status === 'applied' && (
                                   <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between gap-2">
-                                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20">
-                                      ✓ Saved to My Recipes
+                                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20 flex items-center gap-1">
+                                      <PixelCheck size={11} color="#065F46" />
+                                      <span>Saved to My Recipes</span>
                                     </span>
                                     <button
                                       type="button"
@@ -684,9 +695,10 @@ export function StoveSageChatbot() {
                                           currentDate
                                         );
                                       }}
-                                      className="px-2.5 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-[10px] font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer"
+                                      className="px-2.5 py-1 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-[10px] font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer flex items-center gap-1"
                                     >
-                                      + Log to Today ({act.payload.protein || 35}g Pro)
+                                      <PixelPlus size={10} color="#FFFDF9" />
+                                      <span>Log to Today ({act.payload.protein || 35}g Pro)</span>
                                     </button>
                                   </div>
                                 )}
@@ -711,8 +723,9 @@ export function StoveSageChatbot() {
                                   {act.summary || `Proposed ${act.type}`}
                                 </span>
                                 {act.status === 'applied' && (
-                                  <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20 shrink-0">
-                                    ✓ Added
+                                  <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-600/20 shrink-0 flex items-center gap-1">
+                                    <PixelCheck size={11} color="#065F46" />
+                                    <span>Added</span>
                                   </span>
                                 )}
                                 {act.status === 'dismissed' && (
@@ -727,9 +740,21 @@ export function StoveSageChatbot() {
                                   <button
                                     type="button"
                                     onClick={() => handleApplyAction(msg.id, i)}
-                                    className="flex-1 py-1 px-3 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer text-center"
+                                    className="flex-1 py-1 px-3 rounded-lg border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] text-xs font-mono font-medium hover:bg-[#234535] transition-colors cursor-pointer text-center flex items-center justify-center gap-1"
                                   >
-                                    {act.type === 'ADD_HABIT' ? '+ Add to Habits' : act.type === 'LOG_RECIPE' ? '✓ Quick Log' : 'Apply'}
+                                    {act.type === 'ADD_HABIT' ? (
+                                      <>
+                                        <PixelPlus size={11} color="#FFFDF9" />
+                                        <span>Add to Habits</span>
+                                      </>
+                                    ) : act.type === 'LOG_RECIPE' ? (
+                                      <>
+                                        <PixelCheck size={11} color="#FFFDF9" />
+                                        <span>Quick Log</span>
+                                      </>
+                                    ) : (
+                                      <span>Apply</span>
+                                    )}
                                   </button>
                                   <button
                                     type="button"
@@ -752,7 +777,7 @@ export function StoveSageChatbot() {
 
             {isLoading && (
               <div className="flex items-center gap-2 p-3 bg-[#FAF6EE] border border-[#1A3629]/15 rounded-2xl w-fit text-xs font-mono text-[#3A6B52]">
-                <Sparkles className="w-3.5 h-3.5 animate-spin text-[#10B981]" />
+                <PixelSpark size={14} className="animate-spin text-[#10B981]" />
                 <span>Formulating recommendation...</span>
               </div>
             )}
@@ -796,11 +821,11 @@ export function StoveSageChatbot() {
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-semibold text-xs sm:text-sm hover:bg-[#234535] transition-colors cursor-pointer flex items-center gap-1"
+              className="px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] disabled:opacity-40 text-[#FFFDF9] font-cabinet font-semibold text-xs sm:text-sm hover:bg-[#234535] transition-colors cursor-pointer flex items-center gap-1.5"
               aria-label="Send message"
             >
               <span>Send</span>
-              <Send className="w-3 h-3" />
+              <PixelSend size={12} color="#FFFDF9" />
             </button>
           </div>
 
@@ -821,7 +846,7 @@ export function StoveSageChatbot() {
           title="Open Cyath AI Coach (⌘J / Ctrl+J)"
         >
           <span className="font-cabinet font-semibold text-xs text-[#FFFDF9] flex items-center gap-1.5">
-            <Bot className="w-3.5 h-3.5 text-[#10B981]" />
+            <PixelBot size={16} color="#10B981" />
             <span>AI Coach</span>
           </span>
           <span className="hidden sm:inline-block font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#2C4A3B] border border-[#FFFDF9]/20 text-[#A7F3D0]">

@@ -61,16 +61,28 @@ function pickBestSprite(text: string): string {
   return '/assets/food/generic-plate.webp';
 }
 
+import { parseInstantMeal } from '@/lib/instantMacroEngine';
+
 const CANDIDATE_MODELS = [
-  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
   'gemini-3.5-flash-lite',
-  'gemini-flash-latest',
-  'gemini-flash-lite-latest',
-  'gemini-2.5-flash',
+  'gemini-3.5-flash',
 ];
 
 const MEAL_PARSER_SYSTEM_PROMPT = `You are Cyath's scientific nutritional analyst.
 Your task is to analyze meals entered by users in natural language.
+
+STEP 0: STRICT FOOD VALIDATION:
+Examine if the user entry actually describes edible food, beverages, ingredients, or a meal.
+If the input is:
+- Random letters or gibberish (e.g. "asdfgh", "qwerty", "xyz123", "blabla")
+- Non-food objects, animals, or hardware (e.g. "table", "laptop", "car", "shoes")
+- Non-food activities or emotions (e.g. "i ran 10k", "feeling tired", "hello there", "what is this")
+You MUST immediately reject it and return strictly:
+{
+  "isNotFood": true,
+  "error": "This does not appear to be food. Please enter what you actually ate (e.g. '2 boiled eggs with sourdough' or 'Paneer bowl with rice')."
+}
 
 CRITICAL INSTRUCTION: CHECKING SERVING SIZES:
 1. Deconstruct the meal into its primary components/ingredients.
@@ -315,6 +327,16 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
+      const instantFallback = parseInstantMeal(rawText, clarifications);
+      if (instantFallback) {
+        if (instantFallback.isNotFood) {
+          return NextResponse.json(
+            { error: instantFallback.error || 'This does not appear to be food. Please enter what you actually ate.' },
+            { status: 422 }
+          );
+        }
+        return NextResponse.json(instantFallback);
+      }
       const fallback = fallbackHeuristicParse(rawText, clarifications);
       return NextResponse.json(fallback);
     }
@@ -337,7 +359,7 @@ export async function POST(req: NextRequest) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 9000);
+        const timeout = setTimeout(() => controller.abort(), 6500);
 
         const res = await fetch(url, {
           method: 'POST',
@@ -375,6 +397,13 @@ export async function POST(req: NextRequest) {
           .trim();
 
         const parsed = JSON.parse(cleaned);
+
+        if (parsed.isNotFood) {
+          return NextResponse.json(
+            { error: parsed.error || 'This does not appear to be a food item. Please enter what you actually ate.' },
+            { status: 422 }
+          );
+        }
 
         if (parsed.hasCompletePortions) {
           if (!parsed.suggestedSprite) {

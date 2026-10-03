@@ -9,12 +9,14 @@ import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
-import { X, Sparkles } from 'lucide-react';
+import { PixelSpark } from '@/components/common/PixelSpark';
+import { PixelX, PixelCheck } from '@/components/common/PixelIcons';
 
 export interface EveningSealCeremonyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (sealedDate: string) => void;
+  onRequireAuth?: () => void;
 }
 
 type CeremonyStage = 'ROLLING' | 'READY' | 'CHARGING' | 'STAMPED' | 'PINNING';
@@ -26,6 +28,7 @@ export function EveningSealCeremonyModal({
   isOpen,
   onClose,
   onComplete,
+  onRequireAuth,
 }: EveningSealCeremonyModalProps) {
   const {
     currentDate,
@@ -34,6 +37,7 @@ export function EveningSealCeremonyModal({
     streakCount,
     isForgedStreak,
     userProfile,
+    userSession,
     sealDailyLedger,
   } = useHabitStore();
 
@@ -48,7 +52,8 @@ export function EveningSealCeremonyModal({
   const targetDate = currentDate || formatLocalDate();
   const currentLog = getDailyLog(targetDate);
   const progress = calculateLevel(totalXp);
-  const currentIsland = getIslandTier(progress.level);
+  const currentIsland = getIslandTier(progress.level, userProfile?.selectedIslandSuite || userProfile?.archetype);
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
 
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const isSunlightDone = !!currentLog.habitsCompleted?.['sunlight'];
@@ -99,15 +104,18 @@ export function EveningSealCeremonyModal({
     // Call state store mutation: seals day, logs +50 XP
     sealDailyLedger(targetDate);
 
-    // After 1.2s, transition to PINNING and open the 30-Day Ledger Corkboard
-    setTimeout(() => {
-      setStage('PINNING');
-      retroAudio.playPaperRustle();
+    // If authenticated: after 1.2s, transition to PINNING and open the 30-Day Ledger Corkboard
+    // If guest: pause to allow syncing to Supabase cloud or continuing locally
+    if (isAuthenticated) {
       setTimeout(() => {
-        onComplete(targetDate);
-      }, 400);
-    }, 1250);
-  }, [sealDailyLedger, targetDate, onComplete]);
+        setStage('PINNING');
+        retroAudio.playPaperRustle();
+        setTimeout(() => {
+          onComplete(targetDate);
+        }, 400);
+      }, 1250);
+    }
+  }, [sealDailyLedger, targetDate, onComplete, isAuthenticated]);
 
   // Press-and-hold animation loop (~750ms charge time)
   const stepCharge = useCallback(
@@ -198,7 +206,7 @@ export function EveningSealCeremonyModal({
           className="absolute top-4 right-4 w-8 h-8 rounded-full border border-[#241A13] bg-[#FFFDF9] text-[#241A13] hover:bg-[#241A13] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shadow-xs z-20 disabled:opacity-30"
           aria-label="Close ceremony"
         >
-          <X className="w-4 h-4" />
+          <PixelX size={14} />
         </button>
 
         {/* Ritual Stage Header */}
@@ -225,8 +233,9 @@ export function EveningSealCeremonyModal({
         >
           {/* Diagonal Verified Stamp Banner */}
           {stage === 'STAMPED' && (
-            <div className="absolute top-16 -right-2 transform rotate-12 border-2 border-[#991B1B] text-[#991B1B] px-3 py-1 font-mono font-black text-[11px] tracking-wider bg-[#FFFDF9]/90 shadow-2xs animate-in zoom-in-75 duration-200 pointer-events-none">
-              ★ AFFIXED &amp; SEALED ★
+            <div className="absolute top-16 -right-2 transform rotate-12 border-2 border-[#991B1B] text-[#991B1B] px-3 py-1 font-mono font-black text-[11px] tracking-wider bg-[#FFFDF9]/90 shadow-2xs animate-in zoom-in-75 duration-200 pointer-events-none flex items-center gap-1.5">
+              <PixelCheck size={12} color="#991B1B" />
+              <span>AFFIXED &amp; SEALED</span>
             </div>
           )}
 
@@ -285,9 +294,47 @@ export function EveningSealCeremonyModal({
                   className="filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]"
                 />
                 <div className="flex items-center gap-1.5 mt-2 px-3 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 font-mono text-[10px] font-black text-emerald-800 shadow-2xs animate-in fade-in zoom-in-95 duration-200">
-                  <Sparkles className="w-3 h-3 text-amber-500" />
+                  <PixelSpark size={12} />
                   <span>+50 XP AWARDED</span>
                 </div>
+
+                {!isAuthenticated && (
+                  <div className="w-full mt-3 p-2.5 rounded-xl bg-[#241A13]/95 border border-[#D97706]/40 shadow-md flex flex-col items-center gap-1.5 text-center animate-in fade-in zoom-in-95">
+                    <span className="font-mono text-[10px] font-bold text-[#F59E0B]">
+                      Guest Manifest Stored Locally
+                    </span>
+                    <span className="font-sans text-[11px] text-[#D8C7B5] leading-tight max-w-[280px]">
+                      Connect an account to permanently sync your streak to the Supabase cloud.
+                    </span>
+                    <div className="flex items-center gap-2 mt-1 w-full">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          retroAudio.playInspectConfirm();
+                          haptics.tap();
+                          if (onRequireAuth) onRequireAuth();
+                          onClose();
+                        }}
+                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#D97706] text-[#FFFDF9] font-cabinet font-extrabold text-[11px] hover:bg-[#B45309] transition-colors cursor-pointer text-center"
+                      >
+                        Sync to Cloud
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStage('PINNING');
+                          retroAudio.playPaperRustle();
+                          setTimeout(() => {
+                            onComplete(targetDate);
+                          }, 400);
+                        }}
+                        className="py-1.5 px-2.5 rounded-lg border border-[#D8C7B5]/25 text-[#D8C7B5] font-cabinet font-medium text-[11px] hover:bg-white/5 transition-colors cursor-pointer text-center"
+                      >
+                        Keep as Guest
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               /* Interactive Press-and-Hold Brass Signet */
@@ -387,7 +434,9 @@ export function EveningSealCeremonyModal({
         <div className="mt-4 flex items-center justify-center text-center font-mono text-xs text-[#D8C7B5]/80">
           <span>
             {stage === 'STAMPED' || stage === 'PINNING'
-              ? 'Pinning sealed manifest to Guild Ledger...'
+              ? (isAuthenticated
+                  ? 'Pinning sealed manifest to Guild Ledger...'
+                  : 'Manifest verified! Sync to cloud or continue as guest.')
               : 'Press & hold the brass signet to melt and verify tonight’s record.'}
           </span>
         </div>

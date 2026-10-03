@@ -4,8 +4,7 @@ import React, { useEffect } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Trophy } from 'lucide-react';
-
+import { PixelX, PixelTrophy } from '@/components/common/PixelIcons';
 import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 
 interface ItemGetBannerProps {
@@ -35,7 +34,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
   };
 
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-auto animate-in slide-in-from-top-4 fade-in duration-300">
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-70 w-full max-w-md px-4 pointer-events-auto animate-in slide-in-from-top-4 fade-in duration-300">
       <div className="w-full bg-[#FFFDF9] border-2 border-[#1A3629] rounded-2xl p-4 shadow-[6px_6px_0px_#1A3629] flex items-center gap-4">
         <div className="w-14 h-14 relative shrink-0 bg-[#FAF8F5] rounded-xl border border-[#1A3629]/20 p-1 flex items-center justify-center">
           <TrophyRelicSprite
@@ -48,7 +47,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
 
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5 text-[#D97706]" />
+            <PixelTrophy size={14} color="#D97706" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#D97706]">
               {pendingTrophyUnlock.isShame ? 'Trophy of Shame Unlocked' : 'New Specimen Acquired'}
             </span>
@@ -75,7 +74,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
             className="w-7 h-7 rounded-lg text-[#1A3629]/60 hover:text-[#1A3629] hover:bg-[#1A3629]/8 flex items-center justify-center cursor-pointer transition-colors"
             aria-label="Dismiss banner"
           >
-            <X className="w-4 h-4" />
+            <PixelX size={14} color="currentColor" />
           </button>
         </div>
       </div>

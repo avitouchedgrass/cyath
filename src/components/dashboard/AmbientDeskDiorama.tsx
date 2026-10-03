@@ -7,7 +7,7 @@ import { calculateLevel } from '@/lib/progression/engine';
 import { getIslandTier } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Volume2, VolumeX, X, Maximize2, Minimize2 } from 'lucide-react';
+import { PixelVolume, PixelVolumeMute, PixelMaximize, PixelMinimize, PixelX } from '@/components/common/PixelIcons';
 
 interface AmbientDeskDioramaProps {
   isOpen: boolean;
@@ -15,10 +15,13 @@ interface AmbientDeskDioramaProps {
 }
 
 export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps) {
-  const { totalXp, streakCount, isForgedStreak } = useHabitStore();
+  const { totalXp, streakCount, isForgedStreak, userProfile } = useHabitStore();
 
   const progress = useMemo(() => calculateLevel(totalXp), [totalXp]);
-  const currentIsland = useMemo(() => getIslandTier(progress.level), [progress.level]);
+  const currentIsland = useMemo(
+    () => getIslandTier(progress.level, userProfile?.selectedIslandSuite || userProfile?.archetype),
+    [progress.level, userProfile?.selectedIslandSuite, userProfile?.archetype]
+  );
 
   const [currentTimeStr, setCurrentTimeStr] = useState('');
   const [isSoundscapeOn, setIsSoundscapeOn] = useState(false);
@@ -118,7 +121,7 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
             title="Toggle Fullscreen"
             aria-label="Toggle Fullscreen"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            {isFullscreen ? <PixelMinimize size={16} /> : <PixelMaximize size={16} />}
           </button>
 
           {/* Close / Return */}
@@ -129,7 +132,7 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
             title="Exit Ambient Mode (Esc or A)"
             aria-label="Exit Ambient Mode"
           >
-            <X className="w-4 h-4" />
+            <PixelX size={16} />
           </button>
         </div>
       </header>
@@ -154,39 +157,12 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
                 className="w-full h-full select-none"
                 shapeRendering="crispEdges"
               >
-                <defs>
-                  <filter id="ambient-gold-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#F59E0B" floodOpacity="0.9" />
-                  </filter>
-                </defs>
-
                 <image
-                  href={currentIsland.svgImage || currentIsland.image}
+                  href={currentIsland.pngImage || currentIsland.image}
                   width="800"
                   height="800"
                   style={{ imageRendering: 'pixelated' }}
                 />
-
-                {isForgedStreak && (
-                  <g id="ambient-kintsugi-seams" filter="url(#ambient-gold-glow)">
-                    <path
-                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                      stroke="#F59E0B"
-                      strokeWidth="5"
-                      strokeLinecap="square"
-                      strokeLinejoin="miter"
-                      fill="none"
-                    />
-                    <path
-                      d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                      stroke="#FFFBEB"
-                      strokeWidth="2"
-                      strokeLinecap="square"
-                      strokeLinejoin="miter"
-                      fill="none"
-                    />
-                  </g>
-                )}
               </svg>
             )}
           </div>
@@ -214,7 +190,7 @@ export function AmbientDeskDiorama({ isOpen, onClose }: AmbientDeskDioramaProps)
           }`}
           title="Toggle cozy ambient campfire soundscape"
         >
-          {isSoundscapeOn ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-white/50" />}
+          {isSoundscapeOn ? <PixelVolume size={16} className="text-emerald-400" /> : <PixelVolumeMute size={16} className="text-white/50" />}
           <span>{isSoundscapeOn ? 'Campfire Soundscape · Active' : 'Start Campfire Soundscape'}</span>
         </button>
       </footer>

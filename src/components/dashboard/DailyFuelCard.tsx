@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Loader2, X, Camera } from 'lucide-react';
 import { PixelMealPlate } from '@/components/dashboard/PixelMealPlate';
 import { PhotoMealScannerModal } from '@/components/dashboard/PhotoMealScannerModal';
+import { parseInstantMeal } from '@/lib/instantMacroEngine';
+import {
+  PixelCamera,
+  PixelSpinner,
+  PixelX,
+  PixelChevronDown,
+  PixelCheck,
+} from '@/components/common/PixelIcons';
 
 interface DailyFuelCardProps {
   currentProtein: number;
@@ -78,6 +86,38 @@ export function DailyFuelCard({
     setIsSubmittingMeal(true);
     haptics.tap();
 
+    // 0. Zero-Latency Instant Macro Engine Client Check (<1ms)
+    const instant = parseInstantMeal(text);
+    if (instant) {
+      if (instant.isNotFood) {
+        retroAudio.playBlip();
+        setFeedback(instant.error || 'Please enter what you actually ate.');
+        setTimeout(() => setFeedback(null), 3500);
+        setIsSubmittingMeal(false);
+        return;
+      }
+
+      if (instant.hasCompletePortions) {
+        logMealToDay(
+          {
+            name: instant.mealName || text,
+            protein: instant.protein,
+            calories: instant.calories,
+            ingredients: instant.ingredients,
+            suggestedSprite: instant.suggestedSprite || '/assets/food/generic-plate.png',
+          },
+          currentDate
+        );
+        retroAudio.playInspectConfirm();
+        haptics.success();
+        setAmbientMealText('');
+        setFeedback(`Logged: ${instant.mealName} (+${instant.protein}g protein, ${instant.calories} kcal)`);
+        setTimeout(() => setFeedback(null), 3500);
+        setIsSubmittingMeal(false);
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/ai/parse-meal', {
         method: 'POST',
@@ -94,8 +134,8 @@ export function DailyFuelCard({
             name: data.mealName || text,
             protein,
             calories,
-            ingredients: [{ item: text, amount: '1 portion' }],
-            suggestedSprite: '/assets/food/generic-plate.png',
+            ingredients: data.ingredients || [{ item: text, amount: '1 portion' }],
+            suggestedSprite: data.suggestedSprite || '/assets/food/generic-plate.png',
           },
           currentDate
         );
@@ -167,7 +207,7 @@ export function DailyFuelCard({
             title="Scan whole-food plate with camera photo"
             aria-label="Scan meal photo"
           >
-            <Camera className="w-3.5 h-3.5 text-[#059669] group-hover:text-[#FFFDF9] transition-colors" />
+            <PixelCamera size={14} color="#059669" className="group-hover:text-[#FFFDF9]" />
             <span>Scan Photo</span>
           </button>
         </div>
@@ -222,7 +262,7 @@ export function DailyFuelCard({
             className="absolute right-1.5 px-4 py-2 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center shrink-0 shadow-2xs active:scale-98"
           >
             {isSubmittingMeal ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <PixelSpinner size={14} color="#FFFDF9" />
             ) : (
               <span>Log Meal</span>
             )}
@@ -266,6 +306,42 @@ export function DailyFuelCard({
         </div>
       </div>
 
+      {/* 4.5 Metabolic Dinner Rebalancer Prompt */}
+      {remaining > 0 ? (
+        <div className="p-3 rounded-2xl bg-[#F8F5EE] border border-[#1A3629]/15 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+            <span className="text-xs font-cabinet font-bold text-[#1A3629] truncate">
+              {remaining}g protein needed for floor
+            </span>
+          </div>
+          <Link
+            href="/fuel"
+            onClick={() => {
+              retroAudio.playBlip();
+              haptics.tap();
+            }}
+            className="px-3 py-1.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-mono text-[11px] font-bold shrink-0 transition-colors shadow-2xs cursor-pointer flex items-center gap-1"
+          >
+            <span>Dinner Rebalancer →</span>
+          </Link>
+        </div>
+      ) : (
+        <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between text-xs text-emerald-900 font-cabinet font-bold">
+          <span className="flex items-center gap-1.5">
+            <PixelCheck size={12} color="#065F46" />
+            <span>Daily Floor Secured ({currentProtein}g / {targetProtein}g)</span>
+          </span>
+          <Link
+            href="/fuel"
+            onClick={() => retroAudio.playBlip()}
+            className="font-mono text-[11px] text-emerald-700 underline hover:text-emerald-900 cursor-pointer"
+          >
+            Chef Catalog →
+          </Link>
+        </div>
+      )}
+
       {/* 5. Subtle Arrow Accordion for Today's Logged Meals */}
       <div className="pt-2 border-t border-[#1A3629]/10 flex flex-col gap-2">
         <button
@@ -281,11 +357,9 @@ export function DailyFuelCard({
           <span className="font-cabinet font-bold text-xs text-[#1A3629]">
             Today's Logged Meals ({loggedMealsCount})
           </span>
-          <div className="flex items-center gap-1 font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
+          <div className="flex items-center gap-1.5 font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
             <span>{isMealsExpanded ? 'Collapse' : 'Inspect'}</span>
-            <span className={`transition-transform duration-200 font-bold ${isMealsExpanded ? 'rotate-180' : ''}`}>
-              ▼
-            </span>
+            <PixelChevronDown size={10} color="#4A5D4E" className={`transition-transform duration-200 ${isMealsExpanded ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
@@ -320,7 +394,7 @@ export function DailyFuelCard({
                     title="Remove meal entry"
                     aria-label={`Remove ${meal.name}`}
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <PixelX size={10} color="currentColor" />
                   </button>
                 </div>
               ))

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { STREAK_MILESTONES, STREAK_FREEZE } from '@/lib/progression/config';
 
-import { Flame, ShieldCheck } from 'lucide-react';
+import { PixelFlame, PixelShieldCheck } from '@/components/common/PixelIcons';
 
 interface StreakBadgeProps {
   showDetails?: boolean;
@@ -26,7 +26,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
         aria-label="View streak details"
       >
         <div className="flex items-center gap-1.5">
-          <Flame className="w-4 h-4 text-[#D97706] fill-[#F59E0B] shrink-0" />
+          <PixelFlame size={14} color="#EA580C" />
           <span className="font-cabinet text-xs font-bold text-[#1A3629] tabular-nums">
             {streakCount} {streakCount === 1 ? 'Day' : 'Days'}
           </span>
@@ -37,7 +37,7 @@ export function StreakBadge({ showDetails = false }: StreakBadgeProps) {
             className="flex items-center gap-1 pl-2 border-l border-[#1A3629]/15 text-[11px] font-mono font-bold text-[#2563EB]"
             title={`${streakFreezeStock} Streak Freeze available`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+            <PixelShieldCheck size={14} color="#2563EB" />
             <span className="tabular-nums">{streakFreezeStock}</span>
           </div>
         )}

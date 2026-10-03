@@ -7,7 +7,7 @@ import { getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Copy, Check, Share2 } from 'lucide-react';
+import { PixelCopy, PixelCheck, PixelX } from '@/components/common/PixelIcons';
 
 interface MinimalistReceiptModalProps {
   isOpen: boolean;
@@ -31,7 +31,7 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
   const activeDate = dateOverride || currentDate;
   const currentLog = getDailyLog(activeDate);
   const progress = calculateLevel(totalXp);
-  const currentIsland = getIslandTier(progress.level);
+  const currentIsland = getIslandTier(progress.level, userProfile?.selectedIslandSuite || userProfile?.archetype);
 
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const isSunlightDone = !!currentLog.habitsCompleted?.['sunlight'];
@@ -182,13 +182,14 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
           className="absolute top-4 right-3.5 w-7 h-7 rounded-full bg-black/10 hover:bg-black/20 text-[#2B1F17] flex items-center justify-center cursor-pointer transition-colors"
           aria-label="Close receipt"
         >
-          <X className="w-4 h-4" />
+          <PixelX size={14} />
         </button>
 
         {/* Diagonal Stamped Red Ink Mark if Sealed */}
         {isSealed && (
-          <div className="absolute top-24 -right-2 transform rotate-12 border-2 border-[#B91C1C] text-[#B91C1C] px-3 py-1 font-mono font-extrabold text-xs tracking-wider opacity-85 pointer-events-none rounded shadow-2xs">
-            ★ VERIFIED &amp; SEALED ★
+          <div className="absolute top-24 -right-2 transform rotate-12 border-2 border-[#B91C1C] text-[#B91C1C] px-3 py-1 font-mono font-extrabold text-xs tracking-wider opacity-85 pointer-events-none rounded shadow-2xs flex items-center gap-1.5">
+            <PixelCheck size={12} color="#B91C1C" />
+            <span>VERIFIED &amp; SEALED</span>
           </div>
         )}
 
@@ -290,12 +291,12 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <PixelCheck size={14} className="text-emerald-400" />
               <span>Receipt Copied!</span>
             </>
           ) : (
             <>
-              <Copy className="w-3.5 h-3.5" />
+              <PixelCopy size={14} />
               <span>Copy Thermal Receipt</span>
             </>
           )}

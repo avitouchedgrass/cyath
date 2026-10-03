@@ -8,9 +8,9 @@ import { getIslandTier } from '@/lib/progression/config';
 import { StreakBadge } from './StreakBadge';
 
 export function XpHud() {
-  const { totalXp } = useHabitStore();
+  const { totalXp, userProfile } = useHabitStore();
   const progress = calculateLevel(totalXp);
-  const islandTier = getIslandTier(progress.level);
+  const islandTier = getIslandTier(progress.level, userProfile?.selectedIslandSuite || userProfile?.archetype);
 
   return (
     <div className="w-full bg-[#FFFDF9] border border-[#1A3629]/10 rounded-3xl p-5 sm:p-6 shadow-[0_2px_12px_rgba(26,54,41,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">

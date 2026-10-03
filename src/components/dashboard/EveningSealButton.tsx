@@ -5,14 +5,14 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { EveningSealCeremonyModal } from '@/components/dashboard/EveningSealCeremonyModal';
-import { Sparkles, ScrollText, ShieldCheck } from 'lucide-react';
 
 interface EveningSealButtonProps {
   onOpenReceipt?: () => void;
   onOpenCorkboard?: (sealedDate?: string) => void;
+  onRequireAuth?: () => void;
 }
 
-export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSealButtonProps) {
+export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAuth }: EveningSealButtonProps) {
   const {
     currentDate,
     getDailyLog,
@@ -116,6 +116,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard }: EveningSea
         isOpen={isCeremonyOpen}
         onClose={() => setIsCeremonyOpen(false)}
         onComplete={handleCeremonyComplete}
+        onRequireAuth={onRequireAuth}
       />
     </>
   );

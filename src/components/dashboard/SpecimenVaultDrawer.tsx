@@ -5,7 +5,7 @@ import { useHabitStore, TROPHIES_ROSTER, TrophyDefinition, getTrophyMastery } fr
 import { TrophyRelicSprite } from '@/components/dashboard/TrophyRelicSprite';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { X, Lock, CheckCircle2, AlertTriangle, Shield, Share2 } from 'lucide-react';
+import { PixelShield, PixelX, PixelAlert, PixelCheck, PixelLock, PixelShare } from '@/components/common/PixelIcons';
 
 interface SpecimenVaultDrawerProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ interface SpecimenVaultDrawerProps {
   initialSelectedId?: string | null;
 }
 
-type FilterCategory = 'all' | 'keystones' | 'streaks' | 'mastery' | 'shame';
+type FilterCategory = 'all' | 'sanctuary' | 'seals' | 'biometrics' | 'fuel' | 'streaks' | 'shame';
 
 export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: SpecimenVaultDrawerProps) {
   const { unlockedTrophies, trophyCounts } = useHabitStore();
@@ -47,23 +47,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
 
   const filteredTrophies = useMemo(() => {
     if (activeCategory === 'all') return TROPHIES_ROSTER;
-    if (activeCategory === 'shame') return TROPHIES_ROSTER.filter((t) => t.isShame);
-    if (activeCategory === 'keystones') {
-      return TROPHIES_ROSTER.filter((t) =>
-        ['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light'].includes(t.id)
-      );
-    }
-    if (activeCategory === 'streaks') {
-      return TROPHIES_ROSTER.filter((t) =>
-        ['streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
-      );
-    }
-    // mastery
-    return TROPHIES_ROSTER.filter(
-      (t) =>
-        !t.isShame &&
-        !['solar_vanguard', 'iron_anchor', 'hydration_alchemist', 'first_light', 'streak_7d', 'streak_30d', 'forged_reentry', 'protein_streak'].includes(t.id)
-    );
+    return TROPHIES_ROSTER.filter((t) => t.category === activeCategory);
   }, [activeCategory]);
 
   if (!isOpen) return null;
@@ -85,7 +69,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 sm:px-8 py-5 border-b border-[#1E2E24] bg-[#0E1A12] shrink-0">
           <div className="flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#060D09] border border-[#2A3E31] flex items-center justify-center text-[#FBBF24] shadow-[inset_0_2px_6px_rgba(0,0,0,0.6)]">
-              <Shield className="w-5 h-5" />
+              <PixelShield size={20} color="#FBBF24" />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
@@ -107,10 +91,12 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[#060D09] border border-[#1E2E24]">
               {(
                 [
-                  { id: 'all', label: 'All' },
-                  { id: 'keystones', label: 'Keystones' },
+                  { id: 'all', label: `All (${totalCount})` },
+                  { id: 'sanctuary', label: 'Sanctuary' },
+                  { id: 'seals', label: 'Daily Seals' },
+                  { id: 'biometrics', label: 'Biometrics' },
+                  { id: 'fuel', label: 'Fuel' },
                   { id: 'streaks', label: 'Streaks' },
-                  { id: 'mastery', label: 'Mastery' },
                   { id: 'shame', label: 'Shame' },
                 ] as const
               ).map((cat) => (
@@ -139,7 +125,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
               className="w-9 h-9 rounded-full border border-[#2A3E31] bg-[#060D09] text-[#738A7D] hover:text-[#E2E8F0] hover:border-[#E2E8F0]/30 transition-colors flex items-center justify-center cursor-pointer"
               aria-label="Close reliquary"
             >
-              <X className="w-4 h-4" />
+              <PixelX size={14} />
             </button>
           </div>
         </div>
@@ -231,7 +217,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
               className="absolute -top-4 right-0 sm:right-4 w-10 h-10 rounded-full border border-white/20 bg-black/40 text-white hover:bg-white hover:text-[#1A3629] transition-colors flex items-center justify-center cursor-pointer z-20"
               aria-label="Close detail"
             >
-              <X className="w-5 h-5" />
+              <PixelX size={18} />
             </button>
 
             {/* Left Side: Monumental Cardless Floating Trophy */}
@@ -309,7 +295,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                       )}
                       {selectedTrophy.isShame && (
                         <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
+                          <PixelAlert size={12} color="#EF4444" />
                           <span>Satirical Shame</span>
                         </span>
                       )}
@@ -370,12 +356,12 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                     <div className="flex items-center gap-3 pt-2 flex-wrap">
                       {unlockedTrophies.includes(selectedTrophy.id) ? (
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-cabinet font-bold text-xs">
-                          <CheckCircle2 className="w-4 h-4" />
+                          <PixelCheck size={14} />
                           <span>Unlocked &amp; Claimed</span>
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
-                          <Lock className="w-3.5 h-3.5" />
+                          <PixelLock size={14} />
                           <span>Locked Specimen</span>
                         </div>
                       )}
@@ -388,7 +374,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-400/40 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-cabinet font-bold text-xs transition-colors cursor-pointer"
                           title="Share Trophy"
                         >
-                          <Share2 className="w-3.5 h-3.5" />
+                          <PixelShare size={14} />
                           <span>{shareFeedback || 'Share Trophy'}</span>
                         </button>
                       )}

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { X, Check } from 'lucide-react';
+import { PixelX, PixelCheck } from '@/components/common/PixelIcons';
 
 interface MorningBootModalProps {
   isOpen: boolean;
@@ -82,7 +82,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
             className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             aria-label="Close modal"
           >
-            <X className="w-4 h-4" />
+            <PixelX size={14} />
           </button>
         </div>
 
@@ -174,7 +174,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
                 ? 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9]'
                 : 'bg-[#FFFDF9] border-[#1A3629]/25'
             }`}>
-              {sunlightDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              {sunlightDone && <PixelCheck size={14} className="text-[#FFFDF9]" />}
             </div>
           </button>
 

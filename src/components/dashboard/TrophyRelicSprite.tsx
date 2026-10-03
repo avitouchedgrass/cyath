@@ -418,15 +418,116 @@ function renderTrophyAmulet(
         </g>
       );
 
-    // 11. Evening Seal Master: Wax Seal Stamp Coin
+    // 11. Evening Seal Master & First Seal: Wax Seal Stamp Coin
+    case 'first_seal':
     case 'evening_seal_master':
       return (
         <g>
           {/* Wax Seal Circle */}
           <rect x="28" y="23" width="8" height="6" fill="#D97706" />
           <rect x="29" y="24" width="6" height="4" fill="#F59E0B" />
-          {/* Shield Emblem inside Seal */}
+          {/* Pushpin / Shield Emblem inside Seal */}
           <rect x="31" y="25" width="2" height="2" fill="#FEF3C7" />
+        </g>
+      );
+
+    // 11b. 7-Day & 30-Day Seal Streaks
+    case 'seal_streak_7':
+      return (
+        <g>
+          <rect x="28" y="22" width="8" height="8" fill="#B45309" />
+          <rect x="29" y="23" width="6" height="6" fill="#F59E0B" />
+          {/* VII Roman glyph */}
+          <rect x="30" y="25" width="1" height="2" fill="#FFFFFF" />
+          <rect x="32" y="25" width="1" height="2" fill="#FFFFFF" />
+          <rect x="34" y="25" width="1" height="2" fill="#FFFFFF" />
+        </g>
+      );
+
+    case 'seal_streak_30':
+      return (
+        <g>
+          <rect x="28" y="22" width="8" height="8" fill="#7E22CE" />
+          <rect x="29" y="23" width="6" height="6" fill="#A855F7" />
+          <rect x="30" y="24" width="4" height="4" fill="#FACC15" />
+          <rect x="31" y="25" width="2" height="2" fill="#FFFFFF" />
+        </g>
+      );
+
+    // 11c. Flawless Biometrics: 4-Way Circadian Star
+    case 'flawless_biometrics':
+      return (
+        <g>
+          <rect x="31" y="25" width="2" height="2" fill="#FFFFFF" />
+          <rect x="31" y="21" width="2" height="3" fill="#F59E0B" />
+          <rect x="31" y="28" width="2" height="3" fill="#3B82F6" />
+          <rect x="27" y="25" width="3" height="2" fill="#10B981" />
+          <rect x="34" y="25" width="3" height="2" fill="#8B5CF6" />
+        </g>
+      );
+
+    // 11d. Deep Recovery Sleep: Crescent Moon on Dream Cloud
+    case 'deep_recovery_7h':
+      return (
+        <g>
+          {/* Moon */}
+          <rect x="29" y="22" width="6" height="5" fill="#818CF8" />
+          <rect x="31" y="23" width="4" height="4" fill={palette.deepShadow} />
+          {/* Dream Cloud */}
+          <rect x="27" y="27" width="10" height="3" fill="#E0E7FF" />
+          <rect x="29" y="26" width="6" height="2" fill="#FFFFFF" />
+        </g>
+      );
+
+    // 11e. Island Biome Tiers
+    case 'island_sprout':
+      return (
+        <g>
+          <rect x="28" y="24" width="8" height="2" fill="#22C55E" />
+          <rect x="29" y="26" width="6" height="3" fill="#78350F" />
+          <rect x="31" y="29" width="2" height="2" fill="#451A03" />
+          <rect x="31" y="22" width="2" height="2" fill="#86EFAC" />
+        </g>
+      );
+
+    case 'island_cabin':
+      return (
+        <g>
+          <rect x="28" y="24" width="8" height="2" fill="#B45309" />
+          <rect x="30" y="22" width="4" height="2" fill="#B45309" />
+          <rect x="33" y="21" width="1" height="2" fill="#CBD5E1" />
+          <rect x="29" y="26" width="6" height="4" fill="#D97706" />
+          <rect x="31" y="28" width="2" height="2" fill="#451A03" />
+        </g>
+      );
+
+    case 'island_homestead':
+      return (
+        <g>
+          <rect x="28" y="23" width="5" height="6" fill="#94A3B8" />
+          <rect x="28" y="29" width="8" height="2" fill="#38BDF8" />
+          <rect x="33" y="24" width="4" height="5" fill="#B45309" />
+          <rect x="34" y="25" width="2" height="3" fill="#FDE68A" />
+        </g>
+      );
+
+    case 'island_observatory':
+      return (
+        <g>
+          <rect x="29" y="22" width="6" height="4" fill="#F59E0B" />
+          <rect x="32" y="20" width="4" height="2" fill="#E2E8F0" />
+          <rect x="27" y="22" width="2" height="2" fill="#FEF08A" />
+        </g>
+      );
+
+    case 'island_eden':
+      return (
+        <g>
+          <rect x="28" y="22" width="8" height="2" fill="#F8FAFC" />
+          <rect x="29" y="24" width="1" height="4" fill="#E2E8F0" />
+          <rect x="32" y="24" width="1" height="4" fill="#E2E8F0" />
+          <rect x="34" y="24" width="1" height="4" fill="#E2E8F0" />
+          <rect x="31" y="25" width="2" height="2" fill="#C084FC" />
         </g>
       );
 

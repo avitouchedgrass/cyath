@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useHabitStore } from '@/store/useHabitStore';
-import { ISLAND_TIERS, getIslandTier } from '@/lib/progression/config';
+import { getIslandTier, getNextIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateCircadianStatus } from '@/lib/circadianEngine';
 import { retroAudio } from '@/lib/retroAudio';
@@ -26,11 +26,12 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
     activateReentryProtocol,
   } = useHabitStore();
 
+  const activeSuite = userProfile?.selectedIslandSuite || (userProfile?.archetype as any) || 'circadian';
   const progress = useMemo(() => calculateLevel(totalXp), [totalXp]);
-  const currentIsland = useMemo(() => getIslandTier(progress.level), [progress.level]);
+  const currentIsland = useMemo(() => getIslandTier(progress.level, activeSuite), [progress.level, activeSuite]);
   const nextIsland = useMemo(() => {
-    return ISLAND_TIERS.find((t) => t.tier === currentIsland.tier + 1) || null;
-  }, [currentIsland.tier]);
+    return getNextIslandTier(progress.level, activeSuite);
+  }, [progress.level, activeSuite]);
 
   const currentLog = getDailyLog(currentDate);
 
@@ -226,15 +227,11 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
                   />
                 </filter>
 
-                {/* Kintsugi Gold Specular Shimmer */}
-                <filter id="sanctuary-gold-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#F59E0B" floodOpacity="0.85" />
-                </filter>
               </defs>
 
               {/* Base Island inside SVG */}
               <image
-                href={currentIsland.svgImage || currentIsland.image}
+                href={currentIsland.pngImage || currentIsland.image}
                 width="800"
                 height="800"
                 filter={
@@ -246,28 +243,6 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
                 }
                 style={{ imageRendering: 'pixelated' }}
               />
-
-              {/* Native SVG Golden Kintsugi Fracture Lines */}
-              {(isForgedStreak || streakCount >= 5) && (
-                <g id="kintsugi-gold-seams" filter="url(#sanctuary-gold-glow)">
-                  <path
-                    d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                    stroke="#F59E0B"
-                    strokeWidth="5"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    fill="none"
-                  />
-                  <path
-                    d="M370 520 L410 575 L395 640 L425 700 M410 575 L470 595 L520 635 M395 640 L345 675 L315 725"
-                    stroke="#FFFBEB"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    fill="none"
-                  />
-                </g>
-              )}
 
               {/* Native SVG Mist Vapor Layer */}
               {lifecycleState === 'mist' && (

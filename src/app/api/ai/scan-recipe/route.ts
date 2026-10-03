@@ -22,12 +22,15 @@ interface VisionExtractionResult {
 }
 
 const VISION_SYSTEM_PROMPT = `You are Cyath's scientific nutritional computer vision and metabolic reasoning AI.
-You are inspecting an ACTUAL photograph of a real dish or food plate provided by the user.
+You are inspecting an ACTUAL photograph provided by the user.
 
-Your task:
-1. Examine the image carefully. Identify the exact dish, visible items, textures, colors, cooking method (fried, baked, grilled, steamed, sautéed), and portion sizes.
-2. Decompose the plate into specific ingredients with realistic estimated gram weights.
-3. Accurately calculate nutritional macronutrients based on USDA standard reference values:
+CRITICAL INSTRUCTIONS:
+1. IDENTIFY THE EXACT FOOD IN THE PICTURE HONESTLY AND ACCURATELY:
+   - Recognize fast food, restaurant dishes, commercial packaging, logos (e.g. McDonald's French Fries, Big Mac, pizza, sushi, packaged chips, street food) as well as whole foods.
+   - NEVER replace fast food, fries, junk food, or street food with a healthy recipe or quinoa bowl! If the image shows McDonald's fries, identify it specifically as "McDonald's French Fries" (or French Fries).
+   - Accurately calculate realistic macronutrients for what is actually pictured (e.g. for French fries: high carbohydrates, high dietary fats, low protein, e.g. ~320-380 kcal, ~3-4g protein, ~42g carbs, ~16g fats for a medium portion).
+2. Decompose the plate/item into specific ingredients with realistic estimated gram weights.
+3. Calculate nutritional macronutrients based on USDA / standard nutritional reference values:
    - Total Calories (kcal)
    - Protein (g)
    - Carbohydrates (g)
@@ -35,7 +38,7 @@ Your task:
 4. Classify:
    - category: strictly one of ["High Protein", "Steady Carbs", "Quick Fuel", "Keto Clean", "Post Workout"]
    - dietType: strictly one of ["vegetarian", "vegan", "eggetarian", "pescatarian", "omnivore"]
-5. Provide culinary preparation instructions to recreate the dish.
+5. Provide clear preparation or ingredient notes.
 
 Output strictly valid JSON matching this schema:
 {
@@ -48,7 +51,7 @@ Output strictly valid JSON matching this schema:
   "carbs": number,
   "fats": number,
   "prepTimeMinutes": number,
-  "focusScore": "string (e.g. 9.2/10)",
+  "focusScore": "string (e.g. 5.5/10 for high-glycemic fries, 9.2/10 for whole food protein)",
   "tags": ["string"],
   "description": "string",
   "ingredients": [{ "item": "string", "amount": "string" }],
@@ -57,12 +60,10 @@ Output strictly valid JSON matching this schema:
 }`;
 
 const CANDIDATE_MODELS = [
-  'gemini-3.5-flash',
-  'gemini-3.5-flash-lite',
-  'gemini-flash-latest',
-  'gemini-flash-lite-latest',
-  'gemini-2.5-flash',
-  'gemini-2.5-pro',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-3-flash-preview',
+  'gemini-3.8-flash',
+  'gemini-3.6-flash',
 ];
 
 // Curated high-fidelity presets for quick sample dish testing & offline fallback
@@ -259,7 +260,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
     }
 
-    const { image, mimeType = 'image/jpeg', apiKey } = body;
+    const { image, mimeType = 'image/jpeg', apiKey, preset } = body;
 
     // 2. Input Validation
     if (!image || typeof image !== 'string') {
@@ -270,12 +271,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Image payload exceeds 10MB limit.' }, { status: 413 });
     }
 
-    // 3. Instant Sample Dish Preset Resolution
-    const samplePreset = getSamplePreset(image);
-    if (samplePreset) {
+    // 3. Explicit Sample Dish Preset Resolution (only if preset ID explicitly passed)
+    if (preset && typeof preset === 'string' && SAMPLE_PRESETS[preset]) {
       return NextResponse.json({
         success: true,
-        recipe: samplePreset,
+        recipe: SAMPLE_PRESETS[preset],
         source: 'sample-preset',
       });
     }
@@ -285,14 +285,19 @@ export async function POST(req: NextRequest) {
 
     // If key is available, run live Gemini multimodal vision
     if (activeKey) {
-      const base64Data = image.replace(/^data:image\/[a-z]+;base64,/, '');
+      let resolvedMime = mimeType || 'image/jpeg';
+      const mimeMatch = image.match(/^data:([^;]+);base64,/i);
+      if (mimeMatch && mimeMatch[1]) {
+        resolvedMime = mimeMatch[1];
+      }
+      const base64Data = image.replace(/^data:[^;]+;base64,/i, '').trim();
 
       for (const model of CANDIDATE_MODELS) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         try {
-          const response = await callGeminiVision(activeKey, model, base64Data, mimeType, controller.signal);
+          const response = await callGeminiVision(activeKey, model, base64Data, resolvedMime, controller.signal);
           clearTimeout(timeoutId);
 
           if (!response.ok) {

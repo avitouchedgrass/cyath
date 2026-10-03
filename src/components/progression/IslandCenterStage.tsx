@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ISLAND_TIERS, IslandTier, getIslandTier, getNextIslandTier, xpToReachLevel } from '@/lib/progression/config';
+import {
+  ISLAND_TIERS,
+  IslandTier,
+  getIslandTier,
+  getNextIslandTier,
+  getSuiteTiers,
+  xpToReachLevel,
+} from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 import { LivingEmberCanopy } from './LivingEmberCanopy';
 import { useHabitStore } from '@/store/useHabitStore';
@@ -14,12 +21,13 @@ interface IslandCenterStageProps {
 }
 
 export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: IslandCenterStageProps) {
-  const currentIsland = getIslandTier(currentLevel);
-  const nextIsland = getNextIslandTier(currentLevel);
-  const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(currentIsland.tier - 1);
-
   const { currentDate, getDailyLog, userProfile, dailyProtocolsAcceptedByDate, deskRitualsByDate } =
     useHabitStore();
+  const activeSuite = userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian';
+  const activeTiers = getSuiteTiers(activeSuite);
+  const currentIsland = getIslandTier(currentLevel, activeSuite);
+  const nextIsland = getNextIslandTier(currentLevel, activeSuite);
+  const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(currentIsland.tier - 1);
   const currentLog = getDailyLog(currentDate);
   const protocolAccepted = !!dailyProtocolsAcceptedByDate[currentDate];
   const sunlightDone = !!currentLog.habitsCompleted['sunlight'];
@@ -47,7 +55,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
   // Preload remaining island tier assets progressively during idle time
   useEffect(() => {
     const preloader = () => {
-      ISLAND_TIERS.forEach((tier) => {
+      activeTiers.forEach((tier) => {
         const img = new Image();
         img.src = tier.image;
       });
@@ -62,19 +70,19 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
         return () => clearTimeout(timer);
       }
     }
-  }, []);
+  }, [activeTiers]);
 
-  const displayedIsland = ISLAND_TIERS[selectedPhaseIndex] || currentIsland;
+  const displayedIsland = activeTiers[selectedPhaseIndex] || currentIsland;
   const isUnlocked = currentLevel >= displayedIsland.minLevel;
 
   const prevPhase = () => {
     retroAudio.playBlip();
-    setSelectedPhaseIndex((prev) => (prev > 0 ? prev - 1 : ISLAND_TIERS.length - 1));
+    setSelectedPhaseIndex((prev) => (prev > 0 ? prev - 1 : activeTiers.length - 1));
   };
 
   const nextPhase = () => {
     retroAudio.playBlip();
-    setSelectedPhaseIndex((prev) => (prev < ISLAND_TIERS.length - 1 ? prev + 1 : 0));
+    setSelectedPhaseIndex((prev) => (prev < activeTiers.length - 1 ? prev + 1 : 0));
   };
 
   // XP threshold math for current island tier
@@ -112,7 +120,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
             className="relative w-full h-full flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] select-none"
             onContextMenu={(e) => e.preventDefault()}
           >
-            {ISLAND_TIERS.map((tier, index) => {
+            {activeTiers.map((tier, index) => {
               const isSelected = index === selectedPhaseIndex;
               const isTierUnlocked = currentLevel >= tier.minLevel;
 

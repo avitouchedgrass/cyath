@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useHabitStore } from '@/store/useHabitStore';
 import { calculateLevel } from '@/lib/progression/engine';
-import { Sparkles } from 'lucide-react';
+import { PixelArrowUpRight } from '@/components/common/PixelIcons';
 
 export function BottomCornerLevelBadge() {
   const [mounted, setMounted] = useState(false);
@@ -66,8 +66,9 @@ export function BottomCornerLevelBadge() {
           </div>
         </div>
 
-        <span className="hidden md:inline-flex text-[10px] font-mono font-bold text-[#1A3629] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#1A3629]/15">
-          Cockpit ↗
+        <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#1A3629] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#1A3629]/15">
+          <span>Cockpit</span>
+          <PixelArrowUpRight size={10} color="#1A3629" />
         </span>
       </Link>
     </div>

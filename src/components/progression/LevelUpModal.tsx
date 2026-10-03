@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
 import { useHabitStore } from '@/store/useHabitStore';
-import { Gift, Copy, Check, Share2 } from 'lucide-react';
+import { PixelGift, PixelCopy, PixelCheck, PixelShare } from '@/components/common/PixelIcons';
 
 interface LevelUpData {
   oldLevel: number;
@@ -102,7 +102,7 @@ export function LevelUpModal() {
           <div className="flex items-center justify-between text-left">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-[#065F46]">
-                <Gift className="w-3 h-3 text-[#10B981]" />
+                <PixelGift size={12} color="#10B981" />
                 <span>Friend Referral</span>
               </div>
               <span className="text-xs font-cabinet font-bold text-[#1A3629] block">
@@ -122,12 +122,12 @@ export function LevelUpModal() {
             >
               {copiedLink ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                  <PixelCheck size={14} className="text-[#10B981]" />
                   <span>Link Copied!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" />
+                  <PixelCopy size={14} />
                   <span>Copy Invite Link</span>
                 </>
               )}
@@ -141,7 +141,7 @@ export function LevelUpModal() {
               className="p-2 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] transition-colors cursor-pointer flex items-center justify-center shrink-0"
               title="Share to WhatsApp"
             >
-              <Share2 className="w-4 h-4 text-[#1A3629]" />
+              <PixelShare size={14} className="text-[#1A3629]" />
             </a>
           </div>
         </div>

@@ -5,7 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHabitStore } from "@/store/useHabitStore";
 import { GuildInviteModal } from "@/components/referrals/GuildInviteModal";
-import { Gift, Bot, Compass, BookOpen, User } from "lucide-react";
+import {
+  PixelBot,
+  PixelCompass,
+  PixelBook,
+  PixelUser,
+  PixelUtensils,
+  PixelMenu,
+  PixelX,
+} from "@/components/common/PixelIcons";
 import { useScroll } from "framer-motion";
 
 interface HeaderNavProps {
@@ -45,9 +53,10 @@ function FloatingPillNav({
     >
       {isLoggedIn ? (
         memberNavItems.map((item) => {
-          const isActive = item.id === 'playbook'
-            ? pathname.startsWith('/playbook')
-            : pathname === '/dashboard';
+          const isActive =
+            item.href === '/dashboard'
+              ? pathname === '/dashboard'
+              : pathname.startsWith(item.href);
 
           return (
             <Link 
@@ -102,11 +111,10 @@ function MobileBottomDock({
     >
       {memberNavItems.map((item) => {
         const IconComponent = item.icon;
-        const isActive = item.id === 'playbook'
-          ? pathname.startsWith('/playbook')
-          : item.id === 'profile'
-          ? pathname.startsWith('/profile')
-          : pathname === '/dashboard';
+        const isActive =
+          item.href === '/dashboard'
+            ? pathname === '/dashboard'
+            : pathname.startsWith(item.href);
 
         return (
           <Link
@@ -174,14 +182,16 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
   // Logged-in member navigation items
   const memberNavItems: NavItem[] = [
-    { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
-    { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
+    { name: "Sanctuary", href: "/dashboard", id: "today", icon: PixelCompass },
+    { name: "Fuel & Macros", href: "/fuel", id: "fuel", icon: PixelUtensils },
+    { name: "Playbook", href: "/playbook", id: "playbook", icon: PixelBook },
   ];
 
   const mobileMemberNavItems: NavItem[] = [
-    { name: "Cockpit", href: "/dashboard", id: "today", icon: Compass },
-    { name: "Playbook", href: "/playbook", id: "playbook", icon: BookOpen },
-    { name: "Profile", href: "/profile", id: "profile", icon: User },
+    { name: "Sanctuary", href: "/dashboard", id: "today", icon: PixelCompass },
+    { name: "Fuel", href: "/fuel", id: "fuel", icon: PixelUtensils },
+    { name: "Playbook", href: "/playbook", id: "playbook", icon: PixelBook },
+    { name: "Profile", href: "/profile", id: "profile", icon: PixelUser },
   ];
 
   const logoColor = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-[#1A3629]';
@@ -246,7 +256,11 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
               aria-expanded={isMobileMenuOpen}
               className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-[#1A3629]/20 bg-[#1A3629] text-[#FFFDF9] shadow-xs transition-all cursor-pointer font-cabinet font-bold text-xs"
             >
-              {isMobileMenuOpen ? '✕' : '☰'}
+              {isMobileMenuOpen ? (
+                <PixelX size={14} color="#FFFDF9" />
+              ) : (
+                <PixelMenu size={14} color="#FFFDF9" />
+              )}
             </button>
           </div>
 
@@ -287,7 +301,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
                   className="mt-1 px-4 py-3 rounded-xl font-cabinet font-bold text-sm transition-all flex items-center justify-between border border-[#1A3629]/20 bg-[#1A3629] text-[#FFFDF9] cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
-                    <Bot className="w-3.5 h-3.5 text-[#10B981]" />
+                    <PixelBot size={16} color="#10B981" />
                     <span>AI Health Coach</span>
                   </span>
                   <span className="font-mono text-xs text-[#A7F3D0] bg-[#2C4A3B] px-2 py-0.5 rounded font-bold">

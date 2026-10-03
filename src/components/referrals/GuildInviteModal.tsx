@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
-import { Gift, Copy, Check, X } from 'lucide-react';
+import { PixelGift, PixelCopy, PixelCheck, PixelX } from '@/components/common/PixelIcons';
 
 interface GuildInviteModalProps {
   isOpen: boolean;
@@ -89,8 +89,8 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
         <div className="flex items-start justify-between pb-4 border-b border-[#1A3629]/8">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1">
-                <Gift className="w-3 h-3 text-[#C9A84C]" />
+              <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1.5">
+                <PixelGift size={12} color="#C9A84C" />
                 Friend Referral Program
               </span>
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
@@ -108,7 +108,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
             className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             aria-label="Close modal"
           >
-            <X className="w-4 h-4" />
+            <PixelX size={14} color="currentColor" />
           </button>
         </div>
 
@@ -135,12 +135,12 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
           >
             {copiedLink ? (
               <>
-                <Check className="w-3.5 h-3.5" />
+                <PixelCheck size={14} color="#FFFDF9" />
                 <span>Link Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
+                <PixelCopy size={14} color="#FFFDF9" />
                 <span>Copy Invite Link</span>
               </>
             )}
@@ -205,7 +205,7 @@ export function GuildInviteModal({ isOpen, onClose }: GuildInviteModalProps) {
             </form>
           ) : (
             <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#1A3629]">
-              <Check className="w-4 h-4 text-[#1A3629]" />
+              <PixelCheck size={16} color="#1A3629" />
               <span>Referral Bonus Claimed ({displayReferredBy})</span>
             </div>
           )}

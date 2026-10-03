@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { PixelX, PixelSpinner } from '@/components/common/PixelIcons';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
@@ -129,7 +129,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             className="absolute right-5 top-5 rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
             aria-label="Close modal"
           >
-            <X className="h-5 w-5" />
+            <PixelX size={18} />
           </button>
 
           {/* Card Header & Typography */}
@@ -164,7 +164,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
             className="w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 text-sm font-medium text-neutral-200 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
           >
             {googleLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-white" />
+              <PixelSpinner size={16} className="text-white" />
             ) : (
               <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -247,7 +247,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
               disabled={loading || googleLoading}
               className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 active:scale-[0.98] transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading && <Loader2 className="w-4 h-4 animate-spin text-black" />}
+              {loading && <PixelSpinner size={16} className="text-black" />}
               <span>{mode === 'signup' ? 'Sign Up' : 'Log In'}</span>
             </button>
           </form>

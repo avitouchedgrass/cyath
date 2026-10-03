@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FileText, AlertCircle, ShieldAlert, Sparkles, ArrowLeft } from 'lucide-react';
+import { PixelArrowLeft, PixelAlert } from '@/components/common/PixelIcons';
 
 export default function TermsPage() {
   return (
@@ -21,7 +21,7 @@ export default function TermsPage() {
             href="/"
             className="inline-flex items-center gap-1.5 text-xs font-cabinet font-semibold px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] shadow-2xs hover:bg-[#F4F0EA] transition-colors mb-4"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <PixelArrowLeft size={14} />
             <span>Back to Home</span>
           </Link>
 
@@ -39,7 +39,7 @@ export default function TermsPage() {
         {/* Important Health Disclaimer Box */}
         <div className="p-5 sm:p-6 rounded-3xl border border-amber-300/80 bg-amber-50/50 mb-10 shadow-2xs flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-white border border-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
-            <AlertCircle className="w-5 h-5 text-amber-800" />
+            <PixelAlert size={20} color="#92400E" />
           </div>
           <div>
             <h3 className="font-cabinet font-bold text-sm text-amber-900 uppercase tracking-wider mb-1">

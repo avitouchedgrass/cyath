@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
-import { RefreshCw, RotateCcw, Home, AlertOctagon } from 'lucide-react';
+import { PixelRefresh, PixelHome, PixelAlert } from '@/components/common/PixelIcons';
 
 export default function Error({
   error,
@@ -45,7 +45,7 @@ export default function Error({
         <div className="border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_20px_50px_rgba(26,54,41,0.08)] rounded-3xl p-6 sm:p-10 text-center flex flex-col items-center">
           {/* Status Icon */}
           <div className="w-14 h-14 rounded-2xl border border-red-200 bg-[#FEF2F2] text-red-600 flex items-center justify-center mb-6">
-            <AlertOctagon className="w-7 h-7 stroke-[2.5]" />
+            <PixelAlert size={28} color="#DC2626" />
           </div>
 
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#4A5D4E] block mb-1">
@@ -76,7 +76,7 @@ export default function Error({
               onClick={() => reset()}
               className="px-6 py-3 rounded-full border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#234535] font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <PixelRefresh size={16} />
               <span>Try Again</span>
             </button>
 
@@ -85,7 +85,7 @@ export default function Error({
               onClick={handleClearCacheAndReset}
               className="px-5 py-3 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] font-bold text-xs shadow-2xs active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
             >
-              <RotateCcw className="w-4 h-4" />
+              <PixelRefresh size={16} />
               <span>Clear Cache &amp; Reload</span>
             </button>
 
@@ -93,7 +93,7 @@ export default function Error({
               href="/"
               className="px-5 py-3 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] hover:bg-[#EAE3D2] font-bold text-xs shadow-2xs active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
             >
-              <Home className="w-4 h-4" />
+              <PixelHome size={16} />
               <span>Home</span>
             </Link>
           </div>

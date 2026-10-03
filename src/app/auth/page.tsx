@@ -2,20 +2,30 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useHabitStore } from '@/store/useHabitStore';
 import { Logo } from '@/components/ui/Logo';
 import { retroAudio } from '@/lib/retroAudio';
 import { extractReferralCode } from '@/lib/referralUtils';
-import { ArrowLeft, Loader2, Mail, CheckCircle2, RefreshCw, KeyRound, Lock, Gift } from 'lucide-react';
+import {
+  PixelMail,
+  PixelShieldCheck,
+  PixelSpinner,
+  PixelRefresh,
+  PixelKey,
+  PixelLock,
+  PixelGift,
+} from '@/components/common/PixelIcons';
 
 function AuthContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isLoginPage = pathname === '/login';
   const initialMode = searchParams.get('mode') === 'update_password' || searchParams.get('reset') === 'true'
     ? 'update_password'
-    : (searchParams.get('mode') as 'signup' | 'login' | 'forgot' | 'update_password') || 'signup';
+    : (searchParams.get('mode') as 'signup' | 'login' | 'forgot' | 'update_password') || (isLoginPage ? 'login' : 'signup');
 
   const [mode, setMode] = useState<'signup' | 'login' | 'forgot' | 'update_password'>(initialMode);
   const [email, setEmail] = useState('');
@@ -107,6 +117,16 @@ function AuthContent() {
     };
   }, [isVerificationSent, email]);
 
+  const { userSession } = useHabitStore();
+
+  // If already logged in, redirect straight to dashboard
+  useEffect(() => {
+    if (userSession && !userSession.id.startsWith('guest_')) {
+      const target = searchParams.get('redirect') || '/dashboard';
+      router.push(target);
+    }
+  }, [userSession, router, searchParams]);
+
   const completeAuthentication = async (user?: { id: string; email?: string }) => {
     retroAudio.playInspectConfirm();
     const { setUserSession, executePendingAction } = useHabitStore.getState();
@@ -130,6 +150,23 @@ function AuthContent() {
     }
 
     const currentProfile = useHabitStore.getState().userProfile;
+    let isAlreadyOnboarded = !!currentProfile?.onboardingCompleted;
+
+    // Check remote user_profiles if in-memory profile has not populated yet
+    if (!isAlreadyOnboarded && user?.id && !user.id.startsWith('guest_')) {
+      try {
+        const { data: remoteProf } = await supabase
+          .from('user_profiles')
+          .select('onboarding_completed')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (remoteProf?.onboarding_completed) {
+          isAlreadyOnboarded = true;
+        }
+      } catch {}
+    }
+
     const { success, executedAction } = executePendingAction();
     const rawRedirect = searchParams.get('redirect');
     // Sanitize redirect URL to prevent Open Redirect (CWE-601)
@@ -138,13 +175,12 @@ function AuthContent() {
       return url.startsWith('/') && !url.startsWith('//') && !url.includes('\\');
     };
     const safeRedirect = isSafeRelativeUrl(rawRedirect) ? rawRedirect : null;
-    const needsOnboarding = !currentProfile || !currentProfile.onboardingCompleted;
 
     if (success && executedAction?.returnUrl) {
       router.push(executedAction.returnUrl);
     } else if (safeRedirect) {
       router.push(safeRedirect);
-    } else if (needsOnboarding) {
+    } else if (!isAlreadyOnboarded) {
       router.push('/onboarding');
     } else {
       router.push('/dashboard');
@@ -182,6 +218,14 @@ function AuthContent() {
         });
 
         if (error) throw error;
+
+        // If user already exists in Supabase, identities is returned as empty array
+        if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+          setErrorMsg('An account with this email address already exists. Please log in below.');
+          setMode('login');
+          setLoading(false);
+          return;
+        }
 
         if (data.session) {
           setSuccessMsg('Account created successfully! Launching your dashboard...');
@@ -359,11 +403,11 @@ function AuthContent() {
           <div className="flex flex-col gap-5 py-2">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-2xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629]">
-                <Mail className="h-6 w-6 animate-pulse" />
+                <PixelMail size={24} className="animate-pulse" />
               </div>
               <div>
                 <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" /> Verification Sent
+                  <PixelShieldCheck size={14} color="#10B981" /> Verification Sent
                 </span>
               </div>
             </div>
@@ -396,9 +440,9 @@ function AuthContent() {
                 className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <PixelSpinner size={16} />
                 ) : (
-                  <RefreshCw className="w-4 h-4" />
+                  <PixelRefresh size={16} />
                 )}
                 <span>
                   {resendCooldown > 0
@@ -435,7 +479,7 @@ function AuthContent() {
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
-                <KeyRound className="w-5 h-5" />
+                <PixelKey size={20} />
               </div>
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
@@ -482,7 +526,7 @@ function AuthContent() {
                 disabled={loading}
                 className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {loading && <PixelSpinner size={16} />}
                 <span>Send Reset Link</span>
               </button>
             </form>
@@ -507,7 +551,7 @@ function AuthContent() {
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl border border-[#1A3629]/20 bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] shrink-0">
-                <Lock className="w-5 h-5" />
+                <PixelLock size={20} />
               </div>
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
@@ -568,7 +612,7 @@ function AuthContent() {
                 disabled={loading}
                 className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {loading && <PixelSpinner size={16} />}
                 <span>Update Password</span>
               </button>
             </form>
@@ -612,7 +656,7 @@ function AuthContent() {
 
             {pendingRefCode && (
               <div className="p-3 rounded-2xl border border-[#10B981]/30 bg-[#ECFDF5] text-[#065F46] flex items-center gap-2 shadow-2xs">
-                <Gift className="w-4 h-4 text-[#10B981] shrink-0" />
+                <PixelGift size={16} color="#10B981" className="shrink-0" />
                 <span className="font-mono text-xs font-bold">
                   Guild Invite [{pendingRefCode}] Applied · +250 Starter XP
                 </span>
@@ -644,7 +688,7 @@ function AuthContent() {
               className="w-full py-3 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] shadow-2xs hover:bg-[#FAF6EE] hover:border-[#1A3629]/40 text-xs font-cabinet font-bold transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               {googleLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <PixelSpinner size={16} />
               ) : (
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
@@ -741,7 +785,7 @@ function AuthContent() {
                 disabled={loading}
                 className="w-full py-3.5 rounded-full font-cabinet font-bold text-xs border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {loading && <PixelSpinner size={16} />}
                 <span>{mode === 'signup' ? 'Create Account & Continue' : 'Log In'}</span>
               </button>
             </form>

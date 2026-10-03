@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { PixelAlert, PixelRefresh } from '@/components/common/PixelIcons';
 
 interface Props {
   children: ReactNode;
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="p-6 rounded-3xl border border-red-200 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(239,68,68,0.06)] text-center my-4 flex flex-col items-center justify-center gap-3">
           <div className="w-10 h-10 rounded-xl border border-red-200 bg-red-50 flex items-center justify-center text-red-600">
-            <AlertTriangle className="w-5 h-5" />
+            <PixelAlert size={20} color="#DC2626" />
           </div>
           <div>
             <h4 className="font-cabinet font-bold text-sm text-[#1A3629]">
@@ -59,7 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
             onClick={this.reset}
             className="px-4 py-1.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <PixelRefresh size={14} />
             <span>Try Again</span>
           </button>
         </div>

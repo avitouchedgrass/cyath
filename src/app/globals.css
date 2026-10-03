@@ -40,6 +40,8 @@
   --animate-ember-shimmer: emberShimmer 3s ease-in-out infinite;
   --animate-island-float: islandFloat 8s ease-in-out infinite;
   --animate-shadow-float: shadowFloat 8s ease-in-out infinite;
+  --animate-cloud-slow: cloudDriftSlow 52s linear infinite;
+  --animate-cloud-fast: cloudDriftFast 36s linear infinite;
 
   @keyframes islandFloat {
     0%, 100% {
@@ -47,6 +49,30 @@
     }
     50% {
       transform: translateY(-14px);
+    }
+  }
+
+  @keyframes cloudDriftSlow {
+    0% {
+      transform: translate3d(-180px, 0, 0);
+    }
+    50% {
+      transform: translate3d(calc(50vw - 80px), -6px, 0);
+    }
+    100% {
+      transform: translate3d(calc(100vw + 220px), 0, 0);
+    }
+  }
+
+  @keyframes cloudDriftFast {
+    0% {
+      transform: translate3d(-240px, 0, 0);
+    }
+    50% {
+      transform: translate3d(calc(50vw - 100px), 8px, 0);
+    }
+    100% {
+      transform: translate3d(calc(100vw + 260px), 0, 0);
     }
   }
 

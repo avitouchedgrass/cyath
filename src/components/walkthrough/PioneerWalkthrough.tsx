@@ -10,100 +10,78 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 
 const WALKTHROUGH_STEPS: DriveStep[] = [
   {
-    element: '#tour-navigation',
+    element: '#tour-sanctuary-stage',
     popover: {
-      title: 'Navigation Hub',
-      description: 'Quickly switch between your Cockpit, Food Log, Playbook, and Profile.',
+      title: 'Your Living Sanctuary',
+      description:
+        'This floating island is your biological anchor. As you log habits, maintain sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 distinct pixel-art biome tiers.',
       side: 'bottom',
       align: 'center',
     },
   },
   {
-    element: '#tour-sanctuary-island',
+    element: '#btn-seal-today',
     popover: {
-      title: 'Living Sanctuary',
-      description: 'Your floating island grows and evolves as you stay consistent. Watch chimney smoke drift and circadian lighting shift.',
-      side: 'bottom',
-      align: 'center',
-    },
-  },
-  {
-    element: '#tour-ledger-toggle',
-    popover: {
-      title: 'Station Switcher',
-      description: 'Toggle between your immersive Sanctuary Observatory and the rigorous Habit Ledger.',
-      side: 'bottom',
-      align: 'center',
-    },
-  },
-  {
-    element: '#tour-circadian-horizon',
-    popover: {
-      title: 'Circadian Horizon',
-      description: 'Real-time solar cadence and twilight progression calibrated to your natural circadian rhythm.',
-      side: 'bottom',
-      align: 'center',
-    },
-  },
-  {
-    element: '#tour-core-habits',
-    popover: {
-      title: 'Focus Habits',
-      description: 'Check off your daily keystone habits in seconds, plus quick morning and evening check-ins.',
-      side: 'top',
-      align: 'start',
-    },
-  },
-  {
-    element: '#tour-fuel-anchor',
-    popover: {
-      title: 'Daily Fuel & Photo Scan',
-      description: 'Track protein and hydration targets, or tap Photo Scan to deconstruct whole-food meals with AI.',
+      title: 'The Daily Seal Ceremony',
+      description:
+        'Every evening, tap "Seal Today" to open your Turn-by-Turn Debrief drawer. Log morning sunlight, fast 1-tap meals with instant macro calculations, caffeine airlock, and custom questions to mint your daily wax seal and earn graduated XP.',
       side: 'top',
       align: 'center',
     },
   },
   {
-    element: '#tour-specimen-vault',
+    element: '#btn-view-ledger',
+    popover: {
+      title: 'Archival Corkboard Ledger',
+      description:
+        'Tap "View Ledger" to slide out your archival corkboard. Review past days pinned with golden wax seals, inspect historical biometrics, or export 16-bit receipt cards as shareable PNGs.',
+      side: 'top',
+      align: 'center',
+    },
+  },
+  {
+    element: '#specimen-reliquary',
     popover: {
       title: 'Specimen Reliquary',
-      description: 'Inspect uniform pixel chalices, level up 5x Silver and 20x Gold masteries, and share your milestones.',
+      description:
+        'Explore your subterranean trophy vault. Unlock handcrafted pixel relics and chalices for streak milestones, circadian sleep, and nutritional mastery.',
       side: 'top',
-      align: 'center',
-    },
-  },
-  {
-    element: '#tour-nav-playbook',
-    popover: {
-      title: 'Science Playbook',
-      description: 'Explore whole-food recipes, interactive portion scalers, and proven daily energy protocols.',
-      side: 'bottom',
       align: 'center',
     },
   },
   {
     element: '#tour-ai-coach',
     popover: {
-      title: 'Cyath AI Coach',
-      description: 'Ask for personalized whole-food recipes, portion advice, or energy tips anytime.',
+      title: 'StoveSage AI Coach & Scanner',
+      description:
+        'Need recipe inspiration, metabolic advice, or instant photo meal analysis? Open StoveSage (or press Cmd+J) to consult your evidence-based circadian nutrition coach.',
       side: 'top',
       align: 'end',
     },
   },
   {
-    element: '#tour-nav-profile',
+    element: '#tour-navigation',
     popover: {
-      title: 'Profile & Privacy',
-      description: 'Manage streak shields, view privacy and terms, and export your personal health ledger.',
+      title: 'Navigation Hub & Playbook',
+      description:
+        'Navigate between the Habit & Fuel Playbook for peer-reviewed circadian protocols, the Correlation Engine for lifestyle pattern curves, and your Profile to manage habits.',
       side: 'bottom',
-      align: 'end',
+      align: 'center',
     },
   },
   {
     popover: {
-      title: 'Install Cyath on Your Home Screen',
+      title: 'Command Palette: Fast Keyboard Logging',
       description:
-        '<strong>iOS (Safari):</strong> Tap the Share button ↗ at the bottom of your browser, then select <em>Add to Home Screen</em>.<br><br><strong>Android (Chrome):</strong> Tap the three-dot menu ⋮ at the top right, then tap <em>Add to Home Screen</em>.<br><br>You\'ll get the full app experience — no browser chrome, instant launch.',
+        'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in under 2 seconds.',
+      align: 'center',
+    },
+  },
+  {
+    popover: {
+      title: 'Install Cyath as a Native App',
+      description:
+        '<strong>iOS (Safari):</strong> Tap Share then <em>Add to Home Screen</em>.<br><br><strong>Android (Chrome):</strong> Tap Menu ⋮ then <em>Add to Home Screen</em>.<br><br>Enjoy fullscreen real estate, zero browser chrome, and instant offline-ready access.',
       align: 'center',
     },
   },
@@ -153,8 +131,6 @@ export function PioneerWalkthrough() {
           try {
             const uId = userSession?.id || 'guest';
             localStorage.setItem(`cyath_walkthrough_completed_${uId}`, 'true');
-            localStorage.setItem('cyath_walkthrough_global_completed', 'true');
-            localStorage.setItem('cyath_walkthrough_completed', 'true');
             xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 28);
           } catch {}
         }
@@ -165,30 +141,32 @@ export function PioneerWalkthrough() {
     driverObj.drive();
   }, [completeWalkthrough, userSession]);
 
+  const isSanctuaryRoute = pathname === '/dashboard' || pathname === '/';
+
   const handleLaunchRequest = useCallback(() => {
-    if (pathname !== '/dashboard') {
+    if (!isSanctuaryRoute) {
       try {
         sessionStorage.setItem('pending_cyath_walkthrough', 'true');
       } catch {}
-      router.push('/dashboard?tab=today');
+      router.push('/dashboard');
     } else {
       startTour();
     }
-  }, [pathname, router, startTour]);
+  }, [isSanctuaryRoute, router, startTour]);
 
-  // Check for pending cross-page launch once on dashboard
+  // Check for pending cross-page launch once on sanctuary / dashboard
   useEffect(() => {
-    if (pathname !== '/dashboard') return;
+    if (!isSanctuaryRoute) return;
     try {
       if (sessionStorage.getItem('pending_cyath_walkthrough') === 'true') {
         sessionStorage.removeItem('pending_cyath_walkthrough');
         const timer = setTimeout(() => {
           startTour();
-        }, 350);
+        }, 600);
         return () => clearTimeout(timer);
       }
     } catch {}
-  }, [pathname, startTour]);
+  }, [isSanctuaryRoute, startTour]);
 
   // Listen for launch events dispatched from Profile page or Command Palette
   useEffect(() => {
@@ -208,29 +186,24 @@ export function PioneerWalkthrough() {
     };
   }, [handleLaunchRequest]);
 
-  // Auto-launch for new members landing on the cockpit for the very first time
+  // Auto-launch for new members landing on sanctuary for the very first time
   useEffect(() => {
-    if (pathname !== '/dashboard') return;
+    if (!isSanctuaryRoute) return;
 
-    const isMember = !!userSession && !userSession.id.startsWith('guest_');
     const hasFinishedProfile = !!userProfile?.onboardingCompleted;
     const hasFinishedTour = !!userProfile?.walkthroughCompleted;
 
     const userId = userSession?.id || 'guest';
     const localKey = `cyath_walkthrough_completed_${userId}`;
-    const localDone = typeof window !== 'undefined' && (
-      localStorage.getItem(localKey) === 'true' ||
-      localStorage.getItem('cyath_walkthrough_global_completed') === 'true' ||
-      localStorage.getItem('cyath_walkthrough_completed') === 'true'
-    );
+    const localDone = typeof window !== 'undefined' && localStorage.getItem(localKey) === 'true';
 
-    if (isMember && hasFinishedProfile && !hasFinishedTour && !localDone) {
+    if (hasFinishedProfile && !hasFinishedTour && !localDone) {
       const timer = setTimeout(() => {
         startTour();
       }, 1200);
       return () => clearTimeout(timer);
     }
-  }, [pathname, userSession, userProfile, startTour]);
+  }, [isSanctuaryRoute, userSession, userProfile, startTour]);
 
   return null;
 }

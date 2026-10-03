@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight, Home } from 'lucide-react';
+import { PixelChevronRight, PixelHome } from '@/components/common/PixelIcons';
 import { BreadcrumbsJsonLd } from '@/components/seo/JsonLd';
 
 export interface BreadcrumbItem {
@@ -44,19 +44,19 @@ export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
             return (
               <li key={index} className="flex items-center gap-1.5">
                 {index > 0 && (
-                  <ChevronRight className="w-3.5 h-3.5 text-[#4A5D4E] shrink-0" aria-hidden="true" />
+                  <PixelChevronRight size={12} color="#4A5D4E" className="shrink-0" />
                 )}
                 {isLast || !item.href ? (
-                  <span className="text-[#1A3629] font-black" aria-current="page">
-                    {index === 0 ? <Home className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> : null}
-                    {item.label}
+                  <span className="text-[#1A3629] font-black flex items-center gap-1" aria-current="page">
+                    {index === 0 ? <PixelHome size={13} color="#1A3629" /> : null}
+                    <span>{item.label}</span>
                   </span>
                 ) : (
                   <Link
                     href={item.href}
                     className="text-[#4A5D4E] hover:text-[#1A3629] hover:underline transition-colors flex items-center gap-1"
                   >
-                    {index === 0 ? <Home className="w-3.5 h-3.5" /> : null}
+                    {index === 0 ? <PixelHome size={13} color="#4A5D4E" /> : null}
                     <span>{item.label}</span>
                   </Link>
                 )}

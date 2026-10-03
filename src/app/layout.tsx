@@ -3,7 +3,6 @@ import { Inter, JetBrains_Mono, Pixelify_Sans } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { XpToastLayer } from "@/components/progression/XpToastLayer";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
-import { BottomCornerLevelBadge } from "@/components/progression/BottomCornerLevelBadge";
 import { PioneerWalkthrough } from "@/components/walkthrough/PioneerWalkthrough";
 import { StoveSageChatbot } from "@/components/stovesage/StoveSageChatbot";
 import { CommandPalette } from "@/components/commands/CommandPalette";
@@ -113,9 +112,6 @@ export default function RootLayout({
           </ErrorBoundary>
           <ErrorBoundary name="Level Up Modal">
             <LevelUpModal />
-          </ErrorBoundary>
-          <ErrorBoundary name="Level Badge">
-            <BottomCornerLevelBadge />
           </ErrorBoundary>
           <ErrorBoundary name="Walkthrough">
             <PioneerWalkthrough />

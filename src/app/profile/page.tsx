@@ -11,7 +11,20 @@ import { XpHud } from '@/components/progression/XpHud';
 import { GuildInviteModal } from '@/components/referrals/GuildInviteModal';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { WeightTrackerModal } from '@/components/dashboard/WeightTrackerModal';
-import { Cloud, LogOut, RefreshCw, Trash2, AlertTriangle, X, ShieldAlert, RotateCcw, Gift, Compass, Scale, ShieldCheck, Download, ExternalLink, FileText } from 'lucide-react';
+import {
+  PixelGift,
+  PixelRefresh,
+  PixelLogOut,
+  PixelCompass,
+  PixelShieldCheck,
+  PixelDownload,
+  PixelFileText,
+  PixelExternalLink,
+  PixelShieldAlert,
+  PixelTrash,
+  PixelX,
+  PixelAlert,
+} from '@/components/common/PixelIcons';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -204,7 +217,7 @@ export default function ProfilePage() {
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-emerald-600/20 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/70 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               title="Invite Friends for +250 XP"
             >
-              <Gift className="w-3.5 h-3.5 text-[#059669]" />
+              <PixelGift size={14} color="#059669" />
               <span>Invite (+250 XP)</span>
             </button>
 
@@ -214,7 +227,7 @@ export default function ProfilePage() {
               disabled={isSyncing}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4F0EA] font-cabinet font-semibold text-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <PixelRefresh size={14} className={isSyncing ? 'animate-spin' : ''} />
               <span>{isSyncing ? 'Syncing...' : 'Sync Cloud'}</span>
             </button>
 
@@ -223,7 +236,7 @@ export default function ProfilePage() {
               onClick={handleSignOut}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#234535] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <PixelLogOut size={14} />
               <span>Sign Out</span>
             </button>
           </div>
@@ -231,7 +244,7 @@ export default function ProfilePage() {
 
         {syncStatus && (
           <div className="mb-6 p-3.5 rounded-2xl border border-emerald-600/20 bg-emerald-50 text-xs font-mono font-bold text-[#065F46] flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-[#10B981]" />
+            <PixelRefresh size={16} color="#10B981" />
             <span>{syncStatus}</span>
           </div>
         )}
@@ -395,7 +408,7 @@ export default function ProfilePage() {
         <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/15 flex items-center justify-center shrink-0">
-              <Compass className="w-5 h-5 text-[#1A3629]" />
+              <PixelCompass size={20} className="text-[#1A3629]" />
             </div>
             <div>
               <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
@@ -415,7 +428,7 @@ export default function ProfilePage() {
             }}
             className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
           >
-            <Compass className="w-3.5 h-3.5" />
+            <PixelCompass size={14} />
             <span>Launch Walkthrough Tour</span>
           </button>
         </div>
@@ -425,7 +438,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#1A3629]/10">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-[#F4F0EA] border border-[#1A3629]/15 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5 text-[#1A3629]" />
+                <PixelShieldCheck size={20} color="#1A3629" />
               </div>
               <div>
                 <h3 className="font-cabinet font-bold text-lg text-[#1A3629]">
@@ -442,7 +455,7 @@ export default function ProfilePage() {
               onClick={handleExportData}
               className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
             >
-              <Download className="w-3.5 h-3.5" />
+              <PixelDownload size={14} />
               <span>Export Ledger JSON</span>
             </button>
           </div>
@@ -454,7 +467,7 @@ export default function ProfilePage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-[#FFFDF9] border border-[#1A3629]/15 flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-[#1A3629]" />
+                  <PixelFileText size={16} className="text-[#1A3629]" />
                 </div>
                 <div>
                   <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
@@ -465,7 +478,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
+              <PixelExternalLink size={14} className="text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
@@ -474,7 +487,7 @@ export default function ProfilePage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-[#FFFDF9] border border-[#1A3629]/15 flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-[#1A3629]" />
+                  <PixelFileText size={16} className="text-[#1A3629]" />
                 </div>
                 <div>
                   <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
@@ -485,7 +498,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
+              <PixelExternalLink size={14} className="text-[#1A3629]/40 group-hover:text-[#1A3629] group-hover:translate-x-0.5 transition-all" />
             </Link>
           </div>
         </div>
@@ -495,7 +508,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-white border border-red-200 flex items-center justify-center shrink-0 shadow-2xs">
-                <ShieldAlert className="w-5 h-5 text-[#DC2626]" />
+                <PixelShieldAlert size={20} color="#DC2626" />
               </div>
               <div>
                 <h3 className="font-cabinet font-bold text-lg text-[#991B1B]">
@@ -516,7 +529,7 @@ export default function ProfilePage() {
                 }}
                 className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-100/70 text-amber-900 hover:bg-amber-100 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <PixelRefresh size={14} />
                 <span>Reset to Level 1</span>
               </button>
 
@@ -528,7 +541,7 @@ export default function ProfilePage() {
                 }}
                 className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-red-600 bg-red-600 text-white hover:bg-red-700 font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <PixelTrash size={14} />
                 <span>Delete Account</span>
               </button>
             </div>
@@ -552,11 +565,11 @@ export default function ProfilePage() {
               onClick={() => setShowResetModal(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#F4F0EA] cursor-pointer"
             >
-              <X className="w-4 h-4 text-[#1A3629]" />
+              <PixelX size={16} className="text-[#1A3629]" />
             </button>
 
             <div className="w-12 h-12 rounded-2xl bg-amber-100/70 border border-amber-300 flex items-center justify-center mb-4">
-              <RotateCcw className="w-6 h-6 text-amber-900" />
+              <PixelRefresh size={24} className="text-amber-900" />
             </div>
 
             <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mb-2">
@@ -600,11 +613,11 @@ export default function ProfilePage() {
               onClick={() => setShowDeleteModal(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg border border-[#1A3629]/15 hover:bg-[#F4F0EA] cursor-pointer"
             >
-              <X className="w-4 h-4 text-[#1A3629]" />
+              <PixelX size={16} className="text-[#1A3629]" />
             </button>
 
             <div className="w-12 h-12 rounded-2xl bg-red-100/70 border border-red-300 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-700" />
+              <PixelAlert size={24} className="text-red-700" />
             </div>
 
             <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mb-2">
@@ -635,7 +648,7 @@ export default function ProfilePage() {
                   <span>Deleting...</span>
                 ) : (
                   <>
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <PixelTrash size={14} />
                     <span>Delete Everything</span>
                   </>
                 )}

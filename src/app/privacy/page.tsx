@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ShieldCheck, Lock, EyeOff, Database, Sparkles, ArrowLeft } from 'lucide-react';
+import { PixelArrowLeft, PixelLock, PixelShieldCheck, PixelShield } from '@/components/common/PixelIcons';
 
 export default function PrivacyPage() {
   return (
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
             href="/"
             className="inline-flex items-center gap-1.5 text-xs font-cabinet font-semibold px-3.5 py-1.5 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] shadow-2xs hover:bg-[#F4F0EA] transition-colors mb-4"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <PixelArrowLeft size={14} />
             <span>Back to Home</span>
           </Link>
 
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <div className="p-5 rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs">
             <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-600/20 flex items-center justify-center mb-3">
-              <Lock className="w-4 h-4 text-emerald-800" />
+              <PixelLock size={16} color="#065F46" />
             </div>
             <h3 className="font-cabinet font-bold text-sm text-[#1A3629]">Local-First Storage</h3>
             <p className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1">
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
 
           <div className="p-5 rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs">
             <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-600/20 flex items-center justify-center mb-3">
-              <EyeOff className="w-4 h-4 text-blue-800" />
+              <PixelShield size={16} color="#1E40AF" />
             </div>
             <h3 className="font-cabinet font-bold text-sm text-[#1A3629]">Zero Ads or Tracking</h3>
             <p className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1">
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
 
           <div className="p-5 rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-2xs">
             <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-600/20 flex items-center justify-center mb-3">
-              <ShieldCheck className="w-4 h-4 text-amber-800" />
+              <PixelShieldCheck size={16} color="#B45309" />
             </div>
             <h3 className="font-cabinet font-bold text-sm text-[#1A3629]">Data Ownership</h3>
             <p className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1">

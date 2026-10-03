@@ -1,5 +1,5 @@
 export interface ProgressionEvents {
-  'xp:gained': { amount: number; reason: string; totalXp: number };
+  'xp:gained': { amount: number; reason: string; totalXp: number; suite?: 'circadian' | 'iron' | 'focus' };
   'level:up': { oldLevel: number; newLevel: number; title: string; unlockedTitle?: string };
   'streak:milestone': { days: number; milestoneName: string; xpAwarded: number };
   'quest:completed': { questId: string; title: string; xpAwarded: number };

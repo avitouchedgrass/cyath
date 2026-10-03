@@ -365,7 +365,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(rituals.morningRestedRating).toBe(9);
     expect(rituals.targetFocusHours).toBe(5);
     expect(useHabitStore.getState().getDailyLog(today).sleepHours).toBe(8.0);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 100);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 115);
 
     // 6. Store actions: Evening Wrap with zero caffeine (+20 XP for none + 15 XP digital sunset = +35 XP)
     useHabitStore.getState().completeEveningWrap({
@@ -379,7 +379,7 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(updatedRituals.eveningWrapCompleted).toBe(true);
     expect(updatedRituals.caffeineStatus).toBe('none');
     expect(updatedRituals.afternoonSlumpScore).toBe(2);
-    expect(useHabitStore.getState().totalXp).toBe(initialXp + 135);
+    expect(useHabitStore.getState().totalXp).toBe(initialXp + 150);
   });
 
   it('deduplicates custom recipes on addition and successfully logs custom recipes to daily log', () => {
@@ -489,7 +489,9 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(useHabitStore.getState().userProfile?.weightKg).toBe(74.8);
 
     // Third weigh-in 8 days later: eligible for next weekly calibration XP
-    const nextWeekDate = '2026-09-28';
+    const d = new Date(today);
+    d.setDate(d.getDate() + 8);
+    const nextWeekDate = d.toISOString().split('T')[0];
     const result3 = useHabitStore.getState().logWeight(74.2, 'next week weigh-in', nextWeekDate);
     expect(result3.success).toBe(true);
     expect(result3.xpAwarded).toBe(15);

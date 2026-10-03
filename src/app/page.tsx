@@ -10,6 +10,7 @@ import { InteractiveCorrelationMatrix } from '@/components/correlations/Interact
 import { useHabitStore } from '@/store/useHabitStore';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { PixelArrowUpRight, PixelSteak } from '@/components/common/PixelIcons';
 
 const STEP_LOOP = [
   {
@@ -390,8 +391,8 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#FFFDF9] text-[#1A3629] font-mono font-bold text-xs shadow-xs">
-                          ↗
+                        <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#FFFDF9] text-[#1A3629] shadow-xs">
+                          <PixelArrowUpRight size={14} color="#1A3629" />
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                           Food &amp; Focus Patterns
@@ -432,8 +433,8 @@ export default function Home() {
               <div className="lg:col-span-4 border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_20px_rgba(26,54,41,0.04)] hover:shadow-[0_8px_30px_rgba(26,54,41,0.08)] hover:border-[#1A3629]/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629] font-mono font-bold text-xs">
-                      ✦
+                    <div className="w-8 h-8 rounded-xl border border-[#1A3629]/20 flex items-center justify-center shrink-0 bg-[#F4F0EA] text-[#1A3629]">
+                      <PixelSteak size={16} />
                     </div>
                     <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
                       16-Bit Food Fuel

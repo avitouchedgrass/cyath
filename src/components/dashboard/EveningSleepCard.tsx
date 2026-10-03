@@ -5,6 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { EveningSealCeremonyModal } from '@/components/dashboard/EveningSealCeremonyModal';
+import { PixelSun, PixelMoon, PixelGear } from '@/components/common/PixelIcons';
 
 interface EveningSleepCardProps {
   onOpenSchedule: () => void;
@@ -12,6 +13,7 @@ interface EveningSleepCardProps {
   onToggleCorkboard: () => void;
   onOpenAmbient: () => void;
   isCorkboardOpen: boolean;
+  onRequireAuth?: () => void;
 }
 
 export function EveningSleepCard({
@@ -20,6 +22,7 @@ export function EveningSleepCard({
   onToggleCorkboard,
   onOpenAmbient,
   isCorkboardOpen,
+  onRequireAuth,
 }: EveningSleepCardProps) {
   const {
     currentDate,
@@ -153,7 +156,7 @@ export function EveningSleepCard({
               aria-label="Calibrate biological wake and sleep target"
             >
               <span>Calibrate</span>
-              <span className="text-[10px]">⚙</span>
+              <PixelGear size={11} color="currentColor" />
             </button>
           </div>
 
@@ -165,8 +168,8 @@ export function EveningSleepCard({
               className="p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-1 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
               title="Adjust Wake Target"
             >
-              <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
-                <span>☀️</span>
+              <div className="flex items-center gap-1.5 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                <PixelSun size={12} color="#F59E0B" />
                 <span>Wake Target</span>
               </div>
               <span className="font-mono text-sm font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
@@ -180,8 +183,8 @@ export function EveningSleepCard({
               className="p-2.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col items-start gap-1 hover:border-[#1A3629]/40 transition-colors text-left cursor-pointer shadow-2xs group"
               title="Adjust Rest Target"
             >
-              <div className="flex items-center gap-1 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
-                <span>🌙</span>
+              <div className="flex items-center gap-1.5 text-[10px] font-cabinet font-bold text-[#4A5D4E]">
+                <PixelMoon size={12} color="#6366F1" />
                 <span>Rest Target</span>
               </div>
               <span className="font-mono text-sm font-extrabold text-[#1A3629] group-hover:text-[#2C4A3B]">
@@ -198,6 +201,7 @@ export function EveningSleepCard({
         isOpen={isCeremonyOpen}
         onClose={() => setIsCeremonyOpen(false)}
         onComplete={handleCeremonyComplete}
+        onRequireAuth={onRequireAuth}
       />
     </div>
   );

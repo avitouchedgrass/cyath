@@ -7,7 +7,7 @@ import { CURATED_PROTOCOLS, ProtocolBlueprint } from '@/lib/protocols';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
-import { Plus, Check, Clock, Zap, Activity, Flame } from 'lucide-react';
+import { PixelFlame, PixelActivity, PixelClock, PixelLightning, PixelCheck, PixelPlus, PixelSparkles } from '@/components/common/PixelIcons';
 
 const PROTOCOL_CATEGORIES = ['All', 'Morning', 'Focus', 'Sleep', 'Movement'] as const;
 
@@ -72,7 +72,7 @@ function PlaybookContent() {
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs font-mono text-xs font-bold text-[#1A3629]">
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
+            <PixelFlame size={14} color="#F59E0B" />
             <span>{activeProtocolIds.length} Active in Cockpit</span>
           </div>
         </div>
@@ -80,7 +80,7 @@ function PlaybookContent() {
         {/* Toast Alert */}
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-50 bg-[#1A3629] text-[#FFFDF9] px-4 py-2.5 rounded-full border border-[#1A3629]/15 shadow-2xs font-cabinet text-xs font-bold animate-in fade-in flex items-center gap-2">
-            <span>✓</span>
+            <PixelCheck size={14} color="#FFFDF9" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -110,7 +110,7 @@ function PlaybookContent() {
 
           {filteredProtocols.length === 0 ? (
             <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] p-8 text-center flex flex-col items-center justify-center gap-3">
-              <Activity className="w-8 h-8 text-[#1A3629]/30" />
+              <PixelActivity size={24} className="text-[#1A3629]/30" />
               <h3 className="font-cabinet font-bold text-base text-[#1A3629]">
                 No protocols found in this category
               </h3>
@@ -163,7 +163,7 @@ function PlaybookContent() {
 
                         {/* Gold Wax Mint Badge */}
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A3629] border border-amber-400/40 text-amber-200 font-mono text-[10px] font-bold shadow-xs">
-                          <span className="text-amber-400">✦</span>
+                          <PixelSparkles size={11} color="#FBBF24" />
                           <span>+50 XP MINT</span>
                         </div>
                       </div>
@@ -187,12 +187,12 @@ function PlaybookContent() {
                       {/* Anchor Window & Cadence */}
                       <div className="flex items-center gap-3 font-mono text-xs text-[#4A5D4E] bg-[#FFFDF9]/60 px-3 py-2 rounded-xl border border-[#1A3629]/10">
                         <span className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-[#1A3629]" />
+                          <PixelClock size={14} className="text-[#1A3629]" />
                           <span className="font-bold text-[#1A3629]">{proto.timeframe}</span>
                         </span>
                         <span>·</span>
                         <span className="flex items-center gap-1.5">
-                          <Zap className="w-3.5 h-3.5 text-amber-600" />
+                          <PixelLightning size={14} color="#D97706" />
                           <span>Calibrated Anchor</span>
                         </span>
                       </div>
@@ -232,7 +232,7 @@ function PlaybookContent() {
                     {/* Footer Actions */}
                     <div className="pt-4 border-t border-[#1A3629]/15 flex items-center justify-between gap-3 flex-wrap">
                       <div className="flex items-center gap-1.5 font-mono text-xs text-[#4A5D4E]">
-                        <Activity className="w-3.5 h-3.5 text-[#1A3629]" />
+                        <PixelActivity size={14} className="text-[#1A3629]" />
                         <span>{proto.habits.length} Actions · Steady Focus</span>
                       </div>
 
@@ -247,12 +247,12 @@ function PlaybookContent() {
                       >
                         {isActive ? (
                           <>
-                            <Check className="w-3.5 h-3.5 text-amber-400" />
+                            <PixelCheck size={14} className="text-amber-400" />
                             <span>Inscribed in Cockpit</span>
                           </>
                         ) : (
                           <>
-                            <Plus className="w-3.5 h-3.5" />
+                            <PixelPlus size={14} />
                             <span>Inscribe into Cockpit</span>
                           </>
                         )}

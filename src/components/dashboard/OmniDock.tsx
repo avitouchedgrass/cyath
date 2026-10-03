@@ -5,7 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { parseQuickLog, ParsedCommand } from '@/lib/quickLogParser';
-import { Droplets, Zap } from 'lucide-react';
+import { PixelDroplet, PixelLightning, PixelCheck } from '@/components/common/PixelIcons';
 
 export function OmniDock() {
   const {
@@ -71,7 +71,7 @@ export function OmniDock() {
         const isRelative = parsedCmd.payload?.isRelative ?? true;
         const newTotal = isRelative ? (currentLog.totalProteinLogged || 0) + amt : amt;
         setProtein(newTotal, currentDate);
-        setFeedback(`✓ Added +${amt}g Protein (Total: ${newTotal}g)`);
+        setFeedback(`Added +${amt}g Protein (Total: ${newTotal}g)`);
         break;
       }
       case 'LOG_HYDRATION': {
@@ -79,31 +79,31 @@ export function OmniDock() {
         const isRelative = parsedCmd.payload?.isRelative ?? true;
         const newTotal = Number((isRelative ? (currentLog.hydrationLiters || 0) + amt : amt).toFixed(2));
         setHydration(newTotal, currentDate);
-        setFeedback(`✓ Added +${amt}L Water (Total: ${newTotal}L)`);
+        setFeedback(`Added +${amt}L Water (Total: ${newTotal}L)`);
         break;
       }
       case 'LOG_SLEEP': {
         const hrs = parsedCmd.payload?.hours || 7.5;
         setSleep(hrs, currentDate);
-        setFeedback(`✓ Sleep updated to ${hrs} hours`);
+        setFeedback(`Sleep updated to ${hrs} hours`);
         break;
       }
       case 'LOG_ENERGY': {
         const level = parsedCmd.payload?.level || 8;
         setEnergy(level, currentDate);
-        setFeedback(`✓ Alertness rated ${level}/10`);
+        setFeedback(`Alertness rated ${level}/10`);
         break;
       }
       case 'TOGGLE_HABIT': {
         const habitId = parsedCmd.payload?.habitId;
         if (habitId) {
           toggleHabit(habitId, currentDate);
-          setFeedback(`✓ Toggled habit "${parsedCmd.title}"`);
+          setFeedback(`Toggled habit "${parsedCmd.title}"`);
         }
         break;
       }
       default:
-        setFeedback(`✓ Executed: ${parsedCmd.title}`);
+        setFeedback(`Executed: ${parsedCmd.title}`);
         break;
     }
 
@@ -120,7 +120,7 @@ export function OmniDock() {
       sunlightDone: morningCaffeineDelay,
       targetFocusHours: 5,
     }, currentDate);
-    setFeedback('✓ Morning Boot locked (+50 XP)');
+    setFeedback('Morning Boot locked (+50 XP)');
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -132,7 +132,7 @@ export function OmniDock() {
       wholeFoodRating: 8,
       afternoonSlumpScore: eveningSlump,
     }, currentDate);
-    setFeedback('✓ Evening Wrap sealed (+50 XP)');
+    setFeedback('Evening Wrap sealed (+50 XP)');
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -151,10 +151,10 @@ export function OmniDock() {
           </h2>
         </div>
 
-        <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FAF6EE] border border-[#1A3629]/30 px-2.5 py-0.5 rounded-full">
-          {isMorning && (ritual.morningBootCompleted ? '✓ Synced' : '+50 XP Available')}
+        <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FAF6EE] border border-[#1A3629]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+          {isMorning && (ritual.morningBootCompleted ? <><PixelCheck size={11} color="#065F46" /> Synced</> : '+50 XP Available')}
           {!isMorning && !isEvening && 'Active Focus'}
-          {isEvening && (ritual.eveningWrapCompleted ? '✓ Sealed' : '+50 XP Available')}
+          {isEvening && (ritual.eveningWrapCompleted ? <><PixelCheck size={11} color="#065F46" /> Sealed</> : '+50 XP Available')}
         </span>
       </div>
 
@@ -204,7 +204,7 @@ export function OmniDock() {
                 : 'bg-[#FAF8F5] text-[#1A3629]/70 border-[#1A3629]'
             }`}
           >
-            <span>{morningCaffeineDelay ? '✓' : '○'}</span>
+            <span>{morningCaffeineDelay ? <PixelCheck size={11} color="#065F46" /> : '○'}</span>
             <span>Delay Caffeine 90m</span>
           </button>
 
@@ -218,8 +218,9 @@ export function OmniDock() {
               Lock Morning Boot (+50 XP) →
             </button>
           ) : (
-            <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs">
-              ✓ Morning Boot Locked
+            <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
+              <PixelCheck size={12} color="#065F46" />
+              <span>Morning Boot Locked</span>
             </span>
           )}
         </div>
@@ -234,12 +235,12 @@ export function OmniDock() {
               const next = Number(((currentLog.hydrationLiters || 0) + 0.5).toFixed(2));
               setHydration(next, currentDate);
               xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 6);
-              setFeedback('✓ Hydration logged (+500ml)');
+              setFeedback('Hydration logged (+500ml)');
               setTimeout(() => setFeedback(null), 2500);
             }}
             className="px-3.5 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] transition-all cursor-pointer flex items-center gap-1.5"
           >
-            <Droplets className="w-3.5 h-3.5 text-[#0284C7]" />
+            <PixelDroplet size={14} color="#0284C7" />
             <span>Drink +500ml Water</span>
           </button>
 
@@ -250,12 +251,12 @@ export function OmniDock() {
               const next = Math.min(10, (currentLog.energyLevel || 7) + 1);
               setEnergy(next, currentDate);
               xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 6);
-              setFeedback(`✓ Alertness updated to ${next}/10`);
+              setFeedback(`Alertness updated to ${next}/10`);
               setTimeout(() => setFeedback(null), 2500);
             }}
             className="px-3.5 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] font-mono text-xs font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_2px_0px_#1A3629] transition-all cursor-pointer flex items-center gap-1.5"
           >
-            <Zap className="w-3.5 h-3.5 text-[#D97706]" />
+            <PixelLightning size={14} color="#D97706" />
             <span>Rate Alertness ({currentLog.energyLevel || 7}/10)</span>
           </button>
 
@@ -295,7 +296,7 @@ export function OmniDock() {
                 : 'bg-[#FAF8F5] text-[#1A3629]/70 border-[#1A3629]'
             }`}
           >
-            <span>{eveningScreenCutoff ? '✓' : '○'}</span>
+            <span>{eveningScreenCutoff ? <PixelCheck size={11} color="#065F46" /> : '○'}</span>
             <span>Screen Cutoff Respected</span>
           </button>
 
@@ -309,8 +310,9 @@ export function OmniDock() {
               Seal Evening Wrap (+50 XP) →
             </button>
           ) : (
-            <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs">
-              ✓ Evening Wrap Sealed
+            <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
+              <PixelCheck size={12} color="#065F46" />
+              <span>Evening Wrap Sealed</span>
             </span>
           )}
         </div>
@@ -353,7 +355,10 @@ export function OmniDock() {
         {/* Transient Feedback Message */}
         {feedback && (
           <div className="text-xs font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-lg flex items-center justify-between animate-in fade-in">
-            <span>{feedback}</span>
+            <span className="flex items-center gap-1.5">
+              <PixelCheck size={12} color="#065F46" />
+              <span>{feedback}</span>
+            </span>
             <span className="text-[10px] text-[#065F46]/60">Logged &amp; Saved</span>
           </div>
         )}

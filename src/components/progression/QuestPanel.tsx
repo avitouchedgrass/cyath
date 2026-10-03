@@ -5,6 +5,7 @@ import { useHabitStore } from '@/store/useHabitStore';
 import { getDailyQuests, DailyQuest } from '@/lib/progression/engine';
 import { WEEKLY_CHALLENGE_XP } from '@/lib/progression/config';
 import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function QuestPanel() {
   const {
@@ -129,8 +130,9 @@ export function QuestPanel() {
                 </div>
 
                 {isClaimed ? (
-                  <div className="w-full py-2 text-center font-mono text-xs font-bold text-[#10B981] bg-[#E8F5E9] border border-[#10B981]/40 rounded-xl">
-                    Claimed ✓
+                  <div className="w-full py-2 text-center font-mono text-xs font-bold text-[#10B981] bg-[#E8F5E9] border border-[#10B981]/40 rounded-xl flex items-center justify-center gap-1.5">
+                    <PixelCheck size={12} color="#10B981" />
+                    <span>Claimed</span>
                   </div>
                 ) : quest.completed ? (
                   <button

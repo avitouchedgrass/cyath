@@ -8,7 +8,7 @@ import { haptics } from '@/lib/haptics';
 import { MinimalistReceiptModal } from '@/components/dashboard/MinimalistReceiptModal';
 import { PixelWaxSeal } from '@/components/dashboard/PixelWaxSeal';
 import { CorkboardBackdropSvg } from '@/components/dashboard/CorkboardBackdropSvg';
-import { X } from 'lucide-react';
+import { PixelX } from '@/components/common/PixelIcons';
 
 export interface WaxSealCorkboardProps {
   isOpen: boolean;
@@ -108,7 +108,7 @@ export function WaxSealCorkboard({
           className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#241A13] bg-[#FFFDF9] text-[#241A13] hover:bg-[#241A13] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shadow-sm z-20"
           aria-label="Close ledger"
         >
-          <X className="w-4 h-4" />
+          <PixelX size={14} />
         </button>
 
         {/* Archival Ledger Header */}
@@ -306,7 +306,7 @@ export function WaxSealCorkboard({
                 {/* Ghost Silhouette of Missed Ticket / Void Stamp */}
                 <div className="flex flex-col items-center justify-center my-auto">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-dashed border-[#5C4838]/35 flex items-center justify-center opacity-50">
-                    <span className="font-mono text-[8px] text-[#5C4838]/70 font-bold">✕</span>
+                    <PixelX size={8} color="#5C4838" />
                   </div>
                   <span className="font-mono text-[7px] sm:text-[8px] font-extrabold text-[#5C4838]/65 tracking-wider uppercase mt-1">
                     MISSED

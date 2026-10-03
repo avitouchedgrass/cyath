@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { PixelX, PixelCheck } from '@/components/common/PixelIcons';
 
 interface SocialQuestsModalProps {
   isOpen: boolean;
@@ -98,7 +99,7 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
             onClick={onClose}
             className="text-xs font-mono font-bold w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-[#FAF8F5]/80 flex items-center justify-center cursor-pointer transition-colors"
           >
-            ✕
+            <PixelX size={10} color="#1A3629" />
           </button>
         </div>
 
@@ -124,7 +125,10 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
             {isLinkedinVerified ? (
               <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/40 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-mono text-[#065F46]">
-                  <span className="font-bold">✓ Verified</span>
+                  <span className="font-bold flex items-center gap-1">
+                    <PixelCheck size={11} color="#065F46" />
+                    <span>Verified</span>
+                  </span>
                   <span>({socialQuests.linkedin.handle})</span>
                 </div>
                 <span className="font-mono text-[10px] text-[#065F46]/80">
@@ -189,7 +193,10 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
             {isInstagramVerified ? (
               <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/40 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-mono text-[#065F46]">
-                  <span className="font-bold">✓ Verified</span>
+                  <span className="font-bold flex items-center gap-1">
+                    <PixelCheck size={11} color="#065F46" />
+                    <span>Verified</span>
+                  </span>
                   <span>(@{socialQuests.instagram.handle})</span>
                 </div>
                 <span className="font-mono text-[10px] text-[#065F46]/80">
@@ -238,13 +245,14 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
         {/* Global Feedback Message */}
         {statusMessage && (
           <div
-            className={`p-3 rounded-xl border text-xs font-mono font-bold text-center animate-in fade-in duration-150 ${
+            className={`p-3 rounded-xl border text-xs font-mono font-bold text-center animate-in fade-in duration-150 flex items-center justify-center gap-1.5 ${
               statusMessage.error
                 ? 'bg-[#FEF2F2] border-[#EF4444]/30 text-[#B91C1C]'
                 : 'bg-[#ECFDF5] border-[#10B981]/30 text-[#065F46]'
             }`}
           >
-            {statusMessage.error ? '✕' : '✓'} {statusMessage.text}
+            {statusMessage.error ? <PixelX size={11} color="#B91C1C" /> : <PixelCheck size={11} color="#065F46" />}
+            <span>{statusMessage.text}</span>
           </div>
         )}
       </div>

@@ -6,7 +6,7 @@ import { calculateWeeklyReclamation } from '@/lib/weeklyReclamationEngine';
 import { retroAudio } from '@/lib/retroAudio';
 import { getLocalWeekKey } from '@/lib/dateUtils';
 import { exportClinicalDossierSummary } from '@/lib/exporters/dossierPdfExport';
-import { X, Check, Printer } from 'lucide-react';
+import { PixelPrinter, PixelX, PixelCheck } from '@/components/common/PixelIcons';
 
 interface WeeklyDossierModalProps {
   isOpen: boolean;
@@ -102,7 +102,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
             className="w-8 h-8 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             aria-label="Close modal"
           >
-            <X className="w-4 h-4" />
+            <PixelX size={14} />
           </button>
         </div>
 
@@ -187,7 +187,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
                 key={idx}
                 className="p-3 rounded-xl border border-[#1A3629]/10 bg-[#FAF8F5] text-xs font-sans font-medium text-[#1A3629] flex items-start gap-2.5"
               >
-                <Check className="w-3.5 h-3.5 text-[#1A3629] shrink-0 mt-0.5" />
+                <PixelCheck size={14} className="text-[#1A3629] shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{insight}</span>
               </div>
             ))}
@@ -228,14 +228,14 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
               }}
               className="px-3.5 py-2 rounded-full border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629] font-cabinet text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
-              <Printer className="w-3.5 h-3.5 text-[#1A3629]" />
+              <PixelPrinter size={14} className="text-[#1A3629]" />
               <span>Export Summary</span>
             </button>
           </div>
 
           {isAlreadyClaimed ? (
             <div className="px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold flex items-center gap-1.5">
-              <span>✓</span>
+              <PixelCheck size={12} color="#1A3629" />
               <span>Weekly Review Sealed (+100 XP Claimed)</span>
             </div>
           ) : (

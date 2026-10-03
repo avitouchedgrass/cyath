@@ -7,6 +7,7 @@ import { getDailyCommandProtocol } from '@/lib/dailyProtocolEngine';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
 import { shouldTriggerRecoveryDownscale, DOWNSCALED_FOCUS_PROTOCOL } from '@/lib/engines/reentryEngine';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function CommandProtocolCard() {
   const {
@@ -160,8 +161,9 @@ export function CommandProtocolCard() {
             </button>
           ) : !isCompleted ? (
             <div className="flex items-center gap-2">
-              <span className="px-3 py-2 rounded-xl border border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold">
-                ✓ Committed
+              <span className="px-3 py-2 rounded-xl border border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold flex items-center gap-1.5">
+                <PixelCheck size={12} color="#065F46" />
+                <span>Committed</span>
               </span>
               <button
                 type="button"
@@ -172,8 +174,9 @@ export function CommandProtocolCard() {
               </button>
             </div>
           ) : (
-            <div className="px-4 py-2 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold shadow-[2px_2px_0px_#10B981]">
-              ✓ Protocol Mastered · +100 Total XP Awarded
+            <div className="px-4 py-2 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold shadow-[2px_2px_0px_#10B981] flex items-center gap-2">
+              <PixelCheck size={14} color="#065F46" />
+              <span>Protocol Mastered · +100 Total XP Awarded</span>
             </div>
           )}
         </div>

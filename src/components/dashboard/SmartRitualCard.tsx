@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function SmartRitualCard() {
   const { currentDate, deskRitualsByDate, completeMorningBoot, completeEveningWrap, getDailyLog } =
@@ -107,7 +108,7 @@ export function SmartRitualCard() {
                   delayCaffeine ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9]'
                 }`}
               >
-                {delayCaffeine && <span className="text-[10px] font-bold">✓</span>}
+                {delayCaffeine && <PixelCheck size={10} color="#FFFDF9" />}
               </div>
               <span className="font-cabinet text-xs font-bold text-[#1A3629] select-none">
                 Delay caffeine 90m
@@ -169,7 +170,7 @@ export function SmartRitualCard() {
                   screenCutoff ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9]'
                 }`}
               >
-                {screenCutoff && <span className="text-[10px] font-bold">✓</span>}
+                {screenCutoff && <PixelCheck size={10} color="#FFFDF9" />}
               </div>
               <span className="font-cabinet text-xs font-bold text-[#1A3629] select-none">
                 Screen shutdown 60m before bed
@@ -192,7 +193,7 @@ export function SmartRitualCard() {
   return (
     <div className="w-full rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] px-4 py-2.5 flex items-center justify-between text-xs font-mono">
       <div className="flex items-center gap-2">
-        <span className="text-[#065F46] font-bold">✓</span>
+        <PixelCheck size={12} color="#065F46" />
         <span className="font-bold text-[#1A3629]">
           {ritual.eveningWrapCompleted
             ? 'Evening Wrap Sealed'

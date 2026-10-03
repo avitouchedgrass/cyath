@@ -8,12 +8,22 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { parseQuickLog, ParsedCommand } from '@/lib/quickLogParser';
 import { MorningBootModal } from '@/components/dashboard/MorningBootModal';
 import { EveningWrapModal } from '@/components/dashboard/EveningWrapModal';
+import {
+  PixelX,
+  PixelSparkles,
+  PixelArrowUpRight,
+  PixelSun,
+  PixelMoon,
+  PixelLightning,
+  PixelClock,
+  PixelFlame,
+} from '@/components/common/PixelIcons';
 
 interface CommandActionItem {
   id: string;
   category: 'RITUAL' | 'HABIT' | 'METRIC' | 'NAVIGATION' | 'AI';
   categoryLabel: string;
-  glyph: string;
+  glyph: React.ReactNode;
   title: string;
   description: string;
   badge: string;
@@ -116,7 +126,7 @@ export function CommandPalette() {
       id: 'ritual-boot',
       category: 'RITUAL',
       categoryLabel: 'DESK RITUALS',
-      glyph: '◈',
+      glyph: <PixelSun size={14} />,
       title: 'Run Morning Boot Ritual',
       description: 'Align sleep, morning daylight, and target focus blocks',
       badge: 'RITUAL',
@@ -130,7 +140,7 @@ export function CommandPalette() {
       id: 'ritual-wrap',
       category: 'RITUAL',
       categoryLabel: 'DESK RITUALS',
-      glyph: '◈',
+      glyph: <PixelMoon size={14} />,
       title: 'Run Evening Desk Wrap',
       description: 'Review caffeine cutoff, whole food ratio, and seal daybook',
       badge: 'RITUAL',
@@ -145,7 +155,7 @@ export function CommandPalette() {
         id: 'ritual-protocol',
         category: 'RITUAL',
         categoryLabel: 'DESK RITUALS',
-        glyph: '◈',
+        glyph: <PixelLightning size={14} />,
         title: "Accept Today's Protocol Directive",
         description: 'Lock in today\'s evidence-based circadian challenge (+50 XP)',
         badge: '+50 XP',
@@ -221,7 +231,7 @@ export function CommandPalette() {
       id: 'metric-sleep-8',
       category: 'METRIC',
       categoryLabel: 'QUICK ACTIONS',
-      glyph: '◷',
+      glyph: <PixelClock size={14} />,
       title: 'Record 8.0h Sleep Duration',
       description: 'Set previous night recovery duration',
       badge: '8.0H SLEEP',
@@ -238,7 +248,7 @@ export function CommandPalette() {
       id: 'metric-energy-8',
       category: 'METRIC',
       categoryLabel: 'QUICK ACTIONS',
-      glyph: '▲',
+      glyph: <PixelFlame size={14} />,
       title: 'Rate Daily Energy: Level 8 / 10',
       description: 'Record high vigor and steady alertness',
       badge: '8/10 VIGOR',
@@ -256,7 +266,7 @@ export function CommandPalette() {
       id: 'nav-dashboard',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '↗',
+      glyph: <PixelArrowUpRight size={14} />,
       title: 'Go to Dashboard Cockpit',
       description: 'Daily goals, habit checklist, and fuel tracking',
       badge: 'GOTO',
@@ -270,7 +280,7 @@ export function CommandPalette() {
       id: 'nav-playbook',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '↗',
+      glyph: <PixelArrowUpRight size={14} />,
       title: 'Open Habit & Fuel Playbook',
       description: 'Explore circadian protocols and nutritional methodology',
       badge: 'GOTO',
@@ -284,7 +294,7 @@ export function CommandPalette() {
       id: 'nav-sanctuary',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '↗',
+      glyph: <PixelArrowUpRight size={14} />,
       title: 'Open Daily Island Cockpit',
       description: 'Inspect full-screen floating ecosystem, habits, and circadian rhythm',
       badge: 'GOTO',
@@ -298,7 +308,7 @@ export function CommandPalette() {
       id: 'nav-protocols',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '↗',
+      glyph: <PixelArrowUpRight size={14} />,
       title: 'View Circadian Protocols Matrix',
       description: 'Explore research-backed peer-reviewed protocols',
       badge: 'GOTO',
@@ -312,7 +322,7 @@ export function CommandPalette() {
       id: 'nav-correlations',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '↗',
+      glyph: <PixelArrowUpRight size={14} />,
       title: 'Pattern Correlation Engine',
       description: 'Multi-variable lifestyle and energy curves',
       badge: 'GOTO',
@@ -326,7 +336,7 @@ export function CommandPalette() {
       id: 'nav-coach',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '✦',
+      glyph: <PixelSparkles size={14} />,
       title: 'Consult Cyath AI Coach',
       description: 'Ask meal ideas or habit recommendations',
       badge: 'COACH',
@@ -340,7 +350,7 @@ export function CommandPalette() {
       id: 'action-walkthrough',
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
-      glyph: '✦',
+      glyph: <PixelSparkles size={14} />,
       title: 'Launch Interactive Pioneer Walkthrough',
       description: 'Step-by-step spotlight tour across cockpit, habits, food log & AI coach',
       badge: 'TOUR',
@@ -635,7 +645,7 @@ export function CommandPalette() {
                 className="w-6 h-6 rounded-full border border-[#1A3629]/15 flex items-center justify-center text-xs font-mono font-bold hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors"
                 aria-label="Close Command Palette"
               >
-                ✕
+                <PixelX size={10} color="currentColor" />
               </button>
             </div>
           </div>

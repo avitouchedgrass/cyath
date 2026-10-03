@@ -11,9 +11,10 @@ import { MorningBootModal } from './MorningBootModal';
 import { EveningWrapModal } from './EveningWrapModal';
 import { WeightTrackerModal } from './WeightTrackerModal';
 import { XP_MATRIX } from '@/lib/constants/xpMatrix';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function TacticalStatusDock() {
-  const { currentDate, deskRitualsByDate, totalXp, streakCount, userProfile, weightHistory } = useHabitStore();
+  const { currentDate, deskRitualsByDate, totalXp, streakCount, userProfile, weightHistory, suiteXp } = useHabitStore();
   const [isMorningModalOpen, setIsMorningModalOpen] = useState(false);
   const [isEveningModalOpen, setIsEveningModalOpen] = useState(false);
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
@@ -27,8 +28,11 @@ export function TacticalStatusDock() {
   const latestDelta = latestEntry?.deltaKg ?? 0;
   const latestTrend = latestEntry?.trend;
 
-  const progress = calculateLevel(totalXp);
-  const islandTier = getIslandTier(progress.level);
+  const activeSuite = (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as 'circadian' | 'iron' | 'focus';
+  const hasSuiteXp = !!(suiteXp && (suiteXp.circadian > 0 || suiteXp.iron > 0 || suiteXp.focus > 0));
+  const activeSuiteXp = hasSuiteXp ? (suiteXp[activeSuite] ?? 0) : totalXp;
+  const progress = calculateLevel(activeSuiteXp);
+  const islandTier = getIslandTier(progress.level, activeSuite);
 
   // Dynamic Circadian Status derived from logged wake time
   const circadian = useMemo(() => {
@@ -139,8 +143,9 @@ export function TacticalStatusDock() {
                 : `Desk Wrap & Sunset (Cutoff Passed)`}
             </span>
             {(dynamicPhase === 'morning' && morningDone) || (dynamicPhase === 'evening' && eveningDone) ? (
-              <span className="px-2 py-0.5 rounded border border-[#10B981]/40 bg-[#ECFDF5] text-[#065F46] font-mono text-[10px] font-bold">
-                ✓ Sealed
+              <span className="px-2 py-0.5 rounded border border-[#10B981]/40 bg-[#ECFDF5] text-[#065F46] font-mono text-[10px] font-bold flex items-center gap-1">
+                <PixelCheck size={10} color="#065F46" />
+                <span>Sealed</span>
               </span>
             ) : (
               <span className="px-2 py-0.5 rounded border border-[#D97706]/40 bg-[#FEF3C7] text-[#92400E] font-mono text-[10px] font-bold">

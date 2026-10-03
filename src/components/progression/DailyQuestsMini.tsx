@@ -6,6 +6,7 @@ import { getDailyQuests, DailyQuest } from '@/lib/progression/engine';
 import { WEEKLY_CHALLENGE_XP } from '@/lib/progression/config';
 import { retroAudio } from '@/lib/retroAudio';
 import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function DailyQuestsMini() {
   const {
@@ -104,8 +105,9 @@ export function DailyQuestsMini() {
                 </div>
 
                 {isClaimed ? (
-                  <span className="font-mono text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0 uppercase tracking-wider">
-                    Done ✓
+                  <span className="font-mono text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#10B981]/30 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                    <PixelCheck size={10} color="#10B981" />
+                    <span>Done</span>
                   </span>
                 ) : quest.completed ? (
                   <button

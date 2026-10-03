@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
+import { PixelX, PixelCheck } from '@/components/common/PixelIcons';
 
 interface WeightTrackerModalProps {
   isOpen: boolean;
@@ -108,7 +109,7 @@ export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps)
             onClick={onClose}
             className="text-xs font-mono font-bold w-7 h-7 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-[#FAF8F5]/80 flex items-center justify-center cursor-pointer transition-colors"
           >
-            ✕
+            <PixelX size={10} color="#1A3629" />
           </button>
         </div>
 
@@ -228,8 +229,9 @@ export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps)
 
           {/* Feedback Message */}
           {feedback && (
-            <div className="p-3 rounded-xl bg-[#E8F5E9] border border-[#10B981]/40 text-[#065F46] font-mono text-xs font-bold text-center animate-in fade-in duration-150">
-              ✓ {feedback.message} {feedback.xp > 0 ? `(+${feedback.xp} XP)` : ''}
+            <div className="p-3 rounded-xl bg-[#E8F5E9] border border-[#10B981]/40 text-[#065F46] font-mono text-xs font-bold text-center animate-in fade-in duration-150 flex items-center justify-center gap-1.5">
+              <PixelCheck size={12} color="#065F46" />
+              <span>{feedback.message} {feedback.xp > 0 ? `(+${feedback.xp} XP)` : ''}</span>
             </div>
           )}
 

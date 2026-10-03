@@ -4,6 +4,7 @@ import React from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { STREAK_FREEZE } from '@/lib/progression/config';
 import { parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function StreakCardMini() {
   const { streakCount, streakFreezeStock, logsByDate, currentDate } = useHabitStore();
@@ -63,8 +64,8 @@ export function StreakCardMini() {
             <span className="font-mono text-[9px] uppercase font-bold leading-none">
               {day.label}
             </span>
-            <span className="font-mono text-xs font-bold leading-none mt-1">
-              {day.hasActivity ? '✓' : day.isToday ? '·' : '-'}
+            <span className="font-mono text-xs font-bold leading-none mt-1 flex items-center justify-center">
+              {day.hasActivity ? <PixelCheck size={10} color="#FFFDF9" /> : day.isToday ? '·' : '-'}
             </span>
           </div>
         ))}

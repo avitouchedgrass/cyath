@@ -7,6 +7,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { calculateSanctuaryMatrix, PillarTelemetry } from '@/lib/sanctuaryMatrixEngine';
 import { EveningWrapModal } from '@/components/dashboard/EveningWrapModal';
+import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function BiologicalReflectionMatrix() {
   const router = useRouter();
@@ -203,7 +204,7 @@ export function BiologicalReflectionMatrix() {
               </button>
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
-                <span>✓</span>
+                <PixelCheck size={12} color="#065F46" />
                 <span>Deep Recovery Synced</span>
               </div>
             )}
@@ -267,7 +268,7 @@ export function BiologicalReflectionMatrix() {
               </button>
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
-                <span>✓</span>
+                <PixelCheck size={12} color="#065F46" />
                 <span>Amino Acid Quota Met</span>
               </div>
             )}
@@ -331,7 +332,7 @@ export function BiologicalReflectionMatrix() {
               </button>
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
-                <span>✓</span>
+                <PixelCheck size={12} color="#065F46" />
                 <span>Circadian Clock Locked</span>
               </div>
             )}

@@ -5,7 +5,7 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { Check, Battery, BatteryMedium, BatteryLow } from 'lucide-react';
+import { PixelCheck, PixelBatteryLow, PixelBatteryMedium, PixelBatteryFull } from '@/components/common/PixelIcons';
 
 export interface CoreHabitsCardProps {
   onOpenSchedule?: () => void;
@@ -224,7 +224,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                   : 'border-[#1A3629]/30 bg-[#FAF8F5] text-[#1A3629] group-hover:border-[#1A3629]'
               }`}>
                 {isDone ? (
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <PixelCheck size={14} />
                 ) : (
                   <span className="font-mono text-xs font-bold">{habit.keyNumber}</span>
                 )}
@@ -297,7 +297,10 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       {/* Undo toast */}
       {undoToast && (
         <div className="flex items-center justify-between gap-2 px-3.5 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] text-[11px] font-mono animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-md">
-          <span className="font-bold truncate">✓ {undoToast.title}</span>
+          <span className="font-bold truncate flex items-center gap-1.5">
+            <PixelCheck size={12} color="#10B981" />
+            <span>{undoToast.title}</span>
+          </span>
           <button
             type="button"
             onClick={() => {
@@ -391,7 +394,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
             >
-              <BatteryLow className="w-3.5 h-3.5 text-[#DC2626]" />
+              <PixelBatteryLow size={14} color="#DC2626" />
               <span>Slump</span>
             </button>
 
@@ -405,7 +408,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
             >
-              <BatteryMedium className="w-3.5 h-3.5 text-[#D97706]" />
+              <PixelBatteryMedium size={14} color="#D97706" />
               <span>Steady</span>
             </button>
 
@@ -419,7 +422,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
             >
-              <Battery className="w-3.5 h-3.5 text-[#10B981]" />
+              <PixelBatteryFull size={14} color="#10B981" />
               <span>Peak</span>
             </button>
           </div>

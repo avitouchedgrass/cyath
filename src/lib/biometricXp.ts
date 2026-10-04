@@ -2,7 +2,9 @@ export type MealDebriefState = boolean | 'not_yet' | null;
 
 export interface BiometricXpBreakdown {
   sleepXp: number;
+  sleepEfficacyLabel: string;
   sunlightXp: number;
+  sunlightEfficacyLabel: string;
   breakfastXp: number;
   lunchXp: number;
   dinnerXp: number;
@@ -15,6 +17,7 @@ export interface BiometricXpBreakdown {
 export interface BiometricInputs {
   sleepDurationHours: number;
   sunlightSecured: boolean | null;
+  sunlightMinutes?: number;
   breakfastDone: MealDebriefState;
   lunchDone: MealDebriefState;
   dinnerDone?: MealDebriefState;
@@ -26,6 +29,7 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
   const {
     sleepDurationHours,
     sunlightSecured,
+    sunlightMinutes = 15,
     breakfastDone,
     lunchDone,
     dinnerDone,
@@ -33,21 +37,59 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
     customHabitsCompletedCount,
   } = inputs;
 
-  let sleepXp = 5;
-  if (sleepDurationHours >= 7.0 && sleepDurationHours <= 9.0) {
-    sleepXp = 40;
-  } else if (sleepDurationHours > 9.0 && sleepDurationHours <= 10.0) {
-    sleepXp = 30;
-  } else if (sleepDurationHours >= 6.0 && sleepDurationHours < 7.0) {
-    sleepXp = 25;
-  } else if (sleepDurationHours >= 5.0 && sleepDurationHours < 6.0) {
-    sleepXp = 15;
+  // Graduated sleep XP curve based on physiological efficacy
+  let sleepXp = 0;
+  let sleepEfficacyLabel = 'Sleep Deprived (<4.5h)';
+  if (sleepDurationHours >= 7.3 && sleepDurationHours <= 8.5) {
+    sleepXp = 45;
+    sleepEfficacyLabel = 'Golden Restorative Sleep (7.3h - 8.5h)';
+  } else if (sleepDurationHours >= 6.5 && sleepDurationHours < 7.3) {
+    sleepXp = 32;
+    sleepEfficacyLabel = 'Solid Sleep Cadence (6.5h - 7.2h)';
+  } else if (sleepDurationHours > 8.5 && sleepDurationHours <= 9.5) {
+    sleepXp = 35;
+    sleepEfficacyLabel = 'Deep Recovery Window (8.6h - 9.5h)';
+  } else if (sleepDurationHours >= 5.5 && sleepDurationHours < 6.5) {
+    sleepXp = 18;
+    sleepEfficacyLabel = 'Sub-optimal Sleep (5.5h - 6.4h)';
+  } else if (sleepDurationHours >= 4.5 && sleepDurationHours < 5.5) {
+    sleepXp = 8;
+    sleepEfficacyLabel = 'Compromised Sleep (4.5h - 5.4h)';
+  } else if (sleepDurationHours > 9.5) {
+    sleepXp = 20;
+    sleepEfficacyLabel = 'Hypersomnia Rebound (>9.5h)';
+  } else {
+    sleepXp = 0;
+    sleepEfficacyLabel = 'Severe Deprivation (<4.5h)';
   }
 
-  const sunlightXp = sunlightSecured ? 30 : 0;
-  const breakfastXp = breakfastDone === true ? 25 : (breakfastDone === false ? 5 : 0);
-  const lunchXp = lunchDone === true ? 25 : (lunchDone === false ? 5 : 0);
-  const dinnerXp = dinnerDone === true ? 25 : (dinnerDone === false ? 5 : 0);
+  // Graduated sunlight XP based on outdoor lux exposure
+  let sunlightXp = 0;
+  let sunlightEfficacyLabel = 'Stayed Indoors';
+  if (sunlightSecured) {
+    if (sunlightMinutes >= 20) {
+      sunlightXp = 30;
+      sunlightEfficacyLabel = 'Peak Lux Anchored (20m+)';
+    } else if (sunlightMinutes >= 10) {
+      sunlightXp = 25;
+      sunlightEfficacyLabel = 'Optimal Circadian Light (10-19m)';
+    } else {
+      sunlightXp = 15;
+      sunlightEfficacyLabel = 'Light Priming (5-9m)';
+    }
+  }
+
+  // Meals efficacy: Hit target = 25 XP, Fasting = 15 XP, Light = 8 XP, Skipped = 0 XP
+  const calcMealXp = (state?: MealDebriefState) => {
+    if (state === true) return 25;
+    if (state === 'not_yet') return 15;
+    if (state === false) return 8;
+    return 0;
+  };
+
+  const breakfastXp = calcMealXp(breakfastDone);
+  const lunchXp = calcMealXp(lunchDone);
+  const dinnerXp = calcMealXp(dinnerDone);
   const caffeineXp = caffeineRespected ? 25 : 0;
   const customHabitsXp = Math.max(0, customHabitsCompletedCount * 15);
   const baseSealXp = 15;
@@ -56,7 +98,9 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
 
   return {
     sleepXp,
+    sleepEfficacyLabel,
     sunlightXp,
+    sunlightEfficacyLabel,
     breakfastXp,
     lunchXp,
     dinnerXp,

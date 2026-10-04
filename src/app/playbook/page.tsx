@@ -39,14 +39,10 @@ function PlaybookContent() {
     const isAlreadyActive = activeProtocolIds.includes(protocol.id);
     activateProtocol(protocol.id, protocol.standardHabits);
 
-    if (!isAlreadyActive) {
-      gainXp(50, 'Activated Focus Protocol', 'protocol');
-    }
-
     setToastMessage(
       isAlreadyActive
         ? `Removed ${protocol.name} from Daily Cockpit.`
-        : `Added ${protocol.name} to Daily Cockpit (+50 XP)!`
+        : `Added ${protocol.name} to Daily Cockpit!`
     );
 
     setTimeout(() => setToastMessage(null), 3000);

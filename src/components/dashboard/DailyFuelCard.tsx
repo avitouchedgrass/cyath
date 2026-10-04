@@ -56,6 +56,20 @@ export function DailyFuelCard({
   const currentLog = getDailyLog(currentDate);
   const loggedMealsCount = (currentLog.loggedMeals?.length || 0) + (currentLog.loggedRecipeIds?.length || 0);
 
+  const loggedMeals = currentLog.loggedMeals || [];
+  const hasEatenBreakfast = loggedMeals.some((m) => m.mealSlot === 'breakfast');
+  const hasEatenLunch = loggedMeals.some((m) => m.mealSlot === 'lunch');
+  const hasEatenDinner = loggedMeals.some((m) => m.mealSlot === 'dinner');
+
+  const defaultSlot: 'breakfast' | 'lunch' | 'dinner' = !hasEatenBreakfast
+    ? 'breakfast'
+    : !hasEatenLunch
+    ? 'lunch'
+    : 'dinner';
+
+  const [selectedSlot, setSelectedSlot] = useState<'breakfast' | 'lunch' | 'dinner' | null>(null);
+  const activeSlot = selectedSlot || defaultSlot;
+
   const percent = Math.min(100, Math.round((currentProtein / targetProtein) * 100));
   const remaining = Math.max(0, targetProtein - currentProtein);
 
@@ -70,10 +84,11 @@ export function DailyFuelCard({
         calories: preset.calories,
         ingredients: [{ item: preset.desc, amount: '1 serving' }],
         suggestedSprite: '/assets/food/generic-plate.png',
+        mealSlot: activeSlot,
       },
       currentDate
     );
-    setFeedback(`+${preset.protein}g ${preset.label} logged`);
+    setFeedback(`+${preset.protein}g ${preset.label} logged as ${activeSlot.toUpperCase()}`);
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -105,13 +120,14 @@ export function DailyFuelCard({
             calories: instant.calories,
             ingredients: instant.ingredients,
             suggestedSprite: instant.suggestedSprite || '/assets/food/generic-plate.png',
+            mealSlot: activeSlot,
           },
           currentDate
         );
         retroAudio.playInspectConfirm();
         haptics.success();
         setAmbientMealText('');
-        setFeedback(`Logged: ${instant.mealName} (+${instant.protein}g protein, ${instant.calories} kcal)`);
+        setFeedback(`Logged: ${instant.mealName} as ${activeSlot.toUpperCase()} (+${instant.protein}g protein, ${instant.calories} kcal)`);
         setTimeout(() => setFeedback(null), 3500);
         setIsSubmittingMeal(false);
         return;
@@ -136,13 +152,14 @@ export function DailyFuelCard({
             calories,
             ingredients: data.ingredients || [{ item: text, amount: '1 portion' }],
             suggestedSprite: data.suggestedSprite || '/assets/food/generic-plate.png',
+            mealSlot: activeSlot,
           },
           currentDate
         );
         retroAudio.playInspectConfirm();
         haptics.success();
         setAmbientMealText('');
-        setFeedback(`Logged: ${data.mealName || text} (+${protein}g protein)`);
+        setFeedback(`Logged: ${data.mealName || text} as ${activeSlot.toUpperCase()} (+${protein}g protein)`);
         setTimeout(() => setFeedback(null), 3500);
       } else {
         throw new Error('API parse error');

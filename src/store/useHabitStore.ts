@@ -23,7 +23,7 @@ import { XP_MATRIX } from '@/lib/constants/xpMatrix';
 export interface HabitItem {
   id: string;
   title: string;
-  category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'mindset' | 'custom';
+  category: 'morning' | 'nutrition' | 'movement' | 'recovery' | 'mindset' | 'lifestyle' | 'life' | 'misc' | 'custom' | 'circadian' | 'fuel';
   targetDaysPerWeek: number;
 }
 
@@ -42,6 +42,7 @@ export interface LoggedMealEntry {
   loggedAt: string;
   recipeId?: string;
   savedAsRecipe?: boolean;
+  mealSlot?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
 }
 
 export interface DailyLogData {
@@ -109,13 +110,14 @@ export interface UserProfile {
   };
   archetype?: 'circadian' | 'iron' | 'focus';
   selectedIslandSuite?: 'circadian' | 'iron' | 'focus';
+  circadianScheduleXpClaimed?: boolean;
 }
 
 export interface CustomHabitDefinition {
   id: string;
   title: string;
   shortLabel: string;
-  category: 'fuel' | 'movement' | 'recovery' | 'circadian';
+  category: 'fuel' | 'movement' | 'recovery' | 'circadian' | 'lifestyle' | 'life' | 'misc';
 }
 
 export const CUSTOM_HABITS_LIBRARY: CustomHabitDefinition[] = [
@@ -124,6 +126,10 @@ export const CUSTOM_HABITS_LIBRARY: CustomHabitDefinition[] = [
   { id: 'zone2_walk', title: 'Zone 2 Brisk Walk (20m)', shortLabel: 'Zone 2', category: 'movement' },
   { id: 'cold_shower', title: 'Cold Shower / Cold Plunge', shortLabel: 'Cold Plunge', category: 'recovery' },
   { id: 'screens_off', title: 'Screens Off 60m Pre-Bed', shortLabel: 'Screens Off', category: 'circadian' },
+  { id: 'reading_20m', title: 'Deep Non-Screen Reading (20m)', shortLabel: 'Deep Reading', category: 'lifestyle' },
+  { id: 'journaling', title: 'Archival Journal & Reflection', shortLabel: 'Journal / Log', category: 'lifestyle' },
+  { id: 'breathwork', title: 'Box Breathing / Physiological Sigh', shortLabel: 'Breathwork', category: 'lifestyle' },
+  { id: 'outdoor_walk', title: 'Daily Outdoor Walk / Lifestyle', shortLabel: 'Outdoor Life', category: 'misc' },
 ];
 
 export interface TrophyDefinition {
@@ -543,6 +549,7 @@ export interface HabitStoreState {
   completeDailyProtocol: (date?: string) => void;
   completeMorningBoot: (data: { sleepHours: number; restedRating: number; sunlightDone: boolean; targetFocusHours: number }, date?: string) => void;
   completeEveningWrap: (data: { caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
+  commitDebriefTelemetry: (date?: string, telemetry?: { sleepHours?: number; sunlightDone?: boolean; proteinGrams?: number; caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; debriefData?: Record<string, unknown> }) => void;
   logWeight: (weightKg: number, note?: string, date?: string) => { success: boolean; deltaKg: number; trend: 'down' | 'up' | 'stable'; xpAwarded: number };
   claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => { success: boolean; message: string; xpAwarded: number };
   setIsDownscaled: (date: string, isDownscaled: boolean) => void;
@@ -552,12 +559,13 @@ export interface HabitStoreState {
   isForgedStreak: boolean;
   isReentryAvailable: boolean;
   isLedgerSealedByDate: Record<string, boolean>;
+  claimedProtocolIds: string[];
   unlockedTrophies: string[];
   trophyCounts: Record<string, number>;
   pendingTrophyUnlock: TrophyDefinition | null;
 
   setCircadianSchedule: (wakeTime: string, bedTime: string) => void;
-  setCustomHabitSlot: (habitId: string) => void;
+  setCustomHabitSlot: (habitId: string, customTitle?: string, category?: HabitItem['category']) => void;
   sealDailyLedger: (
     date?: string,
     xpAwarded?: number,
@@ -632,6 +640,7 @@ interface UserLocalProgressData {
   streakCount: number;
   streakFreezeStock: number;
   claimedMilestones: number[];
+  claimedProtocolIds?: string[];
   completedQuestIdsByDate: Record<string, string[]>;
   xpHistory: XpHistoryItem[];
   logsByDate?: Record<string, DailyLogData>;
@@ -673,6 +682,7 @@ const saveUserLocalProgress = (userId: string, data: Partial<UserLocalProgressDa
       streakCount: safeStreakCount,
       streakFreezeStock: safeStreakFreeze,
       claimedMilestones: Array.isArray(data.claimedMilestones) ? data.claimedMilestones : (existing.claimedMilestones ?? []),
+      claimedProtocolIds: Array.isArray(data.claimedProtocolIds) ? data.claimedProtocolIds : (existing.claimedProtocolIds ?? []),
       completedQuestIdsByDate: data.completedQuestIdsByDate && typeof data.completedQuestIdsByDate === 'object' ? data.completedQuestIdsByDate : (existing.completedQuestIdsByDate ?? {}),
       xpHistory: Array.isArray(data.xpHistory) ? data.xpHistory : (existing.xpHistory ?? []),
       logsByDate: data.logsByDate && typeof data.logsByDate === 'object' ? data.logsByDate : (existing.logsByDate ?? {}),
@@ -704,6 +714,7 @@ const getUserLocalProgress = (userId: string): UserLocalProgressData | null => {
       streakCount: typeof parsed.streakCount === 'number' && Number.isFinite(parsed.streakCount) ? Math.max(0, parsed.streakCount) : 0,
       streakFreezeStock: typeof parsed.streakFreezeStock === 'number' && Number.isFinite(parsed.streakFreezeStock) ? Math.max(0, parsed.streakFreezeStock) : 1,
       claimedMilestones: Array.isArray(parsed.claimedMilestones) ? parsed.claimedMilestones : [],
+      claimedProtocolIds: Array.isArray(parsed.claimedProtocolIds) ? parsed.claimedProtocolIds : [],
       completedQuestIdsByDate: parsed.completedQuestIdsByDate && typeof parsed.completedQuestIdsByDate === 'object' ? parsed.completedQuestIdsByDate : {},
       xpHistory: Array.isArray(parsed.xpHistory) ? parsed.xpHistory : [],
       logsByDate: parsed.logsByDate && typeof parsed.logsByDate === 'object' ? parsed.logsByDate : {},
@@ -758,6 +769,7 @@ export const useHabitStore = create<HabitStoreState>()(
       isForgedStreak: false,
       isReentryAvailable: false,
       isLedgerSealedByDate: {},
+      claimedProtocolIds: [],
       sleepGoalAwardedByDate: {},
       unlockedTrophies: [],
       trophyCounts: {},
@@ -946,6 +958,7 @@ export const useHabitStore = create<HabitStoreState>()(
           // Merge daily logs if remote logs exist, preserving in-memory logged meals and local recipe entries
           const mergedLogs = { ...get().logsByDate };
           const remoteSeals = { ...get().isLedgerSealedByDate };
+          const mergedDeskRituals = { ...get().deskRitualsByDate };
           if (remoteLogs && remoteLogs.length > 0) {
             remoteLogs.forEach((l) => {
               if (l.habits_completed && (l.habits_completed.__ledger_sealed || l.habits_completed._sealed)) {
@@ -955,6 +968,22 @@ export const useHabitStore = create<HabitStoreState>()(
               const remoteRecipeIds = l.logged_recipes || [];
               const localRecipeIds = currentLocalLog?.loggedRecipeIds || [];
               const mergedRecipeIds = Array.from(new Set([...remoteRecipeIds, ...localRecipeIds]));
+
+              // Cross-Device Sync: merge remote logged meals with local meals by id
+              const remoteMeals: LoggedMealEntry[] = (l.habits_completed?.__logged_meals as LoggedMealEntry[]) || [];
+              const localMeals: LoggedMealEntry[] = currentLocalLog?.loggedMeals || [];
+              const mealMap = new Map<string, LoggedMealEntry>();
+              remoteMeals.forEach((m) => { if (m && m.id) mealMap.set(m.id, m); });
+              localMeals.forEach((m) => { if (m && m.id) mealMap.set(m.id, m); });
+              const mergedLoggedMeals = Array.from(mealMap.values());
+
+              // Cross-Device Sync: merge debrief telemetry
+              if (l.habits_completed?.__debrief_data) {
+                mergedDeskRituals[l.log_date] = {
+                  ...(mergedDeskRituals[l.log_date] || {}),
+                  ...l.habits_completed.__debrief_data,
+                };
+              }
 
               mergedLogs[l.log_date] = {
                 habitsCompleted: { ...(currentLocalLog?.habitsCompleted || {}), ...(l.habits_completed || {}) },
@@ -966,7 +995,7 @@ export const useHabitStore = create<HabitStoreState>()(
                 moodScore: l.mood_score || currentLocalLog?.moodScore || 7,
                 notes: l.notes || currentLocalLog?.notes || '',
                 loggedRecipeIds: mergedRecipeIds,
-                loggedMeals: currentLocalLog?.loggedMeals || [],
+                loggedMeals: mergedLoggedMeals,
               };
             });
           }
@@ -1002,6 +1031,7 @@ export const useHabitStore = create<HabitStoreState>()(
               streakFreezeStock: finalFreeze,
               customRecipes: finalRecipes,
               logsByDate: mergedLogs,
+              deskRitualsByDate: mergedDeskRituals,
               isLedgerSealedByDate: remoteSeals,
               userProfile: finalProfile,
               habits: currentLocalHabits,
@@ -1012,11 +1042,13 @@ export const useHabitStore = create<HabitStoreState>()(
               streakCount: finalStreak,
               streakFreezeStock: finalFreeze,
               claimedMilestones: get().claimedMilestones,
+              claimedProtocolIds: get().claimedProtocolIds,
               completedQuestIdsByDate: get().completedQuestIdsByDate,
               xpHistory: get().xpHistory,
               logsByDate: mergedLogs,
               customRecipes: finalRecipes,
               userProfile: finalProfile,
+              habits: currentLocalHabits,
               isLedgerSealedByDate: remoteSeals,
             });
 
@@ -1213,9 +1245,20 @@ export const useHabitStore = create<HabitStoreState>()(
           habits: updatedHabits,
         });
 
+        // Award protocol anchor bonus strictly once per protocol ID across account lifetime
+        const currentClaimed = get().claimedProtocolIds || [];
+        if (!isAlreadyActive && !currentClaimed.includes(protocolId)) {
+          const updatedClaimed = [...currentClaimed, protocolId];
+          set({ claimedProtocolIds: updatedClaimed });
+          get().gainXp(50, `Focus Protocol Anchored: ${protocolId}`, 'protocol');
+        }
+
         const session = get().userSession;
         if (session && !session.id.startsWith('guest_')) {
-          saveUserLocalProgress(session.id, { habits: updatedHabits });
+          saveUserLocalProgress(session.id, {
+            habits: updatedHabits,
+            claimedProtocolIds: get().claimedProtocolIds,
+          });
         }
       },
 
@@ -1640,6 +1683,51 @@ export const useHabitStore = create<HabitStoreState>()(
           get().gainXp(xpAward, label, 'ritual');
           retroAudio.playTierUpgrade();
         }
+      },
+
+      commitDebriefTelemetry: (date, telemetry = {}) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const currentRituals = get().deskRitualsByDate[targetDate] || {};
+
+        const updatedHabits = { ...currentLog.habitsCompleted };
+        if (telemetry.sunlightDone !== undefined) {
+          updatedHabits.sunlight = telemetry.sunlightDone;
+        }
+
+        const safeProtein = typeof telemetry.proteinGrams === 'number'
+          ? Math.max(currentLog.totalProteinLogged || 0, telemetry.proteinGrams)
+          : currentLog.totalProteinLogged;
+
+        const safeSleep = typeof telemetry.sleepHours === 'number' && telemetry.sleepHours > 0
+          ? telemetry.sleepHours
+          : currentLog.sleepHours;
+
+        const caffeineStatus = telemetry.caffeineStatus || (telemetry.caffeineCutoffRespected ? 'before_cutoff' : 'after_cutoff');
+
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              sleepHours: safeSleep,
+              totalProteinLogged: safeProtein,
+              habitsCompleted: updatedHabits,
+            },
+          },
+          deskRitualsByDate: {
+            ...state.deskRitualsByDate,
+            [targetDate]: {
+              ...currentRituals,
+              eveningWrapCompleted: true,
+              caffeineCutoffRespected: !!telemetry.caffeineCutoffRespected,
+              caffeineStatus,
+              ...(telemetry.debriefData || {}),
+            },
+          },
+        }));
+
+        get().syncWithSupabase(targetDate);
       },
 
       toggleHabit: (habitId, date) => {
@@ -2214,6 +2302,8 @@ export const useHabitStore = create<HabitStoreState>()(
             habits_completed: {
               ...log.habitsCompleted,
               __ledger_sealed: !!get().isLedgerSealedByDate[targetDate],
+              __logged_meals: log.loggedMeals || [],
+              __debrief_data: get().deskRitualsByDate[targetDate] || {},
             },
             total_protein: log.totalProteinLogged,
             total_calories: log.totalCaloriesLogged,
@@ -2239,11 +2329,13 @@ export const useHabitStore = create<HabitStoreState>()(
             streakCount: get().streakCount,
             streakFreezeStock: get().streakFreezeStock,
             claimedMilestones: get().claimedMilestones,
+            claimedProtocolIds: get().claimedProtocolIds,
             completedQuestIdsByDate: get().completedQuestIdsByDate,
             xpHistory: get().xpHistory,
             logsByDate: get().logsByDate,
             customRecipes: get().customRecipes,
             userProfile: get().userProfile,
+            habits: get().habits,
             isLedgerSealedByDate: get().isLedgerSealedByDate,
           });
         } catch {
@@ -2676,31 +2768,39 @@ export const useHabitStore = create<HabitStoreState>()(
           dietaryRestrictions: [],
           onboardingCompleted: true,
         };
-        get().updateUserProfile({ ...currentProfile, wakeTime, bedTime });
-        get().gainXp(25, 'Circadian Rhythm Schedule Set', 'circadian');
+        const hasClaimed = !!currentProfile.circadianScheduleXpClaimed;
+        get().updateUserProfile({
+          ...currentProfile,
+          wakeTime,
+          bedTime,
+          circadianScheduleXpClaimed: true,
+        });
+        if (!hasClaimed) {
+          get().gainXp(25, 'Circadian Rhythm Schedule Set', 'circadian');
+        }
       },
 
-      setCustomHabitSlot: (habitId: string) => {
+      setCustomHabitSlot: (habitId: string, customTitle?: string, category: HabitItem['category'] = 'lifestyle') => {
         const definition = CUSTOM_HABITS_LIBRARY.find((h) => h.id === habitId);
+        const title = customTitle || definition?.title || habitId;
+        const habitCategory = definition?.category || category;
         const currentProfile = get().userProfile;
         if (currentProfile) {
           get().updateUserProfile({ ...currentProfile, customHabitSlot: habitId });
         }
-        if (definition) {
-          const currentHabits = get().habits;
-          if (!currentHabits.some((h) => h.id === habitId)) {
-            set({
-              habits: [
-                ...currentHabits,
-                {
-                  id: definition.id,
-                  title: definition.title,
-                  category: definition.category as any,
-                  targetDaysPerWeek: 7,
-                },
-              ],
-            });
-          }
+        const currentHabits = get().habits;
+        if (!currentHabits.some((h) => h.id === habitId)) {
+          set({
+            habits: [
+              ...currentHabits,
+              {
+                id: habitId,
+                title,
+                category: habitCategory as any,
+                targetDaysPerWeek: 7,
+              },
+            ],
+          });
         }
       },
 

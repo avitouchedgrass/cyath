@@ -48,9 +48,7 @@ export function IslandBiomeGalleryModal({
   const currentSuiteMeta = ISLAND_SUITES[selectedSuite] || ISLAND_SUITES.circadian;
   const currentSuiteTiers = currentSuiteMeta.tiers;
 
-  const hasSuiteXp = !!(suiteXp && (suiteXp.circadian > 0 || suiteXp.iron > 0 || suiteXp.focus > 0));
-  const currentSuiteXp = hasSuiteXp ? (suiteXp[selectedSuite] ?? 0) : (selectedSuite === userActiveSuite ? totalXp : 0);
-  const suiteProgress = calculateLevel(currentSuiteXp);
+  const suiteProgress = calculateLevel(totalXp);
 
   useEffect(() => {
     setMounted(true);
@@ -66,8 +64,7 @@ export function IslandBiomeGalleryModal({
   // Set initial selected index to the user's current tier for this suite on open or suite change
   useEffect(() => {
     if (isOpen) {
-      const activeXp = hasSuiteXp ? (suiteXp[selectedSuite] ?? 0) : (selectedSuite === userActiveSuite ? totalXp : 0);
-      const lvl = calculateLevel(activeXp).level;
+      const lvl = calculateLevel(totalXp).level;
       let activeIndex = 0;
       for (let i = currentSuiteTiers.length - 1; i >= 0; i--) {
         if (lvl >= currentSuiteTiers[i].minLevel) {
@@ -77,7 +74,7 @@ export function IslandBiomeGalleryModal({
       }
       setSelectedIndex(activeIndex);
     }
-  }, [isOpen, selectedSuite, suiteXp, totalXp, currentSuiteTiers]);
+  }, [isOpen, selectedSuite, totalXp, currentSuiteTiers]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -103,7 +100,7 @@ export function IslandBiomeGalleryModal({
   const currentTier: IslandTier = currentSuiteTiers[selectedIndex] || currentSuiteTiers[0];
   const isUnlocked = suiteProgress.level >= currentTier.minLevel;
   const xpNeeded = xpToReachLevel(currentTier.minLevel);
-  const xpRemaining = Math.max(0, xpNeeded - currentSuiteXp);
+  const xpRemaining = Math.max(0, xpNeeded - totalXp);
   const isSuiteActive = selectedSuite === userActiveSuite;
 
   const prevBiome = () => {
@@ -160,8 +157,7 @@ export function IslandBiomeGalleryModal({
               const suite = ISLAND_SUITES[suiteKey];
               const isSelected = selectedSuite === suiteKey;
               const isCurrentActive = userActiveSuite === suiteKey;
-              const sXp = hasSuiteXp ? (suiteXp[suiteKey] ?? 0) : (suiteKey === userActiveSuite ? totalXp : 0);
-              const sLevel = calculateLevel(sXp).level;
+              const sLevel = suiteProgress.level;
 
               return (
                 <button

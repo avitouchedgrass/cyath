@@ -14,7 +14,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'Your Living Sanctuary',
       description:
-        'This floating island is your biological anchor. As you log habits, maintain sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 distinct pixel-art biome tiers.',
+        'This floating island is your biological anchor. As you log habits, maintain circadian sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 handcrafted pixel-art biome tiers. You can also switch between Circadian Master, Iron Anchor, and Deep Worker suites in your Profile.',
       side: 'bottom',
       align: 'center',
     },
@@ -24,7 +24,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'The Daily Seal Ceremony',
       description:
-        'Every evening, tap "Seal Today" to open your Turn-by-Turn Debrief drawer. Log morning sunlight, fast 1-tap meals with instant macro calculations, caffeine airlock, and custom questions to mint your daily wax seal and earn graduated XP.',
+        'Every evening, tap "Seal Today" to open your Turn-by-Turn Debrief drawer. Log morning sunlight, sleep, and meals with our built-in <em>"Not sure how much protein your meal had?"</em> natural AI estimator. Earn graduated XP tailored to biological efficacy and mint your daily wax seal.',
       side: 'top',
       align: 'center',
     },
@@ -34,7 +34,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'Archival Corkboard Ledger',
       description:
-        'Tap "View Ledger" to slide out your archival corkboard. Review past days pinned with golden wax seals, inspect historical biometrics, or export 16-bit receipt cards as shareable PNGs.',
+        'Tap "View Ledger" to slide out your archival corkboard. Review past days pinned with golden wax seals, inspect historical biometrics, or export 16-bit thermal receipt cards as shareable PNGs.',
       side: 'top',
       align: 'center',
     },
@@ -42,9 +42,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#specimen-reliquary',
     popover: {
-      title: 'Specimen Reliquary',
+      title: 'Subterranean Specimen Reliquary',
       description:
-        'Explore your subterranean trophy vault. Unlock handcrafted pixel relics and chalices for streak milestones, circadian sleep, and nutritional mastery.',
+        'Scroll down to explore your subterranean trophy vault. Unlock handcrafted pixel relics and chalices for streak milestones, circadian sleep perfection, and nutritional mastery.',
       side: 'top',
       align: 'center',
     },
@@ -54,7 +54,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'StoveSage AI Coach & Scanner',
       description:
-        'Need recipe inspiration, metabolic advice, or instant photo meal analysis? Open StoveSage (or press Cmd+J) to consult your evidence-based circadian nutrition coach.',
+        'Need whole-food recipe inspiration, metabolic protein rebalancing, or instant photo meal analysis? Open StoveSage (Cmd+J) to consult your evidence-based circadian nutrition coach.',
       side: 'top',
       align: 'end',
     },
@@ -62,9 +62,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-navigation',
     popover: {
-      title: 'Navigation Hub & Playbook',
+      title: 'Navigation Hub & Fuel Engine',
       description:
-        'Navigate between the Habit & Fuel Playbook for peer-reviewed circadian protocols, the Correlation Engine for lifestyle pattern curves, and your Profile to manage habits.',
+        'Navigate between the Fuel Log with 1-tap meal target logging, the Habit & Circadian Playbook for peer-reviewed protocols, the Correlation Dossier, and your Profile.',
       side: 'bottom',
       align: 'center',
     },
@@ -73,7 +73,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'Command Palette: Fast Keyboard Logging',
       description:
-        'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in under 2 seconds.',
+        'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in under 2 seconds without touching the mouse.',
       align: 'center',
     },
   },
@@ -95,16 +95,28 @@ export function PioneerWalkthrough() {
   const driverInstanceRef = useRef<ReturnType<typeof driver> | null>(null);
 
   const startTour = useCallback(() => {
-    // Filter steps to visible elements currently rendered in the DOM
-    const validSteps = WALKTHROUGH_STEPS.filter((step) => {
+    // Dynamically resolve element selectors and filter to visible elements in the DOM
+    const validSteps = WALKTHROUGH_STEPS.map((step) => {
       if (typeof step.element === 'string') {
-        const el = document.querySelector(step.element);
-        if (!el) return false;
+        let targetSelector = step.element;
+        if (targetSelector === '#tour-sanctuary-stage' && !document.querySelector(targetSelector)) {
+          if (document.querySelector('#tour-sanctuary-island')) {
+            targetSelector = '#tour-sanctuary-island';
+          }
+        }
+        if (targetSelector === '#btn-view-ledger' && !document.querySelector(targetSelector)) {
+          if (document.querySelector('#tour-ledger-toggle')) {
+            targetSelector = '#tour-ledger-toggle';
+          }
+        }
+        const el = document.querySelector(targetSelector);
+        if (!el) return null;
         const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
+        if (rect.width === 0 && rect.height === 0) return null;
+        return { ...step, element: targetSelector };
       }
-      return true;
-    });
+      return step;
+    }).filter(Boolean) as DriveStep[];
 
     if (validSteps.length === 0) return;
 

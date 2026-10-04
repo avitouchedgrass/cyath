@@ -22,6 +22,9 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
     getDailyLog,
     streakCount,
     isForgedStreak,
+    isLedgerSealedByDate,
+    logsByDate,
+    userSession,
     userProfile,
     activateReentryProtocol,
   } = useHabitStore();
@@ -41,12 +44,35 @@ export function LivingIslandHero({ onOpenReceipt }: LivingIslandHeroProps) {
 
   const completedHabitsCount = (isSunlightDone ? 1 : 0) + (isHydrationDone ? 1 : 0) + (isFuelDone ? 1 : 0);
 
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
+  const isTodaySealed = isAuthenticated ? !!isLedgerSealedByDate[currentDate] : false;
+
+  const hasHistoricalActivity = useMemo(() => {
+    if (!isAuthenticated) return false;
+    const sealedDates = Object.keys(isLedgerSealedByDate || {}).filter((d) => isLedgerSealedByDate[d]);
+    if (sealedDates.length > 0) return true;
+
+    return Object.entries(logsByDate || {}).some(([date, log]) => {
+      if (date === currentDate) return false;
+      const habitsCount = Object.values(log.habitsCompleted ?? {}).filter(Boolean).length;
+      return (
+        habitsCount > 0 ||
+        (log.totalProteinLogged ?? 0) > 0 ||
+        (log.hydrationLiters ?? 0) > 0 ||
+        (log.sleepHours ?? 0) > 0
+      );
+    });
+  }, [isAuthenticated, isLedgerSealedByDate, logsByDate, currentDate]);
+
+  const isReentryEligible =
+    isAuthenticated && streakCount === 0 && hasHistoricalActivity && !isForgedStreak && !isTodaySealed;
+
   // Dynamic 48-Hour Lifecycle State (Active -> Embers -> Mist Dormancy -> Kintsugi)
   const lifecycleState: IslandLifecycleState = useMemo(() => {
-    if (streakCount === 0) return 'mist';
+    if (isReentryEligible) return 'mist';
     if (completedHabitsCount === 0) return 'embers';
     return 'active';
-  }, [streakCount, completedHabitsCount]);
+  }, [isReentryEligible, completedHabitsCount]);
 
   // Dynamic Circadian Horizon Aura
   const circadian = useMemo(() => {

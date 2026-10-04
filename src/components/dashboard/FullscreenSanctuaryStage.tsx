@@ -34,6 +34,7 @@ export function FullscreenSanctuaryStage({
     streakCount,
     isForgedStreak,
     isLedgerSealedByDate,
+    logsByDate,
     activateReentryProtocol,
     userSession,
     userProfile,
@@ -45,9 +46,7 @@ export function FullscreenSanctuaryStage({
   const activeSuite = (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as 'circadian' | 'iron' | 'focus';
   const activeTiers = getSuiteTiers(activeSuite);
 
-  const hasSuiteXp = !!(suiteXp && (suiteXp.circadian > 0 || suiteXp.iron > 0 || suiteXp.focus > 0));
-  const activeSuiteXp = hasSuiteXp ? (suiteXp[activeSuite] ?? 0) : totalXp;
-  const progress = useMemo(() => calculateLevel(activeSuiteXp), [activeSuiteXp]);
+  const progress = useMemo(() => calculateLevel(totalXp), [totalXp]);
   const currentIsland = useMemo(
     () => getIslandTier(progress.level, activeSuite),
     [progress.level, activeSuite]
@@ -68,6 +67,26 @@ export function FullscreenSanctuaryStage({
     (currentLog.loggedMeals?.length ?? 0) > 0;
 
   const isFlameForged = isAuthenticated && isForgedStreak && !hasLoggedToday;
+
+  const hasHistoricalActivity = useMemo(() => {
+    if (!isAuthenticated) return false;
+    const sealedDates = Object.keys(isLedgerSealedByDate || {}).filter((d) => isLedgerSealedByDate[d]);
+    if (sealedDates.length > 0) return true;
+
+    return Object.entries(logsByDate || {}).some(([date, log]) => {
+      if (date === currentDate) return false;
+      const habitsCount = Object.values(log.habitsCompleted ?? {}).filter(Boolean).length;
+      return (
+        habitsCount > 0 ||
+        (log.totalProteinLogged ?? 0) > 0 ||
+        (log.hydrationLiters ?? 0) > 0 ||
+        (log.sleepHours ?? 0) > 0
+      );
+    });
+  }, [isAuthenticated, isLedgerSealedByDate, logsByDate, currentDate]);
+
+  const isReentryEligible =
+    isAuthenticated && streakCount === 0 && hasHistoricalActivity && !isForgedStreak && !isTodaySealed;
 
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
 
@@ -216,8 +235,8 @@ export function FullscreenSanctuaryStage({
 
       {/* Center: Ginormous Monumental Living Island Graphic */}
       <div className="relative flex-1 flex flex-col items-center justify-center my-auto w-full max-w-5xl py-4 z-10">
-        {/* Dormant Mist Alert Banner only if user had an active account with XP that lapsed */}
-        {streakCount === 0 && totalXp > 50 && (
+        {/* Dormant Mist Alert Banner only if user had an active account with historical streak that lapsed */}
+        {isReentryEligible && (
           <div className="absolute top-2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/20 shadow-sm animate-in fade-in">
             <span className="font-sans text-xs text-[#4A5D4E]">
               Sanctuary in Dormant Mist

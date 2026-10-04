@@ -24,7 +24,15 @@ import {
   PixelTrash,
   PixelX,
   PixelAlert,
+  PixelCheck,
+  PixelSparkles,
+  PixelSun,
+  PixelFlame,
 } from '@/components/common/PixelIcons';
+import { ISLAND_SUITES, IslandSuiteId, getIslandTier } from '@/lib/progression/config';
+import { calculateLevel } from '@/lib/progression/engine';
+import { CUSTOM_HABITS_LIBRARY, HabitItem } from '@/store/useHabitStore';
+import { haptics } from '@/lib/haptics';
 
 const GOAL_TITLES: Record<string, string> = {
   focus: 'Peak Energy & Focus',
@@ -40,6 +48,9 @@ export default function ProfilePage() {
     userSession,
     setUserSession,
     userProfile,
+    updateUserProfile,
+    setCustomHabitSlot,
+    totalXp,
     logsByDate,
     activeProtocolIds,
     deleteAccountData,
@@ -54,6 +65,9 @@ export default function ProfilePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+  const [customHabitTitle, setCustomHabitTitle] = useState('');
+  const [customHabitCategory, setCustomHabitCategory] = useState<HabitItem['category']>('lifestyle');
+  const [isCreatingHabit, setIsCreatingHabit] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -66,6 +80,10 @@ export default function ProfilePage() {
   const totalProteinLogged = Object.values(logsByDate).reduce((acc, log) => {
     return acc + (log.totalProteinLogged || 0);
   }, 0);
+
+  const masterLevelInfo = calculateLevel(totalXp);
+  const activeSuite: IslandSuiteId = (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as IslandSuiteId;
+  const currentIsland = getIslandTier(masterLevelInfo.level, activeSuite);
 
   const handleSignOut = async () => {
     retroAudio.playBlip();
@@ -180,7 +198,7 @@ export default function ProfilePage() {
             href="/dashboard"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-semibold text-xs shadow-2xs hover:bg-[#F4F0EA] transition-colors cursor-pointer self-start sm:self-auto"
           >
-            <span>Open Daily Planner →</span>
+            <span>Open Sanctuary Observatory →</span>
           </Link>
         </div>
 
@@ -293,13 +311,222 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Account Details & Blueprints Configuration */}
+        {/* Sanctuary Biome Architecture Suite Switcher */}
+        <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#1A3629]/10 gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider">
+                  Universal Sanctuary Progression
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#1A3629]/10 text-[#1A3629] font-mono text-[10px] font-bold">
+                  Tier {currentIsland.tier} · Level {masterLevelInfo.level}
+                </span>
+              </div>
+              <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
+                Active Biome Suite: {ISLAND_SUITES[activeSuite]?.name || 'The Circadian Master'}
+              </h2>
+              <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
+                Switch between your floating biomes without losing your master level progression.
+              </p>
+            </div>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors shrink-0"
+            >
+              <span>View in Observatory →</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            {(Object.values(ISLAND_SUITES) as Array<(typeof ISLAND_SUITES)[IslandSuiteId]>).map((suite) => {
+              const isSelected = activeSuite === suite.id;
+              const previewTier = getIslandTier(masterLevelInfo.level, suite.id);
+              return (
+                <div
+                  key={suite.id}
+                  onClick={() => {
+                    if (!isSelected) {
+                      retroAudio.playTierUpgrade();
+                      haptics.tap();
+                      updateUserProfile({ selectedIslandSuite: suite.id });
+                    }
+                  }}
+                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-4 ${
+                    isSelected
+                      ? 'border-[#1A3629] bg-[#FAF8F5] shadow-[4px_4px_0px_#1A3629]'
+                      : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:border-[#1A3629]/40 hover:bg-[#FAF8F5]/50'
+                  }`}
+                >
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase tracking-wider">
+                        {suite.badge}
+                      </span>
+                      {isSelected && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-[10px] font-bold">
+                          <PixelCheck size={10} color="#FFFDF9" />
+                          <span>ACTIVE</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="w-full h-32 rounded-xl bg-gradient-to-b from-[#EBF3EE] to-[#FAF8F5] border border-[#1A3629]/10 flex items-center justify-center overflow-hidden relative">
+                      <img
+                        src={previewTier.pngImage || previewTier.image}
+                        alt={previewTier.name}
+                        className="w-28 h-28 object-contain transition-transform duration-300 hover:scale-110"
+                        style={{ imageRendering: 'pixelated' }}
+                      />
+                    </div>
+
+                    <div>
+                      <h3 className="font-cabinet font-bold text-base text-[#1A3629]">
+                        {suite.name}
+                      </h3>
+                      <p className="font-sans text-xs text-[#4A5D4E] mt-1 leading-snug">
+                        {suite.tagline}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isSelected) {
+                        retroAudio.playTierUpgrade();
+                        haptics.tap();
+                        updateUserProfile({ selectedIslandSuite: suite.id });
+                      }
+                    }}
+                    className={`w-full py-2.5 rounded-xl font-cabinet font-bold text-xs transition-colors cursor-pointer text-center ${
+                      isSelected
+                        ? 'bg-[#1A3629] text-[#FFFDF9]'
+                        : 'border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
+                    }`}
+                  >
+                    <span>{isSelected ? 'Active Architecture' : 'Equip Architecture'}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4th Custom Habit Slot Configuration */}
+        <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#1A3629]/10 gap-2">
+            <div>
+              <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider">
+                Daily Focus Configuration
+              </span>
+              <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
+                4th Custom Habit Slot
+              </h2>
+              <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
+                Equip an optional 4th keystone habit across lifestyle, mindfulness, movement, or nutrition.
+              </p>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-[#1A3629]/10 font-mono text-xs font-bold text-[#1A3629] self-start sm:self-auto">
+              Current: {CUSTOM_HABITS_LIBRARY.find((h) => h.id === (userProfile?.customHabitSlot || 'reading_20m'))?.title || userProfile?.customHabitSlot || 'Deep Reading'}
+            </span>
+          </div>
+
+          {/* Quick Selectors Grid from Library */}
+          <div className="mt-5 flex flex-col gap-3">
+            <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
+              Select from Evidence-Based Habit Library:
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {CUSTOM_HABITS_LIBRARY.map((habit) => {
+                const isEquipped = (userProfile?.customHabitSlot || 'reading_20m') === habit.id;
+                return (
+                  <button
+                    key={habit.id}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playInspectConfirm();
+                      haptics.tap();
+                      setCustomHabitSlot(habit.id, habit.title, habit.category);
+                    }}
+                    className={`p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
+                      isEquipped
+                        ? 'border-[#1A3629] bg-[#FAF8F5] shadow-[2px_2px_0px_#1A3629]'
+                        : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                        {habit.title}
+                      </span>
+                      <span className="font-mono text-[10px] text-[#4A5D4E] uppercase">
+                        {habit.category}
+                      </span>
+                    </div>
+                    {isEquipped && (
+                      <span className="px-2 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-[9px] font-bold shrink-0">
+                        EQUIPPED
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Custom Input Option */}
+            <div className="mt-4 p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3">
+              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                Or Define Your Own Personal Lifestyle Habit:
+              </span>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={customHabitTitle}
+                  onChange={(e) => setCustomHabitTitle(e.target.value)}
+                  placeholder="e.g. 15m Evening Piano, Mobility Routine..."
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] font-cabinet font-bold text-xs text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+                />
+                <select
+                  value={customHabitCategory}
+                  onChange={(e) => setCustomHabitCategory(e.target.value as any)}
+                  className="px-3 py-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629]"
+                >
+                  <option value="lifestyle">Lifestyle</option>
+                  <option value="misc">Misc</option>
+                  <option value="recovery">Recovery</option>
+                  <option value="fuel">Fuel</option>
+                  <option value="movement">Movement</option>
+                  <option value="circadian">Circadian</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const title = customHabitTitle.trim();
+                    if (!title) return;
+                    const id = `custom_${Date.now()}`;
+                    retroAudio.playInspectConfirm();
+                    haptics.tap();
+                    setCustomHabitSlot(id, title, customHabitCategory);
+                    setCustomHabitTitle('');
+                  }}
+                  disabled={!customHabitTitle.trim()}
+                  className="px-4 py-2.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                >
+                  <span>Equip Custom Habit</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Account Details & Baseline Targets */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
-          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
+          <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
               <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
-                Calibrated Blueprint Targets
+                Calibrated Baseline Targets
               </h2>
               <div className="space-y-3 font-mono text-xs">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
@@ -336,8 +563,12 @@ export default function ProfilePage() {
                   <span className="text-[#4A5D4E]">Target Sleep:</span>
                   <span className="font-bold text-[#1A3629]">8.0 hours</span>
                 </div>
+                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                  <span className="text-[#4A5D4E]">Circadian Window:</span>
+                  <span className="font-bold text-[#1A3629]">{userProfile?.bedTime || '23:30'} → {userProfile?.wakeTime || '07:30'}</span>
+                </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#4A5D4E]">Equipped Cartridges:</span>
+                  <span className="text-[#4A5D4E]">Active Protocols:</span>
                   <span className="font-bold text-[#10B981]">{activeProtocolIds?.length || 1} Active</span>
                 </div>
               </div>
@@ -363,7 +594,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
+          <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
               <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
                 Core Pillars Navigation
@@ -371,13 +602,13 @@ export default function ProfilePage() {
               <ul className="space-y-2 font-cabinet font-semibold text-xs">
                 <li>
                   <Link href="/playbook?tab=protocols" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Protocol Cartridges</span>
+                    <span>Focus &amp; Circadian Protocols</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/playbook" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Focus &amp; Circadian Playbook</span>
+                    <span>Evidence-Based Playbook</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
@@ -388,8 +619,8 @@ export default function ProfilePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard?tab=today" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Island Cockpit</span>
+                  <Link href="/dashboard" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
+                    <span>Sanctuary Observatory</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>

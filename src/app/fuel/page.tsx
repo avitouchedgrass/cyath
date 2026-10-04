@@ -38,7 +38,14 @@ export default function FuelPage() {
     currentDate,
     getProteinRebalance,
     logMealToDay,
+    getDailyLog,
   } = useHabitStore();
+
+  const currentLog = getDailyLog(currentDate);
+  const loggedMeals = currentLog.loggedMeals || [];
+  const hasEatenBreakfast = loggedMeals.some((m) => m.mealSlot === 'breakfast');
+  const hasEatenLunch = loggedMeals.some((m) => m.mealSlot === 'lunch');
+  const hasEatenDinner = loggedMeals.some((m) => m.mealSlot === 'dinner');
 
   const [mealInput, setMealInput] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -51,6 +58,30 @@ export default function FuelPage() {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const rebalance = getProteinRebalance(currentDate);
+
+  const handleLogToSlot = (slot: 'breakfast' | 'lunch' | 'dinner') => {
+    if (!parsedResult) return;
+    retroAudio.playInspectConfirm();
+    logMealToDay(
+      {
+        name: parsedResult.mealName || mealInput,
+        protein: parsedResult.protein,
+        calories: parsedResult.calories,
+        carbs: parsedResult.carbs,
+        fats: parsedResult.fats,
+        dietType: parsedResult.dietType,
+        category: parsedResult.category,
+        ingredients: parsedResult.ingredients,
+        suggestedSprite: parsedResult.suggestedSprite || '/assets/food/generic-plate.png',
+        mealSlot: slot,
+      },
+      currentDate
+    );
+    setFeedback(`Logged ${parsedResult.mealName} as ${slot.toUpperCase()} (+${parsedResult.protein}g protein)!`);
+    setMealInput('');
+    setParsedResult(null);
+    setTimeout(() => setFeedback(null), 4000);
+  };
 
   const handleAnalyzeText = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,6 +307,56 @@ export default function FuelPage() {
                   ))}
                 </div>
               )}
+
+              {/* Meal Slot Destination Selection: Breakfast, Lunch, Dinner */}
+              <div className="pt-3 border-t border-[#1A3629]/15 flex flex-col gap-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Log to today's ledger:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    disabled={hasEatenBreakfast}
+                    onClick={() => handleLogToSlot('breakfast')}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-between cursor-pointer transition-all ${
+                      hasEatenBreakfast
+                        ? 'border-[#1A3629]/10 bg-[#FAF8F5] text-[#1A3629]/40 cursor-not-allowed'
+                        : 'border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629]'
+                    }`}
+                  >
+                    <span>Breakfast</span>
+                    <span className="font-mono text-[10px]">{hasEatenBreakfast ? 'Eaten' : `+${parsedResult.protein}g`}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={hasEatenLunch}
+                    onClick={() => handleLogToSlot('lunch')}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-between cursor-pointer transition-all ${
+                      hasEatenLunch
+                        ? 'border-[#1A3629]/10 bg-[#FAF8F5] text-[#1A3629]/40 cursor-not-allowed'
+                        : 'border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629]'
+                    }`}
+                  >
+                    <span>Lunch</span>
+                    <span className="font-mono text-[10px]">{hasEatenLunch ? 'Eaten' : `+${parsedResult.protein}g`}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={hasEatenDinner}
+                    onClick={() => handleLogToSlot('dinner')}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-cabinet font-bold flex items-center justify-between cursor-pointer transition-all ${
+                      hasEatenDinner
+                        ? 'border-[#1A3629]/10 bg-[#FAF8F5] text-[#1A3629]/40 cursor-not-allowed'
+                        : 'border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-[#1A3629]'
+                    }`}
+                  >
+                    <span>Dinner</span>
+                    <span className="font-mono text-[10px]">{hasEatenDinner ? 'Eaten' : `+${parsedResult.protein}g`}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

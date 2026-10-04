@@ -21,9 +21,13 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
     deskRitualsByDate,
     completeEveningWrap,
     setCustomHabitSlot,
+    habits,
   } = useHabitStore();
 
   const [isSlotPickerOpen, setIsSlotPickerOpen] = useState(false);
+  const [customHabitName, setCustomHabitName] = useState('');
+  const [customCategory, setCustomCategory] = useState<'lifestyle' | 'misc'>('lifestyle');
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>('all');
   const [undoToast, setUndoToast] = useState<{ habitId: string; title: string; timer: ReturnType<typeof setTimeout> } | null>(null);
 
   const currentLog = getDailyLog(currentDate);
@@ -36,8 +40,20 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   // Custom 4th habit slot definition
   const customSlotId = userProfile?.customHabitSlot;
   const customDefinition = useMemo(() => {
-    return CUSTOM_HABITS_LIBRARY.find((h) => h.id === customSlotId);
-  }, [customSlotId]);
+    if (!customSlotId) return null;
+    const fromLib = CUSTOM_HABITS_LIBRARY.find((h) => h.id === customSlotId);
+    if (fromLib) return fromLib;
+    const fromHabits = habits.find((h) => h.id === customSlotId);
+    if (fromHabits) {
+      return {
+        id: fromHabits.id,
+        title: fromHabits.title,
+        shortLabel: fromHabits.title.length > 16 ? `${fromHabits.title.slice(0, 14)}..` : fromHabits.title,
+        category: (fromHabits.category as any) || 'lifestyle',
+      };
+    }
+    return null;
+  }, [customSlotId, habits]);
 
   // Core 3 Keystone Habits + Optional 4th
   const displayHabits = useMemo(() => {
@@ -254,8 +270,8 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           );
         })}
 
-        {/* Add 4th Slot Trigger if not configured */}
-        {!customDefinition && (
+        {/* Add or Change 4th Slot Trigger */}
+        {!customDefinition ? (
           <div className="pt-2">
             <button
               type="button"
@@ -265,16 +281,62 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               <span>+ Add 4th Custom Power Habit</span>
             </button>
           </div>
+        ) : (
+          <div className="pt-1.5 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
+              className="text-[10px] font-mono font-bold text-[#4A5D4E] hover:text-[#1A3629] transition-colors cursor-pointer underline underline-offset-2"
+            >
+              {isSlotPickerOpen ? 'Close Picker' : 'Change 4th Habit Slot'}
+            </button>
+          </div>
         )}
 
         {/* Custom Slot Picker Dropdown */}
-        {isSlotPickerOpen && !customDefinition && (
-          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-2 mt-2">
-            <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-              Choose 4th Habit Lever
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              {CUSTOM_HABITS_LIBRARY.map((item) => (
+        {isSlotPickerOpen && (
+          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3 mt-2 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between">
+              <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                Choose 4th Habit Lever
+              </span>
+              <span className="font-mono text-[10px] text-[#4A5D4E]">
+                Fuel · Movement · Lifestyle · Misc
+              </span>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {[
+                { id: 'all', label: 'All' },
+                { id: 'lifestyle', label: 'Lifestyle / Misc' },
+                { id: 'circadian', label: 'Circadian' },
+                { id: 'fuel', label: 'Fuel' },
+                { id: 'movement', label: 'Movement' },
+                { id: 'recovery', label: 'Recovery' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedCategoryTab(tab.id)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-cabinet font-bold transition-all cursor-pointer shrink-0 ${
+                    selectedCategoryTab === tab.id
+                      ? 'bg-[#1A3629] text-[#FFFDF9]'
+                      : 'bg-[#FFFDF9] border border-[#1A3629]/15 text-[#1A3629] hover:bg-[#FAF6EE]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Presets Grid */}
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-0.5">
+              {CUSTOM_HABITS_LIBRARY.filter((item) => {
+                if (selectedCategoryTab === 'all') return true;
+                if (selectedCategoryTab === 'lifestyle') return item.category === 'lifestyle' || item.category === 'misc' || (item.category as any) === 'life';
+                return item.category === selectedCategoryTab;
+              }).map((item) => (
                 <button
                   key={item.id}
                   type="button"
@@ -284,11 +346,59 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                     setCustomHabitSlot(item.id);
                     setIsSlotPickerOpen(false);
                   }}
-                  className="p-2.5 rounded-lg border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] transition-all text-left cursor-pointer"
+                  className={`p-2.5 rounded-lg border text-xs font-cabinet font-bold transition-all text-left cursor-pointer flex flex-col gap-0.5 ${
+                    customSlotId === item.id
+                      ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                      : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF6EE] text-[#1A3629]'
+                  }`}
                 >
                   <span>{item.shortLabel}</span>
+                  <span className={`text-[9px] font-mono capitalize ${customSlotId === item.id ? 'text-[#FFFDF9]/70' : 'text-[#4A5D4E]'}`}>
+                    {item.category}
+                  </span>
                 </button>
               ))}
+            </div>
+
+            {/* Custom Lifestyle / Misc Habit Direct Entry */}
+            <div className="pt-2 border-t border-[#1A3629]/10 flex flex-col gap-1.5">
+              <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                Or create your own custom habit:
+              </span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="text"
+                  value={customHabitName}
+                  onChange={(e) => setCustomHabitName(e.target.value)}
+                  placeholder="e.g. 20m Deep Reading, Meditation..."
+                  maxLength={50}
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-[#1A3629]/20 bg-[#FFFDF9] text-xs font-cabinet font-bold text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none focus:border-[#1A3629]"
+                />
+                <select
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value as any)}
+                  className="px-2 py-1.5 rounded-lg border border-[#1A3629]/20 bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none"
+                >
+                  <option value="lifestyle">Lifestyle</option>
+                  <option value="misc">Misc</option>
+                </select>
+                <button
+                  type="button"
+                  disabled={!customHabitName.trim()}
+                  onClick={() => {
+                    if (!customHabitName.trim()) return;
+                    retroAudio.playInspectConfirm();
+                    haptics.tap();
+                    const newId = `custom_${Date.now()}`;
+                    setCustomHabitSlot(newId, customHabitName.trim(), customCategory);
+                    setCustomHabitName('');
+                    setIsSlotPickerOpen(false);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer disabled:opacity-40"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         )}

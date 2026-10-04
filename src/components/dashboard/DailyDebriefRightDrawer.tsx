@@ -34,6 +34,171 @@ import {
   PixelHourglass,
   PixelSparkles,
 } from '@/components/common/PixelIcons';
+import { parseInstantMeal } from '@/lib/instantMacroEngine';
+
+interface DebriefMealEstimatorProps {
+  mealLabel: 'Breakfast' | 'Lunch' | 'Dinner';
+  targetGrams: number;
+  currentFuel: string;
+  onApplyEstimate: (mealName: string, protein: number, calories: number, hitTarget: boolean) => void;
+}
+
+function DebriefMealEstimator({
+  mealLabel,
+  targetGrams,
+  currentFuel,
+  onApplyEstimate,
+}: DebriefMealEstimatorProps) {
+  const [query, setQuery] = useState(currentFuel || '');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<{ mealName: string; protein: number; calories: number } | null>(null);
+  const { logMealToDay, currentDate } = useHabitStore();
+
+  const handleEstimate = async () => {
+    const text = query.trim();
+    if (!text || isAnalyzing) return;
+    setIsAnalyzing(true);
+    haptics.tap();
+
+    const instant = parseInstantMeal(text);
+    if (instant && !instant.isNotFood && instant.protein > 0) {
+      retroAudio.playInspectConfirm();
+      haptics.success();
+      const res = {
+        mealName: instant.mealName || text,
+        protein: instant.protein,
+        calories: instant.calories,
+      };
+      setResult(res);
+      logMealToDay(
+        {
+          name: res.mealName,
+          protein: res.protein,
+          calories: res.calories,
+          ingredients: instant.ingredients,
+          suggestedSprite: instant.suggestedSprite || '/assets/food/generic-plate.png',
+          mealSlot: mealLabel.toLowerCase() as any,
+        },
+        currentDate
+      );
+      onApplyEstimate(res.mealName, res.protein, res.calories, res.protein >= targetGrams);
+      setIsAnalyzing(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/ai/parse-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const protein = Number(data.protein) || 25;
+        const calories = Number(data.calories) || 350;
+        const parsedName = data.mealName || text;
+        const output = { mealName: parsedName, protein, calories };
+        setResult(output);
+        retroAudio.playInspectConfirm();
+        haptics.success();
+        logMealToDay(
+          {
+            name: parsedName,
+            protein,
+            calories,
+            ingredients: data.ingredients || [{ item: text, amount: '1 portion' }],
+            suggestedSprite: data.suggestedSprite || '/assets/food/generic-plate.png',
+            mealSlot: mealLabel.toLowerCase() as any,
+          },
+          currentDate
+        );
+        onApplyEstimate(parsedName, protein, calories, protein >= targetGrams);
+      } else {
+        throw new Error('AI parse fallback');
+      }
+    } catch {
+      const fallbackProtein = 26;
+      const fallbackCalories = 360;
+      setResult({ mealName: text, protein: fallbackProtein, calories: fallbackCalories });
+      retroAudio.playInspectConfirm();
+      haptics.success();
+      logMealToDay(
+        {
+          name: text,
+          protein: fallbackProtein,
+          calories: fallbackCalories,
+          ingredients: [{ item: text, amount: '1 portion' }],
+          suggestedSprite: '/assets/food/generic-plate.png',
+          mealSlot: mealLabel.toLowerCase() as any,
+        },
+        currentDate
+      );
+      onApplyEstimate(text, fallbackProtein, fallbackCalories, fallbackProtein >= targetGrams);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  return (
+    <div className="p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs flex flex-col gap-2.5">
+      <div className="flex items-center justify-between">
+        <span className="font-cabinet font-extrabold text-xs text-[#1A3629] flex items-center gap-1.5">
+          <PixelSparkles size={14} color="#B8862D" />
+          <span>Not sure how much protein your meal had?</span>
+        </span>
+        <span className="font-mono text-[10px] text-[#4A5D4E]">
+          Target: {targetGrams}g+
+        </span>
+      </div>
+      <p className="font-sans text-[11px] text-[#4A5D4E] leading-tight">
+        Type what you ate in plain English. The natural AI macro engine estimates grams and auto-selects your target button.
+      </p>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleEstimate();
+            }
+          }}
+          placeholder={
+            mealLabel === 'Breakfast'
+              ? 'e.g. 3 eggs scrambled, 2 slices toast, glass of milk...'
+              : mealLabel === 'Lunch'
+              ? 'e.g. Grilled chicken breast, cup of white rice, broccoli...'
+              : 'e.g. 200g salmon fillet, sweet potato, green salad...'
+          }
+          className="flex-1 px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
+        />
+        <button
+          type="button"
+          onClick={handleEstimate}
+          disabled={isAnalyzing || !query.trim()}
+          className="px-3.5 py-2 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0 flex items-center gap-1 shadow-2xs"
+        >
+          <span>{isAnalyzing ? 'Estimating...' : 'Calculate'}</span>
+        </button>
+      </div>
+      {result && (
+        <div className="p-2 rounded-xl bg-[#1A3629]/5 border border-[#1A3629]/15 flex items-center justify-between text-xs animate-in fade-in">
+          <span className="font-mono font-bold text-[#1A3629]">
+            Calculated: ~{result.protein}g Protein ({result.calories} kcal)
+          </span>
+          <span
+            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+              result.protein >= targetGrams ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }`}
+          >
+            {result.protein >= targetGrams ? 'Target Hit!' : 'Light / Below Target'}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface DailyDebriefRightDrawerProps {
   isOpen: boolean;
@@ -60,12 +225,8 @@ export function DailyDebriefRightDrawer({
     isLedgerSealedByDate,
     sealDailyLedger,
     gainXp,
-    setProtein,
-    setSleep,
-    setHydration,
-    toggleHabit,
-    completeMorningBoot,
-    completeEveningWrap,
+    commitDebriefTelemetry,
+    logMealToDay,
     pendingTrophyUnlock,
     dismissPendingTrophy,
   } = useHabitStore();
@@ -81,6 +242,7 @@ export function DailyDebriefRightDrawer({
   const [sleepTime, setSleepTime] = useState(userProfile?.bedTime || '23:30');
   const [wakeTime, setWakeTime] = useState(userProfile?.wakeTime || '07:30');
   const [sunlightDone, setSunlightDone] = useState<boolean | null>(null);
+  const [sunlightMinutes, setSunlightMinutes] = useState<number>(15);
   const [breakfastDone, setBreakfastDone] = useState<boolean | 'not_yet' | null>(null);
   const [breakfastFuel, setBreakfastFuel] = useState<string>('');
   const [lunchDone, setLunchDone] = useState<boolean | 'not_yet' | null>(null);
@@ -123,13 +285,14 @@ export function DailyDebriefRightDrawer({
     return calculateBiometricXp({
       sleepDurationHours: calculatedSleepDuration,
       sunlightSecured: sunlightDone,
+      sunlightMinutes,
       breakfastDone,
       lunchDone,
       dinnerDone,
       caffeineRespected: caffeineDone,
       customHabitsCompletedCount: customCount,
     });
-  }, [calculatedSleepDuration, sunlightDone, breakfastDone, lunchDone, dinnerDone, caffeineDone, customAnswers]);
+  }, [calculatedSleepDuration, sunlightDone, sunlightMinutes, breakfastDone, lunchDone, dinnerDone, caffeineDone, customAnswers]);
 
   const handleUpdateQuestions = (updated: DebriefQuestion[]) => {
     setQuestions(updated);
@@ -180,48 +343,49 @@ export function DailyDebriefRightDrawer({
 
   const handleFinishAndSeal = async () => {
     if (isSealingInProgress) return;
+    if (isTodaySealed || isLedgerSealedByDate[currentDate]) {
+      setHasPinnedReceipt(true);
+      return;
+    }
     setIsSealingInProgress(true);
 
-    // 1. Commit sleep duration
-    setSleep(calculatedSleepDuration, currentDate);
-
-    // 2. Commit sunlight
-    if (sunlightDone) {
-      toggleHabit('sunlight', currentDate);
-    }
-
-    // 3. Commit protein calculations
     let totalEstimatedProtein = 0;
     if (breakfastDone === true) totalEstimatedProtein += 38;
     if (lunchDone === true) totalEstimatedProtein += 45;
     if (dinnerDone === true) totalEstimatedProtein += 40;
-    if (totalEstimatedProtein > 0) {
-      setProtein(totalEstimatedProtein, currentDate);
-    }
 
-    // 4. Commit caffeine cutoff
-    completeEveningWrap(
-      {
-        caffeineCutoffRespected: !!caffeineDone,
-        caffeineStatus: caffeineDone ? 'before_cutoff' : 'after_cutoff',
-        wholeFoodRating: 9,
-        afternoonSlumpScore: 2,
+    commitDebriefTelemetry(currentDate, {
+      sleepHours: calculatedSleepDuration,
+      sunlightDone: !!sunlightDone,
+      proteinGrams: totalEstimatedProtein > 0 ? totalEstimatedProtein : undefined,
+      caffeineCutoffRespected: !!caffeineDone,
+      caffeineStatus: caffeineDone ? 'before_cutoff' : 'after_cutoff',
+      debriefData: {
+        sleepTime,
+        wakeTime,
+        sunlightMinutes,
+        breakfastFuel,
+        lunchFuel,
+        dinnerFuel,
+        caffeineTime,
+        customAnswers,
       },
-      currentDate
-    );
+    });
 
     const stepItems: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }> = [
-      { amount: biometricXp.sleepXp, reason: `Restorative Sleep (${calculatedSleepDuration}h)`, suite: 'circadian' },
-      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: 'Morning Sunlight Anchored', suite: 'circadian' as const }] : []),
+      { amount: biometricXp.sleepXp, reason: `Restorative Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
+      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Morning Sunlight Anchored (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
       ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Protein Floor (30g+)', suite: 'iron' as const }] : []),
+      ...(breakfastDone === 'not_yet' ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Fasting Window Logged', suite: 'iron' as const }] : []),
       ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Protein Anchor (40g+)', suite: 'iron' as const }] : []),
+      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Fasting Window Logged', suite: 'iron' as const }] : []),
       ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Protein Floor (35g+)', suite: 'iron' as const }] : []),
+      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Fasting Window Logged', suite: 'iron' as const }] : []),
       ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Caffeine Air-Lock (${caffeineTime})`, suite: 'focus' as const }] : []),
       ...(biometricXp.customHabitsXp > 0 ? [{ amount: biometricXp.customHabitsXp, reason: 'Custom Habits Completed', suite: 'focus' as const }] : []),
       { amount: biometricXp.baseSealXp, reason: 'Daily Ledger Sealed', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
     ];
 
-    // Tactile sequential ticker: award XP step-by-step to specific suites
     for (let i = 0; i < stepItems.length; i++) {
       setSealingStepIdx(i);
       retroAudio.playBlip();
@@ -230,7 +394,6 @@ export function DailyDebriefRightDrawer({
       await new Promise((resolve) => setTimeout(resolve, 320));
     }
 
-    // 5. Seal ledger (XP already distributed sequentially)
     sealDailyLedger(currentDate, 0, []);
     retroAudio.playTierUpgrade();
     haptics.heavy();
@@ -761,11 +924,38 @@ export function DailyDebriefRightDrawer({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#1A3629]/5 border border-[#1A3629]/10">
-                    <span className="text-xs text-[#4A5D4E] font-medium">Calculated Sleep Duration:</span>
-                    <span className="font-mono text-xs font-bold text-[#1A3629]">
-                      {calculatedSleepDuration} Hours Restored
-                    </span>
+                  <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-[#1A3629]/5 border border-[#1A3629]/10">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#4A5D4E] font-medium">Calculated Sleep Duration:</span>
+                      <span className="font-mono text-xs font-bold text-[#1A3629]">
+                        {calculatedSleepDuration} Hours Restored
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1.5 border-t border-[#1A3629]/10">
+                      <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                        {biometricXp.sleepEfficacyLabel}
+                      </span>
+                      <span className="font-mono text-xs font-black text-[#B8862D]">
+                        +{biometricXp.sleepXp} XP
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-5 gap-1 text-[9px] font-mono text-center pt-1">
+                      <span className={`py-1 rounded ${calculatedSleepDuration < 5.5 ? 'bg-amber-200 text-amber-900 font-bold' : 'bg-black/5 text-[#4A5D4E]'}`}>
+                        &lt;5.5h (0-8 XP)
+                      </span>
+                      <span className={`py-1 rounded ${calculatedSleepDuration >= 5.5 && calculatedSleepDuration < 6.5 ? 'bg-amber-200 text-amber-900 font-bold' : 'bg-black/5 text-[#4A5D4E]'}`}>
+                        5.5-6.4h (18 XP)
+                      </span>
+                      <span className={`py-1 rounded ${calculatedSleepDuration >= 6.5 && calculatedSleepDuration < 7.3 ? 'bg-emerald-200 text-emerald-900 font-bold' : 'bg-black/5 text-[#4A5D4E]'}`}>
+                        6.5-7.2h (32 XP)
+                      </span>
+                      <span className={`py-1 rounded ${calculatedSleepDuration >= 7.3 && calculatedSleepDuration <= 8.5 ? 'bg-emerald-300 text-emerald-950 font-black ring-1 ring-emerald-700' : 'bg-black/5 text-[#4A5D4E]'}`}>
+                        7.3-8.5h (45 XP ★)
+                      </span>
+                      <span className={`py-1 rounded ${calculatedSleepDuration > 8.5 ? 'bg-emerald-200 text-emerald-900 font-bold' : 'bg-black/5 text-[#4A5D4E]'}`}>
+                        &gt;8.5h (20-35 XP)
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -813,6 +1003,39 @@ export function DailyDebriefRightDrawer({
                       <span>Stayed Indoors</span>
                     </button>
                   </div>
+
+                  {sunlightDone === true && (
+                    <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/15">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-[#4A5D4E] font-bold">
+                          Sunlight Exposure Duration:
+                        </span>
+                        <span className="font-mono text-xs font-bold text-[#B8862D]">
+                          +{biometricXp.sunlightXp} XP ({biometricXp.sunlightEfficacyLabel})
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { minutes: 20, label: '20m+ (Peak Lux)' },
+                          { minutes: 15, label: '10–19m (Optimal)' },
+                          { minutes: 5, label: '5–9m (Priming)' },
+                        ].map((opt) => (
+                          <button
+                            key={opt.minutes}
+                            type="button"
+                            onClick={() => setSunlightMinutes(opt.minutes)}
+                            className={`px-2 py-1.5 rounded-lg border text-[11px] font-cabinet font-bold cursor-pointer transition-all ${
+                              sunlightMinutes === opt.minutes
+                                ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                                : 'border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                            }`}
+                          >
+                            <span>{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -886,6 +1109,17 @@ export function DailyDebriefRightDrawer({
                       <span>Did Not Eat Yet</span>
                     </button>
                   </div>
+
+                  {/* Natural AI Macro Estimator */}
+                  <DebriefMealEstimator
+                    mealLabel="Breakfast"
+                    targetGrams={30}
+                    currentFuel={breakfastFuel}
+                    onApplyEstimate={(mealName, protein, calories, hitTarget) => {
+                      setBreakfastFuel(mealName);
+                      setBreakfastDone(hitTarget);
+                    }}
+                  />
 
                   {/* Step 2: What did you eat typing bar + quick selector chips below */}
                   <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col gap-3">
@@ -1016,6 +1250,17 @@ export function DailyDebriefRightDrawer({
                       <span>Did Not Eat Yet</span>
                     </button>
                   </div>
+
+                  {/* Natural AI Macro Estimator */}
+                  <DebriefMealEstimator
+                    mealLabel="Lunch"
+                    targetGrams={40}
+                    currentFuel={lunchFuel}
+                    onApplyEstimate={(mealName, protein, calories, hitTarget) => {
+                      setLunchFuel(mealName);
+                      setLunchDone(hitTarget);
+                    }}
+                  />
 
                   {/* Step 2: What did you eat typing bar + quick selector chips below */}
                   <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col gap-3">
@@ -1174,6 +1419,17 @@ export function DailyDebriefRightDrawer({
                       <span>Did Not Eat Yet</span>
                     </button>
                   </div>
+
+                  {/* Natural AI Macro Estimator */}
+                  <DebriefMealEstimator
+                    mealLabel="Dinner"
+                    targetGrams={35}
+                    currentFuel={dinnerFuel}
+                    onApplyEstimate={(mealName, protein, calories, hitTarget) => {
+                      setDinnerFuel(mealName);
+                      setDinnerDone(hitTarget);
+                    }}
+                  />
 
                   {/* Step 2: What did you eat typing bar + quick selector chips below */}
                   <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col gap-3">

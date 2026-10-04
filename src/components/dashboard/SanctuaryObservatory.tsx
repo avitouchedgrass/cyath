@@ -38,8 +38,32 @@ export function SanctuaryObservatory({
     isForgedStreak,
     activateReentryProtocol,
     isLedgerSealedByDate,
+    logsByDate,
+    userSession,
     userProfile,
   } = useHabitStore();
+
+  const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
+  const isTodaySealed = !!isLedgerSealedByDate[currentDate];
+
+  const hasHistoricalActivity = useMemo(() => {
+    if (!isAuthenticated) return false;
+    const sealedDays = Object.keys(isLedgerSealedByDate).filter((d) => d !== currentDate);
+    if (sealedDays.length > 0) return true;
+    return Object.entries(logsByDate).some(([date, log]) => {
+      if (date === currentDate || !log) return false;
+      const habitsCount = Object.values(log.habitsCompleted ?? {}).filter(Boolean).length;
+      return (
+        habitsCount > 0 ||
+        (log.totalProteinLogged ?? 0) > 0 ||
+        (log.hydrationLiters ?? 0) > 0 ||
+        (log.sleepHours ?? 0) > 0
+      );
+    });
+  }, [isAuthenticated, isLedgerSealedByDate, logsByDate, currentDate]);
+
+  const isReentryEligible =
+    isAuthenticated && streakCount === 0 && hasHistoricalActivity && !isForgedStreak && !isTodaySealed;
 
   const activeSuite = userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian';
   const activeTiers = getSuiteTiers(activeSuite);
@@ -62,10 +86,10 @@ export function SanctuaryObservatory({
   const completedHabitsCount = (isSunlightDone ? 1 : 0) + (isHydrationDone ? 1 : 0) + (isFuelDone ? 1 : 0);
 
   const lifecycleState: IslandLifecycleState = useMemo(() => {
-    if (streakCount === 0) return 'mist';
+    if (isReentryEligible) return 'mist';
     if (completedHabitsCount === 0) return 'embers';
     return 'active';
-  }, [streakCount, completedHabitsCount]);
+  }, [isReentryEligible, completedHabitsCount]);
 
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
 
@@ -149,7 +173,7 @@ export function SanctuaryObservatory({
           </h1>
 
           {/* Dormant Mist Banner if Streak Broken */}
-          {streakCount === 0 && (
+          {isReentryEligible && (
             <div className="mt-0.5 flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs">
               <span className="font-sans text-xs text-[#4A5D4E]">
                 Sanctuary in Dormant Mist

@@ -324,7 +324,7 @@ export default function ProfilePage() {
                 </span>
               </div>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
-                Active Biome Suite: {ISLAND_SUITES[activeSuite]?.name || 'The Circadian Master'}
+                Active Biome Suite: {ISLAND_SUITES[activeSuite]?.name || 'The Pillow Fighter'}
               </h2>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
                 Switch between your floating biomes without losing your master level progression.

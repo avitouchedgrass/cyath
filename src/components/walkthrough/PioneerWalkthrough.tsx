@@ -14,7 +14,7 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
     popover: {
       title: 'Your Living Sanctuary',
       description:
-        'This floating island is your biological anchor. As you log habits, maintain circadian sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 handcrafted pixel-art biome tiers. You can also switch between Circadian Master, Iron Anchor, and Deep Worker suites in your Profile.',
+        'This floating island is your biological anchor. As you log habits, maintain circadian sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 handcrafted pixel-art biome tiers. You can also switch between The Pillow Fighter, The Whey Station, and Ctrl+Alt+Defeat suites in your Profile.',
       side: 'bottom',
       align: 'center',
     },

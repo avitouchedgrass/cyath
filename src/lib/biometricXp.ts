@@ -11,6 +11,11 @@ export interface BiometricXpBreakdown {
   caffeineXp: number;
   customHabitsXp: number;
   baseSealXp: number;
+  wakeConsistencyXp: number;
+  morningRestedXp: number;
+  digitalSunsetXp: number;
+  hydrationXp: number;
+  focusXp: number;
   totalXp: number;
 }
 
@@ -23,6 +28,11 @@ export interface BiometricInputs {
   dinnerDone?: MealDebriefState;
   caffeineRespected: boolean | null;
   customHabitsCompletedCount: number;
+  morningRestedRating?: number;
+  wakeConsistencyAnchor?: boolean;
+  digitalSunsetSecured?: boolean;
+  hydrationLiters?: number;
+  focusBlocksCompleted?: number;
 }
 
 export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakdown {
@@ -35,6 +45,11 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
     dinnerDone,
     caffeineRespected,
     customHabitsCompletedCount,
+    morningRestedRating,
+    wakeConsistencyAnchor,
+    digitalSunsetSecured,
+    hydrationLiters = 0,
+    focusBlocksCompleted = 0,
   } = inputs;
 
   // Graduated sleep XP curve based on physiological efficacy
@@ -62,6 +77,20 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
     sleepXp = 0;
     sleepEfficacyLabel = 'Severe Deprivation (<4.5h)';
   }
+
+  // Morning Rested Quality XP (Circadian recovery touchpoint)
+  let morningRestedXp = 0;
+  if (typeof morningRestedRating === 'number') {
+    if (morningRestedRating >= 8) morningRestedXp = 20;
+    else if (morningRestedRating >= 6) morningRestedXp = 12;
+    else if (morningRestedRating >= 4) morningRestedXp = 6;
+  }
+
+  // Wake Schedule Consistency XP (Anchor Circadian Clock within ±30m)
+  const wakeConsistencyXp = wakeConsistencyAnchor ? 20 : 0;
+
+  // Digital Sunset / Screens Off Routine
+  const digitalSunsetXp = digitalSunsetSecured ? 20 : 0;
 
   // Graduated sunlight XP based on outdoor lux exposure
   let sunlightXp = 0;
@@ -91,10 +120,32 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
   const lunchXp = calcMealXp(lunchDone);
   const dinnerXp = calcMealXp(dinnerDone);
   const caffeineXp = caffeineRespected ? 25 : 0;
+
+  // Hydration Touchpoint for Focus Pillar
+  let hydrationXp = 0;
+  if (hydrationLiters >= 2.5) hydrationXp = 25;
+  else if (hydrationLiters >= 1.5) hydrationXp = 15;
+
+  // Uninterrupted Focus Blocks Touchpoint
+  const focusXp = Math.min(40, (focusBlocksCompleted || 0) * 20);
+
   const customHabitsXp = Math.max(0, customHabitsCompletedCount * 15);
   const baseSealXp = 15;
 
-  const totalXp = sleepXp + sunlightXp + breakfastXp + lunchXp + dinnerXp + caffeineXp + customHabitsXp + baseSealXp;
+  const totalXp =
+    sleepXp +
+    morningRestedXp +
+    wakeConsistencyXp +
+    digitalSunsetXp +
+    sunlightXp +
+    breakfastXp +
+    lunchXp +
+    dinnerXp +
+    caffeineXp +
+    hydrationXp +
+    focusXp +
+    customHabitsXp +
+    baseSealXp;
 
   return {
     sleepXp,
@@ -107,6 +158,11 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
     caffeineXp,
     customHabitsXp,
     baseSealXp,
+    wakeConsistencyXp,
+    morningRestedXp,
+    digitalSunsetXp,
+    hydrationXp,
+    focusXp,
     totalXp,
   };
 }

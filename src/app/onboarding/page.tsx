@@ -25,20 +25,20 @@ type Archetype = 'iron' | 'focus' | 'circadian';
 const ARCHETYPES: { id: Archetype; title: string; subtitle: string; tag: string }[] = [
   {
     id: 'iron',
-    title: 'The Iron Anchor',
-    subtitle: 'Strength, muscle preservation & optimal whole-food protein floor.',
+    title: 'The Whey Station',
+    subtitle: 'Heavy lifting, calibrated macro munching & preserving the holy protein floor.',
     tag: '2.0g/kg Metabolic Floor',
   },
   {
     id: 'focus',
-    title: 'The Deep Worker',
-    subtitle: 'Sustained cognitive dopamine, steady blood sugar, zero energy crashes.',
+    title: 'Ctrl+Alt+Defeat',
+    subtitle: 'Tab overload rehab, dopamine firewall & relentless deep focus flow.',
     tag: 'Flow State & Focus',
   },
   {
     id: 'circadian',
-    title: 'The Circadian Master',
-    subtitle: 'Morning light timing, caffeine cutoff discipline & deep slow-wave sleep.',
+    title: 'The Pillow Fighter',
+    subtitle: 'Catching rays, dodging blue light & championing 8 hours of slow-wave slumber.',
     tag: 'Sleep Architecture',
   },
 ];

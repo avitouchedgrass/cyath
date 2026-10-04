@@ -223,7 +223,9 @@ export function DailyDebriefRightDrawer({
     userProfile,
     userSession,
     isLedgerSealedByDate,
+    isLedgerPartiallySealedByDate,
     sealDailyLedger,
+    amendDebriefMeals,
     gainXp,
     commitDebriefTelemetry,
     logMealToDay,
@@ -241,6 +243,8 @@ export function DailyDebriefRightDrawer({
   // Form responses state
   const [sleepTime, setSleepTime] = useState(userProfile?.bedTime || '23:30');
   const [wakeTime, setWakeTime] = useState(userProfile?.wakeTime || '07:30');
+  const [morningRestedRating, setMorningRestedRating] = useState<number>(8);
+  const [wakeConsistencyAnchor, setWakeConsistencyAnchor] = useState<boolean>(true);
   const [sunlightDone, setSunlightDone] = useState<boolean | null>(null);
   const [sunlightMinutes, setSunlightMinutes] = useState<number>(15);
   const [breakfastDone, setBreakfastDone] = useState<boolean | 'not_yet' | null>(null);
@@ -254,6 +258,11 @@ export function DailyDebriefRightDrawer({
   const [customAnswers, setCustomAnswers] = useState<Record<string, boolean>>({});
   const [isSealingInProgress, setIsSealingInProgress] = useState(false);
   const [sealingStepIdx, setSealingStepIdx] = useState(-1);
+  const [isAmendingMeals, setIsAmendingMeals] = useState(false);
+  const [amendLunchFuel, setAmendLunchFuel] = useState('');
+  const [amendLunchDone, setAmendLunchDone] = useState<boolean | null>(null);
+  const [amendDinnerFuel, setAmendDinnerFuel] = useState('');
+  const [amendDinnerDone, setAmendDinnerDone] = useState<boolean | null>(null);
 
   useEffect(() => {
     setQuestions(loadDebriefQuestions());
@@ -291,8 +300,10 @@ export function DailyDebriefRightDrawer({
       dinnerDone,
       caffeineRespected: caffeineDone,
       customHabitsCompletedCount: customCount,
+      morningRestedRating,
+      wakeConsistencyAnchor,
     });
-  }, [calculatedSleepDuration, sunlightDone, sunlightMinutes, breakfastDone, lunchDone, dinnerDone, caffeineDone, customAnswers]);
+  }, [calculatedSleepDuration, sunlightDone, sunlightMinutes, breakfastDone, lunchDone, dinnerDone, caffeineDone, customAnswers, morningRestedRating, wakeConsistencyAnchor]);
 
   const handleUpdateQuestions = (updated: DebriefQuestion[]) => {
     setQuestions(updated);
@@ -341,8 +352,45 @@ export function DailyDebriefRightDrawer({
     }
   };
 
-  const handleFinishAndSeal = async () => {
+  const isPendingMeals = lunchDone === 'not_yet' || dinnerDone === 'not_yet';
+  const isPartiallySealed =
+    !!isLedgerPartiallySealedByDate?.[currentDate] ||
+    (isTodaySealed && (lunchDone === 'not_yet' || dinnerDone === 'not_yet'));
+
+  const handleSaveDraft = () => {
+    let totalEstimatedProtein = 0;
+    if (breakfastDone === true) totalEstimatedProtein += 38;
+    if (lunchDone === true) totalEstimatedProtein += 45;
+    if (dinnerDone === true) totalEstimatedProtein += 40;
+
+    commitDebriefTelemetry(currentDate, {
+      sleepHours: calculatedSleepDuration,
+      sunlightDone: !!sunlightDone,
+      proteinGrams: totalEstimatedProtein > 0 ? totalEstimatedProtein : undefined,
+      caffeineCutoffRespected: !!caffeineDone,
+      caffeineStatus: caffeineDone ? 'before_cutoff' : 'after_cutoff',
+      debriefData: {
+        sleepTime,
+        wakeTime,
+        morningRestedRating,
+        wakeConsistencyAnchor,
+        sunlightMinutes,
+        breakfastFuel,
+        lunchFuel,
+        dinnerFuel,
+        caffeineTime,
+        customAnswers,
+        isDraft: true,
+      },
+    });
+    retroAudio.playInspectConfirm();
+    haptics.success();
+    onClose();
+  };
+
+  const handleFinishAndSeal = async (forcePartial?: boolean) => {
     if (isSealingInProgress) return;
+    const shouldBePartial = forcePartial !== undefined ? forcePartial : isPendingMeals;
     if (isTodaySealed || isLedgerSealedByDate[currentDate]) {
       setHasPinnedReceipt(true);
       return;
@@ -363,27 +411,32 @@ export function DailyDebriefRightDrawer({
       debriefData: {
         sleepTime,
         wakeTime,
+        morningRestedRating,
+        wakeConsistencyAnchor,
         sunlightMinutes,
         breakfastFuel,
         lunchFuel,
         dinnerFuel,
         caffeineTime,
         customAnswers,
+        isPartialSeal: shouldBePartial,
       },
     });
 
     const stepItems: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }> = [
-      { amount: biometricXp.sleepXp, reason: `Restorative Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
-      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Morning Sunlight Anchored (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
-      ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Protein Floor (30g+)', suite: 'iron' as const }] : []),
+      { amount: biometricXp.sleepXp, reason: `Beauty Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
+      ...(biometricXp.morningRestedXp > 0 ? [{ amount: biometricXp.morningRestedXp, reason: `Morning Rested Score (${morningRestedRating}/10)`, suite: 'circadian' as const }] : []),
+      ...(biometricXp.wakeConsistencyXp > 0 ? [{ amount: biometricXp.wakeConsistencyXp, reason: 'Circadian Wake Window Locked', suite: 'circadian' as const }] : []),
+      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Photosynthe-sis Anchored (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
+      ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'The Whey Station: Breakfast (30g+)', suite: 'iron' as const }] : []),
       ...(breakfastDone === 'not_yet' ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Fasting Window Logged', suite: 'iron' as const }] : []),
-      ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Protein Anchor (40g+)', suite: 'iron' as const }] : []),
-      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Fasting Window Logged', suite: 'iron' as const }] : []),
-      ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Protein Floor (35g+)', suite: 'iron' as const }] : []),
-      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Fasting Window Logged', suite: 'iron' as const }] : []),
-      ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Caffeine Air-Lock (${caffeineTime})`, suite: 'focus' as const }] : []),
+      ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'Midday Meat or Greet: Lunch (40g+)', suite: 'iron' as const }] : []),
+      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Pending / Fasting Window', suite: 'iron' as const }] : []),
+      ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'Nightcap Gains: Dinner (35g+)', suite: 'iron' as const }] : []),
+      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Pending / Fasting Window', suite: 'iron' as const }] : []),
+      ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Decaf or Die (${caffeineTime})`, suite: 'focus' as const }] : []),
       ...(biometricXp.customHabitsXp > 0 ? [{ amount: biometricXp.customHabitsXp, reason: 'Custom Habits Completed', suite: 'focus' as const }] : []),
-      { amount: biometricXp.baseSealXp, reason: 'Daily Ledger Sealed', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
+      { amount: biometricXp.baseSealXp, reason: shouldBePartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
     ];
 
     for (let i = 0; i < stepItems.length; i++) {
@@ -394,10 +447,48 @@ export function DailyDebriefRightDrawer({
       await new Promise((resolve) => setTimeout(resolve, 320));
     }
 
-    sealDailyLedger(currentDate, 0, []);
+    sealDailyLedger(currentDate, 0, [], shouldBePartial);
     retroAudio.playTierUpgrade();
     haptics.heavy();
     setHasPinnedReceipt(true);
+    setIsSealingInProgress(false);
+  };
+
+  const handleAmendMeals = async () => {
+    setIsSealingInProgress(true);
+    const updates: {
+      lunch?: { name: string; protein: number; calories: number; hitTarget: boolean };
+      dinner?: { name: string; protein: number; calories: number; hitTarget: boolean };
+    } = {};
+
+    if (amendLunchFuel.trim().length > 0) {
+      const isTarget = amendLunchDone ?? true;
+      updates.lunch = {
+        name: amendLunchFuel.trim(),
+        protein: isTarget ? 40 : 20,
+        calories: 450,
+        hitTarget: isTarget,
+      };
+      setLunchFuel(amendLunchFuel.trim());
+      setLunchDone(isTarget);
+    }
+
+    if (amendDinnerFuel.trim().length > 0) {
+      const isTarget = amendDinnerDone ?? true;
+      updates.dinner = {
+        name: amendDinnerFuel.trim(),
+        protein: isTarget ? 35 : 20,
+        calories: 500,
+        hitTarget: isTarget,
+      };
+      setDinnerFuel(amendDinnerFuel.trim());
+      setDinnerDone(isTarget);
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await amendDebriefMeals(currentDate, updates);
+    }
+    setIsAmendingMeals(false);
     setIsSealingInProgress(false);
   };
 
@@ -609,10 +700,133 @@ export function DailyDebriefRightDrawer({
 
                   <div className="border-t border-dashed border-[#1A3629]/20 pt-2 flex justify-between font-bold">
                     <span>Status</span>
-                    <span className="text-emerald-700 uppercase">Ledger Sealed</span>
+                    <span className={isPartiallySealed ? 'text-amber-700 uppercase flex items-center gap-1 text-[11px]' : 'text-emerald-700 uppercase flex items-center gap-1 text-[11px]'}>
+                      {isPartiallySealed ? (
+                        <>
+                          <PixelHourglass size={12} color="#B45309" />
+                          <span>Partial · Pending Meals</span>
+                        </>
+                      ) : (
+                        <>
+                          <PixelCheck size={12} color="#047857" />
+                          <span>Ledger Sealed</span>
+                        </>
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
+
+              {/* Amend Debrief Banner if lunch or dinner was pending */}
+              {isPartiallySealed && (
+                <div className="w-full max-w-sm p-4 rounded-2xl bg-[#FFF9E6] border-2 border-[#B8862D] text-[#5C4312] flex flex-col gap-2.5 shadow-[2px_2px_0px_#B8862D] text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-cabinet font-extrabold text-xs">
+                      <PixelHourglass size={14} color="#B8862D" />
+                      <span>Pending Meals on Daily Record</span>
+                    </div>
+                    <span className="font-mono text-[9px] bg-[#B8862D]/20 text-[#8A6520] px-2 py-0.5 rounded font-black uppercase">
+                      Amendable
+                    </span>
+                  </div>
+                  <p className="font-sans text-[11px] text-[#5C4312]/90">
+                    You sealed early with lunch or dinner uneaten. Eaten your meal now? Update your entry and claim up to <strong>+50 XP</strong>!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playInspectConfirm();
+                      haptics.tap();
+                      setIsAmendingMeals(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#B8862D] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#A37424] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <PixelSparkles size={14} color="#FFFDF9" />
+                    <span>Ate Lunch / Dinner? Amend Debrief (+XP) →</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Inline Amend Meals Panel */}
+              {isAmendingMeals && (
+                <div className="w-full max-w-sm p-4 rounded-2xl bg-[#FFFDF9] border-2 border-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex flex-col gap-3.5 text-left animate-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
+                    <span className="font-cabinet font-extrabold text-xs text-[#1A3629] flex items-center gap-1.5">
+                      <PixelSparkles size={14} color="#B8862D" />
+                      <span>Log Remaining Meals for {currentDate}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsAmendingMeals(false)}
+                      className="p-1 rounded-lg hover:bg-black/5 text-[#1A3629] cursor-pointer"
+                    >
+                      <PixelX size={13} color="currentColor" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                      Midday Lunch Fuel
+                    </span>
+                    <DebriefMealEstimator
+                      mealLabel="Lunch"
+                      targetGrams={40}
+                      currentFuel={amendLunchFuel || lunchFuel}
+                      onApplyEstimate={(name, protein, calories, hitTarget) => {
+                        setAmendLunchFuel(name);
+                        setAmendLunchDone(hitTarget);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={amendLunchFuel}
+                      onChange={(e) => setAmendLunchFuel(e.target.value)}
+                      placeholder="e.g. Chicken breast bowl, paneer tikka, tuna..."
+                      className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                      Nightcap Dinner Fuel
+                    </span>
+                    <DebriefMealEstimator
+                      mealLabel="Dinner"
+                      targetGrams={35}
+                      currentFuel={amendDinnerFuel || dinnerFuel}
+                      onApplyEstimate={(name, protein, calories, hitTarget) => {
+                        setAmendDinnerFuel(name);
+                        setAmendDinnerDone(hitTarget);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={amendDinnerFuel}
+                      onChange={(e) => setAmendDinnerFuel(e.target.value)}
+                      placeholder="e.g. Grilled salmon, steak, dal & roti..."
+                      className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#1A3629]/15">
+                    <button
+                      type="button"
+                      onClick={() => setIsAmendingMeals(false)}
+                      className="w-1/3 py-2.5 rounded-xl border border-[#1A3629]/20 font-cabinet font-bold text-xs text-[#1A3629] hover:bg-[#FAF8F5] cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAmendMeals}
+                      disabled={isSealingInProgress || (!amendLunchFuel.trim() && !amendDinnerFuel.trim())}
+                      className="w-2/3 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shadow-[2px_2px_0px_#2C5E43] disabled:opacity-50"
+                    >
+                      <span>{isSealingInProgress ? 'Minting...' : 'Mint Final Seal (+XP)'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2.5 w-full max-w-sm mt-2">
@@ -793,6 +1007,117 @@ export function DailyDebriefRightDrawer({
                 </div>
               </div>
 
+              {/* Amend Debrief Banner if lunch or dinner was pending */}
+              {isPartiallySealed && (
+                <div className="w-full max-w-sm p-4 rounded-2xl bg-[#FFF9E6] border-2 border-[#B8862D] text-[#5C4312] flex flex-col gap-2.5 shadow-[2px_2px_0px_#B8862D] text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-cabinet font-extrabold text-xs">
+                      <PixelHourglass size={14} color="#B8862D" />
+                      <span>Pending Meals on Daily Record</span>
+                    </div>
+                    <span className="font-mono text-[9px] bg-[#B8862D]/20 text-[#8A6520] px-2 py-0.5 rounded font-black uppercase">
+                      Amendable
+                    </span>
+                  </div>
+                  <p className="font-sans text-[11px] text-[#5C4312]/90">
+                    You sealed early with lunch or dinner uneaten. Eaten your meal now? Update your entry and claim up to <strong>+50 XP</strong>!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playInspectConfirm();
+                      haptics.tap();
+                      setIsAmendingMeals(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#B8862D] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#A37424] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <PixelSparkles size={14} color="#FFFDF9" />
+                    <span>Ate Lunch / Dinner? Amend Debrief (+XP) →</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Inline Amend Meals Panel */}
+              {isAmendingMeals && (
+                <div className="w-full max-w-sm p-4 rounded-2xl bg-[#FFFDF9] border-2 border-[#1A3629] shadow-[4px_4px_0px_#1A3629] flex flex-col gap-3.5 text-left animate-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
+                    <span className="font-cabinet font-extrabold text-xs text-[#1A3629] flex items-center gap-1.5">
+                      <PixelSparkles size={14} color="#B8862D" />
+                      <span>Log Remaining Meals for {currentDate}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsAmendingMeals(false)}
+                      className="p-1 rounded-lg hover:bg-black/5 text-[#1A3629] cursor-pointer"
+                    >
+                      <PixelX size={13} color="currentColor" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                      Midday Lunch Fuel
+                    </span>
+                    <DebriefMealEstimator
+                      mealLabel="Lunch"
+                      targetGrams={40}
+                      currentFuel={amendLunchFuel || lunchFuel}
+                      onApplyEstimate={(name, protein, calories, hitTarget) => {
+                        setAmendLunchFuel(name);
+                        setAmendLunchDone(hitTarget);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={amendLunchFuel}
+                      onChange={(e) => setAmendLunchFuel(e.target.value)}
+                      placeholder="e.g. Chicken breast bowl, paneer tikka, tuna..."
+                      className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                      Nightcap Dinner Fuel
+                    </span>
+                    <DebriefMealEstimator
+                      mealLabel="Dinner"
+                      targetGrams={35}
+                      currentFuel={amendDinnerFuel || dinnerFuel}
+                      onApplyEstimate={(name, protein, calories, hitTarget) => {
+                        setAmendDinnerFuel(name);
+                        setAmendDinnerDone(hitTarget);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={amendDinnerFuel}
+                      onChange={(e) => setAmendDinnerFuel(e.target.value)}
+                      placeholder="e.g. Grilled salmon, steak, dal & roti..."
+                      className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#1A3629]/15">
+                    <button
+                      type="button"
+                      onClick={() => setIsAmendingMeals(false)}
+                      className="w-1/3 py-2.5 rounded-xl border border-[#1A3629]/20 font-cabinet font-bold text-xs text-[#1A3629] hover:bg-[#FAF8F5] cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAmendMeals}
+                      disabled={isSealingInProgress || (!amendLunchFuel.trim() && !amendDinnerFuel.trim())}
+                      className="w-2/3 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shadow-[2px_2px_0px_#2C5E43] disabled:opacity-50"
+                    >
+                      <span>{isSealingInProgress ? 'Minting...' : 'Mint Final Seal (+XP)'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Unlocked Trophy Alert if earned during sealing */}
               {pendingTrophyUnlock && (
                 <div
@@ -950,11 +1275,66 @@ export function DailyDebriefRightDrawer({
                         6.5-7.2h (32 XP)
                       </span>
                       <span className={`py-1 rounded ${calculatedSleepDuration >= 7.3 && calculatedSleepDuration <= 8.5 ? 'bg-emerald-300 text-emerald-950 font-black ring-1 ring-emerald-700' : 'bg-black/5 text-[#4A5D4E]'}`}>
-                        7.3-8.5h (45 XP ★)
+                        7.3-8.5h (45 XP Max)
                       </span>
                       <span className={`py-1 rounded ${calculatedSleepDuration > 8.5 ? 'bg-emerald-200 text-emerald-900 font-bold' : 'bg-black/5 text-[#4A5D4E]'}`}>
                         &gt;8.5h (20-35 XP)
                       </span>
+                    </div>
+
+                    {/* Additional Circadian Rested & Consistency Touchpoints */}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-[#1A3629]/15">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
+                          Morning Rested Score
+                        </span>
+                        <span className="font-mono text-[10px] text-[#B8862D] font-bold">
+                          +{biometricXp.morningRestedXp} XP
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { rating: 4, label: 'Zombie (4/10)', xp: 6 },
+                          { rating: 7, label: 'Alert (7/10)', xp: 12 },
+                          { rating: 9, label: 'Supercharged (9/10)', xp: 20 },
+                        ].map((btn) => (
+                          <button
+                            key={btn.rating}
+                            type="button"
+                            onClick={() => setMorningRestedRating(btn.rating)}
+                            className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
+                              morningRestedRating === btn.rating
+                                ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
+                            }`}
+                          >
+                            <span>{btn.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/15">
+                      <div className="flex flex-col text-left">
+                        <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                          Circadian Wake Schedule Anchor
+                        </span>
+                        <span className="font-mono text-[10px] text-[#4A5D4E]">
+                          Woke within ±30m of calibrated schedule
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setWakeConsistencyAnchor(!wakeConsistencyAnchor)}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                          wakeConsistencyAnchor
+                            ? 'border-emerald-700 bg-emerald-100 text-emerald-950 font-black'
+                            : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#4A5D4E]'
+                        }`}
+                      >
+                        <PixelCheck size={12} color={wakeConsistencyAnchor ? '#047857' : '#4A5D4E'} />
+                        <span>{wakeConsistencyAnchor ? 'Locked (+20 XP)' : 'Off Schedule (+0 XP)'}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1703,15 +2083,48 @@ export function DailyDebriefRightDrawer({
                     </div>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={handleFinishAndSeal}
-                    disabled={isSealingInProgress}
-                    className="w-full max-w-sm py-4 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[4px_4px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <span>{isSealingInProgress ? 'Minting Sequential XP...' : `Seal Today & Pin Receipt (+${biometricXp.totalXp} XP)`}</span>
-                    <PixelPushpin size={18} animate={false} />
-                  </button>
+                  {isPendingMeals ? (
+                    <div className="flex flex-col gap-2.5 w-full max-w-sm">
+                      <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 font-cabinet text-xs flex flex-col gap-1 text-left">
+                        <span className="font-extrabold flex items-center gap-1.5">
+                          <PixelHourglass size={14} color="#B45309" />
+                          <span>Lunch or Dinner Pending</span>
+                        </span>
+                        <span className="text-[11px] font-sans text-amber-900">
+                          Seal for now to secure your daytime biometric XP, then amend when dinner is eaten — or save progress and complete the seal ceremony after dinner!
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleFinishAndSeal(true)}
+                        disabled={isSealingInProgress}
+                        className="w-full py-3.5 px-4 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        <span>{isSealingInProgress ? 'Minting...' : `Seal for Now (Amendable) (+${biometricXp.totalXp} XP)`}</span>
+                        <PixelPushpin size={18} animate={false} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveDraft}
+                        disabled={isSealingInProgress}
+                        className="w-full py-3 px-4 rounded-2xl border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF6EE] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <span>Save Progress &amp; Seal Later Tonight</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleFinishAndSeal(false)}
+                      disabled={isSealingInProgress}
+                      className="w-full max-w-sm py-4 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[4px_4px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span>{isSealingInProgress ? 'Minting Sequential XP...' : `Seal Today & Pin Receipt (+${biometricXp.totalXp} XP)`}</span>
+                      <PixelPushpin size={18} animate={false} />
+                    </button>
+                  )}
                 </div>
               )}
 

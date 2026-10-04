@@ -450,12 +450,12 @@ export interface XpHistoryItem {
 }
 
 export const DEFAULT_HABITS: HabitItem[] = [
-  { id: 'sunlight', title: 'Morning Sunlight & Electrolytes (15m)', category: 'morning', targetDaysPerWeek: 7 },
-  { id: 'protein_target', title: 'Hit Daily Protein Target (120g+)', category: 'nutrition', targetDaysPerWeek: 7 },
-  { id: 'movement', title: 'Zone 2 Cardio or Heavy Resistance', category: 'movement', targetDaysPerWeek: 5 },
-  { id: 'hydration', title: 'Hydration Target (2.5L+ Pure Water)', category: 'nutrition', targetDaysPerWeek: 7 },
-  { id: 'digital_sunset', title: 'Digital Sunset & 8h Dark Sleep', category: 'recovery', targetDaysPerWeek: 7 },
-  { id: 'mobility', title: 'Thoracic Mobility & Cold Shower', category: 'recovery', targetDaysPerWeek: 6 },
+  { id: 'sunlight', title: 'Photosynthe-sis (Morning Light & Salts)', category: 'morning', targetDaysPerWeek: 7 },
+  { id: 'protein_target', title: 'The Whey of the Warrior (Hit Protein Target)', category: 'nutrition', targetDaysPerWeek: 7 },
+  { id: 'movement', title: 'Lift Heavy or Run (Resistance / Zone 2)', category: 'movement', targetDaysPerWeek: 5 },
+  { id: 'hydration', title: 'Water You Doing? (2.5L+ Pure Hydration)', category: 'nutrition', targetDaysPerWeek: 7 },
+  { id: 'digital_sunset', title: 'Bedtime Air-Lock (Screens Off & Dark Sleep)', category: 'recovery', targetDaysPerWeek: 7 },
+  { id: 'mobility', title: 'Un-Desk Your Spine (Thoracic Mobility & Cold Splash)', category: 'recovery', targetDaysPerWeek: 6 },
 ];
 
 export interface WeightEntry {
@@ -559,6 +559,8 @@ export interface HabitStoreState {
   isForgedStreak: boolean;
   isReentryAvailable: boolean;
   isLedgerSealedByDate: Record<string, boolean>;
+  isLedgerPartiallySealedByDate: Record<string, boolean>;
+  dailyDebriefLog: Record<string, Record<string, unknown>>;
   claimedProtocolIds: string[];
   unlockedTrophies: string[];
   trophyCounts: Record<string, number>;
@@ -569,7 +571,15 @@ export interface HabitStoreState {
   sealDailyLedger: (
     date?: string,
     xpAwarded?: number,
-    items?: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }>
+    items?: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }>,
+    isPartial?: boolean
+  ) => { success: boolean; xpAwarded: number };
+  amendDebriefMeals: (
+    date: string,
+    meals: {
+      lunch?: { name: string; protein: number; calories: number; hitTarget: boolean };
+      dinner?: { name: string; protein: number; calories: number; hitTarget: boolean };
+    }
   ) => { success: boolean; xpAwarded: number };
   activateReentryProtocol: (date?: string) => { success: boolean; message: string };
   unlockTrophy: (trophyId: string) => boolean;
@@ -769,6 +779,8 @@ export const useHabitStore = create<HabitStoreState>()(
       isForgedStreak: false,
       isReentryAvailable: false,
       isLedgerSealedByDate: {},
+      isLedgerPartiallySealedByDate: {},
+      dailyDebriefLog: {},
       claimedProtocolIds: [],
       sleepGoalAwardedByDate: {},
       unlockedTrophies: [],
@@ -1296,18 +1308,18 @@ export const useHabitStore = create<HabitStoreState>()(
         if (suiteId) {
           targetSuite = suiteId;
         } else if (
-          ['sleep', 'sunlight', 'circadian', 'evening', 'morning', 'ritual'].includes(source) ||
-          /sleep|sun|circadian|dawn|wake|bed/i.test(reason)
+          ['sleep', 'sunlight', 'circadian', 'evening', 'morning', 'ritual', 'rested', 'wake', 'sunset', 'winddown'].includes(source) ||
+          /sleep|sun|circadian|dawn|wake|bed|rested|sunset|pillow|nap|slumber/i.test(reason)
         ) {
           targetSuite = 'circadian';
         } else if (
-          ['nutrition', 'protein', 'recipe', 'fuel', 'weight_log'].includes(source) ||
-          /protein|recipe|meal|dish|fuel|dinner|lunch|breakfast|food/i.test(reason)
+          ['nutrition', 'protein', 'recipe', 'fuel', 'weight_log', 'movement'].includes(source) ||
+          /protein|recipe|meal|dish|fuel|dinner|lunch|breakfast|food|whey|lift|workout|resistance/i.test(reason)
         ) {
           targetSuite = 'iron';
         } else if (
-          ['hydration', 'energy', 'mood', 'caffeine', 'focus'].includes(source) ||
-          /hydration|water|caffeine|energy|mood|focus/i.test(reason)
+          ['hydration', 'energy', 'mood', 'caffeine', 'focus', 'desk_ritual', 'flow'].includes(source) ||
+          /hydration|water|caffeine|energy|mood|focus|ctrl|tab|inbox|flow|slump/i.test(reason)
         ) {
           targetSuite = 'focus';
         } else {
@@ -2804,17 +2816,29 @@ export const useHabitStore = create<HabitStoreState>()(
         }
       },
 
-      sealDailyLedger: (date?: string, xpAwarded?: number, items?: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }>) => {
+      sealDailyLedger: (
+        date?: string,
+        xpAwarded?: number,
+        items?: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }>,
+        isPartial: boolean = false
+      ) => {
         const targetDate = date || get().currentDate;
-        if (get().isLedgerSealedByDate[targetDate]) {
+        const isAlreadySealed = get().isLedgerSealedByDate[targetDate];
+        const isAlreadyPartial = get().isLedgerPartiallySealedByDate?.[targetDate];
+        if (isAlreadySealed && !isAlreadyPartial) {
           return { success: false, xpAwarded: 0 };
         }
         const updatedSeals = {
           ...get().isLedgerSealedByDate,
           [targetDate]: true,
         };
+        const updatedPartials = {
+          ...(get().isLedgerPartiallySealedByDate || {}),
+          [targetDate]: isPartial,
+        };
         set({
           isLedgerSealedByDate: updatedSeals,
+          isLedgerPartiallySealedByDate: updatedPartials,
           isForgedStreak: false,
           isReentryAvailable: false,
         });
@@ -2827,10 +2851,10 @@ export const useHabitStore = create<HabitStoreState>()(
           }
         } else if (typeof xpAwarded === 'number' && xpAwarded > 0) {
           finalXp = xpAwarded;
-          get().gainXp(finalXp, 'Daily Ledger Sealed', 'ledger_seal');
+          get().gainXp(finalXp, isPartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', 'ledger_seal');
         } else if (xpAwarded === undefined) {
           finalXp = 50;
-          get().gainXp(finalXp, 'Daily Ledger Sealed', 'ledger_seal');
+          get().gainXp(finalXp, isPartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', 'ledger_seal');
         }
 
         const currentLog = get().getDailyLog(targetDate);
@@ -2842,6 +2866,7 @@ export const useHabitStore = create<HabitStoreState>()(
               habitsCompleted: {
                 ...currentLog.habitsCompleted,
                 __ledger_sealed: true,
+                __ledger_partial: isPartial,
               },
             },
           },
@@ -2855,6 +2880,72 @@ export const useHabitStore = create<HabitStoreState>()(
 
         get().evaluateTrophies(targetDate);
         return { success: true, xpAwarded: finalXp };
+      },
+
+      amendDebriefMeals: (
+        date: string,
+        meals: {
+          lunch?: { name: string; protein: number; calories: number; hitTarget: boolean };
+          dinner?: { name: string; protein: number; calories: number; hitTarget: boolean };
+        }
+      ) => {
+        const targetDate = date || get().currentDate;
+        const currentDebrief = (get().dailyDebriefLog && get().dailyDebriefLog[targetDate]) || {};
+        let addedXp = 0;
+
+        if (meals.lunch) {
+          get().logMealToDay(
+            {
+              name: meals.lunch.name,
+              protein: meals.lunch.protein,
+              calories: meals.lunch.calories,
+              mealSlot: 'lunch',
+            },
+            targetDate
+          );
+          const award = meals.lunch.hitTarget ? 25 : 15;
+          addedXp += award;
+          get().gainXp(award, `Lunch Fuel Logged (${meals.lunch.name})`, 'ledger_seal', 'iron');
+        }
+
+        if (meals.dinner) {
+          get().logMealToDay(
+            {
+              name: meals.dinner.name,
+              protein: meals.dinner.protein,
+              calories: meals.dinner.calories,
+              mealSlot: 'dinner',
+            },
+            targetDate
+          );
+          const award = meals.dinner.hitTarget ? 25 : 15;
+          addedXp += award;
+          get().gainXp(award, `Dinner Fuel Logged (${meals.dinner.name})`, 'ledger_seal', 'iron');
+        }
+
+        const updatedPartials = {
+          ...(get().isLedgerPartiallySealedByDate || {}),
+          [targetDate]: false,
+        };
+
+        const updatedDebrief = {
+          ...currentDebrief,
+          lunchFuel: meals.lunch ? meals.lunch.name : currentDebrief.lunchFuel,
+          dinnerFuel: meals.dinner ? meals.dinner.name : currentDebrief.dinnerFuel,
+        };
+
+        set({
+          dailyDebriefLog: {
+            ...get().dailyDebriefLog,
+            [targetDate]: updatedDebrief,
+          },
+          isLedgerPartiallySealedByDate: updatedPartials,
+        });
+
+        get().syncWithSupabase(targetDate);
+        get().evaluateTrophies(targetDate);
+        retroAudio.playTierUpgrade();
+        return { success: true, xpAwarded: addedXp };
       },
 
       getProteinRebalance: (date?: string) => {

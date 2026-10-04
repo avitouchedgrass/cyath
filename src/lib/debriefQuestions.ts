@@ -1,7 +1,7 @@
 export interface DebriefQuestion {
   id: string;
   title: string;
-  category: 'circadian' | 'fuel' | 'movement' | 'recovery' | 'custom';
+  category: 'circadian' | 'fuel' | 'movement' | 'recovery' | 'life' | 'lifestyle' | 'custom';
   prompt: string;
   type: 'time_range' | 'boolean' | 'boolean_with_fuel' | 'boolean_with_time';
   isDefault: boolean;

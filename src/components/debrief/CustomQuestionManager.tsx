@@ -173,6 +173,9 @@ export function CustomQuestionManager({
                     <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded-xs bg-[#1A3629]/10 text-[#1A3629] shrink-0 font-bold">
                       +{q.xpReward} XP
                     </span>
+                    <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded-xs bg-black/5 text-[#4A5D4E] shrink-0 font-bold">
+                      {q.category}
+                    </span>
                   </div>
                   <span className="font-sans text-[11px] text-[#4A5D4E] truncate">
                     {q.prompt}
@@ -212,7 +215,17 @@ export function CustomQuestionManager({
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="e.g. Did you take 5g Creatine?"
+              placeholder={
+                category === 'life'
+                  ? 'e.g. Did you meditate, journal, or unplug (20m)?'
+                  : category === 'fuel'
+                  ? 'e.g. Did you take 5g Creatine?'
+                  : category === 'movement'
+                  ? 'e.g. Did you get 10,000 steps today?'
+                  : category === 'recovery'
+                  ? 'e.g. Did you take a cold shower or stretch?'
+                  : 'e.g. Did you avoid screens 60m pre-bed?'
+              }
               maxLength={60}
               className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
             />
@@ -222,6 +235,7 @@ export function CustomQuestionManager({
               onChange={(e) => setCategory(e.target.value as any)}
               className="px-2.5 py-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-mono font-bold text-[#1A3629] focus:outline-none focus:border-[#1A3629]"
             >
+              <option value="life">Life</option>
               <option value="fuel">Fuel</option>
               <option value="movement">Movement</option>
               <option value="recovery">Recovery</option>

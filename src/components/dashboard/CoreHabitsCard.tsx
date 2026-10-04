@@ -379,7 +379,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
                   onChange={(e) => setCustomCategory(e.target.value as any)}
                   className="px-2 py-1.5 rounded-lg border border-[#1A3629]/20 bg-[#FFFDF9] text-xs font-mono text-[#1A3629] focus:outline-none"
                 >
+                  <option value="life">Life</option>
                   <option value="lifestyle">Lifestyle</option>
+                  <option value="recovery">Recovery</option>
+                  <option value="fuel">Fuel</option>
+                  <option value="movement">Movement</option>
+                  <option value="circadian">Circadian</option>
                   <option value="misc">Misc</option>
                 </select>
                 <button

@@ -492,12 +492,13 @@ export default function ProfilePage() {
                   onChange={(e) => setCustomHabitCategory(e.target.value as any)}
                   className="px-3 py-2.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] font-mono text-xs font-bold text-[#1A3629]"
                 >
+                  <option value="life">Life</option>
                   <option value="lifestyle">Lifestyle</option>
-                  <option value="misc">Misc</option>
                   <option value="recovery">Recovery</option>
                   <option value="fuel">Fuel</option>
                   <option value="movement">Movement</option>
                   <option value="circadian">Circadian</option>
+                  <option value="misc">Misc</option>
                 </select>
                 <button
                   type="button"

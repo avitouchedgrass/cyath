@@ -121,15 +121,17 @@ export interface CustomHabitDefinition {
 }
 
 export const CUSTOM_HABITS_LIBRARY: CustomHabitDefinition[] = [
+  { id: 'gratitude_journal', title: 'Daily Gratitude & Reflection', shortLabel: 'Gratitude', category: 'life' },
+  { id: 'mindful_walk', title: 'Mindful Outdoor Reset (15m)', shortLabel: 'Mindful Walk', category: 'life' },
+  { id: 'reading_20m', title: 'Deep Non-Screen Reading (20m)', shortLabel: 'Deep Reading', category: 'life' },
+  { id: 'journaling', title: 'Archival Journal & Log', shortLabel: 'Journal', category: 'life' },
+  { id: 'breathwork', title: 'Box Breathing / Physiological Sigh', shortLabel: 'Breathwork', category: 'life' },
   { id: 'creatine', title: 'Creatine Monohydrate (5g)', shortLabel: 'Creatine', category: 'fuel' },
   { id: 'steps_10k', title: '10,000 Daily Walking Steps', shortLabel: '10k Steps', category: 'movement' },
   { id: 'zone2_walk', title: 'Zone 2 Brisk Walk (20m)', shortLabel: 'Zone 2', category: 'movement' },
   { id: 'cold_shower', title: 'Cold Shower / Cold Plunge', shortLabel: 'Cold Plunge', category: 'recovery' },
   { id: 'screens_off', title: 'Screens Off 60m Pre-Bed', shortLabel: 'Screens Off', category: 'circadian' },
-  { id: 'reading_20m', title: 'Deep Non-Screen Reading (20m)', shortLabel: 'Deep Reading', category: 'lifestyle' },
-  { id: 'journaling', title: 'Archival Journal & Reflection', shortLabel: 'Journal / Log', category: 'lifestyle' },
-  { id: 'breathwork', title: 'Box Breathing / Physiological Sigh', shortLabel: 'Breathwork', category: 'lifestyle' },
-  { id: 'outdoor_walk', title: 'Daily Outdoor Walk / Lifestyle', shortLabel: 'Outdoor Life', category: 'misc' },
+  { id: 'outdoor_walk', title: 'Daily Outdoor Walk', shortLabel: 'Outdoor Life', category: 'misc' },
 ];
 
 export interface TrophyDefinition {

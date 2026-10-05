@@ -200,16 +200,16 @@ export function parseQuickLog(
 
   // 7. Navigation
   const navTargets: Record<string, { path: string; label: string }> = {
-    dashboard: { path: '/dashboard', label: 'Dashboard Cockpit' },
-    dash: { path: '/dashboard', label: 'Dashboard Cockpit' },
-    cockpit: { path: '/dashboard', label: 'Dashboard Cockpit' },
-    recipes: { path: '/playbook', label: 'Playbook & Methodology' },
-    meals: { path: '/playbook', label: 'Playbook & Methodology' },
-    food: { path: '/playbook', label: 'Playbook & Methodology' },
+    dashboard: { path: '/dashboard', label: 'Dashboard' },
+    dash: { path: '/dashboard', label: 'Dashboard' },
+    cockpit: { path: '/dashboard', label: 'Dashboard' },
+    recipes: { path: '/playbook', label: 'Playbook' },
+    meals: { path: '/playbook', label: 'Playbook' },
+    food: { path: '/playbook', label: 'Playbook' },
     sanctuary: { path: '/sanctuary', label: 'Island Sanctuary' },
     island: { path: '/sanctuary', label: 'Island Sanctuary' },
-    protocols: { path: '/protocols', label: 'Circadian Protocols Matrix' },
-    correlations: { path: '/correlations', label: 'Pattern Correlation Engine' },
+    protocols: { path: '/protocols', label: 'Daily Protocols' },
+    correlations: { path: '/correlations', label: 'Habit Insights' },
     patterns: { path: '/correlations', label: 'Pattern Correlation Engine' },
   };
 

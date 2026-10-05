@@ -61,23 +61,23 @@ export function calculateSanctuaryMatrix(input: SanctuaryMatrixInput): Sanctuary
   let hearthAction: PillarTelemetry['prescriptiveAction'];
 
   if (hearthScore >= 85) {
-    hearthStatusTier = 'RESTORATIVE SLEEP';
+    hearthStatusTier = 'GREAT SLEEP';
     hearthColor = 'emerald';
     hearthMechanism =
-      'Slow-wave delta sleep consolidated. Cerebral spinal fluid cleared metabolic waste; adenosine baseline reset.';
-    hearthAction = { label: 'Recovery Locked', actionType: 'NONE' };
+      'Optimal sleep recorded. Your body and mind have had full time to recover.';
+    hearthAction = { label: 'Recovery On Track', actionType: 'NONE' };
   } else if (hearthScore >= 65) {
-    hearthStatusTier = 'MILD SLEEP DEBT';
+    hearthStatusTier = 'MILD SLEEP DEFICIT';
     hearthColor = 'amber';
     hearthMechanism =
-      'Partial deep sleep architecture. Minor residual adenosine detected, risking an earlier mid-afternoon focus dip.';
-    hearthAction = { label: 'Review Evening Wrap', actionType: 'OPEN_EVENING_WRAP' };
+      'Slightly lower rest than optimal. Watch for a mid-afternoon dip in energy.';
+    hearthAction = { label: 'Review Evening Log', actionType: 'OPEN_EVENING_WRAP' };
   } else {
-    hearthStatusTier = 'CHRONIC RECOVERY DEFICIT';
+    hearthStatusTier = 'HIGH SLEEP DEFICIT';
     hearthColor = 'rust';
     hearthMechanism =
-      'Restricted sleep duration impairing prefrontal executive cortex and glucose tolerance. Immediate recovery prioritized.';
-    hearthAction = { label: 'Seal Shutdown Ritual', actionType: 'OPEN_EVENING_WRAP' };
+      'Short sleep duration recorded. Prioritize getting to bed early tonight to recharge.';
+    hearthAction = { label: 'Evening Check-in', actionType: 'OPEN_EVENING_WRAP' };
   }
 
   const hearth: PillarTelemetry = {
@@ -112,22 +112,22 @@ export function calculateSanctuaryMatrix(input: SanctuaryMatrixInput): Sanctuary
   let canopyAction: PillarTelemetry['prescriptiveAction'];
 
   if (canopyScore >= 85) {
-    canopyStatusTier = 'ANABOLIC & HYDRATED';
+    canopyStatusTier = 'WELL NOURISHED';
     canopyColor = 'emerald';
     canopyMechanism =
-      'Leucine satiety trigger satisfied. Osmotic intracellular hydration supports maximal cognitive processing speed.';
-    canopyAction = { label: 'Fuel Synthesized', actionType: 'NONE' };
+      'Protein and hydration targets are on track, supporting energy and muscle recovery.';
+    canopyAction = { label: 'Nutrition On Track', actionType: 'NONE' };
   } else if (canopyScore >= 60) {
-    canopyStatusTier = 'METABOLIC MAINTENANCE';
+    canopyStatusTier = 'ON TRACK';
     canopyColor = 'amber';
     canopyMechanism =
-      'Nutritional baseline adequate but below optimal threshold for muscle protein synthesis and glucose stabilization.';
+      'Good start, but you could use a bit more protein or water to hit your daily goals.';
     canopyAction = { label: 'Quick Add +25g Protein', actionType: 'LOG_PROTEIN', payload: { amount: 25 } };
   } else {
-    canopyStatusTier = 'CELLULAR DEFICIT';
+    canopyStatusTier = 'BEHIND TARGET';
     canopyColor = 'rust';
     canopyMechanism =
-      'Negative nitrogen balance and intracellular hypohydration. Fatigue likely compounded by delayed amino acid delivery.';
+      'Low protein or water intake so far today. Try having a protein-rich snack and a glass of water.';
     canopyAction = { label: 'Quick Add +25g Protein', actionType: 'LOG_PROTEIN', payload: { amount: 25 } };
   }
 
@@ -155,41 +155,40 @@ export function calculateSanctuaryMatrix(input: SanctuaryMatrixInput): Sanctuary
   let atmosphereAction: PillarTelemetry['prescriptiveAction'];
 
   if (atmosphereScore >= 80) {
-    atmosphereStatusTier = 'SYNCHRONIZED ENTRAINMENT';
+    atmosphereStatusTier = 'HABITS ON TRACK';
     atmosphereColor = 'emerald';
     atmosphereMechanism =
-      'Photonic lux anchored central clock genes. Circadian cortisol curve optimal; nocturnal melatonin scheduled naturally.';
-    atmosphereAction = { label: 'Circadian Aligned', actionType: 'NONE' };
+      'Morning sunlight and daily habits completed, keeping your natural schedule in sync.';
+    atmosphereAction = { label: 'Habits Aligned', actionType: 'NONE' };
   } else if (atmosphereScore >= 55) {
-    atmosphereStatusTier = 'CIRCADIAN DRIFT';
+    atmosphereStatusTier = 'NEEDS ATTENTION';
     atmosphereColor = 'amber';
     atmosphereMechanism =
-      'Partial zeitgeber alignment. Missing morning lux or delayed protocol commitment creates vulnerability to afternoon slump.';
+      'A few habits missed today. Complete today\'s focus action to stay on track.';
     atmosphereAction = !input.protocolAccepted
-      ? { label: 'Lock Protocol Directive', actionType: 'ACCEPT_PROTOCOL' }
-      : { label: 'Open Daily Planner', actionType: 'NAV_DASHBOARD' };
+      ? { label: 'Accept Daily Action', actionType: 'ACCEPT_PROTOCOL' }
+      : { label: 'Open Daily Habits', actionType: 'NAV_DASHBOARD' };
   } else {
-    atmosphereStatusTier = 'DESYNCHRONIZED PHASE';
+    atmosphereStatusTier = 'OFF TRACK';
     atmosphereColor = 'rust';
     atmosphereMechanism =
-      'Circadian rhythm desynchronized. Blue light exposure and erratic timing fragments diurnal focus cycles.';
+      'Daily routines are off schedule today. Focus on getting sunlight and completing your daily action.';
     atmosphereAction = !input.protocolAccepted
-      ? { label: 'Lock Protocol Directive', actionType: 'ACCEPT_PROTOCOL' }
-      : { label: 'Open Daily Planner', actionType: 'NAV_DASHBOARD' };
+      ? { label: 'Accept Daily Action', actionType: 'ACCEPT_PROTOCOL' }
+      : { label: 'Open Daily Habits', actionType: 'NAV_DASHBOARD' };
   }
 
   const atmosphere: PillarTelemetry = {
     score: atmosphereScore,
     statusTier: atmosphereStatusTier,
     statusColor: atmosphereColor,
-    primaryMetric: input.sunlightDone ? 'Morning Lux Anchored' : 'Morning Lux Pending',
-    secondaryMetric: input.protocolAccepted ? 'Daily Directive Locked' : 'Directive Uncommitted',
+    primaryMetric: input.sunlightDone ? 'Morning Sunlight Done' : 'Morning Sunlight Pending',
+    secondaryMetric: input.protocolAccepted ? 'Daily Action Accepted' : 'Action Pending',
     clinicalMechanism: atmosphereMechanism,
     prescriptiveAction: atmosphereAction,
   };
 
   // 4. Unified Ecosystem Vitality (1 - 10 scale)
-  // Incorporates biological limiting factor (Liebig's Law of the Minimum)
   const weightedMean = hearthScore * 0.35 + canopyScore * 0.35 + atmosphereScore * 0.30;
   let ecosystemVitalityLevel = Math.max(1, Math.min(10, Math.round(weightedMean / 10)));
   
@@ -201,13 +200,13 @@ export function calculateSanctuaryMatrix(input: SanctuaryMatrixInput): Sanctuary
   let vitalitySummary: string;
   if (ecosystemVitalityLevel >= 8) {
     vitalitySummary =
-      'Flourishing biological harmony. Cellular repair, slow-wave recovery, and circadian rhythms are synchronized.';
+      'Great overall balance. Sleep, nutrition, and daily routines are aligned.';
   } else if (ecosystemVitalityLevel >= 5) {
     vitalitySummary =
-      'Stable baseline with localized deficits. Review lagging biome levers below to prevent compounding fatigue.';
+      'Good progress today. Check the areas below to stay on track with your goals.';
   } else {
     vitalitySummary =
-      'Compounding physiological stress. Prioritize deep recovery and whole-food fueling to revitalize the sanctuary.';
+      'Running low on energy today. Prioritize rest, water, and good meals.';
   }
 
   return {

@@ -49,7 +49,7 @@ export function evaluateUserActivity(
   const isInactivityDetected = hoursInactive >= 24;
 
   const reentryPrompt =
-    'High-friction period detected. Cockpit automatically scaled to a 5-minute restorative baseline to preserve your momentum.';
+    'High-friction period detected. Daily habits automatically scaled to a 5-minute baseline to preserve your momentum.';
 
   return {
     isInactivityDetected,

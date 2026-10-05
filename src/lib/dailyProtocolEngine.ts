@@ -28,7 +28,7 @@ export interface DailyBriefing {
 const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   {
     id: 'delay-caffeine-90m',
-    title: 'Adenosine Reset: 90-Min Caffeine Delay',
+    title: 'Delay Caffeine by 90 Minutes',
     hypothesis: 'Delaying caffeine by 90 minutes post-waking clears overnight adenosine without blunting natural cortisol, preventing the 2:30 PM crash.',
     mechanism: 'Cortisol naturally spikes 30-45m after waking to trigger biological alertness. Early caffeine blunts this natural peak and binds to adenosine receptors without metabolizing them; when caffeine decays, accumulated adenosine floods receptors, causing severe afternoon grogginess.',
     directive: 'Hydrate with 500ml water and electrolytes upon waking. Postpone your first espresso or coffee until 90 minutes after your feet hit the floor.',
@@ -41,7 +41,7 @@ const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   },
   {
     id: 'post-prandial-walk',
-    title: 'Glycemic Shunt: 10-Min Post-Meal Walk',
+    title: '10-Minute Walk After Meals',
     hypothesis: 'A gentle 10-minute walk within 30 minutes of eating shunts glucose directly into skeletal muscle via non-insulin GLUT4 translocation.',
     mechanism: 'Light muscle contractions activate GLUT4 glucose transporters independently of insulin, blunting peak post-meal blood sugar spikes by up to 34% and preventing post-lunch cognitive lethargy.',
     directive: 'Immediately following your largest meal today, take an easy 10-minute continuous stroll outdoors or around your building before returning to your desk.',
@@ -54,7 +54,7 @@ const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   },
   {
     id: 'morning-photon-exposure',
-    title: 'Circadian Ignition: 15m Natural Sunlight',
+    title: '15 Minutes of Morning Sunlight',
     hypothesis: 'Early outdoor photon exposure to retinal ganglion cells anchors your master circadian clock (SCN) and sets a precise timer for melatonin release 16h later.',
     mechanism: 'Natural outdoor daylight exceeds 10,000-50,000 lux (compared to only 500 lux indoors). This stimulates melanopsin in intrinsically photosensitive retinal ganglion cells, shutting down melatonin and calibrating cortisol timing.',
     directive: 'Within 45 minutes of waking, step outside without sunglasses for 10-15 minutes. Look toward the direction of natural daylight.',
@@ -67,7 +67,7 @@ const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   },
   {
     id: 'protein-satiety-anchor',
-    title: 'Metabolic Anchor: 35g+ Protein Breakfast',
+    title: '35g+ Protein Breakfast',
     hypothesis: 'Consuming 35g+ of complete protein in your first meal triggers sustained peptide YY and GLP-1 secretion, stabilizing dopamine and mental stamina through midday.',
     mechanism: 'Adequate branched-chain amino acids provide precursor l-tyrosine for dopamine synthesis while preventing blood glucose volatility associated with high-glycemic carbohydrates.',
     directive: 'Structure your morning meal around at least 35g of bioavailable protein (e.g. pasture eggs, greek yogurt, organic tofu, or wild salmon) before your first intense work block.',
@@ -80,7 +80,7 @@ const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   },
   {
     id: 'digital-sunset-melatonin',
-    title: 'Digital Sunset: 60m Blue Light Cutoff',
+    title: 'No Screens 60 Mins Before Bed',
     hypothesis: 'Eliminating short-wavelength blue light (<480nm) 60 minutes prior to sleep accelerates core body temperature drop and shortens sleep latency.',
     mechanism: 'Blue photons suppress pineal gland melatonin production by over 80%. Dimming screen illumination allows natural melatonin titration, promoting deeper slow-wave restorative delta sleep.',
     directive: '60 minutes before your planned bedtime, shut down work monitors and place phones in do-not-disturb mode across the room. Transition to dim, warm room lighting.',
@@ -93,7 +93,7 @@ const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   },
   {
     id: 'dopamine-single-tasking',
-    title: 'Neural Firewall: 90-Min Single-Task Sprint',
+    title: '90-Minute Focus Block',
     hypothesis: 'A protected 90-minute block without context switching leverages ultradian rhythm biology to maximize prefrontal cortex working memory.',
     mechanism: 'Task-switching induces "attention residue" that takes up to 23 minutes to dissipate. Single-tasking aligns with the brain’s natural 90-minute basic rest-activity cycle (BRAC), driving peak cognitive output.',
     directive: 'Close all communication apps (Slack, email, social) for one dedicated 90-minute sprint this morning. Work on your #1 highest-leverage priority alone.',

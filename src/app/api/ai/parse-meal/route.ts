@@ -61,7 +61,7 @@ function pickBestSprite(text: string): string {
   return '/assets/food/generic-plate.webp';
 }
 
-import { parseInstantMeal } from '@/lib/instantMacroEngine';
+import { parseInstantMeal, extractExplicitMacros, stripExplicitMacroText } from '@/lib/instantMacroEngine';
 
 const CANDIDATE_MODELS = [
   'gemini-3.1-flash-lite',
@@ -84,12 +84,18 @@ You MUST immediately reject it and return strictly:
   "error": "This does not appear to be food. Please enter what you actually ate (e.g. '2 boiled eggs with sourdough' or 'Paneer bowl with rice')."
 }
 
+STEP 0.5: EXPLICIT MACRONUTRIENT DECLARATIONS (CRITICAL OVERRIDE):
+If the user explicitly specifies any macro or calorie counts (e.g. "40g protein", "500 calories", "35g carbs", "10g fat", "protein: 45g", "shake with 30g protein"):
+1. You MUST adopt and preserve these EXACT numerical values in your final output (protein, calories, carbs, fats). Do not alter or re-estimate user-declared macros!
+2. Do NOT confuse macro declarations (such as "40g protein") with food portion weight (such as "40g of chicken").
+3. If explicit macros are provided for the meal, consider the nutritional portions complete (hasCompletePortions: true). Do NOT ask for serving clarifications if the user already provided the exact macro payload!
+
 CRITICAL INSTRUCTION: CHECKING SERVING SIZES:
 1. Deconstruct the meal into its primary components/ingredients.
 2. Carefully inspect whether a quantifiable serving size, weight, or portion count is specified for EVERY main item in the meal.
    - Counted/measurable units count as portions (e.g. "2 eggs", "150g chicken", "1 cup rice", "2 slices bread", "1 tbsp olive oil", "1 apple", "1 scoop whey").
-   - If an item is mentioned with NO quantity/serving size (e.g. user just said "chicken and rice", "salmon with broccoli", "curry with roti"), then serving sizes are MISSING for those items.
-3. If ANY main item lacks a serving size or portion count:
+   - If an item is mentioned with NO quantity/serving size (e.g. user just said "chicken and rice", "salmon with broccoli", "curry with roti") and NO explicit macros were stated, then serving sizes are MISSING for those items.
+3. If ANY main item lacks a serving size or portion count AND no explicit macros were provided:
    You MUST return "hasCompletePortions": false.
    List each missing item with a helpful prompt and 3 realistic suggested portion options.
    Example JSON:
@@ -110,8 +116,8 @@ CRITICAL INSTRUCTION: CHECKING SERVING SIZES:
      "clarificationQuestion": "Please specify the serving size for: Chicken breast, Rice."
    }
 
-4. If serving sizes/portions ARE specified for EVERYTHING in the meal (or provided via user clarifications):
-   Calculate nutritional metrics based on standard USDA whole-food reference values.
+4. If serving sizes/portions ARE specified for EVERYTHING in the meal (or provided via user clarifications or explicit macros):
+   Calculate nutritional metrics based on standard USDA whole-food reference values, respecting any explicit user declarations.
    Determine:
    - mealName: concise, appetizing title
    - protein: total protein in grams (integer)
@@ -149,9 +155,10 @@ Output raw valid JSON only. Never wrap in markdown codeblocks. Do not include em
 export function fallbackHeuristicParse(text: string, clarifications?: Record<string, string>): ParsedMealResponse {
   const combined = `${text} ${Object.entries(clarifications || {}).map(([k, v]) => `${k}: ${v}`).join(' ')}`.trim();
   const lower = combined.toLowerCase();
+  const explicit = extractExplicitMacros(text);
 
   // Extract primary potential ingredients
-  const rawParts = text
+  const rawParts = stripExplicitMacroText(text)
     .split(/,|\band\b|\bwith\b|\+/i)
     .map((s) => s.trim())
     .filter((s) => s.length > 1);
@@ -171,7 +178,7 @@ export function fallbackHeuristicParse(text: string, clarifications?: Record<str
     const hasPortionPattern = /\d+\s*(g|grams|oz|cup|cups|tbsp|tsp|slice|slices|piece|pieces|bowl|bowls|scoop|scoops|ml|l|can|cans|serving|servings)?/i.test(part) ||
       /\b(one|two|three|four|half|quarter|single|double)\b/i.test(part);
 
-    if (!hasPortionPattern) {
+    if (!hasPortionPattern && explicit.protein === undefined && explicit.calories === undefined) {
       let defaultSuggestions = ['1 standard portion (~150g)', '200g (large)', '100g (small)'];
       if (partLower.includes('egg')) {
         defaultSuggestions = ['2 large eggs', '3 large eggs', '1 egg'];
@@ -201,10 +208,10 @@ export function fallbackHeuristicParse(text: string, clarifications?: Record<str
   }
 
   // Calculate realistic heuristic macros
-  let protein = 15;
-  let calories = 250;
-  let carbs = 25;
-  let fats = 8;
+  let protein = explicit.protein !== undefined ? explicit.protein : 15;
+  let calories = explicit.calories !== undefined ? explicit.calories : 250;
+  let carbs = explicit.carbs !== undefined ? explicit.carbs : 25;
+  let fats = explicit.fats !== undefined ? explicit.fats : 8;
   let isVegetarian = true;
   let isVegan = true;
   let dietType: ParsedMealSuccess['dietType'] = 'vegan';
@@ -324,18 +331,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const explicitMacros = extractExplicitMacros(rawText);
+
+    // Fast path: if instant whole-food engine can resolve it completely, return with zero latency
+    const instantResult = parseInstantMeal(rawText, clarifications);
+    if (instantResult && instantResult.hasCompletePortions) {
+      return NextResponse.json(instantResult);
+    }
+    if (instantResult?.isNotFood) {
+      return NextResponse.json(
+        { error: instantResult.error || 'This does not appear to be food. Please enter what you actually ate.' },
+        { status: 422 }
+      );
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      const instantFallback = parseInstantMeal(rawText, clarifications);
-      if (instantFallback) {
-        if (instantFallback.isNotFood) {
-          return NextResponse.json(
-            { error: instantFallback.error || 'This does not appear to be food. Please enter what you actually ate.' },
-            { status: 422 }
-          );
-        }
-        return NextResponse.json(instantFallback);
+      if (instantResult) {
+        return NextResponse.json(instantResult);
       }
       const fallback = fallbackHeuristicParse(rawText, clarifications);
       return NextResponse.json(fallback);
@@ -344,6 +358,9 @@ export async function POST(req: NextRequest) {
     let userPrompt = `User Meal Entry: "${rawText}"`;
     if (Object.keys(clarifications).length > 0) {
       userPrompt += `\nUser Clarified Serving Sizes: ${JSON.stringify(clarifications)}`;
+    }
+    if (explicitMacros.hasAny) {
+      userPrompt += `\nExplicitly Declared User Macros: ${JSON.stringify(explicitMacros)} (MUST PRESERVE IN OUTPUT)`;
     }
 
     const contents = [
@@ -403,6 +420,19 @@ export async function POST(req: NextRequest) {
             { error: parsed.error || 'This does not appear to be a food item. Please enter what you actually ate.' },
             { status: 422 }
           );
+        }
+
+        // If explicit macros were stated, enforce them over LLM hallucinations/underestimates
+        if (explicitMacros.hasAny && (explicitMacros.protein !== undefined || explicitMacros.calories !== undefined)) {
+          parsed.hasCompletePortions = true;
+          if (explicitMacros.protein !== undefined) parsed.protein = explicitMacros.protein;
+          if (explicitMacros.calories !== undefined) parsed.calories = explicitMacros.calories;
+          if (explicitMacros.carbs !== undefined) parsed.carbs = explicitMacros.carbs;
+          if (explicitMacros.fats !== undefined) parsed.fats = explicitMacros.fats;
+          if (!parsed.ingredients || parsed.ingredients.length === 0) {
+            parsed.ingredients = [{ item: parsed.mealName || rawText, amount: '1 calibrated portion' }];
+          }
+          if (parsed.protein >= 30) parsed.category = 'High Protein';
         }
 
         if (parsed.hasCompletePortions) {

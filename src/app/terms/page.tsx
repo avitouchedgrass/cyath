@@ -107,7 +107,7 @@ export default function TermsPage() {
               For inquiries regarding these Terms of Service, please contact:
             </p>
             <div className="p-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] font-mono text-xs font-bold text-[#1A3629] w-fit">
-              legal@cyath.app
+              avitouchedgrass@gmail.com
             </div>
           </section>
 

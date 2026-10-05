@@ -50,7 +50,7 @@ export const DEFAULT_DEBRIEF_QUESTIONS: DebriefQuestion[] = [
     scientificContext: 'Morning amino acids stimulate peptide YY and GLP-1, preventing glucose volatility and sudden donut cravings.',
     followUpPromptYes: 'What was your primary fuel?',
     followUpPromptNo: 'What did you have instead?',
-    chipsYes: ['Cast-Iron Eggs', 'Paneer Bhurji', 'Greek Yogurt Bowl', 'Protein Oats', 'Tofu Scramble', 'Ate My Own'],
+    chipsYes: ['Cast-Iron Eggs', 'Avocado Omelet', 'Greek Yogurt Bowl', 'Protein Oats', 'Tofu Scramble', 'Ate My Own'],
     chipsNo: ['Fasted / Coffee only', 'Light snack', 'Carb pastry', 'Skipped breakfast'],
   },
   {
@@ -65,7 +65,7 @@ export const DEFAULT_DEBRIEF_QUESTIONS: DebriefQuestion[] = [
     scientificContext: 'Whole-food protein and fiber blunts post-meal glucose spikes, banishing the dreaded 2 PM desk slump.',
     followUpPromptYes: 'What fueled your afternoon?',
     followUpPromptNo: 'What did you eat?',
-    chipsYes: ['Herb Grilled Chicken', 'Tawa Paneer Bowl', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Soya / Dal Bowl', 'Ate My Own'],
+    chipsYes: ['Herb Grilled Chicken', 'Turkey & Sweet Potato', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Steak & Quinoa', 'Ate My Own'],
     chipsNo: ['Quick sandwich', 'High-carb takeout', 'Light salad / soup', 'Skipped lunch'],
   },
   {
@@ -80,7 +80,7 @@ export const DEFAULT_DEBRIEF_QUESTIONS: DebriefQuestion[] = [
     scientificContext: 'Nighttime amino acids feed myofibrillar protein synthesis during deep sleep so you don’t wake up catabolic.',
     followUpPromptYes: 'What was your dinner fuel?',
     followUpPromptNo: 'What did you eat?',
-    chipsYes: ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Paneer Tikka Bowl', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Ate My Own'],
+    chipsYes: ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Grass-Fed Ribeye', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Ate My Own'],
     chipsNo: ['Light snack', 'Late carb takeout', 'Skipped dinner'],
   },
   {

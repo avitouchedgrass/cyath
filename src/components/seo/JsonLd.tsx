@@ -116,7 +116,7 @@ export function GlobalJsonLd() {
         name: 'Are all Cyath recipes whole-food based?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. All recipes in Cyath emphasize single-ingredient, whole-food sources like wild salmon, pasture-raised eggs, dairy paneer, lean poultry, and legumes with exact USDA macro breakdowns and dynamic portion scaling.',
+          text: 'Yes. All recipes in Cyath emphasize single-ingredient, whole-food sources like wild salmon, pasture-raised eggs, cottage cheese, lean poultry, and legumes with exact USDA macro breakdowns and dynamic portion scaling.',
         },
       },
       {

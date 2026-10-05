@@ -55,6 +55,8 @@ export default function ProfilePage() {
     activeProtocolIds,
     deleteAccountData,
     resetUserProgress,
+    logWeight,
+    gainXp,
   } = useHabitStore();
 
   const [mounted, setMounted] = useState(false);
@@ -65,6 +67,11 @@ export default function ProfilePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+  const [isRecalibrateModalOpen, setIsRecalibrateModalOpen] = useState(false);
+  const [calibWeightKg, setCalibWeightKg] = useState(userProfile?.weightKg || 70);
+  const [calibProtein, setCalibProtein] = useState(userProfile?.targetProteinGrams || (userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140));
+  const [calibBedTime, setCalibBedTime] = useState(userProfile?.bedTime || '23:30');
+  const [calibWakeTime, setCalibWakeTime] = useState(userProfile?.wakeTime || '07:30');
   const [customHabitTitle, setCustomHabitTitle] = useState('');
   const [customHabitCategory, setCustomHabitCategory] = useState<HabitItem['category']>('lifestyle');
   const [isCreatingHabit, setIsCreatingHabit] = useState(false);
@@ -72,6 +79,19 @@ export default function ProfilePage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (userProfile) {
+      if (userProfile.weightKg) setCalibWeightKg(userProfile.weightKg);
+      if (userProfile.targetProteinGrams) {
+        setCalibProtein(userProfile.targetProteinGrams);
+      } else if (userProfile.weightKg) {
+        setCalibProtein(Math.round(userProfile.weightKg * 2.0));
+      }
+      if (userProfile.bedTime) setCalibBedTime(userProfile.bedTime);
+      if (userProfile.wakeTime) setCalibWakeTime(userProfile.wakeTime);
+    }
+  }, [userProfile]);
 
   const totalDaysLogged = Object.keys(logsByDate).length;
   const totalHabitsCompleted = Object.values(logsByDate).reduce((acc, log) => {
@@ -162,6 +182,41 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSaveRecalibration = async () => {
+    retroAudio.playTierUpgrade();
+    haptics.heavy();
+    const w = Number(calibWeightKg) || 70;
+    const p = Number(calibProtein) || Math.round(w * 2.0);
+    updateUserProfile({
+      weightKg: w,
+      targetProteinGrams: p,
+      bedTime: calibBedTime,
+      wakeTime: calibWakeTime,
+    });
+    logWeight(w, 'Biometric Target Recalibration');
+    gainXp(25, 'Biometric Target Recalibration');
+    setIsRecalibrateModalOpen(false);
+    setSyncStatus('Targets successfully recalibrated (+25 XP)!');
+    setTimeout(() => setSyncStatus(null), 3500);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const activeUserId = session?.user?.id || userSession?.id;
+      if (activeUserId && !activeUserId.startsWith('guest_')) {
+        await supabase
+          .from('user_profiles')
+          .update({
+            weight_kg: w,
+            target_protein_grams: p,
+            bed_time: calibBedTime,
+            wake_time: calibWakeTime,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', activeUserId);
+      }
+    } catch {}
+  };
+
   if (!mounted) return null;
 
   const isGuest = !userSession || userSession.id.startsWith('guest_');
@@ -214,7 +269,7 @@ export default function ProfilePage() {
                   {displayName}
                 </h2>
                 {isGuest && (
-                  <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-[10px] font-mono font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/20 bg-[#F4F0EA] text-xs font-mono font-semibold">
                     GUEST
                   </span>
                 )}
@@ -272,42 +327,88 @@ export default function ProfilePage() {
           <XpHud />
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
-          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Days Logged
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalDaysLogged}
+        {/* Physical Archival Register */}
+        <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_4px_24px_rgba(26,54,41,0.04)] p-6 sm:p-7 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-[#1A3629]/10 gap-2">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs uppercase font-bold tracking-wider text-[#1A3629]">
+                Archival Biometric Ledger
+              </span>
+              <span className="font-mono text-xs px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#4A5D4E]">
+                REGISTER NO. 2026-V2
+              </span>
             </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Active journal entries
+            <span className="font-mono text-xs text-[#4A5D4E] flex items-center gap-1.5 self-start sm:self-auto">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+              Local Encrypted Storage
             </span>
           </div>
 
-          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Habits Completed
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalHabitsCompleted}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Cadence
+                </span>
+                <span className="font-mono text-xs text-[#1A3629]/60">ENTRIES</span>
+              </div>
+              <div className="my-2">
+                <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+                  {totalDaysLogged}
+                </div>
+                <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
+                  Active Journal Days
+                </span>
+              </div>
+              <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
+                <span>Status</span>
+                <span className="text-[#065F46] font-bold">Documented</span>
+              </div>
             </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Total habits completed
-            </span>
-          </div>
 
-          <div className="rounded-3xl border border-[#1A3629]/10 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider block mb-2 text-[#4A5D4E]">
-              Total Protein Logged
-            </span>
-            <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
-              {totalProteinLogged}g
+            <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Discipline
+                </span>
+                <span className="font-mono text-xs text-[#1A3629]/60">CHECKS</span>
+              </div>
+              <div className="my-2">
+                <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+                  {totalHabitsCompleted}
+                </div>
+                <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
+                  Rituals Executed
+                </span>
+              </div>
+              <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
+                <span>Integrity</span>
+                <span className="text-[#065F46] font-bold">Verified</span>
+              </div>
             </div>
-            <span className="text-xs font-cabinet font-medium text-[#2C4A3B] mt-1 block">
-              Total grams logged
-            </span>
+
+            <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
+                  Metabolism
+                </span>
+                <span className="font-mono text-xs text-[#1A3629]/60">PROTEIN</span>
+              </div>
+              <div className="my-2">
+                <div className="font-mono font-black text-3xl tabular-nums text-[#1A3629]">
+                  {totalProteinLogged}g
+                </div>
+                <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
+                  Total Nitrogen Floor
+                </span>
+              </div>
+              <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
+                <span>Daily Target</span>
+                <span className="text-[#065F46] font-bold">
+                  {userProfile?.targetProteinGrams || (userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140)}g
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -316,10 +417,10 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#1A3629]/10 gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider">
+                <span className="font-mono text-xs font-bold text-[#B8862D] uppercase tracking-wider">
                   Universal Sanctuary Progression
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#1A3629]/10 text-[#1A3629] font-mono text-[10px] font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#1A3629]/10 text-[#1A3629] font-mono text-xs font-bold">
                   Tier {currentIsland.tier} · Level {masterLevelInfo.level}
                 </span>
               </div>
@@ -354,17 +455,17 @@ export default function ProfilePage() {
                   }}
                   className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-4 ${
                     isSelected
-                      ? 'border-[#1A3629] bg-[#FAF8F5] shadow-[4px_4px_0px_#1A3629]'
+                      ? 'border-[#1A3629] bg-[#FAF8F5] ring-2 ring-[#1A3629]/10'
                       : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:border-[#1A3629]/40 hover:bg-[#FAF8F5]/50'
                   }`}
                 >
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase tracking-wider">
+                      <span className="font-mono text-xs font-bold text-[#4A5D4E] uppercase tracking-wider">
                         {suite.badge}
                       </span>
                       {isSelected && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-[10px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold">
                           <PixelCheck size={10} color="#FFFDF9" />
                           <span>ACTIVE</span>
                         </span>
@@ -418,7 +519,7 @@ export default function ProfilePage() {
         <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-8 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#1A3629]/10 gap-2">
             <div>
-              <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider">
+              <span className="font-mono text-xs font-bold text-[#B8862D] uppercase tracking-wider">
                 Daily Focus Configuration
               </span>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
@@ -435,7 +536,7 @@ export default function ProfilePage() {
 
           {/* Quick Selectors Grid from Library */}
           <div className="mt-5 flex flex-col gap-3">
-            <span className="font-mono text-[10px] uppercase font-bold text-[#4A5D4E]">
+            <span className="font-mono text-xs uppercase font-bold text-[#4A5D4E]">
               Select from Evidence-Based Habit Library:
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -452,20 +553,20 @@ export default function ProfilePage() {
                     }}
                     className={`p-3 rounded-2xl border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
                       isEquipped
-                        ? 'border-[#1A3629] bg-[#FAF8F5] shadow-[2px_2px_0px_#1A3629]'
-                        : 'border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF8F5]'
+                        ? 'border-2 border-[#1A3629] bg-[#FAF8F5]'
+                        : 'border border-[#1A3629]/15 bg-[#FFFDF9] hover:bg-[#FAF8F5]'
                     }`}
                   >
                     <div className="flex flex-col">
                       <span className="font-cabinet font-bold text-xs text-[#1A3629]">
                         {habit.title}
                       </span>
-                      <span className="font-mono text-[10px] text-[#4A5D4E] uppercase">
+                      <span className="font-mono text-xs text-[#4A5D4E] uppercase">
                         {habit.category}
                       </span>
                     </div>
                     {isEquipped && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-[9px] font-bold shrink-0">
+                      <span className="px-2 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shrink-0">
                         EQUIPPED
                       </span>
                     )}
@@ -526,11 +627,17 @@ export default function ProfilePage() {
           
           <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
-              <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
-                Calibrated Baseline Targets
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-cabinet font-bold text-xl text-[#1A3629]">
+                  Calibrated Baseline Targets
+                </h2>
+                <span className="font-mono text-xs px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#4A5D4E]">
+                  BIOMETRICS
+                </span>
+              </div>
+
               <div className="space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Current Body Weight:</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#1A3629]">
@@ -542,29 +649,34 @@ export default function ProfilePage() {
                         retroAudio.playInspectConfirm();
                         setIsWeightModalOpen(true);
                       }}
-                      className="text-[10px] font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded hover:bg-[#D1FAE5] transition-colors cursor-pointer"
+                      className="text-xs font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded hover:bg-[#D1FAE5] transition-colors cursor-pointer"
                     >
-                      Update (+15 XP)
+                      Check-in (+15 XP)
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Daily Protein:</span>
-                  <span className="font-bold text-[#1A3629]">
-                    {userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140}g / day
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#065F46]">
+                      {userProfile?.targetProteinGrams || (userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140)}g / day
+                    </span>
+                    <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-[#FAF8F5] border border-[#1A3629]/15 text-[#4A5D4E]">
+                      {(((userProfile?.targetProteinGrams || (userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140))) / (userProfile?.weightKg || 70)).toFixed(1)}g/kg
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Hydration:</span>
                   <span className="font-bold text-[#1A3629]">
                     {userProfile?.weightKg ? (userProfile.weightKg * 0.04).toFixed(1) : '2.5'}L / day
                   </span>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Sleep:</span>
-                  <span className="font-bold text-[#1A3629]">8.0 hours</span>
+                  <span className="font-bold text-[#1A3629]">8.0 hours (slow-wave)</span>
                 </div>
-                <div className="flex items-center justify-between pb-2 border-b border-[#1A3629]/10">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Circadian Window:</span>
                   <span className="font-bold text-[#1A3629]">{userProfile?.bedTime || '23:30'} → {userProfile?.wakeTime || '07:30'}</span>
                 </div>
@@ -580,17 +692,17 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => {
                   retroAudio.playInspectConfirm();
-                  setIsWeightModalOpen(true);
+                  setIsRecalibrateModalOpen(true);
                 }}
                 className="flex-1 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-semibold text-xs text-center transition-colors cursor-pointer"
               >
-                Log Weight &amp; Trend (+15 XP)
+                Quick Calibrate Targets
               </button>
               <Link
-                href="/onboarding"
+                href="/onboarding?edit=true"
                 className="flex-1 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs text-center transition-colors block"
               >
-                Re-Calibrate Targets →
+                Full Onboarding Wizard →
               </Link>
             </div>
           </div>
@@ -628,7 +740,7 @@ export default function ProfilePage() {
               </ul>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#1A3629]/10 flex items-center justify-between text-[11px] font-mono text-[#4A5D4E]">
+            <div className="mt-4 pt-3 border-t border-[#1A3629]/10 flex items-center justify-between text-xs font-mono text-[#4A5D4E]">
               <span>Cyath Engine v2.0</span>
               <span>Local-First · Encrypted</span>
             </div>
@@ -705,7 +817,7 @@ export default function ProfilePage() {
                   <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
                     Privacy Policy
                   </h4>
-                  <p className="text-[11px] font-sans text-[#4A5D4E]">
+                  <p className="text-xs font-sans text-[#4A5D4E]">
                     Read our zero-sale telemetry and encryption principles.
                   </p>
                 </div>
@@ -725,7 +837,7 @@ export default function ProfilePage() {
                   <h4 className="font-cabinet font-bold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
                     Terms &amp; Conditions
                   </h4>
-                  <p className="text-[11px] font-sans text-[#4A5D4E]">
+                  <p className="text-xs font-sans text-[#4A5D4E]">
                     Fair-use terms and software agreement.
                   </p>
                 </div>
@@ -887,6 +999,182 @@ export default function ProfilePage() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Quick Recalibration Modal */}
+      {isRecalibrateModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-[#1A3629]/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsRecalibrateModalOpen(false)}
+        >
+          <div
+            className="max-w-lg w-full bg-[#FFFDF9] border border-[#1A3629]/20 rounded-3xl p-6 sm:p-8 relative shadow-[0_20px_50px_rgba(26,54,41,0.18)] flex flex-col gap-5 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]">
+                    Biometric Console
+                  </span>
+                  <span className="font-mono text-xs font-bold text-[#065F46] bg-[#ECFDF5] border border-[#10B981]/30 px-2 py-0.5 rounded-md">
+                    +25 XP Recalibration
+                  </span>
+                </div>
+                <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] mt-1">
+                  Recalibrate Baseline Targets
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRecalibrateModalOpen(false)}
+                className="w-8 h-8 rounded-full border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629]/70 hover:text-[#1A3629] hover:bg-[#FAF8F5]/80 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <PixelX size={12} color="#1A3629" />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {/* Weight row */}
+              <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FAF8F5] flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="recalib-weight" className="font-mono text-xs font-bold uppercase text-[#1A3629]">
+                    Calibrated Body Weight
+                  </label>
+                  <span className="font-mono text-xs text-[#4A5D4E]">
+                    Current: {calibWeightKg} kg
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="recalib-weight"
+                    type="range"
+                    min="40"
+                    max="180"
+                    step="0.5"
+                    value={calibWeightKg}
+                    onChange={(e) => {
+                      const w = parseFloat(e.target.value) || 70;
+                      setCalibWeightKg(w);
+                      setCalibProtein(Math.round(w * 2.0));
+                    }}
+                    className="flex-1 accent-[#1A3629] cursor-pointer"
+                  />
+                  <div className="w-20 px-2.5 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] text-center font-mono font-bold text-sm text-[#1A3629]">
+                    {calibWeightKg} kg
+                  </div>
+                </div>
+              </div>
+
+              {/* Protein Target Floor */}
+              <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FAF8F5] flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="recalib-protein" className="font-mono text-xs font-bold uppercase text-[#1A3629]">
+                    Daily Protein Floor
+                  </label>
+                  <span className="font-mono text-xs font-bold text-[#065F46]">
+                    {(calibProtein / calibWeightKg).toFixed(1)}g / kg
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    id="recalib-protein"
+                    type="range"
+                    min={Math.round(calibWeightKg * 1.2)}
+                    max={Math.round(calibWeightKg * 2.8)}
+                    step="1"
+                    value={calibProtein}
+                    onChange={(e) => setCalibProtein(parseInt(e.target.value) || 140)}
+                    className="flex-1 accent-[#065F46] cursor-pointer"
+                  />
+                  <div className="w-24 px-2.5 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] text-center font-mono font-bold text-sm text-[#065F46]">
+                    {calibProtein}g / day
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="grid grid-cols-4 gap-1.5 pt-1">
+                  {[
+                    { label: '1.6g/kg', name: 'Baseline', mult: 1.6 },
+                    { label: '1.8g/kg', name: 'Athletic', mult: 1.8 },
+                    { label: '2.0g/kg', name: 'Optimal', mult: 2.0 },
+                    { label: '2.2g/kg', name: 'Peak', mult: 2.2 },
+                  ].map((p) => {
+                    const isSelected = Math.round(calibWeightKg * p.mult) === calibProtein;
+                    return (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => {
+                          retroAudio.playBlip();
+                          setCalibProtein(Math.round(calibWeightKg * p.mult));
+                        }}
+                        className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                            : 'border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#F4F0EA]'
+                        }`}
+                      >
+                        <span className="font-mono font-bold text-xs block">{p.label}</span>
+                        <span className="font-cabinet text-xs block opacity-80">{p.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Circadian Bedtime & Wake Time */}
+              <div className="p-4 rounded-2xl border border-[#1A3629]/15 bg-[#FAF8F5] grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="recalib-bedtime" className="font-mono text-xs font-bold uppercase text-[#1A3629]">
+                    Target Bedtime
+                  </label>
+                  <input
+                    id="recalib-bedtime"
+                    type="time"
+                    value={calibBedTime}
+                    onChange={(e) => setCalibBedTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] font-mono font-bold text-xs text-[#1A3629]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="recalib-waketime" className="font-mono text-xs font-bold uppercase text-[#1A3629]">
+                    Target Wake
+                  </label>
+                  <input
+                    id="recalib-waketime"
+                    type="time"
+                    value={calibWakeTime}
+                    onChange={(e) => setCalibWakeTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] font-mono font-bold text-xs text-[#1A3629]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsRecalibrateModalOpen(false)}
+                className="w-full sm:w-auto px-5 py-3 rounded-xl border border-[#1A3629]/15 bg-[#FAF6EE] text-[#1A3629] font-cabinet font-semibold text-xs hover:bg-[#EAE4D7] transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveRecalibration}
+                className="w-full flex-1 py-3 rounded-xl border border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                <PixelCheck size={14} color="#FFFDF9" />
+                <span>Save &amp; Recalibrate (+25 XP)</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

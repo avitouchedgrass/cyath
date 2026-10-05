@@ -587,11 +587,126 @@ function parseWordNumber(str: string): number | null {
   return map[str.toLowerCase()] ?? null;
 }
 
-// Extract portion quantity from a food clause
+export interface ExplicitMacros {
+  protein?: number;
+  calories?: number;
+  carbs?: number;
+  fats?: number;
+  hasAny: boolean;
+}
+
+/**
+ * Extracts explicitly stated macronutrient and calorie values from user input.
+ * Examples: "40g protein", "350 calories", "50g carbs", "12g fat", "protein: 45g"
+ */
+export function extractExplicitMacros(input: string): ExplicitMacros {
+  const result: ExplicitMacros = { hasAny: false };
+  if (!input || typeof input !== 'string') return result;
+
+  // 1. Protein patterns
+  const proteinRegexes = [
+    /(?:protein|prot|p)\s*[:=]\s*(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?/i,
+    /(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:protein|prot)\b/i,
+    /\b(?:protein|prot)\s+(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?\b/i,
+    /(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)\s*(?:protein|prot)\b/i,
+  ];
+  for (const rx of proteinRegexes) {
+    const m = input.match(rx);
+    if (m && m[1]) {
+      const val = parseFloat(m[1]);
+      if (!isNaN(val) && val > 0 && val < 500) {
+        result.protein = Math.round(val);
+        result.hasAny = true;
+        break;
+      }
+    }
+  }
+
+  // 2. Calories patterns
+  const calRegexes = [
+    /(?:calories?|cals?|kcal)\s*[:=]\s*(\d+(?:\.\d+)?)/i,
+    /(\d+(?:\.\d+)?)\s*(?:calories?|cals?|kcal)\b/i,
+    /\b(?:calories?|cals?|kcal)\s+(\d+(?:\.\d+)?)/i,
+  ];
+  for (const rx of calRegexes) {
+    const m = input.match(rx);
+    if (m && m[1]) {
+      const val = parseFloat(m[1]);
+      if (!isNaN(val) && val > 0 && val < 10000) {
+        result.calories = Math.round(val);
+        result.hasAny = true;
+        break;
+      }
+    }
+  }
+
+  // 3. Carbohydrates patterns
+  const carbRegexes = [
+    /(?:carbs?|carbohydrates?|carb)\s*[:=]\s*(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?/i,
+    /(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:carbs?|carbohydrates?|carb)\b/i,
+    /\b(?:carbs?|carbohydrates?|carb)\s+(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?\b/i,
+  ];
+  for (const rx of carbRegexes) {
+    const m = input.match(rx);
+    if (m && m[1]) {
+      const val = parseFloat(m[1]);
+      if (!isNaN(val) && val >= 0 && val < 1000) {
+        result.carbs = Math.round(val);
+        result.hasAny = true;
+        break;
+      }
+    }
+  }
+
+  // 4. Dietary Fats patterns
+  const fatRegexes = [
+    /(?:fats?|fat)\s*[:=]\s*(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?/i,
+    /(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:fats?|fat)\b/i,
+    /\b(?:fats?|fat)\s+(\d+(?:\.\d+)?)\s*(?:g|grams?|gms?)?\b/i,
+  ];
+  for (const rx of fatRegexes) {
+    const m = input.match(rx);
+    if (m && m[1]) {
+      const val = parseFloat(m[1]);
+      if (!isNaN(val) && val >= 0 && val < 500) {
+        result.fats = Math.round(val);
+        result.hasAny = true;
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Strips out explicit macro declarations from a clause so that food portion
+ * extractors do not mistake "40g protein" for 40 grams of food weight.
+ */
+export function stripExplicitMacroText(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(/(?:protein|prot|p)\s*[:=]\s*\d+(?:\.\d+)?\s*(?:g|grams?|gms?)?/gi, ' ')
+    .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:protein|prot)\b/gi, ' ')
+    .replace(/\b(?:protein|prot)\s+\d+(?:\.\d+)?\s*(?:g|grams?|gms?)?\b/gi, ' ')
+    .replace(/\d+(?:\.\d+)?\s*(?:calories?|cals?|kcal)\b/gi, ' ')
+    .replace(/(?:calories?|cals?|kcal)\s*[:=]?\s*\d+(?:\.\d+)?/gi, ' ')
+    .replace(/(?:carbs?|carbohydrates?|carb)\s*[:=]\s*\d+(?:\.\d+)?\s*(?:g|grams?|gms?)?/gi, ' ')
+    .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:carbs?|carbohydrates?|carb)\b/gi, ' ')
+    .replace(/(?:fats?|fat)\s*[:=]\s*\d+(?:\.\d+)?\s*(?:g|grams?|gms?)?/gi, ' ')
+    .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|gms?)\s*(?:of\s+)?(?:fats?|fat)\b/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+// Extract portion quantity from a food clause (ignoring explicit macro phrases)
 function extractPortion(clause: string, entry: FoodEntry): { quantity: number; unit: string; explicit: boolean } {
+  // Strip out explicit macro patterns first so "40g protein" is not treated as 40 grams of chicken
+  const cleanClause = stripExplicitMacroText(clause);
+
   // Look for patterns like "200g", "150 grams", "2 eggs", "1 cup", "2 slices", "1 scoop"
   const regex = /(\d+(?:\.\d+)?|\b(?:one|two|three|four|five|six|half|quarter|single|double)\b)\s*(g|grams?|gms?|kg|oz|cups?|slices?|scoops?|tbsp|tablespoons?|tsp|teaspoons?|pieces?|pcs?|rotis?|eggs?|whites?|handfuls?)?/i;
-  const match = clause.match(regex);
+  const match = cleanClause.match(regex);
 
   if (match) {
     const rawNum = match[1];
@@ -675,6 +790,9 @@ export function parseInstantMeal(
     };
   }
 
+  // Extract any user-stated explicit macronutrients or calories
+  const explicitMacros = extractExplicitMacros(trimmed);
+
   // 2. Split input text into clauses
   const clauses = trimmed
     .split(/,|\band\b|\bwith\b|\+|\bplus\b|\n/i)
@@ -717,12 +835,14 @@ export function parseInstantMeal(
     if (matchedFood) {
       const portion = extractPortion(activeClause, matchedFood);
       
-      // If portion was not explicit AND no clarification was supplied, mark as missing portion
+      // If portion was not explicit AND no clarification was supplied AND no explicit macros given, mark as missing portion
       const hasClarified = Object.keys(clarifications).some((k) =>
         clauseLower.includes(k.toLowerCase()) || k.toLowerCase().includes(clauseLower)
       );
 
-      if (!portion.explicit && !hasClarified) {
+      const hasExplicitMacroContext = explicitMacros.protein !== undefined || explicitMacros.calories !== undefined;
+
+      if (!portion.explicit && !hasClarified && !hasExplicitMacroContext) {
         missingItems.push({
           name: matchedFood.canonicalName,
           prompt: `How much ${matchedFood.canonicalName.toLowerCase()} did you have?`,
@@ -730,22 +850,62 @@ export function parseInstantMeal(
         });
       }
 
+      // If user gave explicit protein and portion wasn't specified, calibrate amount to match
+      let amountStr = portion.unit;
+      let finalQty = portion.quantity;
+      if (!portion.explicit && explicitMacros.protein && matchedFood.protein > 0 && detectedItems.length === 0) {
+        const calibratedGrams = Math.round((explicitMacros.protein / matchedFood.protein) * matchedFood.baseAmount);
+        finalQty = calibratedGrams;
+        amountStr = `~${calibratedGrams}g (${explicitMacros.protein}g protein)`;
+      }
+
       detectedItems.push({
         food: matchedFood,
-        quantity: portion.quantity,
-        amountStr: portion.unit,
-        isExplicit: portion.explicit || hasClarified,
+        quantity: finalQty,
+        amountStr,
+        isExplicit: portion.explicit || hasClarified || hasExplicitMacroContext,
         rawClause: clause,
       });
     }
   }
 
-  // If no recognizable food was identified, return null to allow Gemini AI fallback
+  // If no recognizable food was identified, but user explicitly gave macros, construct a verified entry
   if (detectedItems.length === 0) {
+    if (explicitMacros.hasAny && (explicitMacros.protein !== undefined || explicitMacros.calories !== undefined)) {
+      const cleanName = stripExplicitMacroText(trimmed)
+        .replace(/^(ate|had|eating|consumed|drank)\s+/i, '')
+        .trim();
+      const words = (cleanName || trimmed).split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+      const mealName = words.slice(0, 6).join(' ') || 'Custom Macro Fuel';
+
+      const protein = explicitMacros.protein || 0;
+      const carbs = explicitMacros.carbs || 0;
+      const fats = explicitMacros.fats || 0;
+      const computedCalories = Math.round(protein * 4 + carbs * 4 + fats * 9);
+      const calories = explicitMacros.calories || (computedCalories > 0 ? computedCalories : 200);
+
+      const category: ParsedMealResult['category'] = protein >= 30 ? 'High Protein' : carbs >= 45 ? 'Steady Carbs' : 'Quick Fuel';
+
+      return {
+        hasCompletePortions: true,
+        mealName,
+        protein,
+        calories,
+        carbs,
+        fats,
+        isVegetarian: !/\b(chicken|beef|steak|turkey|salmon|tuna|fish|shrimp|meat|pork)\b/i.test(trimmed),
+        dietType: 'omnivore',
+        category,
+        ingredients: [{ item: mealName, amount: '1 serving (user calibrated)' }],
+        suggestedSprite: pickBestFoodSprite(trimmed),
+        notes: `Calibrated directly from your explicit macros: ${protein}g protein, ${calories} kcal.`,
+        source: 'instant_engine',
+      };
+    }
     return null;
   }
 
-  // If ANY main items lack a portion and no clarification was provided, prompt user
+  // If ANY main items lack a portion and no clarification or explicit macros were provided, prompt user
   if (missingItems.length > 0) {
     return {
       hasCompletePortions: false,
@@ -801,6 +961,17 @@ export function parseInstantMeal(
     });
   }
 
+  // Apply explicit user overrides
+  const finalProtein = explicitMacros.protein !== undefined ? explicitMacros.protein : Math.round(totalProtein);
+  let finalCalories = explicitMacros.calories !== undefined ? explicitMacros.calories : Math.round(totalCalories);
+  const finalCarbs = explicitMacros.carbs !== undefined ? explicitMacros.carbs : Math.round(totalCarbs);
+  const finalFats = explicitMacros.fats !== undefined ? explicitMacros.fats : Math.round(totalFats);
+
+  if (explicitMacros.calories === undefined && explicitMacros.protein !== undefined) {
+    const macroFloor = Math.round(finalProtein * 4 + finalCarbs * 4 + finalFats * 9);
+    finalCalories = Math.max(finalCalories, macroFloor);
+  }
+
   // Determine overall meal diet type
   let dietType: ParsedMealResult['dietType'] = 'vegan';
   let isVegetarian = true;
@@ -821,11 +992,11 @@ export function parseInstantMeal(
 
   // Determine category
   let category: ParsedMealResult['category'] = 'Quick Fuel';
-  if (totalProtein >= 30) {
+  if (finalProtein >= 30) {
     category = 'High Protein';
-  } else if (totalCarbs >= 45) {
+  } else if (finalCarbs >= 45) {
     category = 'Steady Carbs';
-  } else if (totalFats >= 20 && totalCarbs <= 15) {
+  } else if (finalFats >= 20 && finalCarbs <= 15) {
     category = 'Keto Clean';
   }
 
@@ -833,19 +1004,28 @@ export function parseInstantMeal(
   const words = trimmed.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
   const mealName = words.slice(0, 6).join(' ') || 'Whole Food Fuel';
 
+  const notes = explicitMacros.hasAny
+    ? `Calibrated with your explicit targets (${[
+        explicitMacros.protein !== undefined ? `${explicitMacros.protein}g protein` : '',
+        explicitMacros.calories !== undefined ? `${explicitMacros.calories} kcal` : '',
+        explicitMacros.carbs !== undefined ? `${explicitMacros.carbs}g carbs` : '',
+        explicitMacros.fats !== undefined ? `${explicitMacros.fats}g fat` : '',
+      ].filter(Boolean).join(', ')}).`
+    : `Calculated instantly via whole-food macro engine from ${ingredientsList.length} verified ingredients.`;
+
   return {
     hasCompletePortions: true,
     mealName,
-    protein: Math.round(totalProtein),
-    calories: Math.round(totalCalories),
-    carbs: Math.round(totalCarbs),
-    fats: Math.round(totalFats),
+    protein: finalProtein,
+    calories: finalCalories,
+    carbs: finalCarbs,
+    fats: finalFats,
     isVegetarian,
     dietType,
     category,
     ingredients: ingredientsList,
     suggestedSprite: pickBestFoodSprite(trimmed),
-    notes: `Calculated instantly via whole-food macro engine from ${ingredientsList.length} verified ingredients.`,
+    notes,
     source: 'instant_engine',
   };
 }

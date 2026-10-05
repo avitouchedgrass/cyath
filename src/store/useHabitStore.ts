@@ -2551,10 +2551,17 @@ export const useHabitStore = create<HabitStoreState>()(
 
         const updatedHistory = [newEntry, ...currentHistory.filter((e) => e.date !== targetDate || Math.abs(e.timestamp - newEntry.timestamp) > 3600000)].slice(0, 60);
 
-        // Update profile weightKg
+        // Update profile weightKg and recalibrate protein targets
         const currentProfile = get().userProfile;
+        let newProteinTarget = Math.round(newEntry.weightKg * 2.0);
+        if (currentProfile?.targetProteinGrams && currentProfile?.weightKg) {
+          const ratio = currentProfile.targetProteinGrams / currentProfile.weightKg;
+          if (ratio >= 1.2 && ratio <= 3.0) {
+            newProteinTarget = Math.round(newEntry.weightKg * ratio);
+          }
+        }
         if (currentProfile) {
-          get().updateUserProfile({ weightKg: newEntry.weightKg });
+          get().updateUserProfile({ weightKg: newEntry.weightKg, targetProteinGrams: newProteinTarget });
         }
 
         // Award XP on a weekly cadence (at most once every 7 days)

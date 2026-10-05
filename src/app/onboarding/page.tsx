@@ -171,6 +171,9 @@ function OnboardingContent() {
               user_id: activeUserId,
               full_name: profileData.fullName,
               weight_kg: profileData.weightKg,
+              target_protein_grams: profileData.targetProteinGrams,
+              wake_time: profileData.wakeTime,
+              bed_time: profileData.bedTime,
               primary_goal: profileData.primaryGoal,
               onboarding_completed: true,
               updated_at: new Date().toISOString(),
@@ -180,11 +183,14 @@ function OnboardingContent() {
       }
     } catch {}
 
-    try {
-      sessionStorage.setItem('pending_cyath_walkthrough', 'true');
-    } catch {}
-
-    router.replace('/dashboard');
+    if (!isEditing) {
+      try {
+        sessionStorage.setItem('pending_cyath_walkthrough', 'true');
+      } catch {}
+      router.replace('/dashboard');
+    } else {
+      router.replace('/profile');
+    }
   };
 
   return (
@@ -200,24 +206,36 @@ function OnboardingContent() {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629]" />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#4A5D4E]">
-              Initiation Protocol · Step {step} of 4
+              {isEditing ? 'Recalibration Protocol' : 'Initiation Protocol'} · Step {step} of 4
             </span>
           </div>
           
-          {/* Step Pill Indicators */}
-          <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  i === step
-                    ? 'w-6 bg-[#1A3629]'
-                    : i < step
-                    ? 'w-2 bg-[#1A3629]/60'
-                    : 'w-2 bg-[#1A3629]/20'
-                }`}
-              />
-            ))}
+          <div className="flex items-center gap-3">
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => router.push('/profile')}
+                className="font-cabinet font-semibold text-xs text-[#4A5D4E] hover:text-[#1A3629] transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+            )}
+
+            {/* Step Pill Indicators */}
+            <div className="flex items-center gap-1.5">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i === step
+                      ? 'w-6 bg-[#1A3629]'
+                      : i < step
+                      ? 'w-2 bg-[#1A3629]/60'
+                      : 'w-2 bg-[#1A3629]/20'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

@@ -12,7 +12,7 @@ interface WeightTrackerModalProps {
 }
 
 export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps) {
-  const { userProfile, weightHistory, logWeight, currentDate } = useHabitStore();
+  const { userProfile, updateUserProfile, weightHistory, logWeight, currentDate } = useHabitStore();
   const [unit, setUnit] = useState<'kg' | 'lbs'>('kg');
   const [inputVal, setInputVal] = useState<string>('');
   const [note, setNote] = useState<string>('');
@@ -54,10 +54,11 @@ export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps)
       return;
     }
 
+    updateUserProfile({ weightKg: targetKg, targetProteinGrams: newProteinTarget });
     const res = logWeight(targetKg, note.trim() || undefined, currentDate);
     if (res.success) {
       setFeedback({
-        message: `Weight logged: ${targetKg} kg (${trend.toUpperCase()} · ${deltaKg > 0 ? '+' : ''}${deltaKg} kg)`,
+        message: `Weight logged: ${targetKg} kg · Target Protein: ${newProteinTarget}g`,
         xp: res.xpAwarded,
       });
       setTimeout(() => {

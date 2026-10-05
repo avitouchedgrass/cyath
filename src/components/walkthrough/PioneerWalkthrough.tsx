@@ -52,9 +52,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-ai-coach',
     popover: {
-      title: 'StoveSage AI Coach & Scanner',
+      title: 'Cyath AI Nutrition Coach & Scanner',
       description:
-        'Need whole-food recipe inspiration, metabolic protein rebalancing, or instant photo meal analysis? Open StoveSage (Cmd+J) to consult your evidence-based circadian nutrition coach.',
+        'Need whole-food recipe inspiration, metabolic protein rebalancing, or instant photo meal analysis? Open the AI Coach (Cmd+J) to consult your evidence-based circadian nutrition companion.',
       side: 'top',
       align: 'end',
     },
@@ -74,14 +74,6 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
       title: 'Command Palette: Fast Keyboard Logging',
       description:
         'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in under 2 seconds without touching the mouse.',
-      align: 'center',
-    },
-  },
-  {
-    popover: {
-      title: 'Install Cyath as a Native App',
-      description:
-        '<strong>iOS (Safari):</strong> Tap Share then <em>Add to Home Screen</em>.<br><br><strong>Android (Chrome):</strong> Tap Menu ⋮ then <em>Add to Home Screen</em>.<br><br>Enjoy fullscreen real estate, zero browser chrome, and instant offline-ready access.',
       align: 'center',
     },
   },

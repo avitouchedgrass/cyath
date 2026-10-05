@@ -120,7 +120,7 @@ export default function PrivacyPage() {
               If you have any questions regarding this Privacy Policy or your data, please contact our team at:
             </p>
             <div className="p-3 rounded-xl border border-[#1A3629]/20 bg-[#FAF6EE] font-mono text-xs font-bold text-[#1A3629] w-fit">
-              privacy@cyath.app
+              avitouchedgrass@gmail.com
             </div>
           </section>
 

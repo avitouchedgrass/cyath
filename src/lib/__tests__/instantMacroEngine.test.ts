@@ -69,4 +69,20 @@ describe('instantMacroEngine', () => {
       expect(veganMeal.dietType).toBe('vegan');
     }
   });
+
+  it('respects explicitly declared macros and does not mistake 40g protein for 40g food weight', () => {
+    const meal = parseInstantMeal('chicken breast with 45g protein and 400 calories');
+    expect(meal).not.toBeNull();
+    expect(meal?.hasCompletePortions).toBe(true);
+    expect(meal?.protein).toBe(45);
+    expect(meal?.calories).toBe(400);
+  });
+
+  it('instantly resolves custom foods when explicit macros are stated', () => {
+    const bar = parseInstantMeal('Protein bar with 22g protein and 210 calories');
+    expect(bar).not.toBeNull();
+    expect(bar?.hasCompletePortions).toBe(true);
+    expect(bar?.protein).toBe(22);
+    expect(bar?.calories).toBe(210);
+  });
 });

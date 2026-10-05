@@ -781,7 +781,7 @@ export function DailyDebriefRightDrawer({
                       type="text"
                       value={amendLunchFuel}
                       onChange={(e) => setAmendLunchFuel(e.target.value)}
-                      placeholder="e.g. Chicken breast bowl, paneer tikka, tuna..."
+                      placeholder="e.g. Chicken breast bowl, salmon, tuna poke..."
                       className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
                     />
                   </div>
@@ -1071,7 +1071,7 @@ export function DailyDebriefRightDrawer({
                       type="text"
                       value={amendLunchFuel}
                       onChange={(e) => setAmendLunchFuel(e.target.value)}
-                      placeholder="e.g. Chicken breast bowl, paneer tikka, tuna..."
+                      placeholder="e.g. Chicken breast bowl, salmon, tuna poke..."
                       className="w-full px-3 py-2 rounded-xl border border-[#1A3629]/25 bg-[#FAF8F5] text-xs font-cabinet font-bold text-[#1A3629] focus:outline-none"
                     />
                   </div>
@@ -1459,7 +1459,7 @@ export function DailyDebriefRightDrawer({
                       type="button"
                       onClick={() => {
                         setBreakfastDone(false);
-                        if (!breakfastFuel || ['Cast-Iron Eggs & Greens', 'Spiced Paneer Bhurji', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake'].includes(breakfastFuel)) {
+                        if (!breakfastFuel || ['Cast-Iron Eggs & Greens', 'Avocado Omelet & Toast', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake'].includes(breakfastFuel)) {
                           setBreakfastFuel('Skipped breakfast');
                         }
                       }}
@@ -1530,7 +1530,7 @@ export function DailyDebriefRightDrawer({
                         {(breakfastDone === null || breakfastDone === 'not_yet'
                           ? ['Cast-Iron Eggs & Greens', 'Greek Yogurt Bowl', 'Protein Shake', 'Fasting / Not eaten yet', 'Light snack / Fruit', 'Skipped breakfast']
                           : breakfastDone === true
-                          ? ['Cast-Iron Eggs & Greens', 'Spiced Paneer Bhurji', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake']
+                          ? ['Cast-Iron Eggs & Greens', 'Avocado Omelet & Toast', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake']
                           : ['Fasted / Coffee only', 'Light snack / Fruit', 'Croissant / Pastry', 'Skipped breakfast', 'Cereal & Milk']
                         ).map((chip) => (
                           <button
@@ -1541,7 +1541,7 @@ export function DailyDebriefRightDrawer({
                               if (chip === 'Fasting / Not eaten yet') {
                                 setBreakfastDone('not_yet');
                               } else {
-                                const isHighProtein = ['Cast-Iron Eggs & Greens', 'Spiced Paneer Bhurji', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake'].includes(chip);
+                                const isHighProtein = ['Cast-Iron Eggs & Greens', 'Avocado Omelet & Toast', 'Greek Yogurt Bowl', 'Protein Oats & Peanut Butter', 'Tofu Scramble', 'Protein Shake'].includes(chip);
                                 setBreakfastDone(isHighProtein);
                               }
                             }}
@@ -1600,7 +1600,7 @@ export function DailyDebriefRightDrawer({
                       type="button"
                       onClick={() => {
                         setLunchDone(false);
-                        if (!lunchFuel || ['Herb Grilled Chicken & Rice', 'Tawa Paneer Tikka Bowl', 'Salmon & Veggies', 'Soya / Dal Bowl'].includes(lunchFuel)) {
+                        if (!lunchFuel || ['Herb Grilled Chicken & Rice', 'Turkey & Sweet Potato', 'Salmon & Veggies', 'Steak & Quinoa Bowl'].includes(lunchFuel)) {
                           setLunchFuel('McDonald\'s / Fast Food');
                         }
                       }}
@@ -1669,9 +1669,9 @@ export function DailyDebriefRightDrawer({
                       </span>
                       <div className="flex flex-wrap gap-1.5">
                         {(lunchDone === null || lunchDone === 'not_yet'
-                          ? ['Herb Grilled Chicken & Rice', 'Tawa Paneer Tikka Bowl', 'Salmon & Veggies', 'McDonald\'s / Fast Food', 'Haven\'t eaten lunch yet', 'Skipped lunch']
+                          ? ['Herb Grilled Chicken & Rice', 'Turkey & Sweet Potato', 'Salmon & Veggies', 'McDonald\'s / Fast Food', 'Haven\'t eaten lunch yet', 'Skipped lunch']
                           : lunchDone === true
-                          ? ['Herb Grilled Chicken & Rice', 'Tawa Paneer Tikka Bowl', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Soya / Dal Bowl', 'Chipotle Chicken Bowl']
+                          ? ['Herb Grilled Chicken & Rice', 'Turkey & Sweet Potato', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Steak & Quinoa Bowl', 'Chipotle Chicken Bowl']
                           : ['McDonald\'s / Fast Food', 'Sandwich / Wrap', 'Salad without protein', 'Skipped lunch', 'Instant noodles']
                         ).map((chip) => (
                           <button
@@ -1682,7 +1682,7 @@ export function DailyDebriefRightDrawer({
                               if (chip === 'Haven\'t eaten lunch yet') {
                                 setLunchDone('not_yet');
                               } else {
-                                const isHighProtein = ['Herb Grilled Chicken & Rice', 'Tawa Paneer Tikka Bowl', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Soya / Dal Bowl', 'Chipotle Chicken Bowl'].includes(chip);
+                                const isHighProtein = ['Herb Grilled Chicken & Rice', 'Turkey & Sweet Potato', 'Salmon & Veggies', 'Ancient Grains & Tofu', 'Steak & Quinoa Bowl', 'Chipotle Chicken Bowl'].includes(chip);
                                 setLunchDone(isHighProtein);
                               }
                             }}
@@ -1769,7 +1769,7 @@ export function DailyDebriefRightDrawer({
                       type="button"
                       onClick={() => {
                         setDinnerDone(false);
-                        if (!dinnerFuel || ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Paneer Tikka Bowl', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa'].includes(dinnerFuel)) {
+                        if (!dinnerFuel || ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Grass-Fed Ribeye', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa'].includes(dinnerFuel)) {
                           setDinnerFuel('Skipped dinner');
                         }
                       }}
@@ -1838,9 +1838,9 @@ export function DailyDebriefRightDrawer({
                       </span>
                       <div className="flex flex-wrap gap-1.5">
                         {(dinnerDone === null || dinnerDone === 'not_yet'
-                          ? ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Paneer Tikka Bowl', 'Steak & Sweet Potato', 'Haven\'t eaten dinner yet', 'Skipped dinner']
+                          ? ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Grass-Fed Ribeye', 'Steak & Sweet Potato', 'Haven\'t eaten dinner yet', 'Skipped dinner']
                           : dinnerDone === true
-                          ? ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Paneer Tikka Bowl', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Tuna Poke Bowl']
+                          ? ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Grass-Fed Ribeye', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Tuna Poke Bowl']
                           : ['Light salad / Soup', 'Skipped dinner', 'Fast food / Takeout', 'Bread & Cheese']
                         ).map((chip) => (
                           <button
@@ -1851,7 +1851,7 @@ export function DailyDebriefRightDrawer({
                               if (chip === 'Haven\'t eaten dinner yet') {
                                 setDinnerDone('not_yet');
                               } else {
-                                const isHighProtein = ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Paneer Tikka Bowl', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Tuna Poke Bowl'].includes(chip);
+                                const isHighProtein = ['Grilled Salmon & Greens', 'Roast Chicken Breast', 'Grass-Fed Ribeye', 'Steak & Sweet Potato', 'Lentil Stew & Quinoa', 'Tuna Poke Bowl'].includes(chip);
                                 setDinnerDone(isHighProtein);
                               }
                             }}

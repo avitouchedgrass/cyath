@@ -44,31 +44,31 @@ export function SiteFooter({ className = '' }: SiteFooterProps) {
           </ul>
         </div>
 
-        {/* Keystone Levers */}
+        {/* Core Habits */}
         <div className="space-y-3">
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Keystone Levers</div>
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Core Habits</div>
           <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
             <li>
-              <span className="text-[#2C4A3B]/80">Morning Photons</span>
+              <span className="text-[#2C4A3B]/80">Morning Sunlight</span>
             </li>
             <li>
-              <span className="text-[#2C4A3B]/80">Cellular Hydration</span>
+              <span className="text-[#2C4A3B]/80">Daily Water Intake</span>
             </li>
             <li>
-              <span className="text-[#2C4A3B]/80">Whole-Food Protein</span>
+              <span className="text-[#2C4A3B]/80">Protein Target</span>
             </li>
             <li>
-              <span className="text-[#2C4A3B]/80">Evening Seal Ceremony</span>
+              <span className="text-[#2C4A3B]/80">Daily Evening Check-in</span>
             </li>
             <li>
-              <Link href="/dashboard" className="text-[#1A3629] font-black hover:underline">Open Cockpit →</Link>
+              <Link href="/dashboard" className="text-[#1A3629] font-black hover:underline">Open Dashboard →</Link>
             </li>
           </ul>
         </div>
 
         {/* Health Protocols */}
         <div className="space-y-3">
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Circadian Routines</div>
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A3629]">Daily Routines</div>
           <ul className="space-y-2 text-xs font-cabinet font-bold text-[#2C4A3B]">
             <li>
               <Link href="/protocols" className="hover:underline">Morning Sunlight &amp; Energy</Link>

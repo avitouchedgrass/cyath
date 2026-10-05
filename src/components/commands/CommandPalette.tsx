@@ -267,8 +267,8 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: <PixelArrowUpRight size={14} />,
-      title: 'Go to Dashboard Cockpit',
-      description: 'Daily goals, habit checklist, and fuel tracking',
+      title: 'Go to Dashboard',
+      description: 'Daily goals, habits, and meal tracking',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
@@ -281,8 +281,8 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: <PixelArrowUpRight size={14} />,
-      title: 'Open Habit & Fuel Playbook',
-      description: 'Explore circadian protocols and nutritional methodology',
+      title: 'Open Habits & Meals Playbook',
+      description: 'Explore daily guides and recipes',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
@@ -295,8 +295,8 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: <PixelArrowUpRight size={14} />,
-      title: 'Open Daily Island Cockpit',
-      description: 'Inspect full-screen floating ecosystem, habits, and circadian rhythm',
+      title: 'Open Daily Island & Habits',
+      description: 'View floating island, habits, and daily progress',
       badge: 'GOTO',
       action: () => {
         setIsOpen(false);
@@ -351,8 +351,8 @@ export function CommandPalette() {
       category: 'NAVIGATION',
       categoryLabel: 'WORKSPACE NAVIGATION',
       glyph: <PixelSparkles size={14} />,
-      title: 'Launch Interactive Pioneer Walkthrough',
-      description: 'Step-by-step spotlight tour across cockpit, habits, food log & AI coach',
+      title: 'Start Interactive Tour',
+      description: 'Step-by-step tour across dashboard, habits, food log & AI coach',
       badge: 'TOUR',
       action: () => {
         setIsOpen(false);

@@ -12,9 +12,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-sanctuary-stage',
     popover: {
-      title: 'Your Living Sanctuary',
+      title: 'Your Floating Island',
       description:
-        'This floating island is your biological anchor. As you log habits, maintain circadian sleep cadence, and fuel with whole foods, your sanctuary evolves across 10 handcrafted pixel-art biome tiers. You can also switch between The Pillow Fighter, The Whey Station, and Ctrl+Alt+Defeat suites in your Profile.',
+        'This floating island reflects your daily progress. As you log habits, sleep well, and eat nourishing meals, your island levels up across 10 handcrafted pixel-art tiers. You can also switch themes in your Profile.',
       side: 'bottom',
       align: 'center',
     },
@@ -22,9 +22,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#btn-seal-today',
     popover: {
-      title: 'The Daily Seal Ceremony',
+      title: 'Daily Check-in',
       description:
-        'Every evening, tap "Seal Today" to open your Turn-by-Turn Debrief drawer. Log morning sunlight, sleep, and meals with our built-in <em>"Not sure how much protein your meal had?"</em> natural AI estimator. Earn graduated XP tailored to biological efficacy and mint your daily wax seal.',
+        'Every evening, tap "Daily Check-in" to open your daily review. Log morning sunlight, sleep, and meals with our built-in meal estimator. Earn XP for your habits and keep your streak alive.',
       side: 'top',
       align: 'center',
     },
@@ -32,9 +32,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#btn-view-ledger',
     popover: {
-      title: 'Archival Corkboard Ledger',
+      title: 'Daily Log Book',
       description:
-        'Tap "View Ledger" to slide out your archival corkboard. Review past days pinned with golden wax seals, inspect historical biometrics, or export 16-bit thermal receipt cards as shareable PNGs.',
+        'Tap "View Log Book" to see your 30-day history. Review past logs, inspect your habits, or export daily summary receipts as shareable images.',
       side: 'top',
       align: 'center',
     },
@@ -42,9 +42,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#specimen-reliquary',
     popover: {
-      title: 'Subterranean Specimen Reliquary',
+      title: 'Trophies & Badges',
       description:
-        'Scroll down to explore your subterranean trophy vault. Unlock handcrafted pixel relics and chalices for streak milestones, circadian sleep perfection, and nutritional mastery.',
+        'Scroll down to view your trophies. Unlock badges for streak milestones, great sleep, and nutrition consistency.',
       side: 'top',
       align: 'center',
     },
@@ -52,9 +52,9 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-ai-coach',
     popover: {
-      title: 'Cyath AI Nutrition Coach & Scanner',
+      title: 'AI Food & Recipe Assistant',
       description:
-        'Need whole-food recipe inspiration, metabolic protein rebalancing, or instant photo meal analysis? Open the AI Coach (Cmd+J) to consult your evidence-based circadian nutrition companion.',
+        'Need healthy meal ideas, dinner protein advice, or photo meal analysis? Open the AI Assistant (Cmd+J) anytime.',
       side: 'top',
       align: 'end',
     },
@@ -62,18 +62,18 @@ const WALKTHROUGH_STEPS: DriveStep[] = [
   {
     element: '#tour-navigation',
     popover: {
-      title: 'Navigation Hub & Fuel Engine',
+      title: 'Navigation & Quick Links',
       description:
-        'Navigate between the Fuel Log with 1-tap meal target logging, the Habit & Circadian Playbook for peer-reviewed protocols, the Correlation Dossier, and your Profile.',
+        'Easily move between Meals & Nutrition, Daily Protocols, Insights & Trends, and your Profile.',
       side: 'bottom',
       align: 'center',
     },
   },
   {
     popover: {
-      title: 'Command Palette: Fast Keyboard Logging',
+      title: 'Quick Keyboard Logging',
       description:
-        'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in under 2 seconds without touching the mouse.',
+        'Press <strong>Cmd+K</strong> (or <strong>Ctrl+K</strong>) anytime to launch the Command Palette. Type instant shorthand like <code>p35 w0.5 s8</code> to log 35g protein, 0.5L water, and 8 hours sleep in seconds.',
       align: 'center',
     },
   },

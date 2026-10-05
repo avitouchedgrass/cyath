@@ -182,14 +182,14 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
   // Logged-in member navigation items
   const memberNavItems: NavItem[] = [
-    { name: "Sanctuary", href: "/dashboard", id: "today", icon: PixelCompass },
-    { name: "Fuel & Macros", href: "/fuel", id: "fuel", icon: PixelUtensils },
+    { name: "Dashboard", href: "/dashboard", id: "today", icon: PixelCompass },
+    { name: "Meals & Nutrition", href: "/fuel", id: "fuel", icon: PixelUtensils },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: PixelBook },
   ];
 
   const mobileMemberNavItems: NavItem[] = [
-    { name: "Sanctuary", href: "/dashboard", id: "today", icon: PixelCompass },
-    { name: "Fuel", href: "/fuel", id: "fuel", icon: PixelUtensils },
+    { name: "Home", href: "/dashboard", id: "today", icon: PixelCompass },
+    { name: "Meals", href: "/fuel", id: "fuel", icon: PixelUtensils },
     { name: "Playbook", href: "/playbook", id: "playbook", icon: PixelBook },
     { name: "Profile", href: "/profile", id: "profile", icon: PixelUser },
   ];

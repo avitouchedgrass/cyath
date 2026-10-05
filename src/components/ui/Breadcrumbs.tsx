@@ -18,7 +18,7 @@ const DEFAULT_ROUTE_MAP: Record<string, string> = {
   'Focus Protocols': '/playbook',
   'Guided Routines': '/playbook',
   'Daily Insights': '/dashboard?tab=dossier',
-  'Dossier': '/dashboard?tab=dossier',
+  'Insights': '/dashboard?tab=dossier',
   'Sanctuary': '/dashboard?tab=today',
   'Profile': '/profile',
   'Privacy Policy': '/privacy',

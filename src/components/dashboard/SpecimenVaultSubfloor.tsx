@@ -50,14 +50,14 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
         <div className="flex flex-col">
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-              The Specimen Reliquary
+              Trophies &amp; Badges
             </h2>
             <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FFFDF9] border border-[#1A3629]/15 px-3 py-1 rounded-full shadow-2xs">
-              {unlockedCount} / {totalCount} Secured
+              {unlockedCount} / {totalCount} Unlocked
             </span>
           </div>
           <p className="font-sans text-xs text-[#4A5D4E] mt-1">
-            Uniform archival chalices minted through habit consistency, daily seals, and living island ascension.
+            Badges earned through consistent daily habits, check-ins, and leveling up your island.
           </p>
         </div>
 
@@ -66,12 +66,12 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
           {(
             [
               { id: 'all', label: `All (${totalCount})` },
-              { id: 'sanctuary', label: 'Sanctuary (5)' },
-              { id: 'seals', label: 'Daily Seals (5)' },
-              { id: 'biometrics', label: 'Biometrics (5)' },
-              { id: 'fuel', label: 'Fuel (5)' },
+              { id: 'sanctuary', label: 'Islands (5)' },
+              { id: 'seals', label: 'Check-ins (5)' },
+              { id: 'biometrics', label: 'Habits (5)' },
+              { id: 'fuel', label: 'Nutrition (5)' },
               { id: 'streaks', label: 'Streaks (3)' },
-              { id: 'shame', label: 'Shame (2)' },
+              { id: 'shame', label: 'Penalties (2)' },
             ] as const
           ).map((cat) => (
             <button
@@ -145,14 +145,14 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
               <span className={`font-cabinet font-extrabold text-xs line-clamp-1 w-full z-10 ${
                 isUnlocked ? 'text-[#1A3629] group-hover:text-[#2C4A3B] transition-colors' : 'text-[#1A3629]/40'
               }`}>
-                {isUnlocked ? trophy.title : 'Locked Specimen'}
+                {isUnlocked ? trophy.title : 'Locked Trophy'}
               </span>
 
               <div className="flex items-center gap-1.5 mt-1 z-10">
                 <span className={`text-[10px] font-mono uppercase tracking-wider ${
                   isUnlocked ? (trophy.isShame ? 'text-red-700 font-bold' : 'text-[#4A5D4E]') : 'text-[#4A5D4E]/40'
                 }`}>
-                  {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Locked'}
+                  {isUnlocked ? trophy.tier || (trophy.isShame ? 'Penalty' : 'Standard') : 'Locked'}
                 </span>
               </div>
             </button>
@@ -252,7 +252,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                   <>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90">
-                        {selectedTrophy.tier || (selectedTrophy.isShame ? 'Shame' : 'Standard')} Relic
+                        {selectedTrophy.tier || (selectedTrophy.isShame ? 'Penalty' : 'Standard')} Trophy
                       </span>
                       {unlockedTrophies.includes(selectedTrophy.id) && (
                         <span className={`font-mono text-xs font-bold px-3 py-1 rounded-full border ${
@@ -268,7 +268,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                       {selectedTrophy.isShame && (
                         <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-200 flex items-center gap-1.5">
                           <PixelAlert size={12} color="#FCA5A5" />
-                          <span>Satirical Shame</span>
+                          <span>Penalty</span>
                         </span>
                       )}
                     </div>
@@ -292,7 +292,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                         <div className="flex items-center justify-between text-xs font-mono">
                           <span className="text-white/80 font-semibold">Mastery Multiplier:</span>
                           <span className="text-amber-300 font-bold">
-                            {count}x Acquired · {mastery.multiplier}x Multiplier
+                            {count}x Earned · {mastery.multiplier}x Multiplier
                           </span>
                         </div>
                         {mastery.nextThreshold ? (
@@ -332,7 +332,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                         </div>
                       ) : (
                         <div className="inline-flex items-center px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
-                          <span>Locked Specimen</span>
+                          <span>Locked Trophy</span>
                         </div>
                       )}
 
@@ -360,7 +360,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                             ) : (
                               <>
                                 <PixelSparkles size={14} color="#FDE047" />
-                                <span>Share Relic Card</span>
+                                <span>Share Badge</span>
                               </>
                             )}
                           </button>
@@ -372,7 +372,7 @@ export function SpecimenVaultSubfloor({ onRequireAuth }: SpecimenVaultSubfloorPr
                         onClick={() => setSelectedTrophy(null)}
                         className="px-5 py-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white hover:text-[#1A3629] text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
                       >
-                        Back to Reliquary
+                        Back to Trophies
                       </button>
                     </div>
                   </>

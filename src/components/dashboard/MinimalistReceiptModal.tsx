@@ -78,7 +78,7 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
     ctx.font = 'bold 26px monospace';
     ctx.fillText('*** CYATH REGISTER ***', 300, 58);
     ctx.font = '14px monospace';
-    ctx.fillText('TERMINAL #01 // DESK OPERATOR', 300, 84);
+    ctx.fillText('CYATH DAILY SUMMARY', 300, 84);
     ctx.fillText(`DATE: ${activeDate}  ·  LEVEL: ${progress.level}`, 300, 106);
 
     ctx.font = '13px monospace';
@@ -103,10 +103,10 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
       ctx.font = '15px monospace';
       const items = [
         `01. MORNING SUNLIGHT ....... ${isSunlightDone ? 'DONE (+15M)' : 'PENDING'}`,
-        `02. PROTEIN FLOOR .......... ${proteinLogged}g / ${targetProtein}g`,
+        `02. PROTEIN TARGET ......... ${proteinLogged}g / ${targetProtein}g`,
         `03. HYDRATION LOG .......... ${hydrationLogged} LITERS`,
-        `04. DAY STREAK ............. ${streakCount} DAYS ${isForgedStreak ? '(FORGED)' : ''}`,
-        `05. GUILD LEDGER ........... ${isSealed ? 'SEALED & VERIFIED' : 'PENDING STAMP'}`,
+        `04. DAY STREAK ............. ${streakCount} DAYS ${isForgedStreak ? '(PROTECTED)' : ''}`,
+        `05. DAILY STATUS ........... ${isSealed ? 'LOGGED & VERIFIED' : 'PENDING'}`,
       ];
 
       items.forEach((item, idx) => {
@@ -189,7 +189,7 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
         {isSealed && (
           <div className="absolute top-24 -right-2 transform rotate-12 border-2 border-[#B91C1C] text-[#B91C1C] px-3 py-1 font-mono font-extrabold text-xs tracking-wider opacity-85 pointer-events-none rounded shadow-2xs flex items-center gap-1.5">
             <PixelCheck size={12} color="#B91C1C" />
-            <span>VERIFIED &amp; SEALED</span>
+            <span>LOGGED &amp; SAVED</span>
           </div>
         )}
 
@@ -199,7 +199,7 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
             *** CYATH REGISTER ***
           </span>
           <span className="text-[11px] text-[#2B1F17]/75 mt-0.5">
-            TERMINAL #01 // DESK OPERATOR
+            DAILY SUMMARY
           </span>
           <div className="flex items-center justify-between w-full text-[11px] text-[#2B1F17]/80 mt-2 pt-1 border-t border-[#2B1F17]/25 font-bold">
             <span>{activeDate}</span>
@@ -249,13 +249,13 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
 
           <div className="flex items-center justify-between">
             <span className="text-[#2B1F17]/75">04. STREAK</span>
-            <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(FORGED)' : ''}</span>
+            <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(PROTECTED)' : ''}</span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-[#2B1F17]/75">05. LEDGER</span>
+            <span className="text-[#2B1F17]/75">05. STATUS</span>
             <span className={`font-bold ${isSealed ? 'text-[#065F46]' : 'text-amber-700'}`}>
-              {isSealed ? 'SEALED' : 'OPEN'}
+              {isSealed ? 'LOGGED' : 'PENDING'}
             </span>
           </div>
         </div>
@@ -297,7 +297,7 @@ export function MinimalistReceiptModal({ isOpen, onClose, dateOverride }: Minima
           ) : (
             <>
               <PixelCopy size={14} />
-              <span>Copy Thermal Receipt</span>
+              <span>Copy Receipt</span>
             </>
           )}
         </button>

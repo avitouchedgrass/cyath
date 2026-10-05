@@ -140,7 +140,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
               {report.protocolsCommittedCount} / 7
             </span>
             <span className="font-sans text-[11px] text-[#4A5D4E] mt-0.5">
-              Days foundational levers logged
+              Days daily habits logged
             </span>
           </div>
         </div>
@@ -236,7 +236,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
           {isAlreadyClaimed ? (
             <div className="px-5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629] font-cabinet text-xs font-bold flex items-center gap-1.5">
               <PixelCheck size={12} color="#1A3629" />
-              <span>Weekly Review Sealed (+100 XP Claimed)</span>
+              <span>Weekly Review Completed (+100 XP Claimed)</span>
             </div>
           ) : (
             <button
@@ -244,7 +244,7 @@ export function WeeklyDossierModal({ isOpen, onClose }: WeeklyDossierModalProps)
               onClick={handleClaim}
               className="px-6 py-2.5 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet text-xs font-bold transition-all cursor-pointer shadow-2xs"
             >
-              Seal Weekly Review (+100 XP) →
+              Complete Weekly Review (+100 XP) &rarr;
             </button>
           )}
         </div>

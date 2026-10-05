@@ -68,14 +68,14 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E]">
-                Evening Desk Check-In
+                Evening Check-In
               </span>
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
                 {caffeineStatus === 'none' ? '+20 XP' : '+15 XP'}
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-              15-Second Desk Wrap
+              Evening Check-In
             </h2>
           </div>
 
@@ -90,7 +90,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
         </div>
 
         <p className="text-xs font-sans text-[#4A5D4E] leading-relaxed">
-          Record your day’s closing levers before shutting down. Synchronizes your recovery score.
+          Quickly record your afternoon and evening habits before wrapping up for the day.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -186,7 +186,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
           <div className="p-3.5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-cabinet font-bold text-[#1A3629]">
-                Postprandial Energy Dip (1-10)
+                Afternoon Energy Dip (1-10)
               </span>
               <span className="font-mono font-semibold text-xs text-[#1A3629] bg-[#FFFDF9] px-2.5 py-0.5 rounded-full border border-[#1A3629]/10">
                 Severity {afternoonSlumpScore}/10
@@ -211,7 +211,7 @@ export function EveningWrapModal({ isOpen, onClose }: EveningWrapModalProps) {
             type="submit"
             className="w-full mt-1 py-3 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all cursor-pointer shadow-2xs flex items-center justify-center"
           >
-            Wrap Daily Ledger (+50 XP)
+            Save Evening Check-in (+50 XP)
           </button>
         </form>
       </div>

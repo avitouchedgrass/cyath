@@ -75,11 +75,11 @@ export function CommandProtocolCard() {
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#1A3629]/15">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="px-2.5 py-0.5 rounded-md border border-[#1A3629] bg-[#FAF6EE] text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]">
-            Daily Focus Protocol · {protocol.category}
+            Daily Focus · {protocol.category}
           </span>
           {isDownscaled && (
             <span className="px-2.5 py-0.5 rounded-md border border-[#D97706]/40 bg-[#FEF3C7] text-[10px] font-mono font-bold text-[#92400E]">
-              [MINIMUM VIABLE RE-ENTRY ACTIVE]
+              [Easy Recovery]
             </span>
           )}
           <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
@@ -106,7 +106,7 @@ export function CommandProtocolCard() {
 
         <div className="border border-[#1A3629]/15 bg-[#FAF6EE] px-4 py-3.5 rounded-2xl">
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#92400E] block mb-1">
-            Exact Directive
+            Today&apos;s Action
           </span>
           <p className="font-cabinet font-bold text-sm sm:text-base text-[#1A3629] leading-relaxed">
             {protocol.directive}
@@ -117,7 +117,7 @@ export function CommandProtocolCard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
         <div className="flex flex-col gap-1">
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2563EB]">
-            1. Scientific Hypothesis
+            Why It Works
           </span>
           <p className="text-xs font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
             {protocol.hypothesis}
@@ -126,7 +126,7 @@ export function CommandProtocolCard() {
 
         <div className="flex flex-col gap-1">
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#059669]">
-            2. Biological Mechanism
+            How Your Body Responds
           </span>
           <p className="text-xs font-cabinet font-medium text-[#2C4A3B] leading-relaxed">
             {protocol.mechanism}
@@ -138,7 +138,7 @@ export function CommandProtocolCard() {
         <div className="flex items-center gap-3 flex-wrap text-xs font-cabinet">
           {protocol.recipeTitle && (
             <span className="font-bold text-[#1A3629]">
-              Fuel Synergy: {protocol.recipeTitle}
+              Recommended Meal: {protocol.recipeTitle}
             </span>
           )}
 
@@ -157,26 +157,26 @@ export function CommandProtocolCard() {
               onClick={handleAccept}
               className="px-5 py-2.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[3px_3px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
-              Accept Protocol &amp; Commit (+50 XP)
+              I&apos;ll Do This Today (+50 XP)
             </button>
           ) : !isCompleted ? (
             <div className="flex items-center gap-2">
               <span className="px-3 py-2 rounded-xl border border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold flex items-center gap-1.5">
                 <PixelCheck size={12} color="#065F46" />
-                <span>Committed</span>
+                <span>In Progress</span>
               </span>
               <button
                 type="button"
                 onClick={handleComplete}
                 className="px-4 py-2 rounded-xl border-2 border-[#10B981] bg-[#10B981] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#065F46] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
               >
-                Mark Accomplished (+50 XP)
+                Mark Done (+50 XP)
               </button>
             </div>
           ) : (
             <div className="px-4 py-2 rounded-xl border-2 border-[#10B981] bg-[#ECFDF5] text-[#065F46] font-mono text-xs font-bold shadow-[2px_2px_0px_#10B981] flex items-center gap-2">
               <PixelCheck size={14} color="#065F46" />
-              <span>Protocol Mastered · +100 Total XP Awarded</span>
+              <span>Completed · +100 XP Earned</span>
             </div>
           )}
         </div>

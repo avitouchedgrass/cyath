@@ -82,7 +82,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
         <button
           type="button"
           onClick={handleStartCeremony}
-          title={isAlreadySealed ? "View your 30-day habit ledger" : "Begin the daily closing ceremony to seal today's log and earn XP"}
+          title={isAlreadySealed ? "View your 30-day log book" : "Complete your daily check-in to save today's log and earn XP"}
           className={`w-full h-11 px-5 rounded-full font-cabinet font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] ${
             isAlreadySealed
               ? 'border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
@@ -91,8 +91,8 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
         >
           <span>
             {isAlreadySealed
-              ? `Daily Ledger Sealed (${pinnedCount} of 30)`
-              : 'Begin Seal Ceremony (+50 XP)'}
+              ? `Daily Log Saved (${pinnedCount} of 30)`
+              : 'Daily Check-in (+50 XP)'}
           </span>
         </button>
 
@@ -106,7 +106,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
             }}
             className="w-full py-1 text-center font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] cursor-pointer hover:underline"
           >
-            Inspect Thermal Receipt →
+            View Daily Receipt &rarr;
           </button>
         )}
       </div>

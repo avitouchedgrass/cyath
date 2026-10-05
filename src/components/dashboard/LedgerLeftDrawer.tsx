@@ -120,13 +120,13 @@ export function LedgerLeftDrawer({
     const res = await shareReceiptImage(getArchivalExportData());
     if (res.method === 'native') return;
 
-    const shareText = `Cyath Daily Metabolic Receipt · ${selectedDateStr}\n` +
-      `• Restored Sleep: ${selectedLog.sleepHours || 8}h\n` +
-      `• Morning Sun: ${selectedLog.habitsCompleted?.['sunlight'] ? 'Anchored' : 'Skipped'}\n` +
-      `• Logged Protein: ${selectedLog.totalProteinLogged || 80}g\n` +
-      `• Hydration: ${selectedLog.hydrationLiters || 2.5}L\n` +
-      `Official Archival Record pinned to Cyath Ledger.\n` +
-      `Track your metabolic flow at cyath.space`;
+    const shareText = `Cyath Daily Summary · ${selectedDateStr}\n` +
+      `• Sleep: ${selectedLog.sleepHours || 8}h\n` +
+      `• Morning Sunlight: ${selectedLog.habitsCompleted?.['sunlight'] ? 'Done' : 'Skipped'}\n` +
+      `• Protein: ${selectedLog.totalProteinLogged || 80}g\n` +
+      `• Water: ${selectedLog.hydrationLiters || 2.5}L\n` +
+      `Saved to Cyath Daily Log.\n` +
+      `Track your habits at cyath.space`;
 
     try {
       await navigator.clipboard.writeText(shareText);
@@ -152,7 +152,7 @@ export function LedgerLeftDrawer({
         id="tour-ledger-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Archival Guild Ledger Artboard"
+        aria-label="Daily Log Book"
         className={`fixed top-0 left-0 bottom-0 z-50 w-full sm:max-w-2xl md:max-w-3xl bg-[#2A1E17] border-r-2 border-[#1A120D] shadow-[16px_0_40px_rgba(10,7,5,0.4)] transition-transform duration-300 ease-out flex flex-col justify-between overflow-hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -163,10 +163,10 @@ export function LedgerLeftDrawer({
             <PixelScroll size={16} color="#FFFDF9" />
             <div className="flex flex-col">
               <span className="font-cabinet font-extrabold text-sm tracking-wide uppercase">
-                Archival Guild Ledger
+                Daily Log Book
               </span>
               <span className="font-mono text-[10px] text-[#C5B5A0]">
-                30-Day Corkboard Artboard · {sealedCount} Receipts Pinned
+                30-Day History · {sealedCount} Days Logged
               </span>
             </div>
           </div>
@@ -199,10 +199,10 @@ export function LedgerLeftDrawer({
               <div className="flex items-center justify-between">
                 <span className="font-cabinet font-extrabold text-xs uppercase tracking-wider text-[#1A3629] flex items-center gap-1.5">
                   <PixelCalendar size={14} />
-                  <span>30-Day Solstice Board</span>
+                  <span>30-Day History</span>
                 </span>
                 <span className="font-mono text-[10px] text-[#4A5D4E]">
-                  Select date to inspect pinned thermal receipt
+                  Select a date to view your daily summary
                 </span>
               </div>
 
@@ -259,13 +259,13 @@ export function LedgerLeftDrawer({
                     <div className="flex flex-col gap-3 font-mono text-xs text-[#1A3629] pt-4">
                       <div className="border-b border-dashed border-[#1A3629]/25 pb-2 text-center">
                         <span className="font-bold uppercase tracking-wider text-xs block">
-                          Sanctuary Archival Dispatch
+                          Cyath Daily Summary
                         </span>
                         <span className="text-[10px] text-[#4A5D4E]">{selectedDateStr}</span>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <span className="text-[#4A5D4E]">Restored Sleep</span>
+                        <span className="text-[#4A5D4E]">Sleep</span>
                         <span className="font-bold">{selectedLog.sleepHours || 8}h</span>
                       </div>
 
@@ -273,25 +273,25 @@ export function LedgerLeftDrawer({
                         <span className="text-[#4A5D4E]">Morning Sunlight</span>
                         <span className="font-bold text-emerald-700 flex items-center gap-1">
                           {selectedLog.habitsCompleted?.['sunlight'] && <PixelCheck size={11} color="#047857" />}
-                          <span>{selectedLog.habitsCompleted?.['sunlight'] ? 'Anchored' : 'Skipped'}</span>
+                          <span>{selectedLog.habitsCompleted?.['sunlight'] ? 'Done' : 'Skipped'}</span>
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <span className="text-[#4A5D4E]">Logged Protein</span>
+                        <span className="text-[#4A5D4E]">Protein Target</span>
                         <span className="font-bold text-emerald-700">
                           {selectedLog.totalProteinLogged || 80}g Logged
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <span className="text-[#4A5D4E]">Cellular Hydration</span>
+                        <span className="text-[#4A5D4E]">Water Intake</span>
                         <span className="font-bold">{selectedLog.hydrationLiters || 2.5}L</span>
                       </div>
 
                       <div className="border-t border-dashed border-[#1A3629]/25 pt-2 flex justify-between font-bold">
                         <span>Status</span>
-                        <span className="text-emerald-700 uppercase">Sealed in Ledger</span>
+                        <span className="text-emerald-700 uppercase">Logged &amp; Saved</span>
                       </div>
                     </div>
                   </div>
@@ -325,12 +325,12 @@ export function LedgerLeftDrawer({
                   <PixelScroll size={32} color="#1A3629" />
                   <div className="flex flex-col gap-1">
                     <span className="font-cabinet font-extrabold text-base">
-                      No Pinned Receipt for {selectedDateStr}
+                      No Daily Log for {selectedDateStr}
                     </span>
                     <p className="font-sans text-xs text-[#4A5D4E]">
                       {selectedDateStr === todayStr
-                        ? 'Today’s receipt is waiting to be minted. Complete the debrief ceremony to pin it.'
-                        : 'This date concluded without an official ceremony.'}
+                        ? 'Today’s summary is ready to be saved. Complete your daily check-in to save it.'
+                        : 'No daily log was recorded for this day.'}
                     </p>
                   </div>
 
@@ -343,7 +343,7 @@ export function LedgerLeftDrawer({
                       }}
                       className="py-3 px-5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer flex items-center gap-1.5 shadow-[2px_2px_0px_#2C5E43]"
                     >
-                      <span>Seal Today Now →</span>
+                      <span>Check in Today Now →</span>
                     </button>
                   )}
                 </div>
@@ -355,7 +355,7 @@ export function LedgerLeftDrawer({
 
         {/* Bottom Drawer Footer */}
         <div className="w-full px-6 py-3 border-t-2 border-[#1A120D] bg-[#3D2E24] text-[#C5B5A0] flex items-center justify-between font-mono text-[11px] z-10">
-          <span>Pinned Receipts Archive</span>
+          <span>Daily History Archive</span>
           <span>Click outside or press ESC to exit</span>
         </div>
       </aside>

@@ -424,19 +424,19 @@ export function DailyDebriefRightDrawer({
     });
 
     const stepItems: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }> = [
-      { amount: biometricXp.sleepXp, reason: `Beauty Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
+      { amount: biometricXp.sleepXp, reason: `Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
       ...(biometricXp.morningRestedXp > 0 ? [{ amount: biometricXp.morningRestedXp, reason: `Morning Rested Score (${morningRestedRating}/10)`, suite: 'circadian' as const }] : []),
-      ...(biometricXp.wakeConsistencyXp > 0 ? [{ amount: biometricXp.wakeConsistencyXp, reason: 'Circadian Wake Window Locked', suite: 'circadian' as const }] : []),
-      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Photosynthe-sis Anchored (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
-      ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'The Whey Station: Breakfast (30g+)', suite: 'iron' as const }] : []),
+      ...(biometricXp.wakeConsistencyXp > 0 ? [{ amount: biometricXp.wakeConsistencyXp, reason: 'Wake Time On Schedule', suite: 'circadian' as const }] : []),
+      ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Morning Sunlight (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
+      ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'High-Protein Breakfast (30g+)', suite: 'iron' as const }] : []),
       ...(breakfastDone === 'not_yet' ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Fasting Window Logged', suite: 'iron' as const }] : []),
-      ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'Midday Meat or Greet: Lunch (40g+)', suite: 'iron' as const }] : []),
-      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Pending / Fasting Window', suite: 'iron' as const }] : []),
-      ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'Nightcap Gains: Dinner (35g+)', suite: 'iron' as const }] : []),
-      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Pending / Fasting Window', suite: 'iron' as const }] : []),
-      ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Decaf or Die (${caffeineTime})`, suite: 'focus' as const }] : []),
+      ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'High-Protein Lunch (40g+)', suite: 'iron' as const }] : []),
+      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Pending', suite: 'iron' as const }] : []),
+      ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'High-Protein Dinner (35g+)', suite: 'iron' as const }] : []),
+      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Pending', suite: 'iron' as const }] : []),
+      ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Caffeine Cutoff Kept (${caffeineTime})`, suite: 'focus' as const }] : []),
       ...(biometricXp.customHabitsXp > 0 ? [{ amount: biometricXp.customHabitsXp, reason: 'Custom Habits Completed', suite: 'focus' as const }] : []),
-      { amount: biometricXp.baseSealXp, reason: shouldBePartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
+      { amount: biometricXp.baseSealXp, reason: shouldBePartial ? 'Daily Log Saved (Pending Meals)' : 'Daily Log Saved', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
     ];
 
     for (let i = 0; i < stepItems.length; i++) {
@@ -554,16 +554,16 @@ export function DailyDebriefRightDrawer({
     const res = await shareReceiptImage(getExportData());
     if (res.method === 'native') return;
 
-    const shareText = `Cyath Daily Metabolic Receipt · ${currentDate}\n` +
-      `• Sleep Restored: ${calculatedSleepDuration}h (+${biometricXp.sleepXp} XP)\n` +
-      `• Morning Sun: ${sunlightDone ? 'Secured' : 'Missed'} (+${biometricXp.sunlightXp} XP)\n` +
-      `• Breakfast Fuel: ${breakfastFuel ? breakfastFuel : (breakfastDone === true ? 'Hit (30g+)' : breakfastDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.breakfastXp} XP)\n` +
-      `• Lunch Fuel: ${lunchFuel ? lunchFuel : (lunchDone === true ? 'Hit (40g+)' : lunchDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.lunchXp} XP)\n` +
-      `• Dinner Fuel: ${dinnerFuel ? dinnerFuel : (dinnerDone === true ? 'Hit (35g+)' : dinnerDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.dinnerXp} XP)\n` +
+    const shareText = `Cyath Daily Summary · ${currentDate}\n` +
+      `• Sleep: ${calculatedSleepDuration}h (+${biometricXp.sleepXp} XP)\n` +
+      `• Morning Sunlight: ${sunlightDone ? 'Done' : 'Missed'} (+${biometricXp.sunlightXp} XP)\n` +
+      `• Breakfast: ${breakfastFuel ? breakfastFuel : (breakfastDone === true ? 'Hit (30g+)' : breakfastDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.breakfastXp} XP)\n` +
+      `• Lunch: ${lunchFuel ? lunchFuel : (lunchDone === true ? 'Hit (40g+)' : lunchDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.lunchXp} XP)\n` +
+      `• Dinner: ${dinnerFuel ? dinnerFuel : (dinnerDone === true ? 'Hit (35g+)' : dinnerDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.dinnerXp} XP)\n` +
       `• Caffeine Cutoff: ${caffeineDone ? caffeineTime : 'Past Cutoff'} (+${biometricXp.caffeineXp} XP)\n` +
-      `• Total Minted: +${biometricXp.totalXp} XP\n` +
-      `Status: Minted & Sealed into 30-Day Ledger\n` +
-      `Track your metabolic flow at cyath.space`;
+      `• Total Earned: +${biometricXp.totalXp} XP\n` +
+      `Status: Logged & Saved\n` +
+      `Track your daily habits at cyath.space`;
 
     try {
       await navigator.clipboard.writeText(shareText);
@@ -587,7 +587,7 @@ export function DailyDebriefRightDrawer({
         id="tour-seal-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Daily Seal Ceremony"
+        aria-label="Daily Check-in"
         className={`fixed top-0 right-0 bottom-0 z-50 w-full sm:max-w-xl md:max-w-2xl bg-[#F4F0EA] border-l-2 border-[#1A3629] shadow-[-16px_0_40px_rgba(26,54,41,0.2)] transition-transform duration-300 ease-out flex flex-col justify-between overflow-hidden ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -597,10 +597,10 @@ export function DailyDebriefRightDrawer({
           <div className="flex items-center gap-2.5">
             <div className="flex flex-col">
               <span className="font-cabinet font-extrabold text-sm text-[#1A3629] tracking-tight uppercase">
-                Daily Seal Ceremony
+                Daily Check-in
               </span>
               <span className="font-mono text-[10px] text-[#4A5D4E]">
-                {currentDate} · Turn-by-Turn Debrief
+                {currentDate} · Today&apos;s Review
               </span>
             </div>
           </div>
@@ -630,7 +630,7 @@ export function DailyDebriefRightDrawer({
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-center max-w-xl mx-auto w-full">
           {/* ============================================================== */}
-          {/* CASE A: ALREADY SEALED TODAY                                    */}
+          {/* CASE A: ALREADY COMPLETED TODAY                                */}
           {/* ============================================================== */}
           {isTodaySealed && !hasPinnedReceipt ? (
             <div className="flex flex-col items-center text-center gap-6 animate-in fade-in duration-200">
@@ -640,10 +640,10 @@ export function DailyDebriefRightDrawer({
 
               <div className="flex flex-col gap-1.5">
                 <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-                  Today’s Seal is Locked
+                  Today&apos;s Log is Saved
                 </h2>
                 <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] max-w-sm">
-                  You have already completed today&apos;s metabolic debrief. Your thermal receipt is safely pinned to the 30-Day Ledger. Rest well tonight.
+                  You have already completed today&apos;s check-in. Your daily summary is saved. Rest well tonight.
                 </p>
               </div>
 
@@ -659,26 +659,26 @@ export function DailyDebriefRightDrawer({
                 <div className="flex flex-col gap-3 font-mono text-xs text-[#1A3629] pt-4">
                   <div className="border-b border-dashed border-[#1A3629]/20 pb-2 text-center">
                     <span className="font-bold uppercase tracking-wider text-[11px]">
-                      Cyath Sanctuary Dispatch
+                      Cyath Daily Summary
                     </span>
                     <span className="block text-[10px] text-[#4A5D4E]">{currentDate}</span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-[#4A5D4E]">Sleep Restored</span>
+                    <span className="text-[#4A5D4E]">Sleep</span>
                     <span className="font-bold">{currentLog?.sleepHours ? `${currentLog.sleepHours}h` : `${calculatedSleepDuration}h`}</span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-[#4A5D4E]">Morning Sun</span>
+                    <span className="text-[#4A5D4E]">Morning Sunlight</span>
                     <span className="font-bold text-emerald-700 flex items-center gap-1">
                       {(currentLog?.habitsCompleted?.sunlight || sunlightDone) && <PixelCheck size={11} color="#047857" />}
-                      <span>{currentLog?.habitsCompleted?.sunlight || sunlightDone ? 'Secured' : 'Recorded'}</span>
+                      <span>{currentLog?.habitsCompleted?.sunlight || sunlightDone ? 'Done' : 'Recorded'}</span>
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-[#4A5D4E]">Protein Floor</span>
+                    <span className="text-[#4A5D4E]">Protein Target</span>
                     <span className="font-bold text-emerald-700">
                       {currentLog?.totalProteinLogged ? `${currentLog.totalProteinLogged}g Logged` : `${userTargetProtein}g Target`}
                     </span>
@@ -686,14 +686,14 @@ export function DailyDebriefRightDrawer({
 
                   {breakfastFuel && (
                     <div className="flex justify-between">
-                      <span className="text-[#4A5D4E]">Breakfast Fuel</span>
+                      <span className="text-[#4A5D4E]">Breakfast</span>
                       <span className="font-bold text-right truncate max-w-[180px]" title={breakfastFuel}>{breakfastFuel}</span>
                     </div>
                   )}
 
                   {lunchFuel && (
                     <div className="flex justify-between">
-                      <span className="text-[#4A5D4E]">Lunch Fuel</span>
+                      <span className="text-[#4A5D4E]">Lunch</span>
                       <span className="font-bold text-right truncate max-w-[180px]" title={lunchFuel}>{lunchFuel}</span>
                     </div>
                   )}
@@ -709,7 +709,7 @@ export function DailyDebriefRightDrawer({
                       ) : (
                         <>
                           <PixelCheck size={12} color="#047857" />
-                          <span>Ledger Sealed</span>
+                          <span>Completed</span>
                         </>
                       )}
                     </span>
@@ -726,11 +726,11 @@ export function DailyDebriefRightDrawer({
                       <span>Pending Meals on Daily Record</span>
                     </div>
                     <span className="font-mono text-[9px] bg-[#B8862D]/20 text-[#8A6520] px-2 py-0.5 rounded font-black uppercase">
-                      Amendable
+                      Update
                     </span>
                   </div>
                   <p className="font-sans text-[11px] text-[#5C4312]/90">
-                    You sealed early with lunch or dinner uneaten. Eaten your meal now? Update your entry and claim up to <strong>+50 XP</strong>!
+                    You checked in earlier before eating lunch or dinner. Eaten your meal now? Update your entry and claim up to <strong>+50 XP</strong>!
                   </p>
                   <button
                     type="button"
@@ -742,7 +742,7 @@ export function DailyDebriefRightDrawer({
                     className="w-full py-2.5 px-3 rounded-xl bg-[#B8862D] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#A37424] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                   >
                     <PixelSparkles size={14} color="#FFFDF9" />
-                    <span>Ate Lunch / Dinner? Amend Debrief (+XP) →</span>
+                    <span>Ate Lunch or Dinner? Add Them Now (+XP) →</span>
                   </button>
                 </div>
               )}
@@ -766,7 +766,7 @@ export function DailyDebriefRightDrawer({
 
                   <div className="flex flex-col gap-1.5">
                     <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
-                      Midday Lunch Fuel
+                      Lunch
                     </span>
                     <DebriefMealEstimator
                       mealLabel="Lunch"
@@ -788,7 +788,7 @@ export function DailyDebriefRightDrawer({
 
                   <div className="flex flex-col gap-1.5">
                     <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
-                      Nightcap Dinner Fuel
+                      Dinner
                     </span>
                     <DebriefMealEstimator
                       mealLabel="Dinner"
@@ -822,7 +822,7 @@ export function DailyDebriefRightDrawer({
                       disabled={isSealingInProgress || (!amendLunchFuel.trim() && !amendDinnerFuel.trim())}
                       className="w-2/3 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shadow-[2px_2px_0px_#2C5E43] disabled:opacity-50"
                     >
-                      <span>{isSealingInProgress ? 'Minting...' : 'Mint Final Seal (+XP)'}</span>
+                      <span>{isSealingInProgress ? 'Saving...' : 'Save &amp; Claim XP'}</span>
                     </button>
                   </div>
                 </div>
@@ -905,10 +905,10 @@ export function DailyDebriefRightDrawer({
 
               <div className="flex flex-col gap-1">
                 <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-                  Day Sealed &amp; Pinned!
+                  Day Saved &amp; Logged!
                 </h2>
                 <p className="font-sans text-xs text-[#4A5D4E]">
-                  Your metabolic victory has been minted and pinned into the Archival Guild Ledger.
+                  Your daily review has been saved to your log book.
                 </p>
               </div>
 
@@ -1001,7 +1001,7 @@ export function DailyDebriefRightDrawer({
                   </div>
 
                   <div className="border-t border-dashed border-[#1A3629]/20 pt-2 flex justify-between font-bold text-sm">
-                    <span>Reward Minted</span>
+                    <span>Total Earned</span>
                     <span className="text-[#B8862D]">+{biometricXp.totalXp} XP</span>
                   </div>
                 </div>
@@ -1112,7 +1112,7 @@ export function DailyDebriefRightDrawer({
                       disabled={isSealingInProgress || (!amendLunchFuel.trim() && !amendDinnerFuel.trim())}
                       className="w-2/3 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shadow-[2px_2px_0px_#2C5E43] disabled:opacity-50"
                     >
-                      <span>{isSealingInProgress ? 'Minting...' : 'Mint Final Seal (+XP)'}</span>
+                      <span>{isSealingInProgress ? 'Saving...' : 'Save &amp; Claim XP'}</span>
                     </button>
                   </div>
                 </div>
@@ -1131,9 +1131,9 @@ export function DailyDebriefRightDrawer({
                 >
                   <div className="flex items-center gap-2">
                     <PixelTrophy size={16} color="#B45309" />
-                    <span>Archival Specimen Minted: {pendingTrophyUnlock.title}!</span>
+                    <span>Trophy Unlocked: {pendingTrophyUnlock.title}!</span>
                   </div>
-                  <span className="font-mono text-[10px] text-amber-800 underline shrink-0">View Relic →</span>
+                  <span className="font-mono text-[10px] text-amber-800 underline shrink-0">View Trophy &rarr;</span>
                 </div>
               )}
 
@@ -1213,7 +1213,7 @@ export function DailyDebriefRightDrawer({
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelMoon size={14} color="#B8862D" />
-                      <span>Circadian Pillar</span>
+                      <span>Sleep</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
                       What time did you sleep &amp; wake up?
@@ -1253,7 +1253,7 @@ export function DailyDebriefRightDrawer({
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#4A5D4E] font-medium">Calculated Sleep Duration:</span>
                       <span className="font-mono text-xs font-bold text-[#1A3629]">
-                        {calculatedSleepDuration} Hours Restored
+                        {calculatedSleepDuration} Hours Slept
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-1.5 border-t border-[#1A3629]/10">
@@ -1286,7 +1286,7 @@ export function DailyDebriefRightDrawer({
                     <div className="flex flex-col gap-2 pt-2 border-t border-[#1A3629]/15">
                       <div className="flex items-center justify-between">
                         <span className="font-mono text-[10px] font-bold text-[#4A5D4E] uppercase">
-                          Morning Rested Score
+                          Morning Energy Level
                         </span>
                         <span className="font-mono text-[10px] text-[#B8862D] font-bold">
                           +{biometricXp.morningRestedXp} XP
@@ -1294,9 +1294,9 @@ export function DailyDebriefRightDrawer({
                       </div>
                       <div className="grid grid-cols-3 gap-1.5">
                         {[
-                          { rating: 4, label: 'Zombie (4/10)', xp: 6 },
+                          { rating: 4, label: 'Tired (4/10)', xp: 6 },
                           { rating: 7, label: 'Alert (7/10)', xp: 12 },
-                          { rating: 9, label: 'Supercharged (9/10)', xp: 20 },
+                          { rating: 9, label: 'Energized (9/10)', xp: 20 },
                         ].map((btn) => (
                           <button
                             key={btn.rating}
@@ -1317,10 +1317,10 @@ export function DailyDebriefRightDrawer({
                     <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/15">
                       <div className="flex flex-col text-left">
                         <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                          Circadian Wake Schedule Anchor
+                          Consistent Wake Time
                         </span>
                         <span className="font-mono text-[10px] text-[#4A5D4E]">
-                          Woke within ±30m of calibrated schedule
+                          Woke within ±30m of usual schedule
                         </span>
                       </div>
                       <button
@@ -1333,7 +1333,7 @@ export function DailyDebriefRightDrawer({
                         }`}
                       >
                         <PixelCheck size={12} color={wakeConsistencyAnchor ? '#047857' : '#4A5D4E'} />
-                        <span>{wakeConsistencyAnchor ? 'Locked (+20 XP)' : 'Off Schedule (+0 XP)'}</span>
+                        <span>{wakeConsistencyAnchor ? 'On Time (+20 XP)' : 'Off Schedule (+0 XP)'}</span>
                       </button>
                     </div>
                   </div>
@@ -1346,10 +1346,10 @@ export function DailyDebriefRightDrawer({
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelSun size={14} color="#B8862D" />
-                      <span>Circadian Ignition</span>
+                      <span>Morning Sunlight</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                      Did you catch 10m of morning sunlight?
+                      Did you get 10m of morning sunlight?
                     </h3>
                     <p className="font-sans text-xs text-[#4A5D4E]">
                       {currentQ.scientificContext}
@@ -1425,7 +1425,7 @@ export function DailyDebriefRightDrawer({
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelFlame size={14} color="#EA580C" />
-                      <span>Metabolic Anchor</span>
+                      <span>Breakfast</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
                       Did you hit your breakfast protein target (30g+)?
@@ -1566,10 +1566,10 @@ export function DailyDebriefRightDrawer({
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelFlame size={14} color="#EA580C" />
-                      <span>Midday Stamina</span>
+                      <span>Lunch</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                      Did you secure your high-protein lunch (40g+)?
+                      Did you have a high-protein lunch (40g+)?
                     </h3>
                     <p className="font-sans text-xs text-[#4A5D4E]">
                       {currentQ.scientificContext}
@@ -1735,10 +1735,10 @@ export function DailyDebriefRightDrawer({
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#EA580C] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelFlame size={14} color="#EA580C" />
-                      <span>Evening Rebuild &amp; Night Recovery</span>
+                      <span>Dinner</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                      Did you secure your dinner protein anchor (35g+)?
+                      Did you have a high-protein dinner (35g+)?
                     </h3>
                     <p className="font-sans text-xs text-[#4A5D4E]">
                       {currentQ.scientificContext || 'Evening protein stimulates nocturnal muscle protein synthesis (MPS) and stabilizes overnight glucose levels.'}
@@ -1870,13 +1870,13 @@ export function DailyDebriefRightDrawer({
                 </div>
               )}
 
-              {/* CARD 5: CAFFEINE AIR-LOCK */}
+              {/* CARD 5: CAFFEINE CUTOFF */}
               {currentQ?.id === 'caffeine_cutoff' && (
                 <div className="flex flex-col gap-5">
                   <div className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] font-bold text-[#B8862D] uppercase tracking-wider flex items-center gap-1.5">
                       <PixelClock size={14} color="#B8862D" />
-                      <span>Circadian Guard</span>
+                      <span>Caffeine Cutoff</span>
                     </span>
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
                       Did you cut off caffeine 10–12 hours before bed?
@@ -1896,7 +1896,7 @@ export function DailyDebriefRightDrawer({
                           : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF8F5]'
                       }`}
                     >
-                      <span>Yes, Respected Air-Lock</span>
+                      <span>Yes, Cut Off on Time</span>
                     </button>
 
                     <button
@@ -1993,17 +1993,17 @@ export function DailyDebriefRightDrawer({
 
                   <div className="flex flex-col gap-1">
                     <h3 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                      Ready to Seal the Ledger?
+                      Ready to Save Today&apos;s Log?
                     </h3>
                     <p className="font-sans text-xs text-[#4A5D4E] max-w-sm">
-                      Your daily checkpoints have been verified. Mint your biometric yield step-by-step with the 16-bit brass pushpin into your permanent Guild ledger.
+                      Your daily log is ready. Save today&apos;s summary and claim your XP.
                     </p>
                   </div>
 
                   {/* Live Biometric XP Tally Card with itemized sequential suites */}
                   <div className="w-full max-w-sm p-4 rounded-2xl bg-[#FFFDF9] border border-[#1A3629]/15 flex flex-col gap-2 font-mono text-xs text-left shadow-xs">
                     <div className="flex items-center justify-between font-bold text-[11px] text-[#1A3629]">
-                      <span className="uppercase tracking-wider">Calculated Biometric Yield</span>
+                      <span className="uppercase tracking-wider">Today&apos;s XP Breakdown</span>
                       <span className="text-[#B8862D]">+{biometricXp.totalXp} XP Total</span>
                     </div>
                     <div className="flex flex-col gap-1.5 pt-2 border-t border-dashed border-[#1A3629]/15 text-[11px]">
@@ -2058,7 +2058,7 @@ export function DailyDebriefRightDrawer({
                       <div className="flex items-center justify-between">
                         <span className="text-[#4A5D4E] flex items-center gap-1.5">
                           <PixelStopwatch size={13} color="#D97706" />
-                          <span>Caffeine Air-Lock</span>
+                          <span>Caffeine Cutoff</span>
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 font-mono font-bold">Deep Worker</span>
                         </span>
                         <span className={`font-bold ${caffeineDone ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
@@ -2068,7 +2068,7 @@ export function DailyDebriefRightDrawer({
                       <div className="flex items-center justify-between">
                         <span className="text-[#4A5D4E] flex items-center gap-1.5">
                           <PixelPin size={13} color="#EF4444" />
-                          <span>Daily Sanctuary Seal</span>
+                          <span>Daily Check-in</span>
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-800 font-mono font-bold">Active Island</span>
                         </span>
                         <span className="font-bold text-[#1A3629]">+{biometricXp.baseSealXp} XP</span>
@@ -2079,7 +2079,7 @@ export function DailyDebriefRightDrawer({
                   {isSealingInProgress && (
                     <div className="w-full max-w-sm p-3.5 rounded-2xl bg-[#1A3629] text-[#FFFDF9] flex items-center justify-center gap-2.5 font-mono text-xs font-bold animate-pulse shadow-md">
                       <PixelSparkles size={14} color="#FDE047" className="animate-spin" />
-                      <span>MINTING CHECKPOINT {sealingStepIdx + 1}: AWARDING XP SEQUENTIALLY...</span>
+                      <span>SAVING CHECKPOINT {sealingStepIdx + 1}: AWARDING XP...</span>
                     </div>
                   )}
 
@@ -2091,7 +2091,7 @@ export function DailyDebriefRightDrawer({
                           <span>Lunch or Dinner Pending</span>
                         </span>
                         <span className="text-[11px] font-sans text-amber-900">
-                          Seal for now to secure your daytime biometric XP, then amend when dinner is eaten — or save progress and complete the seal ceremony after dinner!
+                          Save for now to collect today&apos;s XP, and update when you&apos;ve had dinner — or save your draft and finish later tonight!
                         </span>
                       </div>
 
@@ -2101,7 +2101,7 @@ export function DailyDebriefRightDrawer({
                         disabled={isSealingInProgress}
                         className="w-full py-3.5 px-4 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] flex items-center justify-center gap-2 disabled:opacity-50"
                       >
-                        <span>{isSealingInProgress ? 'Minting...' : `Seal for Now (Amendable) (+${biometricXp.totalXp} XP)`}</span>
+                        <span>{isSealingInProgress ? 'Saving...' : `Save for Now (+${biometricXp.totalXp} XP)`}</span>
                         <PixelPushpin size={18} animate={false} />
                       </button>
 
@@ -2111,7 +2111,7 @@ export function DailyDebriefRightDrawer({
                         disabled={isSealingInProgress}
                         className="w-full py-3 px-4 rounded-2xl border-2 border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF6EE] transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        <span>Save Progress &amp; Seal Later Tonight</span>
+                        <span>Save Progress &amp; Finish Later</span>
                       </button>
                     </div>
                   ) : (
@@ -2121,7 +2121,7 @@ export function DailyDebriefRightDrawer({
                       disabled={isSealingInProgress}
                       className="w-full max-w-sm py-4 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[4px_4px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span>{isSealingInProgress ? 'Minting Sequential XP...' : `Seal Today & Pin Receipt (+${biometricXp.totalXp} XP)`}</span>
+                      <span>{isSealingInProgress ? 'Saving Today\'s XP...' : `Save Today & Claim XP (+${biometricXp.totalXp} XP)`}</span>
                       <PixelPushpin size={18} animate={false} />
                     </button>
                   )}
@@ -2148,7 +2148,7 @@ export function DailyDebriefRightDrawer({
                     className="px-5 py-2.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5 shadow-[2px_2px_0px_#2C5E43]"
                     title={!canProceed ? "Please complete this step to proceed" : undefined}
                   >
-                    <span>Next Checkpoint</span>
+                    <span>Next</span>
                     <PixelArrowRight size={14} color="#FFFDF9" />
                   </button>
                 </div>

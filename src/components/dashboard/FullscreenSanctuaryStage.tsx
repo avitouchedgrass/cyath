@@ -193,7 +193,7 @@ export function FullscreenSanctuaryStage({
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm ${
             !isAuthenticated ? 'cursor-pointer hover:border-[#1A3629]' : ''
           }`}
-          title={isAuthenticated ? (isFlameForged ? `${streakCount} Day Forged Streak (Kintsugi Grace Shield Active - Log today to reignite)` : `${streakCount} Day Momentum Streak`) : 'Sign in to record daily streak'}
+          title={isAuthenticated ? (isFlameForged ? `${streakCount} Day Protected Streak (Log today to keep your streak)` : `${streakCount} Day Streak`) : 'Sign in to record daily streak'}
         >
           <PixelStreakFlame isForged={isFlameForged} size={20} />
           <span className="font-cabinet font-extrabold text-xs sm:text-sm text-[#1A3629]">
@@ -202,7 +202,7 @@ export function FullscreenSanctuaryStage({
           {isTodaySealed && (
             <span className="flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
               <PixelCheck size={12} color="#047857" />
-              <span>Sealed Today</span>
+              <span>Logged Today</span>
             </span>
           )}
         </div>
@@ -217,7 +217,7 @@ export function FullscreenSanctuaryStage({
             onOpenBiomeGallery?.();
           }}
           className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm font-mono text-xs cursor-pointer hover:border-[#1A3629] hover:shadow-md transition-all group"
-          title="Click to explore Biome Ascensions and Island Suites"
+          title="Click to explore Island Themes and Levels"
         >
           <span className="font-cabinet font-extrabold text-sm text-[#1A3629] group-hover:text-[#2C4A3B]">
             {currentIsland.name}
@@ -228,7 +228,7 @@ export function FullscreenSanctuaryStage({
           </span>
           <span className="text-[10px] text-[#B8862D] font-bold font-cabinet flex items-center gap-1">
             <PixelSparkles size={11} color="#B8862D" />
-            <span>Biomes</span>
+            <span>Themes</span>
           </span>
         </div>
       </div>
@@ -239,14 +239,14 @@ export function FullscreenSanctuaryStage({
         {isReentryEligible && (
           <div className="absolute top-2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/20 shadow-sm animate-in fade-in">
             <span className="font-sans text-xs text-[#4A5D4E]">
-              Sanctuary in Dormant Mist
+              Streak Paused
             </span>
             <button
               type="button"
               onClick={handleReentry}
               className="px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[11px] hover:bg-[#2C4A3B] transition-colors cursor-pointer"
             >
-              Forged Re-Entry
+              Restart Streak
             </button>
           </div>
         )}
@@ -260,7 +260,7 @@ export function FullscreenSanctuaryStage({
             onOpenBiomeGallery?.();
           }}
           className="relative z-10 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] md:w-[540px] md:h-[540px] lg:w-[620px] lg:h-[620px] xl:w-[700px] xl:h-[700px] max-w-full flex items-center justify-center motion-safe:animate-[islandFloat_8s_ease-in-out_infinite] motion-reduce:animate-none transition-all duration-300 cursor-pointer"
-          title="Click to view Biome Ascensions & Island Suites"
+          title="Click to view Island Themes & Levels"
         >
           <Image
             src={currentIsland.pngImage || currentIsland.image}
@@ -293,7 +293,7 @@ export function FullscreenSanctuaryStage({
             className="w-full sm:w-1/2 py-4 px-6 rounded-2xl border-2 border-[#1A3629] bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF8F5] font-cabinet font-black text-sm transition-all cursor-pointer shadow-[4px_4px_0px_#1A3629] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 group"
           >
             <PixelBook size={16} color="#1A3629" />
-            <span>View Ledger</span>
+            <span>View Log Book</span>
           </button>
 
           {/* Primary Button: Seal Today (Right Drawer Trigger) */}
@@ -308,7 +308,7 @@ export function FullscreenSanctuaryStage({
             }`}
           >
             <PixelPushpin size={20} animate={false} className="group-hover:scale-110 transition-transform" />
-            <span>{isTodaySealed ? "Review Today's Seal" : 'Seal Today'}</span>
+            <span>{isTodaySealed ? "Review Today's Log" : 'Daily Check-in'}</span>
           </button>
 
         </div>
@@ -319,7 +319,7 @@ export function FullscreenSanctuaryStage({
           onClick={onScrollToTrophies}
           className="flex items-center gap-1.5 font-mono text-[11px] text-[#4A5D4E] hover:text-[#1A3629] transition-colors cursor-pointer group mt-1"
         >
-          <span>Specimen Reliquary Trophies</span>
+          <span>Trophies & Badges ↓</span>
           <PixelChevronDown size={14} color="#4A5D4E" />
         </button>
       </div>

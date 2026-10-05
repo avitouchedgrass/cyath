@@ -204,7 +204,7 @@ export function EveningSealCeremonyModal({
           onClick={onClose}
           disabled={stage === 'CHARGING' || stage === 'STAMPED' || stage === 'PINNING'}
           className="absolute top-4 right-4 w-8 h-8 rounded-full border border-[#241A13] bg-[#FFFDF9] text-[#241A13] hover:bg-[#241A13] hover:text-[#FFFDF9] transition-colors flex items-center justify-center cursor-pointer shadow-xs z-20 disabled:opacity-30"
-          aria-label="Close ceremony"
+          aria-label="Close modal"
         >
           <PixelX size={14} />
         </button>
@@ -212,12 +212,12 @@ export function EveningSealCeremonyModal({
         {/* Ritual Stage Header */}
         <div className="flex flex-col items-center text-center mb-4">
           <span className="font-cabinet font-black text-lg sm:text-xl text-[#FBF8F1] tracking-tight">
-            Evening Seal Ceremony
+            Daily Check-in
           </span>
           <span className="font-mono text-[11px] text-[#D8C7B5] mt-0.5">
             {stage === 'STAMPED' || stage === 'PINNING'
-              ? 'Manifest Verified & Sealed'
-              : 'Affix the Guild Signet to Lock Today’s Record'}
+              ? 'Summary Verified &amp; Saved'
+              : 'Press &amp; hold below to save today’s summary'}
           </span>
         </div>
 
@@ -235,17 +235,17 @@ export function EveningSealCeremonyModal({
           {stage === 'STAMPED' && (
             <div className="absolute top-16 -right-2 transform rotate-12 border-2 border-[#991B1B] text-[#991B1B] px-3 py-1 font-mono font-black text-[11px] tracking-wider bg-[#FFFDF9]/90 shadow-2xs animate-in zoom-in-75 duration-200 pointer-events-none flex items-center gap-1.5">
               <PixelCheck size={12} color="#991B1B" />
-              <span>AFFIXED &amp; SEALED</span>
+              <span>LOGGED &amp; SAVED</span>
             </div>
           )}
 
           {/* Dot-matrix Register Header */}
           <div className="flex flex-col items-center text-center font-mono w-full">
             <span className="text-[11px] font-black tracking-widest text-[#2B1F17] uppercase">
-              *** CYATH GUILD REGISTER ***
+              *** CYATH DAILY SUMMARY ***
             </span>
             <span className="text-[9.5px] text-[#2B1F17]/70 mt-0.5">
-              TERMINAL #01 // DESK OPERATOR
+              DAILY SUMMARY RECORD
             </span>
             <div className="flex items-center justify-between w-full text-[10px] text-[#2B1F17]/80 mt-2 pt-1 border-t border-[#2B1F17]/25 font-bold">
               <span>{targetDate}</span>
@@ -259,20 +259,20 @@ export function EveningSealCeremonyModal({
           {/* Telemetry Line Items */}
           <div className="w-full flex flex-col gap-1.5 font-mono text-[11px] text-left my-2">
             <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">01. SUNLIGHT RITUAL</span>
+              <span className="text-[#2B1F17]/75">01. MORNING SUNLIGHT</span>
               <span className="font-bold">{isSunlightDone ? 'DONE (+15M)' : 'PENDING'}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">02. PROTEIN FLOOR</span>
+              <span className="text-[#2B1F17]/75">02. DAILY PROTEIN</span>
               <span className="font-bold">{proteinLogged}g / {targetProtein}g</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">03. HYDRATION FLASK</span>
+              <span className="text-[#2B1F17]/75">03. WATER INTAKE</span>
               <span className="font-bold">{hydrationLogged} L</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">04. DAY STREAK</span>
-              <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(FORGED)' : ''}</span>
+              <span className="text-[#2B1F17]/75">04. DAILY STREAK</span>
+              <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(RESTARTED)' : ''}</span>
             </div>
           </div>
 
@@ -301,10 +301,10 @@ export function EveningSealCeremonyModal({
                 {!isAuthenticated && (
                   <div className="w-full mt-3 p-2.5 rounded-xl bg-[#241A13]/95 border border-[#D97706]/40 shadow-md flex flex-col items-center gap-1.5 text-center animate-in fade-in zoom-in-95">
                     <span className="font-mono text-[10px] font-bold text-[#F59E0B]">
-                      Guest Manifest Stored Locally
+                      Saved to this device
                     </span>
                     <span className="font-sans text-[11px] text-[#D8C7B5] leading-tight max-w-[280px]">
-                      Connect an account to permanently sync your streak to the Supabase cloud.
+                      Create an account to back up your habits and streak across devices.
                     </span>
                     <div className="flex items-center gap-2 mt-1 w-full">
                       <button
@@ -317,7 +317,7 @@ export function EveningSealCeremonyModal({
                         }}
                         className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#D97706] text-[#FFFDF9] font-cabinet font-extrabold text-[11px] hover:bg-[#B45309] transition-colors cursor-pointer text-center"
                       >
-                        Sync to Cloud
+                        Create Account
                       </button>
                       <button
                         type="button"
@@ -330,7 +330,7 @@ export function EveningSealCeremonyModal({
                         }}
                         className="py-1.5 px-2.5 rounded-lg border border-[#D8C7B5]/25 text-[#D8C7B5] font-cabinet font-medium text-[11px] hover:bg-white/5 transition-colors cursor-pointer text-center"
                       >
-                        Keep as Guest
+                        Continue as Guest
                       </button>
                     </div>
                   </div>
@@ -345,7 +345,7 @@ export function EveningSealCeremonyModal({
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerUp}
                 className="group relative flex flex-col items-center justify-center cursor-pointer touch-none select-none p-2"
-                title="Press and hold to affix the Guild Wax Seal"
+                title="Press and hold to save today's record"
               >
                 {/* Circular Charge Progress Ring */}
                 <svg
@@ -404,7 +404,7 @@ export function EveningSealCeremonyModal({
                 <span className="font-mono text-[9px] font-black text-[#B91C1C] uppercase tracking-wider mt-2.5">
                   {stage === 'CHARGING'
                     ? `HOLDING... ${Math.round(chargeProgress)}%`
-                    : 'HOLD TO AFFIX SEAL'}
+                    : 'HOLD TO SAVE LOG'}
                 </span>
               </div>
             )}
@@ -435,9 +435,9 @@ export function EveningSealCeremonyModal({
           <span>
             {stage === 'STAMPED' || stage === 'PINNING'
               ? (isAuthenticated
-                  ? 'Pinning sealed manifest to Guild Ledger...'
-                  : 'Manifest verified! Sync to cloud or continue as guest.')
-              : 'Press & hold the brass signet to melt and verify tonight’s record.'}
+                  ? 'Saving daily summary to log book...'
+                  : 'Daily summary saved! Create an account to back up or continue as guest.')
+              : 'Press &amp; hold the stamp to save today’s log.'}
           </span>
         </div>
       </div>

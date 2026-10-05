@@ -74,14 +74,14 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
             <div>
               <div className="flex items-center gap-2.5">
                 <h2 id="vault-drawer-title" className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#E2E8F0] tracking-tight">
-                  Specimen Reliquary
+                  Trophies &amp; Badges
                 </h2>
                 <span className="font-mono text-xs font-bold text-[#FBBF24] bg-[#FBBF24]/10 border border-[#FBBF24]/20 px-2.5 py-0.5 rounded-full">
-                  {unlockedCount} // {totalCount} CLAIMED
+                  {unlockedCount} / {totalCount} UNLOCKED
                 </span>
               </div>
               <p className="font-sans text-xs text-[#738A7D] mt-0.5">
-                Uniform pixel-art chalice trophies minted through biological consistency.
+                Pixel-art trophies and badges earned through consistent daily habits.
               </p>
             </div>
           </div>
@@ -92,12 +92,12 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
               {(
                 [
                   { id: 'all', label: `All (${totalCount})` },
-                  { id: 'sanctuary', label: 'Sanctuary' },
-                  { id: 'seals', label: 'Daily Seals' },
-                  { id: 'biometrics', label: 'Biometrics' },
-                  { id: 'fuel', label: 'Fuel' },
+                  { id: 'sanctuary', label: 'Themes' },
+                  { id: 'seals', label: 'Check-ins' },
+                  { id: 'biometrics', label: 'Sleep & Light' },
+                  { id: 'fuel', label: 'Nutrition' },
                   { id: 'streaks', label: 'Streaks' },
-                  { id: 'shame', label: 'Shame' },
+                  { id: 'shame', label: 'Anti-Habits' },
                 ] as const
               ).map((cat) => (
                 <button
@@ -123,7 +123,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
               type="button"
               onClick={onClose}
               className="w-9 h-9 rounded-full border border-[#2A3E31] bg-[#060D09] text-[#738A7D] hover:text-[#E2E8F0] hover:border-[#E2E8F0]/30 transition-colors flex items-center justify-center cursor-pointer"
-              aria-label="Close reliquary"
+              aria-label="Close trophies"
             >
               <PixelX size={14} />
             </button>
@@ -174,12 +174,12 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
 
                   {/* Engraved Plinth Nameplate */}
                   <span className="font-cabinet font-extrabold text-xs text-[#E2E8F0] line-clamp-1 w-full group-hover:text-white transition-colors z-10">
-                    {isUnlocked ? trophy.title : 'Locked Specimen'}
+                    {isUnlocked ? trophy.title : 'Locked Trophy'}
                   </span>
 
                   <div className="flex items-center gap-1.5 mt-1 z-10">
                     <span className="text-[10px] font-mono uppercase tracking-wider text-[#738A7D]">
-                      {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Encrypted'}
+                      {isUnlocked ? trophy.tier || (trophy.isShame ? 'Shame' : 'Standard') : 'Locked'}
                     </span>
                     {trophy.isShame && isUnlocked && (
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -193,8 +193,8 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
 
         {/* Footer Engraving Bar */}
         <div className="px-6 sm:px-8 py-3.5 border-t border-[#1E2E24] bg-[#0E1A12] flex items-center justify-between text-xs text-[#738A7D] font-sans">
-          <span>Click any specimen to inspect high-resolution chalice lore.</span>
-          <span className="font-mono text-[#FBBF24] font-bold">+50 XP per unlocked relic</span>
+          <span>Click any trophy to view details and requirements.</span>
+          <span className="font-mono text-[#FBBF24] font-bold">+50 XP per unlocked trophy</span>
         </div>
       </div>
 
@@ -362,7 +362,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                       ) : (
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-cabinet font-bold text-xs">
                           <PixelLock size={14} />
-                          <span>Locked Specimen</span>
+                          <span>Locked Trophy</span>
                         </div>
                       )}
 
@@ -384,7 +384,7 @@ export function SpecimenVaultDrawer({ isOpen, onClose, initialSelectedId }: Spec
                         onClick={() => setSelectedTrophy(null)}
                         className="px-5 py-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white hover:text-[#1A3629] text-white font-cabinet font-bold text-xs transition-colors cursor-pointer"
                       >
-                        Back to Reliquary
+                        Back to Trophies
                       </button>
                     </div>
                   </>

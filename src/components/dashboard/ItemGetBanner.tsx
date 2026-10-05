@@ -49,7 +49,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
           <div className="flex items-center gap-1.5">
             <PixelTrophy size={14} color="#D97706" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#D97706]">
-              {pendingTrophyUnlock.isShame ? 'Trophy of Shame Unlocked' : 'New Specimen Acquired'}
+              {pendingTrophyUnlock.isShame ? 'Anti-Habit Trophy Unlocked' : 'New Trophy Unlocked!'}
             </span>
           </div>
           <h4 className="font-cabinet font-extrabold text-sm text-[#1A3629] truncate">
@@ -66,7 +66,7 @@ export function ItemGetBanner({ onOpenVault }: ItemGetBannerProps) {
             onClick={handleInspect}
             className="px-3 py-1.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shadow-2xs"
           >
-            Inspect
+            View
           </button>
           <button
             type="button"

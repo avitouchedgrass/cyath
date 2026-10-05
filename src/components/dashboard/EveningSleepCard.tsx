@@ -117,8 +117,8 @@ export function EveningSleepCard({
                 }`}
               >
                 {isAlreadySealed
-                  ? 'View Sealed Ledger'
-                  : 'Begin Seal Ceremony (+50 XP)'}
+                  ? 'View Log Book'
+                  : 'Daily Check-in (+50 XP)'}
               </button>
             ) : (
               <button
@@ -126,7 +126,7 @@ export function EveningSleepCard({
                 onClick={onToggleCorkboard}
                 className="w-full py-2 px-3 rounded-xl border border-[#1A3629]/20 bg-[#FFFDF9] hover:bg-[#1A3629] hover:text-[#FFFDF9] font-cabinet font-bold text-xs text-[#1A3629] transition-all cursor-pointer text-center shadow-2xs"
               >
-                {isCorkboardOpen ? 'Close Ledger View' : `Open 30-Day Ledger (${pinnedCount}/30)`}
+                {isCorkboardOpen ? 'Close Log Book' : `Open 30-Day Log Book (${pinnedCount}/30)`}
               </button>
             )}
 
@@ -136,7 +136,7 @@ export function EveningSleepCard({
                 onClick={onOpenReceipt}
                 className="text-center font-mono text-[10px] text-[#2B3A2F] hover:text-[#1A3629] font-medium cursor-pointer hover:underline py-0.5"
               >
-                Inspect Thermal Receipt
+                View Daily Receipt
               </button>
             )}
           </div>
@@ -146,7 +146,7 @@ export function EveningSleepCard({
         <div className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/10">
           <div className="flex items-center justify-between">
             <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-              Circadian Cadence
+              Sleep Schedule
             </span>
             <button
               type="button"

@@ -204,59 +204,59 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
     category: 'sanctuary',
   },
 
-  // 2. Daily Seal Ceremony & Receipts
+  // 2. Daily Check-in & Receipts
   {
     id: 'first_seal',
     title: 'The First Brass Seal',
-    subtitle: 'Ceremonial Closer',
-    description: 'Completed your first Evening Seal Ceremony and stamped your daily receipt.',
+    subtitle: 'First Check-in',
+    description: 'Completed your first evening check-in and saved your daily summary.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_normal.png',
-    unlockCondition: 'Complete first Daily Seal Ceremony',
+    unlockCondition: 'Complete first daily check-in',
     tier: 'Bronze',
     category: 'seals',
   },
   {
     id: 'seal_streak_7',
-    title: 'Archival Monolith',
-    subtitle: '7 Pinned Receipts',
-    description: 'Sealed your daily ledger 7 days in a row without breaking the cadence.',
+    title: 'Weekly Consistency',
+    subtitle: '7 Saved Receipts',
+    description: 'Completed your daily check-in 7 days in a row.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_normal.png',
-    unlockCondition: '7-day daily seal streak achieved',
+    unlockCondition: '7-day check-in streak achieved',
     tier: 'Silver',
     category: 'seals',
   },
   {
     id: 'seal_streak_30',
-    title: 'The Unbroken Ledger',
-    subtitle: 'Archival Sovereign',
-    description: 'Forged 30 consecutive days of verified evening seals pinned to your corkboard.',
+    title: 'The Unbroken Month',
+    subtitle: 'Consistency Champion',
+    description: 'Completed 30 consecutive days of verified evening check-ins.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_normal.png',
-    unlockCondition: '30-day daily seal streak achieved',
+    unlockCondition: '30-day check-in streak achieved',
     tier: 'Celestial',
     category: 'seals',
   },
   {
     id: 'flawless_biometrics',
-    title: 'Circadian Sovereign',
-    subtitle: 'Flawless Daily Yield',
-    description: 'Earned maximum biometric yield: 7-9h sleep + morning light + protein target + zero caffeine post-cutoff.',
+    title: 'Perfect Day',
+    subtitle: 'All Targets Hit',
+    description: 'Hit all daily targets: 7-9h sleep + morning sunlight + protein target + caffeine cutoff.',
     isShame: false,
     spriteUrl: '/assets/trophies/solar_vanguard.png',
-    unlockCondition: 'Achieve maximum biometric XP yield on a seal',
+    unlockCondition: 'Hit all daily targets on a check-in',
     tier: 'Gold',
     category: 'seals',
   },
   {
     id: 'thermal_receipt',
-    title: 'Physical Thermal Mint',
-    subtitle: 'Archival Proof',
-    description: 'Downloaded or shared a 16-bit physical receipt card from your ledger.',
+    title: 'Daily Receipt',
+    subtitle: 'Saved Summary',
+    description: 'Downloaded or shared your daily receipt card.',
     isShame: false,
     spriteUrl: '/assets/trophies/trophy_lock.png',
-    unlockCondition: 'Export or share a physical receipt card',
+    unlockCondition: 'Export or share a receipt card',
     tier: 'Bronze',
     category: 'seals',
   },
@@ -287,11 +287,11 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'deep_recovery_7h',
     title: 'The Dream Sanctuary',
-    subtitle: 'Cellular Rejuvenation',
-    description: 'Achieved 7.5+ hours of restorative sleep across 5 logged daily seals.',
+    subtitle: 'Restorative Sleep',
+    description: 'Achieved 7.5+ hours of sleep across 5 logged days.',
     isShame: false,
     spriteUrl: '/assets/trophies/hydration_alchemist.png',
-    unlockCondition: '7.5+ hours sleep logged on 5 seals',
+    unlockCondition: '7.5+ hours sleep logged on 5 days',
     tier: 'Gold',
     category: 'biometrics',
   },
@@ -322,19 +322,19 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'iron_anchor',
     title: 'Iron Protein Anchor',
-    subtitle: 'Whole-Food Sentry',
-    description: 'Hit your personalized daily protein floor with whole-food fuel.',
+    subtitle: 'Nutrition Goal',
+    description: 'Hit your personalized daily protein target.',
     isShame: false,
     spriteUrl: '/assets/trophies/iron_anchor.png',
-    unlockCondition: 'Daily protein floor reached',
+    unlockCondition: 'Daily protein target reached',
     tier: 'Gold',
     category: 'fuel',
   },
   {
     id: 'protein_streak',
     title: 'Whole-Food Sentinel',
-    subtitle: 'Cellular Foundation',
-    description: 'Hit your daily protein floor 5 days in a row.',
+    subtitle: 'Daily Protein',
+    description: 'Hit your daily protein target 5 days in a row.',
     isShame: false,
     spriteUrl: '/assets/trophies/iron_anchor.png',
     unlockCondition: '5-day protein target streak',
@@ -344,18 +344,18 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'clean_plate',
     title: 'High-Protein Chef',
-    subtitle: 'Macro Calibration',
-    description: 'Logged 3 calibrated whole-food meals in a single day.',
+    subtitle: 'Balanced Meals',
+    description: 'Logged 3 healthy meals in a single day.',
     isShame: false,
     spriteUrl: '/assets/trophies/iron_anchor.png',
-    unlockCondition: '3 whole-food meals logged in a day',
+    unlockCondition: '3 healthy meals logged in a day',
     tier: 'Bronze',
     category: 'fuel',
   },
   {
     id: 'hydration_alchemist',
     title: 'Hydration Alchemist',
-    subtitle: 'Cellular Osmosis',
+    subtitle: 'Daily Water Goal',
     description: 'Reached 2.5L+ hydration before mid-afternoon.',
     isShame: false,
     spriteUrl: '/assets/trophies/hydration_alchemist.png',
@@ -366,8 +366,8 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'cellular_surge',
     title: 'Deep Hydration Crown',
-    subtitle: 'Flow State Architect',
-    description: 'Logged 3.0 liters of pure cellular hydration.',
+    subtitle: 'Water Intake',
+    description: 'Logged 3.0 liters of water in a single day.',
     isShame: false,
     spriteUrl: '/assets/trophies/hydration_alchemist.png',
     unlockCondition: '3.0L water logged in a single day',
@@ -379,8 +379,8 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'streak_7d',
     title: 'The 7-Day Monolith',
-    subtitle: 'Unbroken Orbit',
-    description: 'Maintained an unbroken habit momentum for 7 consecutive days.',
+    subtitle: 'Consistency',
+    description: 'Maintained a 7-day habit streak.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_normal.png',
     unlockCondition: '7-day habit streak reached',
@@ -390,8 +390,8 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'streak_30d',
     title: 'The 30-Day Solstice',
-    subtitle: 'Master of Cadence',
-    description: 'Forged 30 consecutive days of habit consistency.',
+    subtitle: 'Consistency Champion',
+    description: 'Completed 30 consecutive days of habit consistency.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_normal.png',
     unlockCondition: '30-day habit streak achieved',
@@ -401,11 +401,11 @@ export const TROPHIES_ROSTER: TrophyDefinition[] = [
   {
     id: 'forged_reentry',
     title: 'Forged Fire Heart',
-    subtitle: 'Phoenix of the Ledger',
-    description: 'Recovered a lapsed habit streak through the Grace Re-entry Protocol.',
+    subtitle: 'Back On Track',
+    description: 'Restarted a habit streak after a break.',
     isShame: false,
     spriteUrl: '/assets/trophies/flame_iron.png',
-    unlockCondition: 'Activate Grace Re-entry Protocol',
+    unlockCondition: 'Restart habit streak',
     tier: 'Gold',
     category: 'streaks',
   },
@@ -2574,7 +2574,7 @@ export const useHabitStore = create<HabitStoreState>()(
 
         let xpAwarded = 0;
         if (!hasWeighedInLastWeek) {
-          get().gainXp(15, 'Biometric Calibration: Weekly Weight Checked', 'weight_log');
+          get().gainXp(15, 'Weekly Weight Logged', 'weight_log');
           xpAwarded = 15;
           retroAudio.playTierUpgrade();
         } else {
@@ -2860,10 +2860,10 @@ export const useHabitStore = create<HabitStoreState>()(
           }
         } else if (typeof xpAwarded === 'number' && xpAwarded > 0) {
           finalXp = xpAwarded;
-          get().gainXp(finalXp, isPartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', 'ledger_seal');
+          get().gainXp(finalXp, isPartial ? 'Daily Log Saved (Pending Meals)' : 'Daily Log Saved', 'ledger_seal');
         } else if (xpAwarded === undefined) {
           finalXp = 50;
-          get().gainXp(finalXp, isPartial ? 'Daily Ledger Sealed (Pending Meals)' : 'Daily Ledger Sealed', 'ledger_seal');
+          get().gainXp(finalXp, isPartial ? 'Daily Log Saved (Pending Meals)' : 'Daily Log Saved', 'ledger_seal');
         }
 
         const currentLog = get().getDailyLog(targetDate);
@@ -2914,7 +2914,7 @@ export const useHabitStore = create<HabitStoreState>()(
           );
           const award = meals.lunch.hitTarget ? 25 : 15;
           addedXp += award;
-          get().gainXp(award, `Lunch Fuel Logged (${meals.lunch.name})`, 'ledger_seal', 'iron');
+          get().gainXp(award, `Lunch Logged (${meals.lunch.name})`, 'ledger_seal', 'iron');
         }
 
         if (meals.dinner) {
@@ -2929,7 +2929,7 @@ export const useHabitStore = create<HabitStoreState>()(
           );
           const award = meals.dinner.hitTarget ? 25 : 15;
           addedXp += award;
-          get().gainXp(award, `Dinner Fuel Logged (${meals.dinner.name})`, 'ledger_seal', 'iron');
+          get().gainXp(award, `Dinner Logged (${meals.dinner.name})`, 'ledger_seal', 'iron');
         }
 
         const updatedPartials = {

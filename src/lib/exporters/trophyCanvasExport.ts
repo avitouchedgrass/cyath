@@ -71,14 +71,14 @@ export async function generateTrophyCanvas(data: TrophyExportData): Promise<HTML
   ctx.font = 'bold 12px monospace';
   ctx.fillStyle = data.isShame ? '#F87171' : '#FCD34D';
   ctx.fillText(
-    data.isShame ? 'SATIRICAL SHAME RELIC' : 'CYATH SPECIMEN ARCHIVE',
+    data.isShame ? 'ANTI-HABIT TROPHY' : 'CYATH TROPHY',
     width / 2,
     64
   );
 
   ctx.font = '10px monospace';
   ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-  ctx.fillText('OFFICIAL SANCTUARY CITATION', width / 2, 82);
+  ctx.fillText('ACHIEVEMENT UNLOCKED', width / 2, 82);
 
   // Divider Line
   ctx.strokeStyle = 'rgba(200, 147, 50, 0.3)';
@@ -215,11 +215,11 @@ export async function generateTrophyCanvas(data: TrophyExportData): Promise<HTML
 
   ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
   ctx.font = '11px monospace';
-  ctx.fillText(`SPECIMEN ID: ${data.id.toUpperCase()} · VERIFIED PROTOCOL`, width / 2, 742);
+  ctx.fillText(`TROPHY ID: ${data.id.toUpperCase()} · VERIFIED HABIT`, width / 2, 742);
 
   ctx.fillStyle = '#10B981';
   ctx.font = 'bold 11px monospace';
-  ctx.fillText('https://cyath.space · Circadian Sanctuary', width / 2, 762);
+  ctx.fillText('https://cyath.space · Daily Habit Tracker', width / 2, 762);
 
   return canvas;
 }
@@ -249,8 +249,8 @@ export async function shareTrophyImage(data: TrophyExportData): Promise<{ shared
   if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({
-        title: `${data.title} · Cyath Relic`,
-        text: `[Cyath Specimen Relic] ${data.title} (${data.masteryLabel})\n${data.subtitle}\nVerified consistency on Cyath: https://cyath.space`,
+        title: `${data.title} · Cyath Trophy`,
+        text: `[Cyath Trophy] ${data.title} (${data.masteryLabel})\n${data.subtitle}\nConsistent daily habits on Cyath: https://cyath.space`,
         files: [file],
       });
       return { shared: true, method: 'native' };

@@ -203,7 +203,7 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
   ctx.textAlign = 'left';
   ctx.fillStyle = '#1A3629';
   ctx.font = 'bold 18px monospace';
-  ctx.fillText('TOTAL MINTED', leftX, footerY + 36);
+  ctx.fillText('TOTAL EARNED', leftX, footerY + 36);
 
   ctx.textAlign = 'right';
   ctx.fillStyle = '#B8862D';
@@ -214,10 +214,10 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
   ctx.textAlign = 'center';
   ctx.font = 'bold 12px monospace';
   ctx.fillStyle = '#1A3629';
-  ctx.fillText('[ SEALED INTO 30-DAY BIOLOGICAL LEDGER ]', width / 2, footerY + 75);
+  ctx.fillText('[ LOGGED & SAVED ]', width / 2, footerY + 75);
   ctx.font = '11px monospace';
   ctx.fillStyle = '#4A5D4E';
-  ctx.fillText('https://cyath.space · Passive Circadian Tracker', width / 2, footerY + 95);
+  ctx.fillText('https://cyath.space · Daily Habit Tracker', width / 2, footerY + 95);
 
   // Bottom Sawtooth Effect
   ctx.fillStyle = '#FFFDF9';

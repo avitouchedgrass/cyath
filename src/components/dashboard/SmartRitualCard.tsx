@@ -57,7 +57,7 @@ export function SmartRitualCard() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]">
-              MORNING BOOT · 10-SECOND CHECK-IN
+              MORNING CHECK-IN
             </span>
           </div>
           <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#EAE3D2] px-2 py-0.5 rounded">
@@ -120,7 +120,7 @@ export function SmartRitualCard() {
             type="submit"
             className="w-full py-2 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer text-center mt-1"
           >
-            Lock Morning Boot (+50 XP) →
+            Save Morning Check-in (+50 XP) →
           </button>
         </form>
       </div>
@@ -135,7 +135,7 @@ export function SmartRitualCard() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]">
-              EVENING WRAP &amp; SHUTDOWN · 8-SECOND CLOSE
+              EVENING CHECK-IN
             </span>
           </div>
           <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#EAE3D2] px-2 py-0.5 rounded">
@@ -182,7 +182,7 @@ export function SmartRitualCard() {
             type="submit"
             className="w-full py-2 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer text-center mt-1"
           >
-            Seal Evening Wrap &amp; Shutdown (+50 XP) →
+            Save Evening Check-in (+50 XP) →
           </button>
         </form>
       </div>
@@ -196,18 +196,18 @@ export function SmartRitualCard() {
         <PixelCheck size={12} color="#065F46" />
         <span className="font-bold text-[#1A3629]">
           {ritual.eveningWrapCompleted
-            ? 'Evening Wrap Sealed'
-            : 'Morning Boot Primed'}
+            ? 'Evening Check-in Complete'
+            : 'Morning Check-in Complete'}
         </span>
         <span className="text-[#4A5D4E] text-[11px] hidden sm:inline">
           {ritual.eveningWrapCompleted
-            ? `· Melatonin Gate active`
+            ? `· Bedtime wind-down`
             : `· ${ritual.morningRestedRating || 8}/10 Rested`}
         </span>
       </div>
 
       <span className="text-[10px] text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#065F46]/20 font-bold">
-        Ritual Complete
+        Check-in Complete
       </span>
     </div>
   );

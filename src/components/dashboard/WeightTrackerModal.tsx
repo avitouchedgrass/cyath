@@ -94,7 +94,7 @@ export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps)
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]">
-                Biometric Ledger
+                Weight Log
               </span>
               <span className="font-mono text-[10px] font-bold text-[#1A3629] bg-[#E8F5E9] border border-[#10B981]/30 px-2 py-0.5 rounded-md">
                 +15 XP Daily
@@ -241,7 +241,7 @@ export function WeightTrackerModal({ isOpen, onClose }: WeightTrackerModalProps)
             type="submit"
             className="w-full py-3 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-sm tracking-wide transition-all shadow-2xs cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
           >
-            <span>Log Biometric Weight</span>
+            <span>Log Weight</span>
             <span className="font-mono text-xs opacity-80">(+15 XP)</span>
           </button>
         </form>

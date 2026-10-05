@@ -120,7 +120,7 @@ export function OmniDock() {
       sunlightDone: morningCaffeineDelay,
       targetFocusHours: 5,
     }, currentDate);
-    setFeedback('Morning Boot locked (+50 XP)');
+    setFeedback('Morning Check-in saved (+50 XP)');
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -132,7 +132,7 @@ export function OmniDock() {
       wholeFoodRating: 8,
       afternoonSlumpScore: eveningSlump,
     }, currentDate);
-    setFeedback('Evening Wrap sealed (+50 XP)');
+    setFeedback('Evening Check-in saved (+50 XP)');
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -144,17 +144,17 @@ export function OmniDock() {
           <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
           <h2 className="font-cabinet font-bold text-base sm:text-lg text-[#1A3629]">
             {isMorning
-              ? 'Morning Boot · 10-Second Check-In'
+              ? 'Morning Check-in'
               : isEvening
-              ? 'Evening Wrap & Shutdown'
-              : 'Midday Focus & Slump Defense'}
+              ? 'Evening Check-in'
+              : 'Midday Focus & Energy'}
           </h2>
         </div>
 
         <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#FAF6EE] border border-[#1A3629]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          {isMorning && (ritual.morningBootCompleted ? <><PixelCheck size={11} color="#065F46" /> Synced</> : '+50 XP Available')}
+          {isMorning && (ritual.morningBootCompleted ? <><PixelCheck size={11} color="#065F46" /> Saved</> : '+50 XP Available')}
           {!isMorning && !isEvening && 'Active Focus'}
-          {isEvening && (ritual.eveningWrapCompleted ? <><PixelCheck size={11} color="#065F46" /> Sealed</> : '+50 XP Available')}
+          {isEvening && (ritual.eveningWrapCompleted ? <><PixelCheck size={11} color="#065F46" /> Saved</> : '+50 XP Available')}
         </span>
       </div>
 
@@ -215,12 +215,12 @@ export function OmniDock() {
               onClick={handleMorningLock}
               className="ml-auto px-4 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
-              Lock Morning Boot (+50 XP) →
+              Save Morning Check-in (+50 XP) →
             </button>
           ) : (
             <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
               <PixelCheck size={12} color="#065F46" />
-              <span>Morning Boot Locked</span>
+              <span>Morning Check-in Saved</span>
             </span>
           )}
         </div>
@@ -307,12 +307,12 @@ export function OmniDock() {
               onClick={handleEveningSeal}
               className="ml-auto px-4 py-1.5 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
-              Seal Evening Wrap (+50 XP) →
+              Save Evening Check-in (+50 XP) →
             </button>
           ) : (
             <span className="ml-auto font-mono text-xs text-[#065F46] font-bold bg-[#ECFDF5] border border-[#10B981]/40 px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
               <PixelCheck size={12} color="#065F46" />
-              <span>Evening Wrap Sealed</span>
+              <span>Evening Check-in Saved</span>
             </span>
           )}
         </div>

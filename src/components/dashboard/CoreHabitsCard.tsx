@@ -79,8 +79,8 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         keyNumber: 3,
         title: 'Whole-Food Protein',
         subtitle: isProteinMet
-          ? `${currentProtein}g of ${targetProtein}g daily target (floor secured)`
-          : `${currentProtein}g of ${targetProtein}g daily target (${targetProtein - currentProtein}g to floor)`,
+          ? `${currentProtein}g of ${targetProtein}g daily target (target met)`
+          : `${currentProtein}g of ${targetProtein}g daily target (${targetProtein - currentProtein}g remaining)`,
         isDone: isProteinMet,
         statusLabel: isProteinMet ? 'Completed' : currentProtein > 0 ? `${currentProtein}g Logged` : 'Pending',
       },
@@ -91,7 +91,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         id: customDefinition.id,
         keyNumber: 4,
         title: customDefinition.title,
-        subtitle: 'Custom power lever',
+        subtitle: 'Custom daily habit',
         isDone: !!currentLog.habitsCompleted?.[customDefinition.id],
         statusLabel: !!currentLog.habitsCompleted?.[customDefinition.id] ? 'Completed' : 'Pending',
       });
@@ -193,7 +193,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#1A3629]/10">
         <div className="flex flex-col min-w-0">
           <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
-            Daily Ritual Anchors
+            Daily Habits
           </h3>
           {onOpenSchedule ? (
             <button
@@ -211,7 +211,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           )}
         </div>
         <span className="font-mono text-xs font-bold text-[#1A3629] shrink-0">
-          {completedCount} of {displayHabits.length} Secured
+          {completedCount} of {displayHabits.length} Done
         </span>
       </div>
 
@@ -259,7 +259,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
 
               {isDone ? (
                 <span className="shrink-0 font-mono text-[11px] text-[#065F46] font-bold">
-                  Secured
+                  Done
                 </span>
               ) : (
                 <span className="shrink-0 font-mono text-[11px] text-[#4A5D4E]/60 group-hover:text-[#1A3629]">
@@ -278,7 +278,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               onClick={() => setIsSlotPickerOpen(!isSlotPickerOpen)}
               className="w-full py-2.5 px-3.5 rounded-xl border border-dashed border-[#1A3629]/20 hover:border-[#1A3629]/40 bg-[#FAF8F5]/40 hover:bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <span>+ Add 4th Custom Power Habit</span>
+              <span>+ Add 4th Custom Habit</span>
             </button>
           </div>
         ) : (
@@ -298,7 +298,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3 mt-2 animate-in fade-in duration-150">
             <div className="flex items-center justify-between">
               <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                Choose 4th Habit Lever
+                Choose 4th Habit
               </span>
               <span className="font-mono text-[10px] text-[#4A5D4E]">
                 Fuel · Movement · Lifestyle · Misc

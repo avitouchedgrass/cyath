@@ -115,21 +115,21 @@ export function WaxSealCorkboard({
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b-2 border-[#3D2E24]/20 pb-3 sm:pb-4 pr-10 sm:pr-0">
           <div className="flex flex-col">
             <h2 className="font-cabinet font-black text-xl sm:text-2xl lg:text-3xl text-[#2B1F17] tracking-tight">
-              The 30-Day Guild Ledger
+              The 30-Day Ledger
             </h2>
             <p className="font-mono text-[11px] sm:text-xs text-[#5C4838] mt-0.5">
-              Daily thermal receipts pinned &amp; verified with guild wax. Grey shadows mark missed days.
+              Daily receipts saved and logged. Blank slots mark missed days.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9]/95 border-2 border-[#2B1F17]/20 font-mono text-xs font-bold text-[#2B1F17] shadow-xs">
               <span className="text-[#991B1B]">●</span>
-              <span>{sealedCount} / 30 Sealed</span>
+              <span>{sealedCount} / 30 Days Logged</span>
             </div>
             {isForgedStreak && (
               <span className="font-mono text-[11px] sm:text-xs font-bold text-[#1E3A8A] bg-blue-100/95 px-2.5 py-1 rounded-full border-2 border-blue-300 shadow-xs">
-                Forged Streak ({streakCount}d)
+                Restored Streak ({streakCount}d)
               </span>
             )}
           </div>
@@ -327,29 +327,29 @@ export function WaxSealCorkboard({
               <span className="w-3.5 h-4.5 bg-[#FFFDF7] border border-[#2B1F17]/30 rounded-xs inline-flex items-center justify-center shadow-2xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#991B1B]" />
               </span>
-              <span>Sealed Receipt</span>
+              <span>Saved Receipt</span>
             </span>
             <span
               className="flex items-center gap-1.5 cursor-help"
-              title="Grace Re-entry: Streak was broken but restored through golden Kintsugi repair."
+              title="Streak was broken but restored retroactively."
             >
               <span className="w-3.5 h-4.5 bg-[#FFFDF7] border border-[#2B1F17]/30 rounded-xs inline-flex items-center justify-center shadow-2xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#334155]" />
               </span>
-              <span>Forged (Kintsugi)</span>
+              <span>Restored Streak</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3.5 h-4.5 bg-[#2B1F17]/25 border border-dashed border-[#5C4838]/40 rounded-xs inline-block" />
-              <span>Missed Shadow</span>
+              <span>Missed Day</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3.5 h-4.5 bg-[#FFFDF9]/70 border border-dashed border-[#B91C1C]/60 rounded-xs inline-block" />
-              <span>Today Pending</span>
+              <span>Today Open</span>
             </span>
           </div>
 
           <span className="text-[10px] sm:text-[11px] text-[#2B1F17]/85 font-semibold">
-            Tap any sealed receipt to inspect 58mm slip →
+            Tap any receipt to view details →
           </span>
         </div>
       </div>

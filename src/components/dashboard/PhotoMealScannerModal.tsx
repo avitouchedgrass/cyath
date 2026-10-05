@@ -226,7 +226,7 @@ export function PhotoMealScannerModal({ isOpen, onClose }: PhotoMealScannerModal
                 Photo Meal Scanner
               </h2>
               <span className="text-[11px] font-mono text-[#4A5D4E] block">
-                Multimodal Computer Vision · Macro Deconstruction
+                Instant Nutrition &amp; Protein Breakdown
               </span>
             </div>
           </div>
@@ -325,18 +325,18 @@ export function PhotoMealScannerModal({ isOpen, onClose }: PhotoMealScannerModal
                     <div className="flex items-center justify-between text-white font-mono text-[10px] font-bold">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                        SPECTRAL VISION ANALYSIS
+                        ANALYZING MEAL PHOTO
                       </span>
-                      <span>16-BIT SCAN</span>
+                      <span>SCANNING</span>
                     </div>
                     <div className="w-full text-center">
                       <span className="px-3 py-1 rounded-full bg-black/75 border border-[#10B981]/50 text-white font-mono text-xs font-bold inline-flex items-center gap-2">
                         <PixelSpinner size={14} color="#10B981" />
-                        Deconstructing Plate Levers...
+                        Calculating protein &amp; calories...
                       </span>
                     </div>
                     <div className="text-white/60 font-mono text-[9px] text-right">
-                      MATCHING USDA MATRIX
+                      MATCHING NUTRITION DATABASE
                     </div>
                   </div>
                 )}
@@ -460,7 +460,7 @@ export function PhotoMealScannerModal({ isOpen, onClose }: PhotoMealScannerModal
                 ) : (
                   <>
                     <PixelCopy size={12} color="#4A5D4E" />
-                    <span>Copy Specs</span>
+                    <span>Copy Nutrition</span>
                   </>
                 )}
               </button>
@@ -474,17 +474,17 @@ export function PhotoMealScannerModal({ isOpen, onClose }: PhotoMealScannerModal
                     ? 'bg-[#065F46] text-[#FFFDF9]'
                     : 'bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9]'
                 }`}
-                title="Log this verified plate to your daily nutrition ledger"
+                title="Save this meal to your daily nutrition log"
               >
                 {hasLogged ? (
                   <>
                     <PixelCheck size={12} color="#FFFDF9" />
-                    <span>Logged to Ledger!</span>
+                    <span>Saved to Daily Log!</span>
                   </>
                 ) : (
                   <>
                     <PixelUtensils size={12} color="#FFFDF9" />
-                    <span>Commit to Ledger (+{scanResult.protein}g)</span>
+                    <span>Save to Daily Log (+{scanResult.protein}g)</span>
                   </>
                 )}
               </button>

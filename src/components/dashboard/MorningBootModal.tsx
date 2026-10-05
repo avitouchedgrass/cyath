@@ -65,14 +65,14 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4A5D4E]">
-                Desk Morning Boot
+                Morning Check-in
               </span>
               <span className="px-2.5 py-0.5 rounded-full border border-[#1A3629]/10 bg-[#FAF8F5] text-[10px] font-mono font-semibold text-[#1A3629]">
                 +50 XP
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-              10-Second Desk Check-in
+              Morning Check-in
             </h2>
           </div>
 
@@ -87,7 +87,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
         </div>
 
         <p className="text-xs font-sans text-[#4A5D4E] leading-relaxed">
-          Calibrate your biological baseline before diving into deep work.
+          Log your sleep and set today's focus before starting your day.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -166,7 +166,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
                 10-15m Morning Natural Daylight
               </span>
               <span className="block text-[11px] font-sans text-[#4A5D4E] mt-0.5">
-                Resets master circadian clock &amp; clears adenosine
+                Helps wakefulness and sets your natural body clock
               </span>
             </div>
             <div className={`w-5 h-5 rounded-md border flex items-center justify-center font-mono text-xs font-bold shrink-0 ${
@@ -213,7 +213,7 @@ export function MorningBootModal({ isOpen, onClose }: MorningBootModalProps) {
             type="submit"
             className="w-full mt-1 py-3 rounded-full bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-sm transition-all cursor-pointer shadow-2xs flex items-center justify-center"
           >
-            Prime My Focus (+50 XP)
+            Save Morning Check-in (+50 XP)
           </button>
         </form>
       </div>

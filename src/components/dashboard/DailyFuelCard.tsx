@@ -251,8 +251,8 @@ export function DailyFuelCard({
 
         {/* Amount logged stated below progress bar */}
         <div className="flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
-          <span className="font-semibold text-[#1A3629]">{currentProtein}g logged of {targetProtein}g floor</span>
-          <span>{remaining > 0 ? `${remaining}g to floor` : 'Floor Secured'}</span>
+          <span className="font-semibold text-[#1A3629]">{currentProtein}g logged of {targetProtein}g target</span>
+          <span>{remaining > 0 ? `${remaining}g remaining` : 'Target Met'}</span>
         </div>
       </div>
 
@@ -297,10 +297,10 @@ export function DailyFuelCard({
         )}
       </form>
 
-      {/* 4. 4 Boxes of Quick Calibrated Plates */}
+      {/* 4. 4 Boxes of Quick Add Plates */}
       <div className="flex flex-col gap-1.5">
         <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-          Quick Calibrated
+          Quick Add Meals
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {PRESET_MEALS.map((preset) => (
@@ -323,13 +323,13 @@ export function DailyFuelCard({
         </div>
       </div>
 
-      {/* 4.5 Metabolic Dinner Rebalancer Prompt */}
+      {/* 4.5 Dinner Ideas Prompt */}
       {remaining > 0 ? (
         <div className="p-3 rounded-2xl bg-[#F8F5EE] border border-[#1A3629]/15 flex items-center justify-between gap-3 shadow-2xs">
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
             <span className="text-xs font-cabinet font-bold text-[#1A3629] truncate">
-              {remaining}g protein needed for floor
+              {remaining}g protein needed for target
             </span>
           </div>
           <Link
@@ -340,21 +340,21 @@ export function DailyFuelCard({
             }}
             className="px-3 py-1.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-mono text-[11px] font-bold shrink-0 transition-colors shadow-2xs cursor-pointer flex items-center gap-1"
           >
-            <span>Dinner Rebalancer →</span>
+            <span>Dinner Ideas →</span>
           </Link>
         </div>
       ) : (
         <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between text-xs text-emerald-900 font-cabinet font-bold">
           <span className="flex items-center gap-1.5">
             <PixelCheck size={12} color="#065F46" />
-            <span>Daily Floor Secured ({currentProtein}g / {targetProtein}g)</span>
+            <span>Daily Target Met ({currentProtein}g / {targetProtein}g)</span>
           </span>
           <Link
             href="/fuel"
             onClick={() => retroAudio.playBlip()}
             className="font-mono text-[11px] text-emerald-700 underline hover:text-emerald-900 cursor-pointer"
           >
-            Chef Catalog →
+            All Recipes →
           </Link>
         </div>
       )}
@@ -375,7 +375,7 @@ export function DailyFuelCard({
             Today's Logged Meals ({loggedMealsCount})
           </span>
           <div className="flex items-center gap-1.5 font-mono text-[11px] text-[#4A5D4E] group-hover:text-[#1A3629]">
-            <span>{isMealsExpanded ? 'Collapse' : 'Inspect'}</span>
+            <span>{isMealsExpanded ? 'Collapse' : 'View'}</span>
             <PixelChevronDown size={10} color="#4A5D4E" className={`transition-transform duration-200 ${isMealsExpanded ? 'rotate-180' : ''}`} />
           </div>
         </button>
@@ -417,7 +417,7 @@ export function DailyFuelCard({
               ))
             ) : (
               <div className="py-3 px-3 rounded-xl border border-dashed border-[#1A3629]/15 bg-[#FAF8F5]/80 text-center font-sans text-xs text-[#2B3A2F] font-medium">
-                No meals logged yet today. Type a meal above or choose a Quick Calibrated plate.
+                No meals logged yet today. Type a meal above or choose a Quick Add plate.
               </div>
             )}
           </div>

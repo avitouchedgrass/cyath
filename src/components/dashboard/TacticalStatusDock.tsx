@@ -137,19 +137,19 @@ export function TacticalStatusDock() {
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
               {dynamicPhase === 'morning'
-                ? `Morning Boot (Wake + ${circadian.hoursSinceWake}h)`
+                ? `Morning Check-in (Wake + ${circadian.hoursSinceWake}h)`
                 : dynamicPhase === 'midday'
                 ? `Midday Focus Sprint (Caffeine Window)`
-                : `Desk Wrap & Sunset (Cutoff Passed)`}
+                : `Evening Check-in (Cutoff Passed)`}
             </span>
             {(dynamicPhase === 'morning' && morningDone) || (dynamicPhase === 'evening' && eveningDone) ? (
               <span className="px-2 py-0.5 rounded border border-[#10B981]/40 bg-[#ECFDF5] text-[#065F46] font-mono text-[10px] font-bold flex items-center gap-1">
                 <PixelCheck size={10} color="#065F46" />
-                <span>Sealed</span>
+                <span>Saved</span>
               </span>
             ) : (
               <span className="px-2 py-0.5 rounded border border-[#D97706]/40 bg-[#FEF3C7] text-[#92400E] font-mono text-[10px] font-bold">
-                Action Pending
+                Pending
               </span>
             )}
           </div>
@@ -166,7 +166,7 @@ export function TacticalStatusDock() {
             <span className="font-bold text-[#1A3629] tracking-wider">
               {dynamicPhase === 'morning'
                 ? (circadian.milestones.isCaffeinePermissible
-                  ? 'Permissible Now'
+                  ? 'Good to have'
                   : `${circadian.milestones.adenosineCaffeineBuffer.end} (+90m)`)
                 : dynamicPhase === 'midday'
                 ? (circadian.milestones.isPastCaffeineCutoff
@@ -182,17 +182,17 @@ export function TacticalStatusDock() {
             <h3 className="font-cabinet font-bold text-base text-[#1A3629] leading-snug">
               {dynamicPhase === 'morning'
                 ? morningDone
-                  ? 'Morning Baseline Calibrated'
-                  : '10-Second Morning Boot Check-in'
+                  ? 'Morning Check-in Complete'
+                  : 'Quick Morning Check-in'
                 : dynamicPhase === 'midday'
                 ? 'Deep Work Sprint Active'
                 : eveningDone
-                ? 'Desk Wrap Sealed · Daily Log Saved'
-                : '15-Second Desk Shutdown Pending'}
+                ? 'Evening Check-in Complete · Daily Log Saved'
+                : 'Evening Check-in Pending'}
             </h3>
             <p className="text-xs font-cabinet text-[#2C4A3B] leading-relaxed">
               {dynamicPhase === 'morning'
-                ? 'Anchor sleep, daylight exposure, and target focus hours before starting.'
+                ? 'Log sleep, daylight exposure, and target focus hours before starting.'
                 : dynamicPhase === 'midday'
                 ? 'Protect working memory. Respect your 9.5h caffeine cutoff to guarantee deep sleep tonight.'
                 : 'Log caffeine cutoff, meal quality, and afternoon energy dip.'}
@@ -213,7 +213,7 @@ export function TacticalStatusDock() {
                     : 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
                 }`}
               >
-                {morningDone ? 'Review Morning Boot' : `Start Morning Boot (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP)`}
+                {morningDone ? 'Review Morning Check-in' : `Start Morning Check-in (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP)`}
               </button>
             )}
 
@@ -230,7 +230,7 @@ export function TacticalStatusDock() {
                 }}
                 className="w-full py-2.5 px-4 rounded-xl border-2 border-[#1A3629] bg-[#FAF6EE] hover:bg-[#FFFDF9] text-[#1A3629] font-cabinet font-bold text-xs shadow-[2px_2px_0px_#1A3629] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center justify-center"
               >
-                {morningDone ? 'Pre-log Evening Wrap →' : `Log Morning Boot (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP) →`}
+                {morningDone ? 'Log Evening Check-in →' : `Log Morning Check-in (+${XP_MATRIX.MORNING_BOOT_SUNLIGHT_COMBINED} XP) →`}
               </button>
             )}
 
@@ -247,7 +247,7 @@ export function TacticalStatusDock() {
                     : 'bg-[#1A3629] border-[#1A3629] text-[#FFFDF9] shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none'
                 }`}
               >
-                {eveningDone ? 'Review Desk Wrap' : `Seal Desk Wrap (+${XP_MATRIX.EVENING_WRAP} XP)`}
+                {eveningDone ? 'Review Evening Check-in' : `Save Evening Check-in (+${XP_MATRIX.EVENING_WRAP} XP)`}
               </button>
             )}
           </div>

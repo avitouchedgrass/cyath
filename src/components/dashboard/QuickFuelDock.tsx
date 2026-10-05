@@ -70,7 +70,7 @@ export function QuickFuelDock() {
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shrink-0" />
               <span className="font-cabinet font-bold text-xs sm:text-sm text-[#1A3629] truncate">
-                Protein Anchor
+                Daily Protein Target
               </span>
             </div>
             <span className="font-mono text-xs font-bold text-[#1A3629] tabular-nums shrink-0">

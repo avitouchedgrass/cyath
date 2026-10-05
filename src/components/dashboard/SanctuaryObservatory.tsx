@@ -151,7 +151,7 @@ export function SanctuaryObservatory({
           onToggleLedger();
         }}
         className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pl-2 pr-3 py-4 min-h-[56px] min-w-[34px] rounded-r-xl border-y border-r border-[#1A3629]/25 bg-[#FAF8F5] hover:bg-[#1A3629] text-[#1A3629] hover:text-[#FFFDF9] shadow-[2px_4px_16px_rgba(26,54,41,0.12)] transition-all flex flex-col items-center gap-1 cursor-pointer group select-none before:absolute before:-inset-2 before:content-['']"
-        title={isLedgerOpen ? 'Slide back to Living Island' : 'Slide open 30-Day Guild Ledger'}
+        title={isLedgerOpen ? 'Slide back to Living Island' : 'Slide open 30-Day Ledger'}
         aria-label={isLedgerOpen ? 'Close 30-Day Ledger' : 'Open 30-Day Ledger'}
       >
         <span className="font-mono text-xs font-bold transition-transform duration-200 group-hover:scale-110 flex items-center justify-center">
@@ -183,7 +183,7 @@ export function SanctuaryObservatory({
                 onClick={handleReentry}
                 className="px-2.5 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-[11px] hover:bg-[#2C4A3B] transition-colors cursor-pointer"
               >
-                Forged Re-Entry
+                Restart Streak
               </button>
             </div>
           )}
@@ -324,11 +324,11 @@ export function SanctuaryObservatory({
           <div className="relative z-10 flex items-center justify-between pb-3 border-b-2 border-[#3D2E24]/20">
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs font-bold text-[#2B1F17] bg-[#FFFDF9]/95 border-2 border-[#2B1F17]/20 px-3 py-1 rounded-none shadow-2xs">
-                {pinnedCount} of 30 Sealed
+                {pinnedCount} of 30 Days Logged
               </span>
               {isForgedStreak && (
                 <span className="font-mono text-[10px] font-bold text-[#1E3A8A] bg-blue-100/95 border-2 border-blue-300 px-2.5 py-0.5 rounded-none">
-                  Kintsugi Active
+                  Streak Protected
                 </span>
               )}
             </div>
@@ -369,7 +369,7 @@ export function SanctuaryObservatory({
                       clipPath: SAWTOOTH_CLIP,
                       transform: `rotate(${naturalTilt}deg)`,
                     }}
-                    aria-label={`${slot.dateStr}: ${slot.isSealed ? 'Sealed with wax, click to inspect receipt' : slot.isToday ? 'Today, unsealed' : 'Unsealed'}`}
+                    aria-label={`${slot.dateStr}: ${slot.isSealed ? 'Saved, click to view receipt' : slot.isToday ? 'Today, open' : 'Open'}`}
                     className={`aspect-[4/5] rounded-none border flex flex-col items-center justify-between p-1 sm:p-1.5 transition-all duration-150 cursor-pointer text-center relative select-none ${
                       slot.isSealed
                         ? 'border-[#2B1F17]/30 bg-[#FFFDF7] hover:border-[#1A3629] shadow-[0_2px_6px_rgba(0,0,0,0.15)] hover:scale-105 hover:rotate-0'
@@ -377,7 +377,7 @@ export function SanctuaryObservatory({
                         ? 'border-[#2B1F17]/40 bg-[#FFFDF9]/85 hover:bg-[#FFFDF9]'
                         : 'border-[#2B1F17]/15 bg-[#FAF8F5]/60 hover:bg-[#FAF8F5]'
                     }`}
-                    title={`${slot.dateStr}: ${slot.isSealed ? 'Sealed (Click to view receipt)' : 'Unsealed'}`}
+                    title={`${slot.dateStr}: ${slot.isSealed ? 'Saved (Click to view receipt)' : 'Open'}`}
                   >
                     <span className={`font-mono text-[9px] sm:text-[10px] font-bold ${slot.isToday ? 'text-[#1A3629]' : 'text-[#2B1F17]'}`}>
                       {slot.dayNumber}
@@ -406,7 +406,7 @@ export function SanctuaryObservatory({
 
           {/* Ledger Footer */}
           <div className="relative z-10 flex items-center justify-between pt-2 border-t-2 border-[#3D2E24]/20 text-xs font-sans text-[#2B1F17] font-medium">
-            <span>Click any sealed day to inspect receipt</span>
+            <span>Click any saved day to view receipt</span>
             <button
               type="button"
               onClick={() => {

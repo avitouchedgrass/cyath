@@ -41,8 +41,8 @@ function PlaybookContent() {
 
     setToastMessage(
       isAlreadyActive
-        ? `Removed ${protocol.name} from Daily Cockpit.`
-        : `Added ${protocol.name} to Daily Cockpit!`
+        ? `Removed ${protocol.name} from Daily Dashboard.`
+        : `Added ${protocol.name} to Daily Dashboard!`
     );
 
     setTimeout(() => setToastMessage(null), 3000);
@@ -60,16 +60,16 @@ function PlaybookContent() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
           <div>
             <h1 className="font-cabinet font-extrabold text-3xl md:text-4xl tracking-tight text-[#1A3629]">
-              Focus &amp; Circadian Playbook
+              Focus &amp; Daily Playbook
             </h1>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
-              Behavioral protocols, cognitive cadence, and restorative routines for deep work stamina.
+              Science-backed daily routines and focus practices for better energy and sleep.
             </p>
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFFDF9] border border-[#1A3629]/15 shadow-2xs font-mono text-xs font-bold text-[#1A3629]">
             <PixelFlame size={14} color="#F59E0B" />
-            <span>{activeProtocolIds.length} Active in Cockpit</span>
+            <span>{activeProtocolIds.length} Active Today</span>
           </div>
         </div>
 
@@ -123,12 +123,12 @@ function PlaybookContent() {
               {filteredProtocols.map((proto, idx) => {
                 const isActive = activeProtocolIds.includes(proto.id);
                 const disciplineSeals: Record<string, { kanji: string; romaji: string; code: string }> = {
-                  Morning: { kanji: '朝', romaji: 'DAWN CADENCE', code: '01' },
-                  Focus: { kanji: '集', romaji: 'DEEP SPRINT', code: '02' },
-                  Sleep: { kanji: '眠', romaji: 'RESTORATION', code: '03' },
-                  Movement: { kanji: '動', romaji: 'POSTURE RESET', code: '04' },
+                  Morning: { kanji: '朝', romaji: 'MORNING', code: '01' },
+                  Focus: { kanji: '集', romaji: 'FOCUS', code: '02' },
+                  Sleep: { kanji: '眠', romaji: 'SLEEP', code: '03' },
+                  Movement: { kanji: '動', romaji: 'MOVEMENT', code: '04' },
                 };
-                const seal = disciplineSeals[proto.category] || { kanji: '規', romaji: 'PROTOCOL', code: `0${idx + 1}` };
+                const seal = disciplineSeals[proto.category] || { kanji: '規', romaji: proto.category.toUpperCase(), code: `0${idx + 1}` };
 
                 return (
                   <article
@@ -142,14 +142,14 @@ function PlaybookContent() {
                     {/* Top Architectural Header */}
                     <div className="flex flex-col gap-4">
                       <div className="flex items-center justify-between gap-3 flex-wrap">
-                        {/* Woodblock Discipline Seal */}
+                        {/* Discipline Seal */}
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg bg-[#C2410C]/10 border border-[#C2410C]/30 text-[#C2410C] flex items-center justify-center font-bold text-sm select-none shrink-0 shadow-2xs">
                             <span>{seal.kanji}</span>
                           </div>
                           <div className="flex flex-col">
                             <span className="font-mono text-[10px] font-bold tracking-widest text-[#1A3629] uppercase">
-                              DOC № {seal.code} · {proto.category}
+                              {proto.category} Routine
                             </span>
                             <span className="font-mono text-[9px] text-[#4A5D4E] tracking-wider uppercase">
                               {seal.romaji}
@@ -157,10 +157,10 @@ function PlaybookContent() {
                           </div>
                         </div>
 
-                        {/* Gold Wax Mint Badge */}
+                        {/* XP Badge */}
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A3629] border border-amber-400/40 text-amber-200 font-mono text-[10px] font-bold shadow-xs">
                           <PixelSparkles size={11} color="#FBBF24" />
-                          <span>+50 XP MINT</span>
+                          <span>+50 XP</span>
                         </div>
                       </div>
 
@@ -174,9 +174,9 @@ function PlaybookContent() {
                         </p>
                       </div>
 
-                      {/* Biological Mechanism Callout */}
+                      {/* Mechanism Callout */}
                       <div className="p-3 rounded-2xl bg-[#F4EDE0]/60 border-l-4 border-[#1A3629] text-xs font-sans text-[#1A3629] leading-relaxed">
-                        <span className="font-bold">Mechanism: </span>
+                        <span className="font-bold">Why it works: </span>
                         <span>{proto.whyItWorks}</span>
                       </div>
 
@@ -189,15 +189,15 @@ function PlaybookContent() {
                         <span>·</span>
                         <span className="flex items-center gap-1.5">
                           <PixelLightning size={14} color="#D97706" />
-                          <span>Calibrated Anchor</span>
+                          <span>Recommended timing</span>
                         </span>
                       </div>
 
-                      {/* Protocol Anchors */}
+                      {/* Protocol Habits */}
                       <div className="flex flex-col gap-2 pt-1">
                         <div className="flex items-center justify-between">
                           <span className="font-cabinet font-bold text-xs text-[#1A3629] uppercase tracking-wider">
-                            Protocol Anchors ({proto.habits.length})
+                            Daily Habits ({proto.habits.length})
                           </span>
                           <span className="font-mono text-[10px] text-[#4A5D4E]">
                             Sequential Order
@@ -244,12 +244,12 @@ function PlaybookContent() {
                         {isActive ? (
                           <>
                             <PixelCheck size={14} className="text-amber-400" />
-                            <span>Inscribed in Cockpit</span>
+                            <span>Active on Dashboard</span>
                           </>
                         ) : (
                           <>
                             <PixelPlus size={14} />
-                            <span>Inscribe into Cockpit</span>
+                            <span>Add to Dashboard</span>
                           </>
                         )}
                       </button>

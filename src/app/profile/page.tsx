@@ -253,7 +253,7 @@ export default function ProfilePage() {
             href="/dashboard"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9] text-[#1A3629] font-cabinet font-semibold text-xs shadow-2xs hover:bg-[#F4F0EA] transition-colors cursor-pointer self-start sm:self-auto"
           >
-            <span>Open Sanctuary Observatory →</span>
+            <span>Open Daily Dashboard →</span>
           </Link>
         </div>
 
@@ -332,15 +332,12 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-[#1A3629]/10 gap-2">
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs uppercase font-bold tracking-wider text-[#1A3629]">
-                Archival Biometric Ledger
-              </span>
-              <span className="font-mono text-xs px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#4A5D4E]">
-                REGISTER NO. 2026-V2
+                Activity Overview
               </span>
             </div>
             <span className="font-mono text-xs text-[#4A5D4E] flex items-center gap-1.5 self-start sm:self-auto">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-              Local Encrypted Storage
+              Saved locally on this device
             </span>
           </div>
 
@@ -348,7 +345,7 @@ export default function ProfilePage() {
             <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
-                  Cadence
+                  Consistency
                 </span>
                 <span className="font-mono text-xs text-[#1A3629]/60">ENTRIES</span>
               </div>
@@ -357,7 +354,7 @@ export default function ProfilePage() {
                   {totalDaysLogged}
                 </div>
                 <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
-                  Active Journal Days
+                  Days Logged
                 </span>
               </div>
               <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
@@ -369,7 +366,7 @@ export default function ProfilePage() {
             <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
-                  Discipline
+                  Habits
                 </span>
                 <span className="font-mono text-xs text-[#1A3629]/60">CHECKS</span>
               </div>
@@ -378,7 +375,7 @@ export default function ProfilePage() {
                   {totalHabitsCompleted}
                 </div>
                 <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
-                  Rituals Executed
+                  Habits Completed
                 </span>
               </div>
               <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
@@ -390,7 +387,7 @@ export default function ProfilePage() {
             <div className="p-4 sm:p-5 rounded-2xl border border-[#1A3629]/10 bg-[#FAF8F5] flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A5D4E]">
-                  Metabolism
+                  Nutrition
                 </span>
                 <span className="font-mono text-xs text-[#1A3629]/60">PROTEIN</span>
               </div>
@@ -399,7 +396,7 @@ export default function ProfilePage() {
                   {totalProteinLogged}g
                 </div>
                 <span className="font-cabinet font-medium text-xs text-[#2C4A3B]">
-                  Total Nitrogen Floor
+                  Total Protein Logged
                 </span>
               </div>
               <div className="pt-2 border-t border-[#1A3629]/10 flex items-center justify-between font-mono text-xs text-[#4A5D4E]">
@@ -418,24 +415,24 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xs font-bold text-[#B8862D] uppercase tracking-wider">
-                  Universal Sanctuary Progression
+                  Island Themes &amp; Levels
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#1A3629]/10 text-[#1A3629] font-mono text-xs font-bold">
                   Tier {currentIsland.tier} · Level {masterLevelInfo.level}
                 </span>
               </div>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
-                Active Biome Suite: {ISLAND_SUITES[activeSuite]?.name || 'The Pillow Fighter'}
+                Active Theme: {ISLAND_SUITES[activeSuite]?.name || 'The Pillow Fighter'}
               </h2>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
-                Switch between your floating biomes without losing your master level progression.
+                Switch between island themes without losing your level progress.
               </p>
             </div>
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#1A3629] hover:text-[#FFFDF9] transition-colors shrink-0"
             >
-              <span>View in Observatory →</span>
+              <span>View on Dashboard →</span>
             </Link>
           </div>
 
@@ -507,7 +504,7 @@ export default function ProfilePage() {
                         : 'border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
                     }`}
                   >
-                    <span>{isSelected ? 'Active Architecture' : 'Equip Architecture'}</span>
+                    <span>{isSelected ? 'Active Theme' : 'Select Theme'}</span>
                   </button>
                 </div>
               );
@@ -520,13 +517,13 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#1A3629]/10 gap-2">
             <div>
               <span className="font-mono text-xs font-bold text-[#B8862D] uppercase tracking-wider">
-                Daily Focus Configuration
+                Daily Habits
               </span>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight mt-1">
                 4th Custom Habit Slot
               </h2>
               <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5">
-                Equip an optional 4th keystone habit across lifestyle, mindfulness, movement, or nutrition.
+                Add an optional 4th habit for daily tracking.
               </p>
             </div>
             <span className="px-3 py-1 rounded-full bg-[#1A3629]/10 font-mono text-xs font-bold text-[#1A3629] self-start sm:self-auto">
@@ -537,7 +534,7 @@ export default function ProfilePage() {
           {/* Quick Selectors Grid from Library */}
           <div className="mt-5 flex flex-col gap-3">
             <span className="font-mono text-xs uppercase font-bold text-[#4A5D4E]">
-              Select from Evidence-Based Habit Library:
+              Choose from popular habits:
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {CUSTOM_HABITS_LIBRARY.map((habit) => {
@@ -567,7 +564,7 @@ export default function ProfilePage() {
                     </div>
                     {isEquipped && (
                       <span className="px-2 py-0.5 rounded-full bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shrink-0">
-                        EQUIPPED
+                        ACTIVE
                       </span>
                     )}
                   </button>
@@ -578,7 +575,7 @@ export default function ProfilePage() {
             {/* Custom Input Option */}
             <div className="mt-4 p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3">
               <span className="font-cabinet font-bold text-xs text-[#1A3629]">
-                Or Define Your Own Personal Lifestyle Habit:
+                Or add your own custom habit:
               </span>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -615,7 +612,7 @@ export default function ProfilePage() {
                   disabled={!customHabitTitle.trim()}
                   className="px-4 py-2.5 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                 >
-                  <span>Equip Custom Habit</span>
+                  <span>Add Habit</span>
                 </button>
               </div>
             </div>
@@ -629,10 +626,10 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-cabinet font-bold text-xl text-[#1A3629]">
-                  Calibrated Baseline Targets
+                  Daily Targets
                 </h2>
                 <span className="font-mono text-xs px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#4A5D4E]">
-                  BIOMETRICS
+                  TARGETS
                 </span>
               </div>
 
@@ -674,10 +671,10 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
                   <span className="text-[#4A5D4E]">Target Sleep:</span>
-                  <span className="font-bold text-[#1A3629]">8.0 hours (slow-wave)</span>
+                  <span className="font-bold text-[#1A3629]">8.0 hours</span>
                 </div>
                 <div className="flex items-center justify-between pb-2.5 border-b border-[#1A3629]/10">
-                  <span className="text-[#4A5D4E]">Circadian Window:</span>
+                  <span className="text-[#4A5D4E]">Sleep Schedule:</span>
                   <span className="font-bold text-[#1A3629]">{userProfile?.bedTime || '23:30'} → {userProfile?.wakeTime || '07:30'}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -696,13 +693,13 @@ export default function ProfilePage() {
                 }}
                 className="flex-1 py-2.5 rounded-xl border border-[#1A3629] bg-[#1A3629] hover:bg-[#2C4A3B] text-[#FFFDF9] font-cabinet font-semibold text-xs text-center transition-colors cursor-pointer"
               >
-                Quick Calibrate Targets
+                Update Targets
               </button>
               <Link
                 href="/onboarding?edit=true"
                 className="flex-1 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs text-center transition-colors block"
               >
-                Full Onboarding Wizard →
+                Recalibrate All Settings →
               </Link>
             </div>
           </div>
@@ -710,30 +707,30 @@ export default function ProfilePage() {
           <div className="rounded-3xl border border-[#1A3629]/15 bg-[#FFFDF9] shadow-[0_2px_12px_rgba(26,54,41,0.03)] p-6 sm:p-7 flex flex-col justify-between">
             <div>
               <h2 className="font-cabinet font-bold text-xl mb-4 text-[#1A3629]">
-                Core Pillars Navigation
+                Quick Links
               </h2>
               <ul className="space-y-2 font-cabinet font-semibold text-xs">
                 <li>
                   <Link href="/playbook?tab=protocols" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Focus &amp; Circadian Protocols</span>
+                    <span>Daily Protocols</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/playbook" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Evidence-Based Playbook</span>
+                    <span>Guides &amp; Recipes</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/dashboard?tab=dossier" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Correlation Engine &amp; Dossier</span>
+                    <span>Insights &amp; Trends</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/dashboard" className="flex items-center justify-between p-3.5 rounded-2xl border border-[#1A3629]/10 hover:bg-[#F4F0EA] transition-colors">
-                    <span>Sanctuary Observatory</span>
+                    <span>Dashboard</span>
                     <span className="font-mono text-xs">→</span>
                   </Link>
                 </li>
@@ -789,7 +786,7 @@ export default function ProfilePage() {
                   Trust, Privacy &amp; Legal Terms
                 </h3>
                 <p className="text-xs font-cabinet font-medium text-[#4A5D4E] mt-0.5 max-w-xl leading-relaxed">
-                  Your circadian data, dietary logs, and habit streaks belong solely to you. Learn about our commitments or export your telemetry.
+                  Your health data, meals, and habit streaks belong solely to you. Learn about our commitments or export your data.
                 </p>
               </div>
             </div>
@@ -800,7 +797,7 @@ export default function ProfilePage() {
               className="px-4 py-2.5 rounded-xl border border-[#1A3629]/15 bg-[#F4F0EA] hover:bg-[#EBE5DC] text-[#1A3629] font-cabinet font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-auto"
             >
               <PixelDownload size={14} />
-              <span>Export Ledger JSON</span>
+              <span>Export Data JSON</span>
             </button>
           </div>
 

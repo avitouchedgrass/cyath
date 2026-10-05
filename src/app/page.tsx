@@ -59,7 +59,7 @@ export default function Home() {
   if (mounted && userSession && !userSession.id.startsWith('guest_')) {
     return (
       <div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">
-        Loading Sanctuary Cockpit...
+        Loading Dashboard...
       </div>
     );
   }

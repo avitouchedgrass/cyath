@@ -206,7 +206,7 @@ function OnboardingContent() {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629]" />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#4A5D4E]">
-              {isEditing ? 'Recalibration Protocol' : 'Initiation Protocol'} · Step {step} of 4
+              {isEditing ? 'Update Settings' : 'Setup'} · Step {step} of 4
             </span>
           </div>
           
@@ -254,18 +254,18 @@ function OnboardingContent() {
                 />
               </div>
               <h1 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-                Your Sanctuary Awaits
+                Welcome to Cyath
               </h1>
               <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-1 max-w-sm">
-                A calm, zero-friction 16-bit ecosystem designed to build foundational biology through effortless checkboxes.
+                A simple 16-bit daily habit tracker designed to build consistent routines and energy.
               </p>
             </div>
 
             {/* Operator Call-Sign Input */}
             <div className="flex flex-col gap-2">
               <label htmlFor="operator-name" className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629] flex items-center justify-between">
-                <span>Explorer Call-Sign</span>
-                <span className="font-mono text-[10px] text-[#4A5D4E] font-normal">Identifies your daily receipts</span>
+                <span>Your Name</span>
+                <span className="font-mono text-[10px] text-[#4A5D4E] font-normal">Used on your daily summaries</span>
               </label>
               <input
                 id="operator-name"
@@ -282,7 +282,7 @@ function OnboardingContent() {
             {/* Focus Archetype Selector */}
             <div className="flex flex-col gap-2 pt-1">
               <span className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629]">
-                Choose Primary Discipline
+                Choose Your Main Goal
               </span>
               <div className="grid grid-cols-1 gap-2.5">
                 {ARCHETYPES.map((arch) => (
@@ -331,7 +331,7 @@ function OnboardingContent() {
               }}
               className="w-full py-3.5 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 mt-2"
             >
-              <span>Next: Circadian Cadence</span>
+              <span>Next: Sleep &amp; Schedule</span>
               <PixelArrowRight size={16} />
             </button>
           </div>
@@ -342,10 +342,10 @@ function OnboardingContent() {
           <div className="flex flex-col gap-5 animate-in fade-in duration-150">
             <div>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                Circadian Light &amp; Sleep Windows
+                Sleep &amp; Morning Sunlight
               </h2>
               <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-1">
-                Grounded in neurobiology. Sunlight timing anchors your cortisol awakening response, while caffeine timing protects slow-wave sleep.
+                Morning sunlight sets your daily rhythm, while cutting off late caffeine protects your sleep.
               </p>
             </div>
 
@@ -382,7 +382,7 @@ function OnboardingContent() {
             <div className="p-4 rounded-2xl bg-[#FAF6EE] border border-[#1A3629]/20 flex flex-col gap-3">
               <span className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629] flex items-center gap-1.5">
                 <PixelClock size={14} className="text-[#1A3629]" />
-                <span>Your Automatically Calculated Daily Windows</span>
+                <span>Your Recommended Daily Schedule</span>
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -394,7 +394,7 @@ function OnboardingContent() {
                     Within 60m of {wakeTime}
                   </span>
                   <p className="text-[11px] text-[#4A5D4E] mt-0.5">
-                    10 mins viewing outside light to set circadian clock.
+                    10 mins outside to set your body clock.
                   </p>
                 </div>
 
@@ -406,7 +406,7 @@ function OnboardingContent() {
                     Strictly before {caffeineCutoffText}
                   </span>
                   <p className="text-[11px] text-[#4A5D4E] mt-0.5">
-                    Clears adenosine receptors for uninterrupted sleep.
+                    Protects deep sleep later tonight.
                   </p>
                 </div>
               </div>
@@ -434,7 +434,7 @@ function OnboardingContent() {
                 }}
                 className="flex-1 py-3.5 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2"
               >
-                <span>Next: Metabolic Auto-Rebalancing</span>
+                <span>Next: Protein Target</span>
                 <PixelArrowRight size={16} />
               </button>
             </div>
@@ -446,10 +446,10 @@ function OnboardingContent() {
           <div className="flex flex-col gap-5 animate-in fade-in duration-150">
             <div>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                Metabolic Floor &amp; Auto-Rebalancing
+                Daily Protein Target &amp; Smart Adjustment
               </h2>
               <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-1">
-                Zero calorie obsession. Cyath distributes your protein baseline and automatically rebalances dinner if your earlier meals fall short.
+                No calorie counting. Set your daily protein target and dinner will automatically adjust if earlier meals fall short.
               </p>
             </div>
 
@@ -457,7 +457,7 @@ function OnboardingContent() {
             <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/15 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629]">
-                  Body Weight &amp; Daily Protein Floor
+                  Body Weight &amp; Daily Protein Target
                 </span>
                 <div className="inline-flex rounded-lg border border-[#1A3629]/20 p-0.5 bg-[#FFFDF9]">
                   <button
@@ -524,7 +524,7 @@ function OnboardingContent() {
               <div className="flex items-center justify-between">
                 <span className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#065F46] flex items-center gap-1.5">
                   <PixelLightning size={14} color="#059669" />
-                  <span>How Dynamic Rebalancing Works for You</span>
+                  <span>How Dinner Adjusts for You</span>
                 </span>
                 <span className="text-[10px] font-mono font-bold text-[#065F46] bg-[#FFFDF9] px-2 py-0.5 rounded-full border border-[#10B981]/20">
                   Target: {targetProtein}g
@@ -533,7 +533,7 @@ function OnboardingContent() {
 
               <p className="text-xs font-sans text-[#1A3629] leading-relaxed">
                 If your Breakfast and Lunch each fall short of target by 10g, Cyath does not shame you or demand food weighing.
-                It seamlessly <strong>adds +20g to your Dinner target</strong>, surfacing a smart whole-food adjustment so your daily metabolic floor stays 100% intact.
+                It seamlessly <strong>adds +20g to your Dinner target</strong>, surfacing a smart whole-food adjustment so your daily protein target is still met.
               </p>
 
               {/* Visual distribution preview */}
@@ -562,7 +562,7 @@ function OnboardingContent() {
             {/* Optional 4th Custom Habit */}
             <div className="flex flex-col gap-2">
               <span className="font-cabinet font-bold text-xs uppercase tracking-wider text-[#1A3629]">
-                Choose 4th Habit Slot
+                Choose an Optional 4th Habit
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CUSTOM_HABITS_LIBRARY.map((item) => (
@@ -607,7 +607,7 @@ function OnboardingContent() {
                 }}
                 className="flex-1 py-3.5 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2"
               >
-                <span>Next: The Daily Seal Ceremony</span>
+                <span>Next: Evening Check-in</span>
                 <PixelArrowRight size={16} />
               </button>
             </div>
@@ -622,10 +622,10 @@ function OnboardingContent() {
                 <PixelPushpin size={36} className="filter drop-shadow-md animate-bounce" />
               </div>
               <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight">
-                Effortless Evening Sealing
+                Quick Evening Check-in
               </h2>
               <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-1 max-w-sm">
-                No active frantic logging throughout the day. At night, answer simple yes/no checks, pin your thermal receipt, and rest.
+                No calorie counting throughout the day. At night, answer a few quick questions, save your daily log, and rest.
               </p>
             </div>
 
@@ -634,7 +634,7 @@ function OnboardingContent() {
               <div className="flex items-center justify-between border-b border-[#1A3629]/15 pb-2">
                 <span className="text-[10px] font-bold text-[#1A3629] uppercase tracking-wider flex items-center gap-1.5">
                   <PixelPushpin size={14} />
-                  <span>DAILY ARCHIVAL THERMAL RECEIPT</span>
+                  <span>DAILY SUMMARY RECEIPT</span>
                 </span>
                 <span className="text-[10px] font-bold text-[#059669]">
                   100% SYNCS TO CLOUD
@@ -650,7 +650,7 @@ function OnboardingContent() {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>Protein Target ({targetProtein}g floor)</span>
+                  <span>Protein Target ({targetProtein}g target)</span>
                   <span className="font-bold text-[#059669] flex items-center gap-1">
                     <PixelCheck size={11} color="#059669" />
                     <span>REBALANCED</span>
@@ -660,16 +660,16 @@ function OnboardingContent() {
                   <span>Caffeine cutoff ({caffeineCutoffText})</span>
                   <span className="font-bold text-[#059669] flex items-center gap-1">
                     <PixelCheck size={11} color="#059669" />
-                    <span>LOCKED</span>
+                    <span>RESPECTED</span>
                   </span>
                 </div>
               </div>
 
               <div className="border-t border-dashed border-[#1A3629]/20 pt-2 flex items-center justify-between text-[11px] font-bold text-[#1A3629]">
-                <span>Status: Ready to be Pinned</span>
+                <span>Status: Ready to Save</span>
                 <span className="text-amber-700 flex items-center gap-1">
                   <PixelSpark size={12} />
-                  <span>+50 XP CEREMONY</span>
+                  <span>+50 XP BONUS</span>
                 </span>
               </div>
             </div>
@@ -694,7 +694,7 @@ function OnboardingContent() {
                 className="flex-1 py-3.5 px-6 rounded-2xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-sm hover:bg-[#2C4A3B] transition-all cursor-pointer shadow-[3px_3px_0px_#2C5E43] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <PixelPushpin size={16} />
-                <span>{isSubmitting ? 'Entering Sanctuary...' : 'Seal Initiation & Enter Sanctuary (+50 XP)'}</span>
+                <span>{isSubmitting ? 'Saving...' : 'Complete Setup & Go to Dashboard (+50 XP)'}</span>
                 <PixelSpark size={14} />
               </button>
             </div>
@@ -707,7 +707,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">Loading Initiation Protocol...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#F4F0EA] flex items-center justify-center text-[#1A3629] font-mono text-xs">Loading Setup...</div>}>
       <OnboardingContent />
     </Suspense>
   );

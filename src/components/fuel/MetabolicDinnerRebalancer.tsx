@@ -78,7 +78,7 @@ export function MetabolicDinnerRebalancer({
       onCookRecipe(match.recipe, match.effectiveProtein, match.effectiveCalories);
     }
 
-    setFeedback(`Logged "${match.recipe.name}" (+${match.effectiveProtein}g protein)! Floor updated.`);
+    setFeedback(`Logged "${match.recipe.name}" (+${match.effectiveProtein}g protein)! Daily protein updated.`);
     setTimeout(() => {
       setCookingRecipeId(null);
       setFeedback(null);
@@ -91,14 +91,14 @@ export function MetabolicDinnerRebalancer({
         return (
           <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono text-xs font-bold flex items-center gap-1.5">
             <PixelCheck size={12} color="#065F46" />
-            Goal Locked ({totalLogged}g / {target}g)
+            Goal Reached ({totalLogged}g / {target}g)
           </span>
         );
       case 'deficit_catchup':
         return (
           <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 animate-pulse">
             <PixelAlert size={12} color="#92400E" />
-            Deficit Catch-up (+{rebalance.adjustedDinnerTarget}g needed)
+            Catch-up (+{rebalance.adjustedDinnerTarget}g needed)
           </span>
         );
       case 'surplus':
@@ -129,24 +129,24 @@ export function MetabolicDinnerRebalancer({
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629]" />
               <h2 className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
-                Metabolic Dinner Rebalancer
+                Smart Dinner Rebalancer
               </h2>
             </div>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E]">
-              Calibrating your personalized evening metabolic target...
+              Calculating your evening dinner target...
             </p>
           </div>
           <div className="shrink-0">
             <span className="px-3 py-1 rounded-full bg-[#1A3629]/10 text-[#1A3629] border border-[#1A3629]/20 font-mono text-xs font-bold flex items-center gap-1.5">
               <PixelTarget size={12} color="#1A3629" />
-              Target: Calibrating...
+              Target: Calculating...
             </span>
           </div>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/20 flex flex-col gap-3">
           <div className="flex items-center justify-between font-mono text-xs text-[#1A3629]">
-            <span className="font-bold">Daily Floor Progress</span>
+            <span className="font-bold">Daily Protein Progress</span>
             <span className="font-bold tabular-nums">-- / --</span>
           </div>
           <div className="w-full h-3 rounded-full bg-[#EAE3D2] overflow-hidden border border-[#1A3629]/20">
@@ -168,7 +168,7 @@ export function MetabolicDinnerRebalancer({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629]" />
             <h2 className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] tracking-tight">
-              Metabolic Dinner Rebalancer
+              Smart Dinner Rebalancer
             </h2>
           </div>
           <p suppressHydrationWarning className="font-sans text-xs sm:text-sm text-[#4A5D4E]">
@@ -190,7 +190,7 @@ export function MetabolicDinnerRebalancer({
       {/* 2. Today's Metabolic Fuel Bar */}
       <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#1A3629]/20 flex flex-col gap-3">
         <div className="flex items-center justify-between font-mono text-xs text-[#1A3629]">
-          <span className="font-bold">Daily Floor Progress</span>
+          <span className="font-bold">Daily Protein Progress</span>
           <span className="font-bold tabular-nums">
             {totalLogged}g / {target}g ({progressPct}%)
           </span>
@@ -219,7 +219,7 @@ export function MetabolicDinnerRebalancer({
           <div className="p-2 rounded-xl bg-[#FFFDF9] border border-[#1A3629]/10">
             <span className="text-[10px] text-[#4A5D4E] uppercase block">Dinner Target</span>
             <span className={`font-bold ${rebalance.isGoalAchieved ? 'text-emerald-700' : 'text-amber-800'}`}>
-              {rebalance.isGoalAchieved ? 'Locked' : `${rebalance.adjustedDinnerTarget}g`}
+              {rebalance.isGoalAchieved ? 'Goal Reached' : `${rebalance.adjustedDinnerTarget}g`}
             </span>
           </div>
         </div>
@@ -232,12 +232,12 @@ export function MetabolicDinnerRebalancer({
             <PixelChefHat size={16} color="#1A3629" />
             <h3 className="font-cabinet font-extrabold text-base sm:text-lg text-[#1A3629]">
               {rebalance.isGoalAchieved
-                ? 'Light Restorative Recommendations'
-                : `Chef Dishes Calibrated to Hit Your Remaining ${rebalance.adjustedDinnerTarget}g`}
+                ? 'Light Dinner Ideas'
+                : `Meals Recommended to Hit Your Remaining ${rebalance.adjustedDinnerTarget}g`}
             </h3>
           </div>
           <span className="font-mono text-xs text-[#4A5D4E] hidden sm:inline">
-            1-tap cooking &amp; ledger sync
+            1-tap cooking &amp; log sync
           </span>
         </div>
 

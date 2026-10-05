@@ -178,16 +178,16 @@ export default function FuelPage() {
       <HeaderNav />
 
       <main className="relative z-10 flex-1 max-w-7xl 2xl:max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-48 flex flex-col gap-8">
-        <Breadcrumbs items={[{ label: 'Fuel & Macros' }]} />
+        <Breadcrumbs items={[{ label: 'Meals & Nutrition' }]} />
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1A3629]/10 pb-4">
           <div>
             <h1 className="font-cabinet font-extrabold text-3xl md:text-4xl tracking-tight text-[#1A3629]">
-              Fuel &amp; Macro Calibration
+              Meals &amp; Nutrition
             </h1>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
-              Metabolic Dinner Rebalancer, instant macro calculator, and 31+ curated chef recipes.
+              Smart Dinner Rebalancer, instant food calculator, and 31+ healthy recipes.
             </p>
           </div>
 
@@ -225,9 +225,6 @@ export default function FuelPage() {
                 Instant Food &amp; Macro Calculator
               </h2>
             </div>
-            <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-[#1A3629]/10 text-[#1A3629]">
-              &lt;2ms local verification
-            </span>
           </div>
 
           <form onSubmit={handleAnalyzeText} className="flex flex-col sm:flex-row gap-3">
@@ -374,10 +371,10 @@ export default function FuelPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="font-cabinet font-extrabold text-2xl text-[#1A3629] tracking-tight">
-                Curated Whole-Food High-Protein Dishes
+                High-Protein Meals
               </h2>
               <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
-                Scientifically calibrated chef plates. Tap any dish to view ingredients or cook directly to your ledger.
+                Whole-food protein meals. Tap any dish to view ingredients or log directly to your daily summary.
               </p>
             </div>
 
@@ -413,7 +410,7 @@ export default function FuelPage() {
                 {cat === 'Hits Floor' ? (
                   <>
                     <PixelSparkles size={12} color={selectedCategory === cat ? '#FEF08A' : '#D97706'} />
-                    <span suppressHydrationWarning>Hits My Floor ({mounted ? rebalance.adjustedDinnerTarget : 35}g)</span>
+                    <span suppressHydrationWarning>Hits Target ({mounted ? rebalance.adjustedDinnerTarget : 35}g)</span>
                   </>
                 ) : (
                   <span>{cat}</span>

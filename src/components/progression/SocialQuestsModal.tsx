@@ -80,17 +80,17 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border border-[#1A3629]/15 bg-[#FAF8F5] text-[#1A3629]">
-                Sanctuary Community Quests
+                Community
               </span>
               <span className="font-mono text-[10px] font-bold text-[#1A3629] bg-[#E8F5E9] border border-[#10B981]/30 px-2 py-0.5 rounded-md">
-                +15 XP + Vanguard Badge
+                +15 XP + Badge
               </span>
             </div>
             <h2 className="font-cabinet font-extrabold text-xl sm:text-2xl text-[#1A3629] mt-1">
               Connect With Cyath
             </h2>
             <p className="font-sans text-xs text-[#4A5D4E] mt-0.5">
-              Follow our official channels for human biology updates. Each verified channel awards +15 XP and unlocks the permanent Vanguard Follower profile badge.
+              Follow our channels for updates and healthy daily habits. Earn +15 XP and a profile badge for each verified channel.
             </p>
           </div>
 
@@ -166,7 +166,7 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
                     disabled={!linkedinOpened && !linkedinHandle}
                     className="px-3.5 py-2 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] disabled:bg-[#1A3629]/30 text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer text-center"
                   >
-                    Verify (+50 XP)
+                    Verify (+15 XP)
                   </button>
                 </div>
               </div>
@@ -234,7 +234,7 @@ export function SocialQuestsModal({ isOpen, onClose }: SocialQuestsModalProps) {
                     disabled={!instagramOpened && !instagramHandle}
                     className="px-3.5 py-2 rounded-xl bg-[#1A3629] hover:bg-[#2C4A3B] disabled:bg-[#1A3629]/30 text-[#FFFDF9] font-cabinet font-bold text-xs transition-all cursor-pointer text-center"
                   >
-                    Verify (+50 XP)
+                    Verify (+15 XP)
                   </button>
                 </div>
               </div>

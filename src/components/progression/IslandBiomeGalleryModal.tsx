@@ -133,10 +133,10 @@ export function IslandBiomeGalleryModal({
         <div className="flex items-start justify-between pb-3 border-b border-[#1A3629]/10 gap-4">
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1A3629]/60">
-              SANCTUARY ARCHIVE &middot; TIER {currentTier.tier} OF {currentSuiteTiers.length}
+              TIER {currentTier.tier} OF {currentSuiteTiers.length}
             </span>
             <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] tracking-tight mt-0.5">
-              Island Biome Gallery
+              Island Themes &amp; Levels
             </h2>
           </div>
 
@@ -190,7 +190,7 @@ export function IslandBiomeGalleryModal({
               className="py-2 px-3 rounded-xl bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] transition-all font-cabinet font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
             >
               <PixelSparkles size={12} color="#FFFDF9" />
-              <span>Set as Active Sanctuary</span>
+              <span>Set as Active Theme</span>
             </button>
           )}
         </div>
@@ -283,7 +283,7 @@ export function IslandBiomeGalleryModal({
         {/* Thumbnail Selector Strip (Tiers 1-10) */}
         <div className="flex flex-col gap-2">
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]/60">
-            SANCTUARY TIERS
+            ALL TIERS
           </span>
 
           <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5">

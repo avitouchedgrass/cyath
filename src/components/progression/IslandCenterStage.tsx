@@ -182,7 +182,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
             <button
               type="button"
               onClick={prevPhase}
-              aria-label="Previous Sanctuary Phase"
+              aria-label="Previous Island Theme"
               className="w-8 h-8 rounded-lg border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] flex items-center justify-center hover:bg-[#EAE3D2] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-sm shadow-[1px_1px_0px_#1A3629]"
             >
               ‹
@@ -191,7 +191,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-                  Phase {displayedIsland.tier}
+                  Tier {displayedIsland.tier}
                 </span>
                 {!isUnlocked && (
                   <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded border border-[#C9A84C]/50 bg-[#FEF3C7] text-[#92400E] font-bold">
@@ -207,7 +207,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
             <button
               type="button"
               onClick={nextPhase}
-              aria-label="Next Sanctuary Phase"
+              aria-label="Next Island Theme"
               className="w-8 h-8 rounded-lg border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] flex items-center justify-center hover:bg-[#EAE3D2] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer font-bold text-sm shadow-[1px_1px_0px_#1A3629]"
             >
               ›
@@ -233,7 +233,7 @@ export function IslandCenterStage({ currentLevel, totalXp, progressPercent }: Is
         <div className="flex items-center justify-between text-xs font-mono text-[#1A3629]">
           <span className="font-bold tracking-tight">Level {currentLevel}</span>
           <span className="text-[#4A5D4E] tabular-nums text-[11px]">
-            {nextIsland ? `Level ${nextIsland.minLevel} Evolution · ${xpRemaining.toLocaleString()} XP to evolve` : 'Apex Sanctuary Reached'}
+            {nextIsland ? `Level ${nextIsland.minLevel} · ${xpRemaining.toLocaleString()} XP to unlock` : 'Max Level Reached'}
           </span>
         </div>
       </div>

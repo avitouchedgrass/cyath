@@ -66,7 +66,7 @@ export function LevelUpModal() {
         </div>
 
         <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#D97706] mb-1">
-          Milestone Ascended
+          Level Up!
         </span>
 
         <h2 className="font-cabinet font-extrabold text-3xl sm:text-4xl text-[#1A3629] mb-2 tracking-tight">
@@ -134,7 +134,7 @@ export function LevelUpModal() {
             </button>
 
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`I just ascended to Level ${data.newLevel} on Cyath! Join my guild with code ${userReferralCode} to claim +250 Starter XP: ${inviteUrl}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`I just reached Level ${data.newLevel} on Cyath! Join with code ${userReferralCode} to claim +250 XP: ${inviteUrl}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => retroAudio.playInspectConfirm()}

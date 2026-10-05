@@ -57,14 +57,14 @@ export function BiologicalReflectionMatrix() {
         const newTotal = currentLog.totalProteinLogged + amt;
         setProtein(newTotal, currentDate);
         xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 8);
-        setActionNotice(`Added +${amt}g protein to daily ledger.`);
+        setActionNotice(`Added +${amt}g protein to daily log.`);
         setTimeout(() => setActionNotice(null), 2500);
         break;
       }
       case 'ACCEPT_PROTOCOL': {
         acceptDailyProtocol(currentDate);
         xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 8);
-        setActionNotice('Daily protocol directive locked (+50 XP).');
+        setActionNotice("Today's action completed (+50 XP).");
         setTimeout(() => setActionNotice(null), 2500);
         break;
       }
@@ -99,11 +99,11 @@ export function BiologicalReflectionMatrix() {
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
             <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#1A3629]/70">
-              LIVE SANCTUARY STATUS · OBSERVATORY
+              DAILY HEALTH OVERVIEW
             </span>
           </div>
           <h2 className="font-cabinet font-extrabold text-2xl sm:text-3xl text-[#1A3629] mt-2 tracking-tight">
-            Ecosystem Vitality · Level {matrix.ecosystemVitalityLevel} / 10
+            Daily Balance &middot; Level {matrix.ecosystemVitalityLevel} / 10
           </h2>
           <p className="font-cabinet text-xs sm:text-sm font-medium text-[#2C4A3B] mt-1 leading-relaxed">
             {matrix.vitalitySummary}
@@ -122,13 +122,13 @@ export function BiologicalReflectionMatrix() {
           </div>
           <div className="flex flex-col pr-1">
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4A5D4E]">
-              Ecosystem Harmony
+              Daily Score
             </span>
             <span className="font-cabinet font-bold text-lg text-[#1A3629] tabular-nums leading-tight">
-              {matrix.ecosystemVitalityLevel * 10}% Biome Health
+              {matrix.ecosystemVitalityLevel * 10}% Health Score
             </span>
             <span className="font-mono text-[10px] text-[#1A3629]/70">
-              Liebig Bottleneck Protected
+              Core Habits On Track
             </span>
           </div>
         </div>
@@ -141,7 +141,7 @@ export function BiologicalReflectionMatrix() {
             <span className="w-2 h-2 rounded-full bg-[#1A3629] animate-pulse" />
             {actionNotice}
           </span>
-          <span className="text-[10px] opacity-70">SANCTUARY UPDATED</span>
+          <span className="text-[10px] opacity-70">SAVED</span>
         </div>
       )}
 
@@ -158,7 +158,7 @@ export function BiologicalReflectionMatrix() {
                   ◈
                 </span>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
-                  THE HEARTH
+                  SLEEP &amp; RECOVERY
                 </span>
               </div>
               <span
@@ -205,7 +205,7 @@ export function BiologicalReflectionMatrix() {
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <PixelCheck size={12} color="#065F46" />
-                <span>Deep Recovery Synced</span>
+                <span>Sleep Goal Met</span>
               </div>
             )}
           </div>
@@ -222,7 +222,7 @@ export function BiologicalReflectionMatrix() {
                   +
                 </span>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
-                  THE CANOPY
+                  NUTRITION &amp; WATER
                 </span>
               </div>
               <span
@@ -269,7 +269,7 @@ export function BiologicalReflectionMatrix() {
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <PixelCheck size={12} color="#065F46" />
-                <span>Amino Acid Quota Met</span>
+                <span>Protein Goal Met</span>
               </div>
             )}
           </div>
@@ -286,7 +286,7 @@ export function BiologicalReflectionMatrix() {
                   ◈
                 </span>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#1A3629]">
-                  ATMOSPHERE
+                  FOCUS &amp; ROUTINES
                 </span>
               </div>
               <span
@@ -333,7 +333,7 @@ export function BiologicalReflectionMatrix() {
             ) : (
               <div className="w-full py-2.5 px-3 rounded-xl border border-[#065F46]/25 bg-[#ECFDF5]/70 text-[#065F46] font-mono text-xs font-bold text-center flex items-center justify-center gap-1.5">
                 <PixelCheck size={12} color="#065F46" />
-                <span>Circadian Clock Locked</span>
+                <span>Routines Completed</span>
               </div>
             )}
           </div>

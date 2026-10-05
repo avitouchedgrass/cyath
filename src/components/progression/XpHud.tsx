@@ -72,7 +72,7 @@ export function XpHud() {
           href="/dashboard?tab=today"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet text-xs font-semibold hover:bg-[#234535] transition-colors"
         >
-          <span>Daily Cockpit →</span>
+          <span>Daily Dashboard &rarr;</span>
         </Link>
       </div>
     </div>

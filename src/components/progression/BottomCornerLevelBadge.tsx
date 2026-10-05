@@ -37,7 +37,7 @@ export function BottomCornerLevelBadge() {
         id="xp-hud-badge-target"
         href="/dashboard?tab=today"
         className="flex items-center gap-3 px-3.5 py-2 rounded-full border border-[#1A3629]/15 bg-[#FFFDF9]/95 backdrop-blur-xs shadow-[0_4px_20px_rgba(26,54,41,0.08)] hover:shadow-[0_8px_25px_rgba(26,54,41,0.12)] hover:border-[#1A3629]/30 transition-all cursor-pointer group"
-        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) · Open Cockpit`}
+        title={`Level ${progress.level} (${progress.currentLevelXp}/${progress.xpForNextLevel} XP) · Open Dashboard`}
         aria-label={`Current Level: Level ${progress.level}`}
       >
         {/* Floating Level Badge Circle */}
@@ -67,7 +67,7 @@ export function BottomCornerLevelBadge() {
         </div>
 
         <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#1A3629] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-[#1A3629]/15">
-          <span>Cockpit</span>
+          <span>Dashboard</span>
           <PixelArrowUpRight size={10} color="#1A3629" />
         </span>
       </Link>

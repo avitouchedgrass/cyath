@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { PixelCheck } from '@/components/common/PixelIcons';
+import { PixelCheck, PixelBolt } from '@/components/common/PixelIcons';
 
 export function SmartRitualCard() {
   const { currentDate, deskRitualsByDate, completeMorningBoot, completeEveningWrap, getDailyLog, setIsDownscaled } =
@@ -117,9 +117,10 @@ export function SmartRitualCard() {
                     setRestedRating(2);
                     retroAudio.playBlip();
                   }}
-                  className="text-[#92400E] hover:underline cursor-pointer"
+                  className="text-[#92400E] hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  ⚡ Wiped (2/10)
+                  <PixelBolt size={11} color="#B45309" />
+                  <span>Wiped (2/10)</span>
                 </button>
                 <span className="text-[#4A5D4E]">{restedRating <= 4 ? '15m Micro-Sprint' : '90m Focus'}</span>
               </div>

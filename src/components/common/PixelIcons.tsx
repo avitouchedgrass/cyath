@@ -1935,5 +1935,61 @@ export function PixelGear({ size = 16, className = '', color = 'currentColor' }:
   );
 }
 
+/**
+ * 16x16 Handcrafted Pixel Lightning Bolt (Kinetic Sprint / Energy / Recovery)
+ */
+export function PixelBolt({ size = 16, className = '', color = '#F59E0B' }: PixelIconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`shrink-0 select-none ${className}`}
+      style={{ imageRendering: 'pixelated', shapeRendering: 'crispEdges' }}
+      aria-hidden="true"
+    >
+      <rect x="8" y="1" width="3" height="2" fill={color} />
+      <rect x="7" y="3" width="3" height="2" fill={color} />
+      <rect x="6" y="5" width="4" height="2" fill={color} />
+      <rect x="4" y="7" width="8" height="2" fill={color} />
+      <rect x="6" y="9" width="4" height="2" fill={color} />
+      <rect x="5" y="11" width="3" height="2" fill={color} />
+      <rect x="4" y="13" width="2" height="2" fill={color} />
+      <rect x="8" y="3" width="1" height="2" fill="#FEF08A" />
+      <rect x="6" y="7" width="4" height="1" fill="#FEF08A" />
+      <rect x="6" y="9" width="2" height="1" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 16x16 Handcrafted Pixel Walking Figure (Movement / Gentle Walk)
+ */
+export function PixelWalk({ size = 16, className = '', color = '#059669' }: PixelIconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`shrink-0 select-none ${className}`}
+      style={{ imageRendering: 'pixelated', shapeRendering: 'crispEdges' }}
+      aria-hidden="true"
+    >
+      <rect x="8" y="1" width="3" height="3" fill={color} />
+      <rect x="7" y="4" width="4" height="5" fill={color} />
+      <rect x="5" y="5" width="2" height="3" fill={color} />
+      <rect x="11" y="6" width="2" height="3" fill={color} />
+      <rect x="9" y="9" width="2" height="3" fill={color} />
+      <rect x="10" y="12" width="3" height="2" fill={color} />
+      <rect x="6" y="9" width="2" height="3" fill={color} />
+      <rect x="4" y="11" width="3" height="2" fill={color} />
+    </svg>
+  );
+}
+
 
 

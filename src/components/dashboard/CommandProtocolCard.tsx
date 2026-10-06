@@ -8,7 +8,7 @@ import { CURATED_PROTOCOLS } from '@/lib/protocols';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
 import { shouldTriggerRecoveryDownscale, DOWNSCALED_FOCUS_PROTOCOL } from '@/lib/engines/reentryEngine';
-import { PixelCheck } from '@/components/common/PixelIcons';
+import { PixelCheck, PixelBolt } from '@/components/common/PixelIcons';
 
 export function CommandProtocolCard() {
   const {
@@ -115,7 +115,8 @@ export function CommandProtocolCard() {
             }`}
             title={isDownscaled ? 'Click to restore full 90m focus session' : 'Feeling wiped? Click to switch to 15m recovery sprint'}
           >
-            <span>{isDownscaled ? '✦ Recovery Mode Active (15m)' : '⚡ Feeling Wiped?'}</span>
+            <PixelBolt size={12} color={isDownscaled ? '#92400E' : '#D97706'} />
+            <span>{isDownscaled ? 'Recovery Mode Active (15m)' : 'Feeling Wiped?'}</span>
           </button>
           <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
             {protocol.expectedGain}

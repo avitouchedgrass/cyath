@@ -11,7 +11,7 @@ import { downloadReceiptPng, shareReceiptImage, ReceiptExportData } from '@/lib/
 import { getIslandTier } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { calculateBiometricXp } from '@/lib/biometricXp';
-import { PixelScroll, PixelPin, PixelX, PixelCalendar, PixelDownload, PixelShare, PixelCheck } from '@/components/common/PixelIcons';
+import { PixelScroll, PixelPin, PixelX, PixelCalendar, PixelDownload, PixelShare, PixelCheck, PixelBolt } from '@/components/common/PixelIcons';
 
 interface LedgerLeftDrawerProps {
   isOpen: boolean;
@@ -286,7 +286,10 @@ export function LedgerLeftDrawer({
                       {selectedLog.isDownscaled && (
                         <div className="flex justify-between items-center text-amber-900 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-600/20">
                           <span>Focus Protocol</span>
-                          <span className="text-[11px] font-mono">⚡ 15m Sprint (Recovery)</span>
+                          <span className="text-[11px] font-mono flex items-center gap-1 text-amber-950 font-black">
+                            <PixelBolt size={11} color="#B45309" />
+                            <span>15m Sprint (Recovery)</span>
+                          </span>
                         </div>
                       )}
 

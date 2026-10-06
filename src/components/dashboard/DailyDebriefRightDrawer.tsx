@@ -33,6 +33,9 @@ import {
   PixelStopwatch,
   PixelHourglass,
   PixelSparkles,
+  PixelBolt,
+  PixelDroplet,
+  PixelWalk,
 } from '@/components/common/PixelIcons';
 import { parseInstantMeal } from '@/lib/instantMacroEngine';
 import { supabase } from '@/lib/supabase';
@@ -1160,8 +1163,9 @@ export function DailyDebriefRightDrawer({
                   {isRecoveryActive && (
                     <div className="flex justify-between items-center text-amber-900 font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-600/20">
                       <span>Recovery Protocol</span>
-                      <span className="text-[11px] font-mono flex items-center gap-1 text-amber-950 font-black">
-                        <span>⚡ 15m Sprint (Active)</span>
+                      <span className="text-[11px] font-mono flex items-center gap-1.5 text-amber-950 font-black">
+                        <PixelBolt size={12} color="#B45309" />
+                        <span>15m Sprint (Active)</span>
                       </span>
                     </div>
                   )}
@@ -1505,7 +1509,7 @@ export function DailyDebriefRightDrawer({
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                         {[
-                          { rating: 2, label: '⚡ Wiped (2/10)', xp: 4 },
+                          { rating: 2, label: 'Wiped (2/10)', xp: 4, isBolt: true },
                           { rating: 4, label: 'Tired (4/10)', xp: 6 },
                           { rating: 7, label: 'Alert (7/10)', xp: 12 },
                           { rating: 9, label: 'Energized (9/10)', xp: 20 },
@@ -1520,12 +1524,15 @@ export function DailyDebriefRightDrawer({
                                 setIsDownscaled(currentDate, true);
                               }
                             }}
-                            className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
+                            className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 ${
                               morningRestedRating === btn.rating
                                 ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs'
                                 : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] hover:bg-[#FAF6EE]'
                             }`}
                           >
+                            {btn.isBolt && (
+                              <PixelBolt size={12} color={morningRestedRating === btn.rating ? '#FEF08A' : '#B45309'} />
+                            )}
                             <span>{btn.label}</span>
                           </button>
                         ))}
@@ -1558,9 +1565,18 @@ export function DailyDebriefRightDrawer({
                             : `Morning energy score indicates acute recovery debt. Focus session is capped at a 15-minute low-friction kinetic sprint.`}
                         </p>
                         <div className="flex flex-wrap gap-1.5 pt-1 border-t border-amber-700/15 text-[9px] font-mono text-amber-900">
-                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20 font-bold">⚡ 15m Kinetic Sprint</span>
-                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20">💧 500ml Electrolytes</span>
-                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20">🚶 5m Gentle Walk</span>
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20 font-bold flex items-center gap-1">
+                            <PixelBolt size={10} color="#B45309" />
+                            <span>15m Kinetic Sprint</span>
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20 flex items-center gap-1">
+                            <PixelDroplet size={10} color="#0284C7" />
+                            <span>500ml Electrolytes</span>
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20 flex items-center gap-1">
+                            <PixelWalk size={10} color="#059669" />
+                            <span>5m Gentle Walk</span>
+                          </span>
                         </div>
                       </div>
                     ) : (
@@ -1579,9 +1595,10 @@ export function DailyDebriefRightDrawer({
                             setManualDownscaled(true);
                             setIsDownscaled(currentDate, true);
                           }}
-                          className="px-3 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-mono font-bold text-[#1A3629] hover:bg-amber-100 hover:border-amber-400 hover:text-amber-950 transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                          className="px-3 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-mono font-bold text-[#1A3629] hover:bg-amber-100 hover:border-amber-400 hover:text-amber-950 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
                         >
-                          <span>⚡ Feeling Wiped? (15m Sprint)</span>
+                          <PixelBolt size={12} color="#B45309" />
+                          <span>Feeling Wiped? (15m Sprint)</span>
                         </button>
                       </div>
                     )}

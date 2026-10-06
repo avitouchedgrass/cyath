@@ -10,7 +10,7 @@ import { PixelStreakFlame } from '@/components/ui/PixelStreakFlame';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { PixelPushpin } from '@/components/dashboard/PixelPushpin';
-import { PixelCheck, PixelBook, PixelChevronDown, PixelSparkles } from '@/components/common/PixelIcons';
+import { PixelCheck, PixelBook, PixelChevronDown, PixelSparkles, PixelBolt } from '@/components/common/PixelIcons';
 import { PixelSpark } from '@/components/common/PixelSpark';
 
 interface FullscreenSanctuaryStageProps {
@@ -214,8 +214,8 @@ export function FullscreenSanctuaryStage({
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-amber-100/90 backdrop-blur-md border border-amber-300/80 shadow-xs text-amber-950 font-mono text-xs font-bold animate-in fade-in"
               title="Recovery Mode Active: Daily focus sprint downscaled to 15m to protect streak"
             >
-              <PixelSpark size={12} color="#B45309" />
-              <span>⚡ 15m Recovery Sprint Active</span>
+              <PixelBolt size={14} color="#B45309" />
+              <span>15m Recovery Sprint Active</span>
             </div>
           )}
         </div>

@@ -32,6 +32,7 @@ export function LedgerLeftDrawer({
   const todayStr = useMemo(() => formatLocalDate(), []);
   const [selectedDateStr, setSelectedDateStr] = useState<string>(todayStr);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'card' | 'story'>('card');
 
   useEffect(() => {
     const handleClose = () => {
@@ -111,6 +112,7 @@ export function LedgerLeftDrawer({
       customHabitsXp: bioXp.customHabitsXp,
       baseSealXp: bioXp.baseSealXp,
       totalXp: bioXp.totalXp,
+      format: exportFormat,
     };
   };
 
@@ -118,17 +120,20 @@ export function LedgerLeftDrawer({
     retroAudio.playInspectConfirm();
     haptics.tap();
     useHabitStore.getState().unlockTrophy('thermal_receipt');
-    await downloadReceiptPng(getArchivalExportData(), `cyath-archival-${selectedDateStr}.png`);
+    const filename = exportFormat === 'story'
+      ? `cyath-story-${selectedDateStr}.png`
+      : `cyath-archival-${selectedDateStr}.png`;
+    await downloadReceiptPng(getArchivalExportData(), filename, exportFormat);
   };
 
   const handleShareReceipt = async () => {
     retroAudio.playInspectConfirm();
     haptics.tap();
     useHabitStore.getState().unlockTrophy('thermal_receipt');
-    const res = await shareReceiptImage(getArchivalExportData());
+    const res = await shareReceiptImage(getArchivalExportData(), exportFormat);
     if (res.method === 'native') return;
 
-    const shareText = `Cyath Daily Summary · ${selectedDateStr}\n` +
+    const shareText = `Cyath Daily ${exportFormat === 'story' ? 'Story (9:16)' : 'Summary'} · ${selectedDateStr}\n` +
       `• Sleep: ${selectedLog.sleepHours || 8}h\n` +
       `• Morning Sunlight: ${selectedLog.habitsCompleted?.['sunlight'] ? 'Done' : 'Skipped'}\n` +
       `• Protein: ${selectedLog.totalProteinLogged || 80}g\n` +
@@ -304,15 +309,50 @@ export function LedgerLeftDrawer({
                     </div>
                   </div>
 
+                  {/* Format Toggle (Card vs 9:16 Story) */}
+                  <div className="flex items-center justify-between p-1 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 text-xs font-cabinet font-bold w-full max-w-sm mt-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExportFormat('card');
+                        retroAudio.playBlip();
+                        haptics.tap();
+                      }}
+                      className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all ${
+                        exportFormat === 'card'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                          : 'text-[#4A5D4E] hover:text-[#1A3629]'
+                      }`}
+                    >
+                      Card (2:3)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExportFormat('story');
+                        retroAudio.playBlip();
+                        haptics.tap();
+                      }}
+                      className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
+                        exportFormat === 'story'
+                          ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+                          : 'text-[#4A5D4E] hover:text-[#1A3629]'
+                      }`}
+                    >
+                      <span>Story (9:16)</span>
+                      <span className="font-mono text-[9px] px-1 py-0.2 bg-emerald-100 text-emerald-800 rounded">IG/TikTok</span>
+                    </button>
+                  </div>
+
                   {/* Share & Download Archival Record Actions */}
-                  <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm mt-3">
+                  <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm mt-2">
                     <button
                       type="button"
                       onClick={handleDownloadReceipt}
                       className="w-full sm:w-1/2 py-3 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] font-cabinet font-extrabold text-xs hover:bg-[#FAF6EE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1A3629]"
                     >
                       <PixelDownload size={14} />
-                      <span>Download PNG</span>
+                      <span>{exportFormat === 'story' ? 'Download Story' : 'Download PNG'}</span>
                     </button>
 
                     <button
@@ -321,7 +361,7 @@ export function LedgerLeftDrawer({
                       className="w-full sm:w-1/2 py-3 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#2C5E43]"
                     >
                       <PixelShare size={14} />
-                      <span>{copiedShare ? 'Copied!' : 'Share Card'}</span>
+                      <span>{copiedShare ? 'Copied!' : exportFormat === 'story' ? 'Share Story' : 'Share Card'}</span>
                     </button>
                   </div>
                 </>

@@ -23,15 +23,20 @@ export interface ReceiptExportData {
   customHabitsXp: number;
   baseSealXp: number;
   totalXp: number;
+  format?: 'card' | 'story';
 }
 
-export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HTMLCanvasElement> {
+export async function generateReceiptCanvas(
+  data: ReceiptExportData,
+  format: 'card' | 'story' = data.format || 'card'
+): Promise<HTMLCanvasElement> {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Could not get 2D canvas context');
 
-  const width = 640;
-  const height = 960;
+  const isStory = format === 'story';
+  const width = isStory ? 1080 : 640;
+  const height = isStory ? 1920 : 960;
   canvas.width = width;
   canvas.height = height;
 
@@ -41,51 +46,59 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
 
   // Outer 16-Bit Border
   ctx.strokeStyle = '#1A3629';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(16, 16, width - 32, height - 32);
+  ctx.lineWidth = isStory ? 8 : 4;
+  const outerMargin = isStory ? 32 : 16;
+  ctx.strokeRect(outerMargin, outerMargin, width - outerMargin * 2, height - outerMargin * 2);
 
   // Inner subtle border
   ctx.strokeStyle = 'rgba(26, 54, 41, 0.2)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(22, 22, width - 44, height - 44);
+  ctx.lineWidth = isStory ? 2 : 1;
+  const innerMargin = isStory ? 44 : 22;
+  ctx.strokeRect(innerMargin, innerMargin, width - innerMargin * 2, height - innerMargin * 2);
 
   // Top Brass Pushpin Graphic
   const pinX = width / 2;
-  const pinY = 48;
+  const pinY = isStory ? 88 : 48;
+  const pinScale = isStory ? 1.7 : 1;
   
   // Pin Shadow
   ctx.fillStyle = 'rgba(26, 54, 41, 0.25)';
-  ctx.fillRect(pinX - 10, pinY + 8, 24, 6);
+  ctx.fillRect(pinX - 10 * pinScale, pinY + 8 * pinScale, 24 * pinScale, 6 * pinScale);
 
   // Pin Head (16-bit brass)
   ctx.fillStyle = '#C89332';
-  ctx.fillRect(pinX - 12, pinY - 14, 24, 18);
+  ctx.fillRect(pinX - 12 * pinScale, pinY - 14 * pinScale, 24 * pinScale, 18 * pinScale);
   ctx.fillStyle = '#E8BE5A';
-  ctx.fillRect(pinX - 9, pinY - 11, 18, 12);
+  ctx.fillRect(pinX - 9 * pinScale, pinY - 11 * pinScale, 18 * pinScale, 12 * pinScale);
   ctx.fillStyle = '#FFEAA7';
-  ctx.fillRect(pinX - 6, pinY - 8, 6, 6);
+  ctx.fillRect(pinX - 6 * pinScale, pinY - 8 * pinScale, 6 * pinScale, 6 * pinScale);
   ctx.fillStyle = '#7E5316';
-  ctx.fillRect(pinX - 12, pinY + 2, 24, 4);
+  ctx.fillRect(pinX - 12 * pinScale, pinY + 2 * pinScale, 24 * pinScale, 4 * pinScale);
 
   // Header Title
   ctx.fillStyle = '#1A3629';
   ctx.textAlign = 'center';
-  ctx.font = 'bold 22px monospace';
-  ctx.fillText('*** CYATH SANCTUARY DISPATCH ***', width / 2, 105);
+  ctx.font = isStory ? 'bold 36px monospace' : 'bold 22px monospace';
+  ctx.fillText('*** CYATH SANCTUARY DISPATCH ***', width / 2, isStory ? 185 : 105);
 
-  ctx.font = '13px monospace';
+  ctx.font = isStory ? '20px monospace' : '13px monospace';
   ctx.fillStyle = '#4A5D4E';
-  ctx.fillText(`DATE: ${data.date}  ·  LEVEL ${data.level}`, width / 2, 128);
+  ctx.fillText(`DATE: ${data.date}  ·  LEVEL ${data.level}`, width / 2, isStory ? 228 : 128);
 
+  // Dashed divider line under header
   ctx.strokeStyle = 'rgba(26, 54, 41, 0.25)';
-  ctx.setLineDash([4, 4]);
+  ctx.setLineDash(isStory ? [6, 6] : [4, 4]);
   ctx.beginPath();
-  ctx.moveTo(36, 142);
-  ctx.lineTo(width - 36, 142);
+  const linePad = isStory ? 64 : 36;
+  const headerLineY = isStory ? 254 : 142;
+  ctx.moveTo(linePad, headerLineY);
+  ctx.lineTo(width - linePad, headerLineY);
   ctx.stroke();
   ctx.setLineDash([]);
 
   // Draw Island Artwork
+  const imgSize = isStory ? 360 : 220;
+  const imgY = isStory ? 280 : 155;
   try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -96,27 +109,29 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
     });
 
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(img, width / 2 - 110, 155, 220, 220);
+    ctx.drawImage(img, width / 2 - imgSize / 2, imgY, imgSize, imgSize);
   } catch {}
 
   // Island Name & Sub-badge
   ctx.fillStyle = '#1A3629';
-  ctx.font = 'bold 16px monospace';
-  ctx.fillText(data.islandName.toUpperCase(), width / 2, 400);
+  ctx.font = isStory ? 'bold 28px monospace' : 'bold 16px monospace';
+  const islandNameY = isStory ? 685 : 400;
+  ctx.fillText(data.islandName.toUpperCase(), width / 2, islandNameY);
 
   ctx.strokeStyle = 'rgba(26, 54, 41, 0.25)';
-  ctx.setLineDash([4, 4]);
+  ctx.setLineDash(isStory ? [6, 6] : [4, 4]);
   ctx.beginPath();
-  ctx.moveTo(36, 420);
-  ctx.lineTo(width - 36, 420);
+  const subDividerY = isStory ? 720 : 420;
+  ctx.moveTo(linePad, subDividerY);
+  ctx.lineTo(width - linePad, subDividerY);
   ctx.stroke();
   ctx.setLineDash([]);
 
   // Itemized Biometric Rows
-  const startY = 460;
-  const rowGap = 38;
-  const leftX = 48;
-  const rightX = width - 48;
+  const startY = isStory ? 790 : 460;
+  const rowGap = isStory ? 66 : 38;
+  const leftX = isStory ? 84 : 48;
+  const rightX = width - leftX;
 
   const rows = [
     {
@@ -177,52 +192,60 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
 
     ctx.textAlign = 'left';
     ctx.fillStyle = '#4A5D4E';
-    ctx.font = '13px monospace';
+    ctx.font = isStory ? '21px monospace' : '13px monospace';
     ctx.fillText(row.label, leftX, y);
 
     ctx.textAlign = 'center';
     ctx.fillStyle = row.highlight ? '#1A3629' : '#738677';
-    ctx.font = 'bold 13px monospace';
+    ctx.font = isStory ? 'bold 21px monospace' : 'bold 13px monospace';
     ctx.fillText(row.value, width / 2, y);
 
     ctx.textAlign = 'right';
     ctx.fillStyle = '#B8862D';
-    ctx.font = 'bold 13px monospace';
+    ctx.font = isStory ? 'bold 21px monospace' : 'bold 13px monospace';
     ctx.fillText(row.xp, rightX, y);
   });
 
   // Total Sealed XP Footer
-  const footerY = 760;
+  const footerY = isStory ? 1440 : 760;
   ctx.strokeStyle = '#1A3629';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = isStory ? 4 : 2;
   ctx.beginPath();
-  ctx.moveTo(36, footerY);
-  ctx.lineTo(width - 36, footerY);
+  ctx.moveTo(linePad, footerY);
+  ctx.lineTo(width - linePad, footerY);
   ctx.stroke();
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#1A3629';
-  ctx.font = 'bold 18px monospace';
-  ctx.fillText('TOTAL EARNED', leftX, footerY + 36);
+  ctx.font = isStory ? 'bold 30px monospace' : 'bold 18px monospace';
+  ctx.fillText('TOTAL EARNED', leftX, footerY + (isStory ? 60 : 36));
 
   ctx.textAlign = 'right';
   ctx.fillStyle = '#B8862D';
-  ctx.font = 'bold 22px monospace';
-  ctx.fillText(`+${data.totalXp} XP`, rightX, footerY + 36);
+  ctx.font = isStory ? 'bold 36px monospace' : 'bold 22px monospace';
+  ctx.fillText(`+${data.totalXp} XP`, rightX, footerY + (isStory ? 60 : 36));
 
   // Status Stamp
   ctx.textAlign = 'center';
-  ctx.font = 'bold 12px monospace';
+  ctx.font = isStory ? 'bold 20px monospace' : 'bold 12px monospace';
   ctx.fillStyle = '#1A3629';
-  ctx.fillText('[ LOGGED & SAVED ]', width / 2, footerY + 75);
-  ctx.font = '11px monospace';
-  ctx.fillStyle = '#4A5D4E';
-  ctx.fillText('https://cyath.space · Daily Habit Tracker', width / 2, footerY + 95);
+  ctx.fillText('[ LOGGED & SAVED ]', width / 2, footerY + (isStory ? 125 : 75));
+
+  // Crisp Watermark (cyath.space / cyath.app)
+  ctx.font = isStory ? 'bold 18px monospace' : '11px monospace';
+  ctx.fillStyle = '#1A3629';
+  ctx.fillText('cyath.space · Pixel-Perfect Health & Daily Habits', width / 2, footerY + (isStory ? 165 : 95));
+
+  if (isStory) {
+    ctx.font = '14px monospace';
+    ctx.fillStyle = '#4A5D4E';
+    ctx.fillText('1-TAP NUTRITION ENGINE · ZERO STREAK BURNOUT', width / 2, footerY + 200);
+  }
 
   // Bottom Sawtooth Effect
   ctx.fillStyle = '#FFFDF9';
-  const toothWidth = 16;
-  const toothHeight = 10;
+  const toothWidth = isStory ? 24 : 16;
+  const toothHeight = isStory ? 16 : 10;
   const numTeeth = Math.ceil(width / toothWidth);
   ctx.beginPath();
   ctx.moveTo(0, height);
@@ -238,33 +261,46 @@ export async function generateReceiptCanvas(data: ReceiptExportData): Promise<HT
   return canvas;
 }
 
-export async function downloadReceiptPng(data: ReceiptExportData, filename?: string): Promise<void> {
-  const canvas = await generateReceiptCanvas(data);
+export async function downloadReceiptPng(
+  data: ReceiptExportData,
+  filename?: string,
+  format: 'card' | 'story' = data.format || 'card'
+): Promise<void> {
+  const canvas = await generateReceiptCanvas(data, format);
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   if (!blob) return;
 
+  const defaultName = format === 'story'
+    ? `cyath-story-${data.date}.png`
+    : `cyath-receipt-${data.date}.png`;
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename || `cyath-receipt-${data.date}.png`;
+  a.download = filename || defaultName;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-export async function shareReceiptImage(data: ReceiptExportData): Promise<{ shared: boolean; method: 'native' | 'clipboard' | 'download' }> {
-  const canvas = await generateReceiptCanvas(data);
+export async function shareReceiptImage(
+  data: ReceiptExportData,
+  format: 'card' | 'story' = data.format || 'card'
+): Promise<{ shared: boolean; method: 'native' | 'clipboard' | 'download' }> {
+  const canvas = await generateReceiptCanvas(data, format);
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   if (!blob) return { shared: false, method: 'download' };
 
-  const file = new File([blob], `cyath-receipt-${data.date}.png`, { type: 'image/png' });
+  const defaultName = format === 'story'
+    ? `cyath-story-${data.date}.png`
+    : `cyath-receipt-${data.date}.png`;
+  const file = new File([blob], defaultName, { type: 'image/png' });
 
   if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({
-        title: `Cyath Daily Receipt · ${data.date}`,
-        text: `Cyath Daily Metabolic Receipt · Sealed +${data.totalXp} XP\nTrack your metabolic flow at cyath.space`,
+        title: `Cyath Daily ${format === 'story' ? 'Story' : 'Receipt'} · ${data.date}`,
+        text: `Cyath Daily Metabolic ${format === 'story' ? 'Story (9:16)' : 'Receipt'} · Sealed +${data.totalXp} XP\nTrack your metabolic flow at cyath.space`,
         files: [file],
       });
       return { shared: true, method: 'native' };
@@ -272,6 +308,6 @@ export async function shareReceiptImage(data: ReceiptExportData): Promise<{ shar
   }
 
   // Fallback to PNG download
-  await downloadReceiptPng(data);
+  await downloadReceiptPng(data, undefined, format);
   return { shared: true, method: 'download' };
 }

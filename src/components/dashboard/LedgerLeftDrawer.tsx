@@ -113,6 +113,7 @@ export function LedgerLeftDrawer({
       baseSealXp: bioXp.baseSealXp,
       totalXp: bioXp.totalXp,
       format: exportFormat,
+      isDownscaled: !!selectedLog.isDownscaled,
     };
   };
 
@@ -281,6 +282,13 @@ export function LedgerLeftDrawer({
                         <span className="text-[#4A5D4E]">Sleep</span>
                         <span className="font-bold">{selectedLog.sleepHours || 8}h</span>
                       </div>
+
+                      {selectedLog.isDownscaled && (
+                        <div className="flex justify-between items-center text-amber-900 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-600/20">
+                          <span>Focus Protocol</span>
+                          <span className="text-[11px] font-mono">⚡ 15m Sprint (Recovery)</span>
+                        </div>
+                      )}
 
                       <div className="flex justify-between items-center">
                         <span className="text-[#4A5D4E]">Morning Sunlight</span>

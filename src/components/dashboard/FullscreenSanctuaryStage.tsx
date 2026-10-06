@@ -11,6 +11,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { PixelPushpin } from '@/components/dashboard/PixelPushpin';
 import { PixelCheck, PixelBook, PixelChevronDown, PixelSparkles } from '@/components/common/PixelIcons';
+import { PixelSpark } from '@/components/common/PixelSpark';
 
 interface FullscreenSanctuaryStageProps {
   onOpenSeal: () => void;
@@ -184,26 +185,38 @@ export function FullscreenSanctuaryStage({
       </div>
 
       {/* Top Bar: Sanctuary Status, Streak & Biome Tier */}
-      <div className="w-full max-w-4xl flex items-center justify-between z-10 pt-2">
-        {/* Streak Flame Badge */}
-        <div
-          onClick={() => {
-            if (!isAuthenticated && onRequireAuth) onRequireAuth();
-          }}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm ${
-            !isAuthenticated ? 'cursor-pointer hover:border-[#1A3629]' : ''
-          }`}
-          title={isAuthenticated ? (isFlameForged ? `${streakCount} Day Protected Streak (Log today to keep your streak)` : `${streakCount} Day Streak`) : 'Sign in to record daily streak'}
-        >
-          <PixelStreakFlame isForged={isFlameForged} size={20} />
-          <span className="font-cabinet font-extrabold text-xs sm:text-sm text-[#1A3629]">
-            {isAuthenticated ? `${streakCount} ${streakCount === 1 ? 'Day Streak' : 'Days Streak'}` : 'Guest Explorer'}
-          </span>
-          {isTodaySealed && (
-            <span className="flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
-              <PixelCheck size={12} color="#047857" />
-              <span>Logged Today</span>
+      <div className="w-full max-w-4xl flex items-center justify-between z-10 pt-2 gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Streak Flame Badge */}
+          <div
+            onClick={() => {
+              if (!isAuthenticated && onRequireAuth) onRequireAuth();
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm ${
+              !isAuthenticated ? 'cursor-pointer hover:border-[#1A3629]' : ''
+            }`}
+            title={isAuthenticated ? (isFlameForged ? `${streakCount} Day Protected Streak (Log today to keep your streak)` : `${streakCount} Day Streak`) : 'Sign in to record daily streak'}
+          >
+            <PixelStreakFlame isForged={isFlameForged} size={20} />
+            <span className="font-cabinet font-extrabold text-xs sm:text-sm text-[#1A3629]">
+              {isAuthenticated ? `${streakCount} ${streakCount === 1 ? 'Day Streak' : 'Days Streak'}` : 'Guest Explorer'}
             </span>
+            {isTodaySealed && (
+              <span className="flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
+                <PixelCheck size={12} color="#047857" />
+                <span>Logged Today</span>
+              </span>
+            )}
+          </div>
+
+          {currentLog?.isDownscaled && (
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-amber-100/90 backdrop-blur-md border border-amber-300/80 shadow-xs text-amber-950 font-mono text-xs font-bold animate-in fade-in"
+              title="Recovery Mode Active: Daily focus sprint downscaled to 15m to protect streak"
+            >
+              <PixelSpark size={12} color="#B45309" />
+              <span>⚡ 15m Recovery Sprint Active</span>
+            </div>
           )}
         </div>
 

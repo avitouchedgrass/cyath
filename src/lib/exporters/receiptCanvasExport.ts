@@ -24,6 +24,7 @@ export interface ReceiptExportData {
   baseSealXp: number;
   totalXp: number;
   format?: 'card' | 'story';
+  isDownscaled?: boolean;
 }
 
 export async function generateReceiptCanvas(
@@ -170,6 +171,12 @@ export async function generateReceiptCanvas(
       xp: `+${data.caffeineXp} XP`,
       highlight: !!data.caffeineDone,
     },
+    ...(data.isDownscaled ? [{
+      label: 'Recovery Protocol',
+      value: '15m Kinetic Sprint',
+      xp: 'Protected',
+      highlight: true,
+    }] : []),
     {
       label: 'Daily Wrap & Seal',
       value: 'Anchored',

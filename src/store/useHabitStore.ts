@@ -551,7 +551,7 @@ export interface HabitStoreState {
   completeDailyProtocol: (date?: string) => void;
   completeMorningBoot: (data: { sleepHours: number; restedRating: number; sunlightDone: boolean; targetFocusHours: number }, date?: string) => void;
   completeEveningWrap: (data: { caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; wholeFoodRating: number; afternoonSlumpScore: number }, date?: string) => void;
-  commitDebriefTelemetry: (date?: string, telemetry?: { sleepHours?: number; sunlightDone?: boolean; proteinGrams?: number; caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; debriefData?: Record<string, unknown> }) => void;
+  commitDebriefTelemetry: (date?: string, telemetry?: { sleepHours?: number; sunlightDone?: boolean; proteinGrams?: number; caffeineCutoffRespected?: boolean; caffeineStatus?: 'none' | 'before_cutoff' | 'after_cutoff'; isDownscaled?: boolean; debriefData?: Record<string, unknown> }) => void;
   logWeight: (weightKg: number, note?: string, date?: string) => { success: boolean; deltaKg: number; trend: 'down' | 'up' | 'stable'; xpAwarded: number };
   claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => { success: boolean; message: string; xpAwarded: number };
   setIsDownscaled: (date: string, isDownscaled: boolean) => void;
@@ -1763,6 +1763,12 @@ export const useHabitStore = create<HabitStoreState>()(
 
         const caffeineStatus = telemetry.caffeineStatus || (telemetry.caffeineCutoffRespected ? 'before_cutoff' : 'after_cutoff');
 
+        const isDownscaled = telemetry.isDownscaled !== undefined
+          ? telemetry.isDownscaled
+          : (typeof currentLog.isDownscaled === 'boolean'
+            ? currentLog.isDownscaled
+            : (safeSleep > 0 && safeSleep < 5.5));
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
@@ -1771,6 +1777,7 @@ export const useHabitStore = create<HabitStoreState>()(
               sleepHours: safeSleep,
               totalProteinLogged: safeProtein,
               habitsCompleted: updatedHabits,
+              isDownscaled,
             },
           },
           deskRitualsByDate: {

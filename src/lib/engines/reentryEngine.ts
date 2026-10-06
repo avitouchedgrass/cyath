@@ -1,6 +1,7 @@
 export interface RecoveryTelemetryInput {
   sleepHours?: number;
   morningRestedRating?: number; // 1 to 5 scale (or 1 to 10 mapped)
+  scale?: 5 | 10;
 }
 
 export interface DownscaledMicroHabit {
@@ -60,8 +61,9 @@ export function shouldTriggerRecoveryDownscale(input: RecoveryTelemetryInput): b
   }
 
   if (typeof input.morningRestedRating === 'number' && input.morningRestedRating > 0) {
-    // Check if 5-point scale (<= 2) or 10-point scale (<= 4)
-    if (input.morningRestedRating <= 2) {
+    if (input.scale === 10) {
+      if (input.morningRestedRating <= 4) return true;
+    } else if (input.morningRestedRating <= 2) {
       return true;
     }
   }

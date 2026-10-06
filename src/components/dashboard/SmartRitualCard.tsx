@@ -7,7 +7,7 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { PixelCheck } from '@/components/common/PixelIcons';
 
 export function SmartRitualCard() {
-  const { currentDate, deskRitualsByDate, completeMorningBoot, completeEveningWrap, getDailyLog } =
+  const { currentDate, deskRitualsByDate, completeMorningBoot, completeEveningWrap, getDailyLog, setIsDownscaled } =
     useHabitStore();
 
   const currentLog = getDailyLog(currentDate);
@@ -30,12 +30,16 @@ export function SmartRitualCard() {
     e.preventDefault();
     retroAudio.playInspectConfirm();
     xpParticleEmitter.emit(window.innerWidth / 2, window.innerHeight / 2, 10);
+    const isWiped = restedRating <= 4 || sleepHours < 5.5;
     completeMorningBoot({
       sleepHours,
       restedRating,
       sunlightDone: delayCaffeine,
-      targetFocusHours: 5,
+      targetFocusHours: isWiped ? 1 : 5,
     }, currentDate);
+    if (isWiped) {
+      setIsDownscaled(currentDate, true);
+    }
   };
 
   const handleEveningSubmit = (e: React.FormEvent) => {
@@ -88,9 +92,16 @@ export function SmartRitualCard() {
 
             {/* Rested Rating */}
             <div className="flex flex-col gap-1">
-              <label className="font-mono font-bold text-[11px] text-[#1A3629]">
-                Rested Score: {restedRating}/10
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="font-mono font-bold text-[11px] text-[#1A3629]">
+                  Rested: {restedRating}/10
+                </label>
+                {restedRating <= 4 && (
+                  <span className="font-mono text-[9px] text-[#92400E] bg-[#FEF3C7] px-1.5 py-0.5 rounded font-bold">
+                    Recovery Mode
+                  </span>
+                )}
+              </div>
               <input
                 type="range"
                 min="1"
@@ -99,6 +110,19 @@ export function SmartRitualCard() {
                 onChange={(e) => setRestedRating(Number(e.target.value))}
                 className="w-full accent-[#1A3629] cursor-pointer mt-1"
               />
+              <div className="flex items-center justify-between text-[10px] font-mono mt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRestedRating(2);
+                    retroAudio.playBlip();
+                  }}
+                  className="text-[#92400E] hover:underline cursor-pointer"
+                >
+                  ⚡ Wiped (2/10)
+                </button>
+                <span className="text-[#4A5D4E]">{restedRating <= 4 ? '15m Micro-Sprint' : '90m Focus'}</span>
+              </div>
             </div>
 
             {/* Delay Caffeine */}

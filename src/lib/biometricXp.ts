@@ -84,6 +84,7 @@ export function calculateBiometricXp(inputs: BiometricInputs): BiometricXpBreakd
     if (morningRestedRating >= 8) morningRestedXp = 20;
     else if (morningRestedRating >= 6) morningRestedXp = 12;
     else if (morningRestedRating >= 4) morningRestedXp = 6;
+    else if (morningRestedRating >= 1) morningRestedXp = 4;
   }
 
   // Wake Schedule Consistency XP (Anchor Circadian Clock within ±30m)

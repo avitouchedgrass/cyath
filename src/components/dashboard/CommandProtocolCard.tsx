@@ -21,16 +21,19 @@ export function CommandProtocolCard() {
     deskRitualsByDate,
     acceptDailyProtocol,
     completeDailyProtocol,
+    setIsDownscaled,
   } = useHabitStore();
 
   const currentLog = getDailyLog(currentDate);
   const ritual = deskRitualsByDate[currentDate] || {};
 
   const isDownscaled = useMemo(() => {
-    if (currentLog.isDownscaled) return true;
-    return shouldTriggerRecoveryDownscale({
+    if (typeof currentLog.isDownscaled === 'boolean') return currentLog.isDownscaled;
+    const restedRating = ritual.morningRestedRating;
+    const isWiped = typeof restedRating === 'number' && restedRating <= 4;
+    return isWiped || shouldTriggerRecoveryDownscale({
       sleepHours: currentLog.sleepHours,
-      morningRestedRating: ritual.morningRestedRating,
+      morningRestedRating: restedRating,
     });
   }, [currentLog.isDownscaled, currentLog.sleepHours, ritual.morningRestedRating]);
 
@@ -100,11 +103,20 @@ export function CommandProtocolCard() {
           <span className="px-2.5 py-0.5 rounded-md border border-[#1A3629] bg-[#FAF6EE] text-[10px] font-mono font-bold uppercase tracking-wider text-[#1A3629]">
             Daily Focus · {protocol.category}
           </span>
-          {isDownscaled && (
-            <span className="px-2.5 py-0.5 rounded-md border border-[#D97706]/40 bg-[#FEF3C7] text-[10px] font-mono font-bold text-[#92400E]">
-              [Easy Recovery]
-            </span>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              setIsDownscaled(currentDate, !isDownscaled);
+            }}
+            className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1 ${
+              isDownscaled
+                ? 'border-[#D97706] bg-[#FEF3C7] text-[#92400E] hover:bg-[#FDE68A]'
+                : 'border-[#1A3629]/20 bg-[#FAF8F5] text-[#4A5D4E] hover:border-[#D97706] hover:text-[#92400E]'
+            }`}
+            title={isDownscaled ? 'Click to restore full 90m focus session' : 'Feeling wiped? Click to switch to 15m recovery sprint'}
+          >
+            <span>{isDownscaled ? '✦ Recovery Mode Active (15m)' : '⚡ Feeling Wiped?'}</span>
+          </button>
           <span className="px-2.5 py-0.5 rounded-md border border-[#10B981]/40 bg-[#ECFDF5] text-[10px] font-mono font-bold text-[#065F46]">
             {protocol.expectedGain}
           </span>

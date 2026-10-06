@@ -233,6 +233,7 @@ export function DailyDebriefRightDrawer({
     logMealToDay,
     pendingTrophyUnlock,
     dismissPendingTrophy,
+    setIsDownscaled,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -258,6 +259,7 @@ export function DailyDebriefRightDrawer({
   const [caffeineDone, setCaffeineDone] = useState<boolean | null>(null);
   const [caffeineTime, setCaffeineTime] = useState<string>('Before 12:00 PM');
   const [customAnswers, setCustomAnswers] = useState<Record<string, boolean>>({});
+  const [manualDownscaled, setManualDownscaled] = useState<boolean | null>(null);
   const [isSealingInProgress, setIsSealingInProgress] = useState(false);
   const [sealingStepIdx, setSealingStepIdx] = useState(-1);
   const [isAmendingMeals, setIsAmendingMeals] = useState(false);
@@ -355,6 +357,12 @@ export function DailyDebriefRightDrawer({
     });
   }, [calculatedSleepDuration, sunlightDone, sunlightMinutes, breakfastDone, lunchDone, dinnerDone, caffeineDone, customAnswers, morningRestedRating, wakeConsistencyAnchor]);
 
+  const isRecoveryActive = useMemo(() => {
+    if (manualDownscaled !== null) return manualDownscaled;
+    if (typeof currentLog?.isDownscaled === 'boolean') return currentLog.isDownscaled;
+    return calculatedSleepDuration < 5.5 || morningRestedRating <= 2;
+  }, [manualDownscaled, currentLog?.isDownscaled, calculatedSleepDuration, morningRestedRating]);
+
   const handleUpdateQuestions = (updated: DebriefQuestion[]) => {
     setQuestions(updated);
     saveDebriefQuestions(updated);
@@ -419,6 +427,7 @@ export function DailyDebriefRightDrawer({
       proteinGrams: totalEstimatedProtein > 0 ? totalEstimatedProtein : undefined,
       caffeineCutoffRespected: !!caffeineDone,
       caffeineStatus: caffeineDone ? 'before_cutoff' : 'after_cutoff',
+      isDownscaled: isRecoveryActive,
       debriefData: {
         sleepTime,
         wakeTime,
@@ -433,6 +442,7 @@ export function DailyDebriefRightDrawer({
         isDraft: true,
       },
     });
+    setIsDownscaled(currentDate, isRecoveryActive);
     retroAudio.playInspectConfirm();
     haptics.success();
     onClose();
@@ -458,6 +468,7 @@ export function DailyDebriefRightDrawer({
       proteinGrams: totalEstimatedProtein > 0 ? totalEstimatedProtein : undefined,
       caffeineCutoffRespected: !!caffeineDone,
       caffeineStatus: caffeineDone ? 'before_cutoff' : 'after_cutoff',
+      isDownscaled: isRecoveryActive,
       debriefData: {
         sleepTime,
         wakeTime,
@@ -472,6 +483,7 @@ export function DailyDebriefRightDrawer({
         isPartialSeal: shouldBePartial,
       },
     });
+    setIsDownscaled(currentDate, isRecoveryActive);
 
     const stepItems: Array<{ amount: number; reason: string; suite: 'circadian' | 'iron' | 'focus' }> = [
       { amount: biometricXp.sleepXp, reason: `Sleep (${calculatedSleepDuration}h · ${biometricXp.sleepEfficacyLabel})`, suite: 'circadian' },
@@ -638,6 +650,7 @@ export function DailyDebriefRightDrawer({
       baseSealXp: biometricXp.baseSealXp,
       totalXp: biometricXp.totalXp,
       format: exportFormat,
+      isDownscaled: isRecoveryActive,
     };
   };
 
@@ -1144,6 +1157,15 @@ export function DailyDebriefRightDrawer({
                     </span>
                   </div>
 
+                  {isRecoveryActive && (
+                    <div className="flex justify-between items-center text-amber-900 font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-600/20">
+                      <span>Recovery Protocol</span>
+                      <span className="text-[11px] font-mono flex items-center gap-1 text-amber-950 font-black">
+                        <span>⚡ 15m Sprint (Active)</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center">
                     <span className="text-[#4A5D4E]">Morning Light</span>
                     <span className="font-bold flex items-center gap-1.5">
@@ -1481,8 +1503,9 @@ export function DailyDebriefRightDrawer({
                           +{biometricXp.morningRestedXp} XP
                         </span>
                       </div>
-                      <div className="grid grid-cols-3 gap-1.5">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                         {[
+                          { rating: 2, label: '⚡ Wiped (2/10)', xp: 4 },
                           { rating: 4, label: 'Tired (4/10)', xp: 6 },
                           { rating: 7, label: 'Alert (7/10)', xp: 12 },
                           { rating: 9, label: 'Energized (9/10)', xp: 20 },
@@ -1490,7 +1513,13 @@ export function DailyDebriefRightDrawer({
                           <button
                             key={btn.rating}
                             type="button"
-                            onClick={() => setMorningRestedRating(btn.rating)}
+                            onClick={() => {
+                              setMorningRestedRating(btn.rating);
+                              if (btn.rating === 2) {
+                                setManualDownscaled(true);
+                                setIsDownscaled(currentDate, true);
+                              }
+                            }}
                             className={`py-2 px-1.5 rounded-xl border text-[11px] font-cabinet font-bold transition-all cursor-pointer text-center ${
                               morningRestedRating === btn.rating
                                 ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] shadow-xs'
@@ -1502,6 +1531,60 @@ export function DailyDebriefRightDrawer({
                         ))}
                       </div>
                     </div>
+
+                    {/* Recovery Mode Protocol Status & Manual Downscale Toggle */}
+                    {isRecoveryActive ? (
+                      <div className="p-3.5 rounded-xl border border-amber-600/30 bg-amber-500/10 flex flex-col gap-2 pt-2.5 animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[10px] font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <PixelSpark size={12} color="#B45309" />
+                            <span>✦ Recovery Mode Active (15m Sprint)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setManualDownscaled(false);
+                              setIsDownscaled(currentDate, false);
+                            }}
+                            className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border border-amber-700/30 bg-[#FFFDF9] text-amber-950 hover:bg-amber-100 transition-colors cursor-pointer"
+                            title="Click to restore standard 90m focus target"
+                          >
+                            Restore Full Day
+                          </button>
+                        </div>
+                        <p className="font-sans text-[11px] text-amber-950 leading-relaxed">
+                          {calculatedSleepDuration < 5.5
+                            ? `Sleep duration (${calculatedSleepDuration}h) fell below the 5.5h biological threshold. Daily focus sprint is downscaled to 15 minutes to protect streak momentum without prefrontal burnout.`
+                            : `Morning energy score indicates acute recovery debt. Focus session is capped at a 15-minute low-friction kinetic sprint.`}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-amber-700/15 text-[9px] font-mono text-amber-900">
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20 font-bold">⚡ 15m Kinetic Sprint</span>
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20">💧 500ml Electrolytes</span>
+                          <span className="px-2 py-0.5 rounded bg-[#FFFDF9]/90 border border-amber-700/20">🚶 5m Gentle Walk</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/15">
+                        <div className="flex flex-col text-left">
+                          <span className="font-cabinet font-bold text-xs text-[#1A3629]">
+                            Recovery Downscale
+                          </span>
+                          <span className="font-mono text-[10px] text-[#4A5D4E]">
+                            Sick, hungover, or exhausted?
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setManualDownscaled(true);
+                            setIsDownscaled(currentDate, true);
+                          }}
+                          className="px-3 py-1.5 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-mono font-bold text-[#1A3629] hover:bg-amber-100 hover:border-amber-400 hover:text-amber-950 transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                        >
+                          <span>⚡ Feeling Wiped? (15m Sprint)</span>
+                        </button>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between pt-2 border-t border-[#1A3629]/15">
                       <div className="flex flex-col text-left">

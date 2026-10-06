@@ -838,22 +838,55 @@ export const useHabitStore = create<HabitStoreState>()(
               socialQuests: cached.socialQuests ?? DEFAULT_SOCIAL_QUESTS,
             });
           } else {
-            // Completely fresh session for this user ID on this browser
-            set({
-              totalXp: 0,
-              streakCount: 0,
-              streakFreezeStock: 1,
-              claimedMilestones: [],
-              completedQuestIdsByDate: {},
-              xpHistory: [],
-              customRecipes: [],
-              habits: DEFAULT_HABITS,
-              logsByDate: { [getTodayString()]: createEmptyDailyLog() },
-              isLedgerSealedByDate: {},
-              userProfile: null,
-              weightHistory: [],
-              socialQuests: DEFAULT_SOCIAL_QUESTS,
-            });
+            // Check if upgrading from an in-memory guest session
+            const isUpgradingFromGuest = prevSession && prevSession.id.startsWith('guest_');
+            if (isUpgradingFromGuest && (get().totalXp > 0 || Object.keys(get().logsByDate).length > 0)) {
+              const bonusXp = 50;
+              const migratedXp = (get().totalXp || 0) + bonusXp;
+              const migratedHistory: XpHistoryItem[] = [
+                {
+                  id: `upgrade_${Date.now()}`,
+                  amount: bonusXp,
+                  reason: 'Pioneer Account Linked (+50 XP)',
+                  timestamp: new Date().toISOString(),
+                },
+                ...(get().xpHistory || []),
+              ];
+              const upgradedProgress = {
+                totalXp: migratedXp,
+                streakCount: get().streakCount ?? 0,
+                streakFreezeStock: get().streakFreezeStock ?? 1,
+                claimedMilestones: get().claimedMilestones ?? [],
+                completedQuestIdsByDate: get().completedQuestIdsByDate ?? {},
+                xpHistory: migratedHistory,
+                customRecipes: get().customRecipes ?? [],
+                habits: get().habits && get().habits.length > 0 ? get().habits : DEFAULT_HABITS,
+                logsByDate: get().logsByDate ?? { [getTodayString()]: createEmptyDailyLog() },
+                isLedgerSealedByDate: get().isLedgerSealedByDate ?? {},
+                userProfile: get().userProfile ?? null,
+                weightHistory: get().weightHistory ?? [],
+                socialQuests: get().socialQuests ?? DEFAULT_SOCIAL_QUESTS,
+              };
+              saveUserLocalProgress(session.id, upgradedProgress);
+              set(upgradedProgress);
+            } else {
+              // Completely fresh session for this user ID on this browser
+              set({
+                totalXp: 0,
+                streakCount: 0,
+                streakFreezeStock: 1,
+                claimedMilestones: [],
+                completedQuestIdsByDate: {},
+                xpHistory: [],
+                customRecipes: [],
+                habits: DEFAULT_HABITS,
+                logsByDate: { [getTodayString()]: createEmptyDailyLog() },
+                isLedgerSealedByDate: {},
+                userProfile: null,
+                weightHistory: [],
+                socialQuests: DEFAULT_SOCIAL_QUESTS,
+              });
+            }
           }
           get().reconcileUserSession(session);
         } else if (!session) {

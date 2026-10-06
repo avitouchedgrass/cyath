@@ -6,6 +6,7 @@ import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { PixelCheck, PixelBatteryLow, PixelBatteryMedium, PixelBatteryFull } from '@/components/common/PixelIcons';
+import { PwaInstallToast } from '@/components/pwa/PwaInstallToast';
 
 export interface CoreHabitsCardProps {
   onOpenSchedule?: () => void;
@@ -29,6 +30,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   const [customCategory, setCustomCategory] = useState<'lifestyle' | 'misc'>('lifestyle');
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>('all');
   const [undoToast, setUndoToast] = useState<{ habitId: string; title: string; timer: ReturnType<typeof setTimeout> } | null>(null);
+  const [showPwaPrompt, setShowPwaPrompt] = useState(false);
 
   const currentLog = getDailyLog(currentDate);
   const ritual = deskRitualsByDate[currentDate] || {};
@@ -136,6 +138,11 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       const habitTitle = displayHabits.find(h => h.id === habitId)?.title || habitId;
       const timer = setTimeout(() => setUndoToast(null), 4000);
       setUndoToast({ habitId, title: habitTitle, timer });
+
+      // Trigger PWA home screen prompt after logging 2nd consecutive habit
+      if (completedCount + 1 >= 2) {
+        setShowPwaPrompt(true);
+      }
     } else {
       retroAudio.playBlip();
       if (undoToast?.habitId === habitId) {
@@ -544,6 +551,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
         </div>
 
       </div>
+
+      {/* 1-Tap PWA Home Screen Installation Prompt */}
+      <PwaInstallToast
+        forceShow={showPwaPrompt}
+        onDismiss={() => setShowPwaPrompt(false)}
+      />
     </div>
   );
 }

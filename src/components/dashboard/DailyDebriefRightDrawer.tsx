@@ -35,6 +35,7 @@ import {
   PixelSparkles,
 } from '@/components/common/PixelIcons';
 import { parseInstantMeal } from '@/lib/instantMacroEngine';
+import { supabase } from '@/lib/supabase';
 
 interface DebriefMealEstimatorProps {
   mealLabel: 'Breakfast' | 'Lunch' | 'Dinner';
@@ -543,6 +544,55 @@ export function DailyDebriefRightDrawer({
   };
 
   const [copiedShare, setCopiedShare] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'card' | 'story'>('card');
+  const [magicEmail, setMagicEmail] = useState('');
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [magicError, setMagicError] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleUpgrade = async () => {
+    retroAudio.playInspectConfirm();
+    haptics.tap();
+    setGoogleLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error('Google upgrade error:', err);
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleMagicLinkUpgrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!magicEmail || !magicEmail.includes('@')) return;
+    setMagicLoading(true);
+    setMagicError(null);
+    retroAudio.playInspectConfirm();
+    haptics.tap();
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: magicEmail,
+        options: {
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+        },
+      });
+      if (error) throw error;
+      setMagicLinkSent(true);
+      retroAudio.playTierUpgrade();
+      haptics.success();
+    } catch (err: any) {
+      setMagicError(err.message || 'Failed to send magic link');
+    } finally {
+      setMagicLoading(false);
+    }
+  };
 
   const userTargetProtein = userProfile?.targetProteinGrams || (userProfile?.weightKg ? Math.round(userProfile.weightKg * 1.6) : 100);
   const bProteinEst = breakfastDone === true ? 30 : (breakfastDone === false ? 10 : 0);
@@ -587,6 +637,7 @@ export function DailyDebriefRightDrawer({
       customHabitsXp: biometricXp.customHabitsXp,
       baseSealXp: biometricXp.baseSealXp,
       totalXp: biometricXp.totalXp,
+      format: exportFormat,
     };
   };
 
@@ -594,17 +645,20 @@ export function DailyDebriefRightDrawer({
     retroAudio.playInspectConfirm();
     haptics.tap();
     useHabitStore.getState().unlockTrophy('thermal_receipt');
-    await downloadReceiptPng(getExportData(), `cyath-receipt-${currentDate}.png`);
+    const filename = exportFormat === 'story'
+      ? `cyath-story-${currentDate}.png`
+      : `cyath-receipt-${currentDate}.png`;
+    await downloadReceiptPng(getExportData(), filename, exportFormat);
   };
 
   const handleShareReceipt = async () => {
     retroAudio.playInspectConfirm();
     haptics.tap();
     useHabitStore.getState().unlockTrophy('thermal_receipt');
-    const res = await shareReceiptImage(getExportData());
+    const res = await shareReceiptImage(getExportData(), exportFormat);
     if (res.method === 'native') return;
 
-    const shareText = `Cyath Daily Summary · ${currentDate}\n` +
+    const shareText = `Cyath Daily ${exportFormat === 'story' ? 'Story (9:16)' : 'Summary'} · ${currentDate}\n` +
       `• Sleep: ${calculatedSleepDuration}h (+${biometricXp.sleepXp} XP)\n` +
       `• Morning Sunlight: ${sunlightDone ? 'Done' : 'Missed'} (+${biometricXp.sunlightXp} XP)\n` +
       `• Breakfast: ${breakfastFuel ? breakfastFuel : (breakfastDone === true ? 'Hit (30g+)' : breakfastDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Skipped / Light')} (+${biometricXp.breakfastXp} XP)\n` +
@@ -621,6 +675,123 @@ export function DailyDebriefRightDrawer({
       setTimeout(() => setCopiedShare(false), 2500);
     } catch {}
   };
+
+  const renderGuestProgressionBridge = () => {
+    if (isAuthenticated) return null;
+    return (
+      <div className="w-full p-4 rounded-2xl bg-[#FFFDF9] border-2 border-[#1A3629] text-[#1A3629] flex flex-col gap-3 shadow-[3px_3px_0px_#1A3629] text-left">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <PixelSparkles size={14} color="#C89332" />
+              <span className="font-cabinet font-extrabold text-xs text-[#1A3629]">
+                Save 16-bit History &amp; Claim +50 XP
+              </span>
+            </div>
+            <span className="font-mono text-[10px] text-[#4A5D4E] mt-0.5">
+              Link account before closing · Protect your streak across devices
+            </span>
+          </div>
+          <span className="shrink-0 font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900">
+            +50 XP
+          </span>
+        </div>
+
+        {magicLinkSent ? (
+          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 font-mono text-[11px] flex items-center gap-2">
+            <PixelCheck size={14} color="#059669" />
+            <span>Magic link dispatched! Check your email to claim +50 XP.</span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={handleGoogleUpgrade}
+              disabled={googleLoading}
+              className="w-full py-2.5 px-3 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-cabinet font-bold text-xs hover:bg-[#FAF6EE] transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
+            >
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>{googleLoading ? 'Connecting...' : '1-Click Save with Google (+50 XP)'}</span>
+            </button>
+
+            <form onSubmit={handleMagicLinkUpgrade} className="flex items-center gap-1.5">
+              <input
+                type="email"
+                value={magicEmail}
+                onChange={(e) => setMagicEmail(e.target.value)}
+                placeholder="Or enter email for magic link..."
+                required
+                className="flex-1 px-3 py-2 rounded-xl border border-[#1A3629]/20 bg-[#FAF8F5] text-xs font-cabinet font-medium text-[#1A3629] placeholder:text-[#4A5D4E]/60 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={magicLoading || !magicEmail.includes('@')}
+                className="py-2 px-3 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+              >
+                {magicLoading ? 'Sending...' : 'Send Link'}
+              </button>
+            </form>
+            {magicError && (
+              <span className="font-mono text-[10px] text-red-600">{magicError}</span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderExportFormatToggle = () => (
+    <div className="flex items-center justify-between p-1 rounded-xl bg-[#FAF8F5] border border-[#1A3629]/15 text-xs font-cabinet font-bold w-full">
+      <button
+        type="button"
+        onClick={() => {
+          setExportFormat('card');
+          retroAudio.playBlip();
+          haptics.tap();
+        }}
+        className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all ${
+          exportFormat === 'card'
+            ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+            : 'text-[#4A5D4E] hover:text-[#1A3629]'
+        }`}
+      >
+        Card (2:3)
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setExportFormat('story');
+          retroAudio.playBlip();
+          haptics.tap();
+        }}
+        className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
+          exportFormat === 'story'
+            ? 'bg-[#1A3629] text-[#FFFDF9] shadow-xs'
+            : 'text-[#4A5D4E] hover:text-[#1A3629]'
+        }`}
+      >
+        <span>Story (9:16)</span>
+        <span className="font-mono text-[9px] px-1 py-0.2 bg-emerald-100 text-emerald-800 rounded">IG/TikTok</span>
+      </button>
+    </div>
+  );
 
   const isFinalStep = activeStepIndex === enabledQuestions.length;
 
@@ -884,26 +1055,8 @@ export function DailyDebriefRightDrawer({
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2.5 w-full max-w-sm mt-2">
-                {!isAuthenticated && (
-                  <div className="w-full p-3 rounded-2xl bg-amber-50/90 border border-amber-300 text-amber-950 flex items-center justify-between gap-2 shadow-2xs">
-                    <div className="flex flex-col text-left">
-                      <span className="font-cabinet font-bold text-xs">Guest Record Saved Locally</span>
-                      <span className="font-mono text-[10px] text-amber-800">Sync with cloud to protect your streak</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        retroAudio.playInspectConfirm();
-                        haptics.tap();
-                        if (onRequireAuth) onRequireAuth();
-                        onClose();
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shrink-0"
-                    >
-                      Sync Cloud
-                    </button>
-                  </div>
-                )}
+                {renderGuestProgressionBridge()}
+                {renderExportFormatToggle()}
 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full">
                   <button
@@ -912,7 +1065,7 @@ export function DailyDebriefRightDrawer({
                     className="w-full sm:w-1/2 py-3.5 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] font-cabinet font-extrabold text-xs hover:bg-[#FAF6EE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1A3629]"
                   >
                     <PixelUpload size={14} color="#1A3629" />
-                    <span>Download PNG</span>
+                    <span>{exportFormat === 'story' ? 'Download Story' : 'Download PNG'}</span>
                   </button>
 
                   <button
@@ -921,7 +1074,7 @@ export function DailyDebriefRightDrawer({
                     className="w-full sm:w-1/2 py-3.5 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#2C5E43]"
                   >
                     <PixelCopy size={14} color="#FFFDF9" />
-                    <span>{copiedShare ? 'Copied Link!' : 'Share Card'}</span>
+                    <span>{copiedShare ? 'Copied Link!' : exportFormat === 'story' ? 'Share Story' : 'Share Card'}</span>
                   </button>
                 </div>
 
@@ -1193,26 +1346,8 @@ export function DailyDebriefRightDrawer({
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2.5 w-full max-w-sm mt-2">
-                {!isAuthenticated && (
-                  <div className="w-full p-3 rounded-2xl bg-amber-50/90 border border-amber-300 text-amber-950 flex items-center justify-between gap-2 shadow-2xs">
-                    <div className="flex flex-col text-left">
-                      <span className="font-cabinet font-bold text-xs">Guest Record Saved Locally</span>
-                      <span className="font-mono text-[10px] text-amber-800">Sync with cloud to protect your streak</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        retroAudio.playInspectConfirm();
-                        haptics.tap();
-                        if (onRequireAuth) onRequireAuth();
-                        onClose();
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-[#1A3629] text-[#FFFDF9] font-cabinet font-bold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer shrink-0"
-                    >
-                      Sync Cloud
-                    </button>
-                  </div>
-                )}
+                {renderGuestProgressionBridge()}
+                {renderExportFormatToggle()}
 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full">
                   <button
@@ -1221,7 +1356,7 @@ export function DailyDebriefRightDrawer({
                     className="w-full sm:w-1/2 py-3.5 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#FAF8F5] text-[#1A3629] font-cabinet font-extrabold text-xs hover:bg-[#FAF6EE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#1A3629]"
                   >
                     <PixelUpload size={14} color="#1A3629" />
-                    <span>Download PNG</span>
+                    <span>{exportFormat === 'story' ? 'Download Story' : 'Download PNG'}</span>
                   </button>
 
                   <button
@@ -1230,7 +1365,7 @@ export function DailyDebriefRightDrawer({
                     className="w-full sm:w-1/2 py-3.5 px-3 rounded-2xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-cabinet font-extrabold text-xs hover:bg-[#2C4A3B] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#2C5E43]"
                   >
                     <PixelCopy size={14} color="#FFFDF9" />
-                    <span>{copiedShare ? 'Copied Link!' : 'Share Card'}</span>
+                    <span>{copiedShare ? 'Copied Link!' : exportFormat === 'story' ? 'Share Story' : 'Share Card'}</span>
                   </button>
                 </div>
 

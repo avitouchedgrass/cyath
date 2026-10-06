@@ -1,6 +1,14 @@
 export interface ProgressionEvents {
   'xp:gained': { amount: number; reason: string; totalXp: number; suite?: 'circadian' | 'iron' | 'focus' };
   'level:up': { oldLevel: number; newLevel: number; title: string; unlockedTitle?: string };
+  'island:evolve': {
+    oldTier: number;
+    newTier: number;
+    level: number;
+    suite: 'circadian' | 'iron' | 'focus';
+    oldIsland: { name: string; image: string; pngImage?: string };
+    newIsland: { name: string; image: string; pngImage?: string; description?: string };
+  };
   'streak:milestone': { days: number; milestoneName: string; xpAwarded: number };
   'quest:completed': { questId: string; title: string; xpAwarded: number };
 }

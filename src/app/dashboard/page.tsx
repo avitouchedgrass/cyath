@@ -49,6 +49,12 @@ function DashboardContent() {
     };
     window.addEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
 
+    const handleCloseDrawers = () => {
+      setIsSealDrawerOpen(false);
+      setIsLedgerDrawerOpen(false);
+    };
+    window.addEventListener('cyath-close-drawers' as any, handleCloseDrawers);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
@@ -105,6 +111,7 @@ function DashboardContent() {
 
     return () => {
       window.removeEventListener('cyath-audio-mute-changed' as any, handleMuteChange);
+      window.removeEventListener('cyath-close-drawers' as any, handleCloseDrawers);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isAuthenticated, userProfile, userSession, router, currentDate, setDate]);

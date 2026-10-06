@@ -25,7 +25,7 @@ export interface DailyBriefing {
   recommendedProtocolId?: string;
 }
 
-const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
+export const MASTER_PROTOCOLS: DailyCommandProtocol[] = [
   {
     id: 'delay-caffeine-90m',
     title: 'Delay Caffeine by 90 Minutes',

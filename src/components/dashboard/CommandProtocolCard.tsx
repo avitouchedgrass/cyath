@@ -3,7 +3,8 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useHabitStore } from '@/store/useHabitStore';
-import { getDailyCommandProtocol } from '@/lib/dailyProtocolEngine';
+import { getDailyCommandProtocol, MASTER_PROTOCOLS } from '@/lib/dailyProtocolEngine';
+import { CURATED_PROTOCOLS } from '@/lib/protocols';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { getRelativeLocalDate, parseLocalDate } from '@/lib/dateUtils';
 import { shouldTriggerRecoveryDownscale, DOWNSCALED_FOCUS_PROTOCOL } from '@/lib/engines/reentryEngine';
@@ -13,6 +14,7 @@ export function CommandProtocolCard() {
   const {
     currentDate,
     userProfile,
+    activeProtocolIds = [],
     getDailyLog,
     dailyProtocolsAcceptedByDate,
     dailyProtocolsCompletedByDate,
@@ -36,8 +38,29 @@ export function CommandProtocolCard() {
   const yesterdayLog = useMemo(() => getDailyLog(yesterdayDate), [getDailyLog, yesterdayDate]);
 
   const rawProtocol = useMemo(() => {
+    const activeId = userProfile?.keystoneProtocolId || (activeProtocolIds && activeProtocolIds.length > 0 ? activeProtocolIds[0] : null);
+    if (activeId) {
+      const matchMaster = MASTER_PROTOCOLS.find((p) => p.protocolId === activeId || p.id === activeId);
+      if (matchMaster) return matchMaster;
+      const matchCurated = CURATED_PROTOCOLS.find((p) => p.id === activeId);
+      if (matchCurated) {
+        return {
+          id: matchCurated.id,
+          title: matchCurated.name,
+          hypothesis: matchCurated.shortSummary,
+          mechanism: matchCurated.whyItWorks,
+          directive: matchCurated.habits.map((h) => `${h.title} (${h.hint})`).join(' · '),
+          category: matchCurated.category.toLowerCase() as any,
+          xpReward: 50,
+          expectedGain: matchCurated.timeframe,
+          protocolId: matchCurated.id,
+          recipeSlug: undefined,
+          recipeTitle: undefined,
+        };
+      }
+    }
     return getDailyCommandProtocol(currentDate, userProfile?.primaryGoal, yesterdayLog);
-  }, [currentDate, userProfile?.primaryGoal, yesterdayLog]);
+  }, [currentDate, userProfile?.primaryGoal, userProfile?.keystoneProtocolId, activeProtocolIds, yesterdayLog]);
 
   const protocol = useMemo(() => {
     if (isDownscaled) {

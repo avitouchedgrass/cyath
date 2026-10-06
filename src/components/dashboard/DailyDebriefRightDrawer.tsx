@@ -224,6 +224,7 @@ export function DailyDebriefRightDrawer({
     userSession,
     isLedgerSealedByDate,
     isLedgerPartiallySealedByDate,
+    dailyDebriefLog,
     sealDailyLedger,
     amendDebriefMeals,
     gainXp,
@@ -268,13 +269,61 @@ export function DailyDebriefRightDrawer({
     setQuestions(loadDebriefQuestions());
   }, []);
 
+  const currentLog = getDailyLog(currentDate);
+
+  // Sync state dynamically when drawer is open or meals update
+  useEffect(() => {
+    if (!isOpen) return;
+    const debrief = (dailyDebriefLog && dailyDebriefLog[currentDate]) || {};
+    const meals = currentLog?.loggedMeals || [];
+
+    if (debrief.breakfastFuel) {
+      setBreakfastFuel(String(debrief.breakfastFuel));
+      setBreakfastDone(true);
+    } else {
+      const bMeal = meals.find((m) => (m.mealSlot || '').toLowerCase() === 'breakfast' || (m.name || '').toLowerCase().includes('breakfast'));
+      if (bMeal) {
+        setBreakfastFuel(bMeal.name);
+        setBreakfastDone((bMeal.protein || 0) >= 30);
+      }
+    }
+
+    if (debrief.lunchFuel) {
+      setLunchFuel(String(debrief.lunchFuel));
+      setLunchDone(true);
+    } else {
+      const lMeal = meals.find((m) => (m.mealSlot || '').toLowerCase() === 'lunch' || (m.name || '').toLowerCase().includes('lunch'));
+      if (lMeal) {
+        setLunchFuel(lMeal.name);
+        setLunchDone((lMeal.protein || 0) >= 40);
+      }
+    }
+
+    if (debrief.dinnerFuel) {
+      setDinnerFuel(String(debrief.dinnerFuel));
+      setDinnerDone(true);
+    } else {
+      const dMeal = meals.find((m) => (m.mealSlot || '').toLowerCase() === 'dinner' || (m.name || '').toLowerCase().includes('dinner'));
+      if (dMeal) {
+        setDinnerFuel(dMeal.name);
+        setDinnerDone((dMeal.protein || 0) >= 35);
+      }
+    }
+  }, [isOpen, currentDate, currentLog?.loggedMeals, dailyDebriefLog]);
+
+  useEffect(() => {
+    const handleCloseDrawers = () => {
+      onClose();
+    };
+    window.addEventListener('cyath-close-drawers', handleCloseDrawers);
+    return () => window.removeEventListener('cyath-close-drawers', handleCloseDrawers);
+  }, [onClose]);
+
   const enabledQuestions = useMemo(() => {
     return questions.filter((q) => q.enabled);
   }, [questions]);
 
   const isTodaySealed = !!isLedgerSealedByDate[currentDate];
-
-  const currentLog = getDailyLog(currentDate);
 
   // Calculate hours slept
   const calculatedSleepDuration = useMemo(() => {
@@ -487,6 +536,7 @@ export function DailyDebriefRightDrawer({
 
     if (Object.keys(updates).length > 0) {
       await amendDebriefMeals(currentDate, updates);
+      setHasPinnedReceipt(true);
     }
     setIsAmendingMeals(false);
     setIsSealingInProgress(false);
@@ -775,6 +825,8 @@ export function DailyDebriefRightDrawer({
                       onApplyEstimate={(name, protein, calories, hitTarget) => {
                         setAmendLunchFuel(name);
                         setAmendLunchDone(hitTarget);
+                        setLunchFuel(name);
+                        setLunchDone(hitTarget);
                       }}
                     />
                     <input
@@ -797,6 +849,8 @@ export function DailyDebriefRightDrawer({
                       onApplyEstimate={(name, protein, calories, hitTarget) => {
                         setAmendDinnerFuel(name);
                         setAmendDinnerDone(hitTarget);
+                        setDinnerFuel(name);
+                        setDinnerDone(hitTarget);
                       }}
                     />
                     <input

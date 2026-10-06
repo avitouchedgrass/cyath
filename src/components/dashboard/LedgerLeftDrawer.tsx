@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useHabitStore } from '@/store/useHabitStore';
 import { formatLocalDate } from '@/lib/dateUtils';
 import { CorkboardBackdropSvg } from '@/components/dashboard/CorkboardBackdropSvg';
@@ -32,6 +32,14 @@ export function LedgerLeftDrawer({
   const todayStr = useMemo(() => formatLocalDate(), []);
   const [selectedDateStr, setSelectedDateStr] = useState<string>(todayStr);
   const [copiedShare, setCopiedShare] = useState(false);
+
+  useEffect(() => {
+    const handleClose = () => {
+      onClose();
+    };
+    window.addEventListener('cyath-close-drawers', handleClose);
+    return () => window.removeEventListener('cyath-close-drawers', handleClose);
+  }, [onClose]);
 
   // Generate rolling 30 days
   const rollingDays = useMemo(() => {

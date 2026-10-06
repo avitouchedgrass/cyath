@@ -1364,6 +1364,17 @@ export const useHabitStore = create<HabitStoreState>()(
             title: newLevelInfo.title,
             unlockedTitle: newLevelInfo.title !== oldLevelInfo.title ? newLevelInfo.title : undefined,
           });
+
+          const oldIsland = getIslandTier(oldLevelInfo.level, targetSuite);
+          const newIsland = getIslandTier(newLevelInfo.level, targetSuite);
+          progressionEvents.emit('island:evolve', {
+            oldTier: oldIsland.tier,
+            newTier: newIsland.tier,
+            level: newLevelInfo.level,
+            suite: targetSuite,
+            oldIsland: { name: oldIsland.name, image: oldIsland.image, pngImage: oldIsland.pngImage },
+            newIsland: { name: newIsland.name, image: newIsland.image, pngImage: newIsland.pngImage, description: (newIsland as any).description },
+          });
         }
 
         const userId = get().userSession?.id;
@@ -2202,7 +2213,9 @@ export const useHabitStore = create<HabitStoreState>()(
         const targetDate = date || get().currentDate;
         const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
         const existingMeals = currentLog.loggedMeals || [];
-        const alreadyLoggedCount = existingMeals.length + currentLog.loggedRecipeIds.length;
+        const prevProtein = currentLog.totalProteinLogged || 0;
+        const addedProtein = Math.max(0, meal.protein || 0);
+        const newProtein = prevProtein + addedProtein;
 
         const newMealEntry: LoggedMealEntry = {
           ...meal,
@@ -2216,22 +2229,46 @@ export const useHabitStore = create<HabitStoreState>()(
           ? [...currentLog.loggedRecipeIds, meal.recipeId]
           : currentLog.loggedRecipeIds;
 
+        const profile = get().userProfile;
+        const targetProtein = profile?.targetProteinGrams || (profile?.weightKg ? Math.round(profile.weightKg * 1.6) : GOALS.proteinGrams);
+        const isTargetMet = newProtein >= targetProtein;
+        const updatedHabitsCompleted = {
+          ...(currentLog.habitsCompleted || {}),
+          ...(isTargetMet ? { protein_target: true } : {}),
+        };
+
         set((state) => ({
           logsByDate: {
             ...state.logsByDate,
             [targetDate]: {
               ...currentLog,
-              totalProteinLogged: currentLog.totalProteinLogged + (meal.protein || 0),
+              totalProteinLogged: newProtein,
               totalCaloriesLogged: currentLog.totalCaloriesLogged + (meal.calories || 0),
               loggedMeals: updatedMeals,
               loggedRecipeIds: updatedRecipes,
+              habitsCompleted: updatedHabitsCompleted,
             },
           },
         }));
 
-        if (alreadyLoggedCount < 3) {
-          get().gainXp(XP_AWARDS.recipeLogged, 'Whole Food Dish Prepared', 'recipe');
+        // Award meal XP: Always award XP for first 5 meals of the day (including catch-up meals)
+        if (existingMeals.length < 5) {
+          get().gainXp(XP_AWARDS.recipeLogged, `Whole Food Meal Logged (+${addedProtein}g Protein)`, 'recipe');
         }
+
+        // Award Protein Target progression if this meal pushes past milestone/target thresholds
+        const hadFull = prevProtein >= targetProtein;
+        const hadHalf = prevProtein >= targetProtein / 2 && !hadFull;
+        const nowFull = newProtein >= targetProtein;
+        const nowHalf = newProtein >= targetProtein / 2 && !nowFull;
+
+        if (!hadFull && nowFull) {
+          const delta = hadHalf ? (XP_AWARDS.proteinGoal - XP_AWARDS.proteinPartial) : XP_AWARDS.proteinGoal;
+          get().gainXp(delta, `Protein Target Reached (${newProtein}g / ${targetProtein}g)`, 'nutrition');
+        } else if (!hadHalf && nowHalf && !nowFull) {
+          get().gainXp(XP_AWARDS.proteinPartial, `Protein Milestone Reached (${newProtein}g)`, 'nutrition');
+        }
+
         get().syncWithSupabase(targetDate);
         return newMealEntry;
       },
@@ -2708,11 +2745,18 @@ export const useHabitStore = create<HabitStoreState>()(
 
       setKeystoneProtocol: (protocolId: string) => {
         const currentProfile = get().userProfile;
-        if (!currentProfile) return;
-        get().updateUserProfile({
-          ...currentProfile,
-          keystoneProtocolId: protocolId,
-        });
+        if (!currentProfile) {
+          get().updateUserProfile({
+            id: get().userSession?.id || 'guest_user',
+            fullName: 'Explorer',
+            keystoneProtocolId: protocolId,
+          } as any);
+        } else {
+          get().updateUserProfile({
+            ...currentProfile,
+            keystoneProtocolId: protocolId,
+          });
+        }
       },
 
       resetUserProgress: async () => {

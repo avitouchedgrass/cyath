@@ -17,8 +17,11 @@ function PlaybookContent() {
   const [mounted, setMounted] = useState(false);
 
   const {
-    activeProtocolIds,
+    activeProtocolIds = [],
     activateProtocol,
+    setKeystoneProtocol,
+    acceptDailyProtocol,
+    currentDate,
     gainXp,
   } = useHabitStore();
 
@@ -39,13 +42,15 @@ function PlaybookContent() {
     const isAlreadyActive = activeProtocolIds.includes(protocol.id);
     activateProtocol(protocol.id, protocol.standardHabits);
 
-    setToastMessage(
-      isAlreadyActive
-        ? `Removed ${protocol.name} from Daily Dashboard.`
-        : `Added ${protocol.name} to Daily Dashboard!`
-    );
+    if (!isAlreadyActive) {
+      setKeystoneProtocol(protocol.id);
+      acceptDailyProtocol(currentDate);
+      setToastMessage(`Anchored ${protocol.name} on Daily Dashboard (+15 XP Commitment)!`);
+    } else {
+      setToastMessage(`Removed ${protocol.name} from Daily Dashboard.`);
+    }
 
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   return (

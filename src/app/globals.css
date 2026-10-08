@@ -42,6 +42,11 @@
   --animate-shadow-float: shadowFloat 8s ease-in-out infinite;
   --animate-cloud-slow: cloudDriftSlow 52s linear infinite;
   --animate-cloud-fast: cloudDriftFast 36s linear infinite;
+  --animate-god-rays: godRaysRotate 30s linear infinite;
+  --animate-evolution-tremor: evolutionTremor 0.08s linear infinite;
+  --animate-seismic-slam: seismicSlam 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  --animate-screen-shake: screenCameraShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  --animate-shockwave-expand: shockwaveExpand 0.7s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
 
   @keyframes islandFloat {
     0%, 100% {
@@ -270,6 +275,86 @@
     50% {
       opacity: 0.6;
       transform: scale(1.04);
+    }
+  }
+
+  @keyframes godRaysRotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes evolutionTremor {
+    0% {
+      transform: translate(0, 0);
+    }
+    20% {
+      transform: translate(-1.5px, 1px);
+    }
+    40% {
+      transform: translate(1.5px, -1.5px);
+    }
+    60% {
+      transform: translate(-1px, -1px);
+    }
+    80% {
+      transform: translate(1px, 1.5px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes seismicSlam {
+    0% {
+      transform: translateY(-44px) scale(1.06);
+    }
+    55% {
+      transform: translateY(6px) scale(1.04, 0.96);
+    }
+    75% {
+      transform: translateY(-3px) scale(0.99, 1.01);
+    }
+    100% {
+      transform: translateY(0px) scale(1);
+    }
+  }
+
+  @keyframes screenCameraShake {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    15% {
+      transform: translate(-4px, 4px) rotate(-0.4deg);
+    }
+    30% {
+      transform: translate(4px, -3px) rotate(0.3deg);
+    }
+    45% {
+      transform: translate(-3px, 2px) rotate(-0.1deg);
+    }
+    60% {
+      transform: translate(2px, -2px) rotate(0deg);
+    }
+    75% {
+      transform: translate(-1px, 1px);
+    }
+    90% {
+      transform: translate(1px, -0.5px);
+    }
+  }
+
+  @keyframes shockwaveExpand {
+    0% {
+      transform: scale(0.2);
+      opacity: 0.95;
+    }
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
     }
   }
 }

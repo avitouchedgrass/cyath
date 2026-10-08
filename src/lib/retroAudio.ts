@@ -425,6 +425,120 @@ class RetroAudioEngine {
       // Ignore
     }
   }
+
+  // Resonant rising energy oscillation for island evolution charging phase
+  public playEvolutionCharge() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const duration = 1.1;
+
+      // Base rising synth tone
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(130, now);
+      osc.frequency.exponentialRampToValueAtTime(587.33, now + duration);
+
+      // Pulse tremolo gain
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.linearRampToValueAtTime(0.14, now + duration - 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch {
+      // Ignore
+    }
+  }
+
+  // Dazzling cosmic supernova burst (celestial chord + shimmering glass arpeggio)
+  public playEvolutionSupernova() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Sparkling rapid chimes
+      const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98, 2093.00];
+      freqs.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        const t = now + idx * 0.045;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
+      });
+
+      // Warm resonant brass chord bed
+      const chord = [261.63, 329.63, 392.00, 523.25];
+      chord.forEach((freq) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.85);
+      });
+    } catch {
+      // Ignore
+    }
+  }
+
+  // Deep seismic bedrock touchdown with sub-bass impact and dust crackle
+  public playSeismicTouchdown() {
+    if (this.isMuted) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // 1. Sub-bass ground impact
+      const sub = this.ctx.createOscillator();
+      const subGain = this.ctx.createGain();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(110, now);
+      sub.frequency.exponentialRampToValueAtTime(28, now + 0.32);
+      subGain.gain.setValueAtTime(0.42, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      sub.connect(subGain);
+      subGain.connect(this.ctx.destination);
+      sub.start(now);
+      sub.stop(now + 0.35);
+
+      // 2. Punchy transient slap
+      const slap = this.ctx.createOscillator();
+      const slapGain = this.ctx.createGain();
+      slap.type = 'triangle';
+      slap.frequency.setValueAtTime(240, now);
+      slap.frequency.exponentialRampToValueAtTime(50, now + 0.09);
+      slapGain.gain.setValueAtTime(0.22, now);
+      slapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      slap.connect(slapGain);
+      slapGain.connect(this.ctx.destination);
+      slap.start(now);
+      slap.stop(now + 0.09);
+    } catch {
+      // Ignore
+    }
+  }
+
   // Heavy acoustic stamp impact with deep parchment thud
   public playWaxStampThump() {
     if (this.isMuted) return;

@@ -11,6 +11,7 @@ import {
 } from '@/lib/progression/config';
 import { calculateLevel } from '@/lib/progression/engine';
 import { retroAudio } from '@/lib/retroAudio';
+import { progressionEvents } from '@/lib/progression/events';
 import { useHabitStore } from '@/store/useHabitStore';
 import {
   PixelX,
@@ -277,6 +278,29 @@ export function IslandBiomeGalleryModal({
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-1 leading-relaxed">
               {currentTier.description}
             </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                retroAudio.playInspectConfirm();
+                const prevTier = currentSuiteTiers[Math.max(0, selectedIndex - 1)] || currentSuiteTiers[0];
+                onClose();
+                setTimeout(() => {
+                  progressionEvents.emit('island:evolve', {
+                    oldTier: prevTier.tier,
+                    newTier: currentTier.tier,
+                    level: currentTier.minLevel,
+                    suite: selectedSuite,
+                    oldIsland: { name: prevTier.name, image: prevTier.image, pngImage: prevTier.pngImage },
+                    newIsland: { name: currentTier.name, image: currentTier.image, pngImage: currentTier.pngImage, description: currentTier.description },
+                  });
+                }, 150);
+              }}
+              className="mt-2.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-amber-500/30 bg-amber-400/10 hover:bg-amber-400/20 text-amber-900 font-cabinet font-bold text-xs transition-colors cursor-pointer"
+            >
+              <PixelSparkles size={12} color="#D97706" />
+              <span>Preview Metamorphosis Ceremony</span>
+            </button>
           </div>
         </div>
 

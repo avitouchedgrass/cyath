@@ -30,6 +30,7 @@ export function EveningSleepCard({
     habits,
     userProfile,
     isLedgerSealedByDate,
+    getSlumpEssentials,
   } = useHabitStore();
 
   const [isCeremonyOpen, setIsCeremonyOpen] = useState(false);
@@ -41,7 +42,12 @@ export function EveningSleepCard({
   const wakeTime = userProfile?.wakeTime || '07:30';
   const bedTime = userProfile?.bedTime || '23:30';
 
-  const habitsDone = habits.length > 0 && habits.every((h) => !!currentLog.habitsCompleted[h.id]);
+  const slumpData = getSlumpEssentials(currentDate);
+  const isSlumpActive = slumpData.isSlumpActive;
+
+  const habitsDone = isSlumpActive && slumpData.config.requireOnlyEssentialsForSeal
+    ? slumpData.allEssentialsMet
+    : habits.length > 0 && habits.every((h) => !!currentLog.habitsCompleted[h.id]);
 
   const isEveningWindow = useMemo(() => {
     const now = new Date();
@@ -99,6 +105,8 @@ export function EveningSleepCard({
             <p className="font-sans text-[11px] text-[#3D4D41] leading-snug font-medium">
               {isAlreadySealed
                 ? `${pinnedCount} of 30 days verified and sealed with wax.`
+                : isSlumpActive
+                ? 'Slump mode active: essentials verified. Ready to seal & sleep.'
                 : isEligible
                 ? 'Ready to archive today with thermal receipt and wax seal.'
                 : 'Unlocks in the evening (3 hours before target bedtime).'}
@@ -118,6 +126,8 @@ export function EveningSleepCard({
               >
                 {isAlreadySealed
                   ? 'View Log Book'
+                  : isSlumpActive
+                  ? 'Daily Check-in · Slump Seal (+50 XP)'
                   : 'Daily Check-in (+50 XP)'}
               </button>
             ) : (

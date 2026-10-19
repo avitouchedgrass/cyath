@@ -395,11 +395,11 @@ export default function Home() {
                           <PixelArrowUpRight size={14} color="#1A3629" />
                         </div>
                         <h3 className="font-cabinet font-bold text-xl tracking-tight text-[#1A3629]">
-                          Food &amp; Focus Patterns
+                          Chrono-Metabolic Biomarker Engine
                         </h3>
                       </div>
                       <p className="text-xs sm:text-sm font-cabinet font-medium text-[#2C4A3B]">
-                        See the direct connection between your protein fuel and your peak focus days.
+                        Pearson correlation engine mapping postprandial protein load to circadian vitality and peak focus output.
                       </p>
                     </div>
 
@@ -413,8 +413,8 @@ export default function Home() {
                   <div className="w-full mb-4">
                     <ErrorBoundary name="Scatter Matrix">
                       <InteractiveCorrelationMatrix
-                        xLabel="Protein Fuel"
-                        yLabel="Focus Score"
+                        xLabel="Postprandial Amino-Acid Floor"
+                        yLabel="Vitality Index"
                         xUnit="g"
                       />
                     </ErrorBoundary>
@@ -422,9 +422,9 @@ export default function Home() {
                 </div>
 
                 <div className="relative z-10 flex items-center justify-between pt-4 border-t border-[#1A3629]/10 text-xs font-mono font-bold text-[#2C4A3B]">
-                  <span>Daily habit &amp; meal insights</span>
+                  <span>Circadian biomarker correlation • Pearson r² engine</span>
                   <Link href="/correlations" className="hover:underline flex items-center gap-1 text-[#1A3629]">
-                    <span>View All Insights →</span>
+                    <span>View Full Analysis →</span>
                   </Link>
                 </div>
               </div>

@@ -22,6 +22,10 @@ export interface ParsedMealSuccess {
   ingredients: Array<{ item: string; amount: string }>;
   suggestedSprite: string;
   notes?: string;
+  // Chrononutrition & clinical biomarker fields
+  glycemicRisk?: 'Low' | 'Moderate' | 'Spike Risk';
+  circadianImpact?: string;
+  allostaticScore?: number;
 }
 
 export interface ParsedMealIncomplete {
@@ -64,13 +68,15 @@ function pickBestSprite(text: string): string {
 import { parseInstantMeal, extractExplicitMacros, stripExplicitMacroText } from '@/lib/instantMacroEngine';
 
 const CANDIDATE_MODELS = [
-  'gemini-3.1-flash-lite',
-  'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-3-flash-preview',
+  'gemini-flash-latest',
+  'gemini-flash-lite-latest',
+  'gemini-3.6-flash',
 ];
 
-const MEAL_PARSER_SYSTEM_PROMPT = `You are Cyath's scientific nutritional analyst.
-Your task is to analyze meals entered by users in natural language.
+const MEAL_PARSER_SYSTEM_PROMPT = `You are Cyath's clinical chrononutrition and metabolic biomarker AI.
+Your task is to analyze meals using evidence-based nutritional science and chronobiology to help users understand how their eating patterns affect circadian metabolic health, glycemic stability, and allostatic load.
 
 STEP 0: STRICT FOOD VALIDATION:
 Examine if the user entry actually describes edible food, beverages, ingredients, or a meal.
@@ -129,6 +135,17 @@ CRITICAL INSTRUCTION: CHECKING SERVING SIZES:
    - category: strictly one of ["High Protein", "Steady Carbs", "Quick Fuel", "Keto Clean", "Post Workout"]
    - ingredients: array of {"item": string, "amount": string}
    - notes: short sentence explaining key nutritional anchors.
+   - glycemicRisk: strictly one of ["Low", "Moderate", "Spike Risk"]. Evaluate the meal's glycemic index profile:
+     * "Spike Risk" = high simple carbs with low fiber/protein (e.g. white bread alone, sugary cereal, pastry, juice)
+     * "Moderate" = mixed macros with some fast-digesting carbs but buffered by protein or fiber
+     * "Low" = high protein, high fiber, or primarily fat/protein-dominant meals
+   - circadianImpact: one concise clinical sentence (max 20 words) explaining how this meal's macronutrient profile and timing interacts with circadian metabolic physiology. Reference concepts like: postprandial glucose stability, peripheral insulin sensitivity windows, adenosine clearance, cortisol rhythm, or amino acid bioavailability.
+   - allostaticScore: integer from 1 to 5 representing systemic metabolic load:
+     * 1 = Minimal load (high protein + fiber + low glycemic — optimal for daytime metabolic window)
+     * 2 = Low load (balanced whole-food meal with moderate carbs)
+     * 3 = Moderate load (mixed nutrients, some processing or refined carbs)
+     * 4 = High load (predominantly refined carbs, low fiber, low protein)
+     * 5 = Maximum load (ultra-processed, high sugar, near-zero micronutrients, circadian disruptive)
 
    Example JSON:
    {
@@ -146,11 +163,15 @@ CRITICAL INSTRUCTION: CHECKING SERVING SIZES:
        {"item": "Jasmine Rice (cooked)", "amount": "1 cup (150g)"},
        {"item": "Steamed Broccoli", "amount": "1 cup (90g)"}
      ],
-     "notes": "Whole-food balanced plate with 44g bioavailable protein."
+     "notes": "Whole-food balanced plate with 44g bioavailable protein.",
+     "glycemicRisk": "Low",
+     "circadianImpact": "High leucine content activates mTOR synthesis; optimal within 6-hour post-wake metabolic window.",
+     "allostaticScore": 2
    }
 
 FORMATTING RULE:
 Output raw valid JSON only. Never wrap in markdown codeblocks. Do not include emojis.`;
+
 
 export function fallbackHeuristicParse(text: string, clarifications?: Record<string, string>): ParsedMealResponse {
   const combined = `${text} ${Object.entries(clarifications || {}).map(([k, v]) => `${k}: ${v}`).join(' ')}`.trim();
@@ -292,6 +313,30 @@ export function fallbackHeuristicParse(text: string, clarifications?: Record<str
 
   const category: ParsedMealSuccess['category'] = protein >= 30 ? 'High Protein' : carbs >= 50 ? 'Steady Carbs' : 'Quick Fuel';
 
+  // Derive clinical biomarker fields from ingredient heuristics
+  const hasRefinedCarbs = /bread|toast|pasta|pastry|juice|cereal|sugar|cake|cookie/i.test(lower);
+  const hasWholeCarbs = /oats|quinoa|rice|potato|roti|grain/i.test(lower);
+  const isHighProtein = protein >= 30;
+  const isHighFiber = /broccoli|spinach|salad|vegetable|greens|lentil|bean|chickpea|oats/i.test(lower);
+
+  let glycemicRisk: ParsedMealSuccess['glycemicRisk'] = 'Moderate';
+  if (isHighProtein && !hasRefinedCarbs) glycemicRisk = 'Low';
+  else if (hasRefinedCarbs && !isHighProtein && !isHighFiber) glycemicRisk = 'Spike Risk';
+
+  let circadianImpact = 'Balanced macronutrient profile supports stable postprandial glucose within the daylight metabolic window.';
+  if (glycemicRisk === 'Low' && isHighProtein) {
+    circadianImpact = 'High amino acid load activates mTOR pathway; ideal within 6-hour post-wake peripheral insulin sensitivity window.';
+  } else if (glycemicRisk === 'Spike Risk') {
+    circadianImpact = 'Rapid glucose spike may disrupt cortisol rhythm; low fiber blunts postprandial satiety signaling.';
+  } else if (hasWholeCarbs && isHighProtein) {
+    circadianImpact = 'Complex carbs paired with protein stabilize postprandial glucose and support sustained adenosine clearance.';
+  }
+
+  let allostaticScore = 3;
+  if (glycemicRisk === 'Low' && isHighProtein && isHighFiber) allostaticScore = 1;
+  else if (glycemicRisk === 'Low' && isHighProtein) allostaticScore = 2;
+  else if (glycemicRisk === 'Spike Risk') allostaticScore = 4;
+
   // Capitalize meal name cleanly
   const words = text.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
   const mealName = words.slice(0, 6).join(' ') || 'Whole Food Meal';
@@ -309,6 +354,9 @@ export function fallbackHeuristicParse(text: string, clarifications?: Record<str
     ingredients: ingredientsList,
     suggestedSprite: pickBestSprite(text),
     notes: `Calculated from ${ingredientsList.length} calibrated ingredients.`,
+    glycemicRisk,
+    circadianImpact,
+    allostaticScore,
   };
 }
 
@@ -385,7 +433,7 @@ export async function POST(req: NextRequest) {
             contents,
             generationConfig: {
               temperature: 0.2,
-              maxOutputTokens: 800,
+              maxOutputTokens: 1200,
               responseMimeType: 'application/json',
             },
           }),
@@ -433,6 +481,38 @@ export async function POST(req: NextRequest) {
             parsed.ingredients = [{ item: parsed.mealName || rawText, amount: '1 calibrated portion' }];
           }
           if (parsed.protein >= 30) parsed.category = 'High Protein';
+        }
+
+        // Defensively sanitize numeric macros
+        if (parsed.protein !== undefined) parsed.protein = typeof parsed.protein === 'number' ? parsed.protein : parseInt(String(parsed.protein).replace(/[^0-9]/g, '')) || 0;
+        if (parsed.calories !== undefined) parsed.calories = typeof parsed.calories === 'number' ? parsed.calories : parseInt(String(parsed.calories).replace(/[^0-9]/g, '')) || 0;
+        if (parsed.carbs !== undefined) parsed.carbs = typeof parsed.carbs === 'number' ? parsed.carbs : parseInt(String(parsed.carbs).replace(/[^0-9]/g, '')) || 0;
+        if (parsed.fats !== undefined) parsed.fats = typeof parsed.fats === 'number' ? parsed.fats : parseInt(String(parsed.fats).replace(/[^0-9]/g, '')) || 0;
+
+        // Normalize allostaticScore to integer 1-5
+        if (typeof parsed.allostaticScore === 'string') {
+          const s = parsed.allostaticScore.toLowerCase();
+          if (s.includes('min')) parsed.allostaticScore = 1;
+          else if (s.includes('low')) parsed.allostaticScore = 2;
+          else if (s.includes('mod')) parsed.allostaticScore = 3;
+          else if (s.includes('high')) parsed.allostaticScore = 4;
+          else if (s.includes('max')) parsed.allostaticScore = 5;
+          else parsed.allostaticScore = parseInt(s.replace(/[^0-9]/g, '')) || 2;
+        }
+        if (typeof parsed.allostaticScore === 'number') {
+          parsed.allostaticScore = Math.max(1, Math.min(5, Math.round(parsed.allostaticScore)));
+        } else {
+          parsed.allostaticScore = 2;
+        }
+
+        // Normalize glycemicRisk
+        if (!['Low', 'Moderate', 'Spike Risk'].includes(parsed.glycemicRisk)) {
+          parsed.glycemicRisk = (parsed.protein || 0) >= 30 ? 'Low' : 'Moderate';
+        }
+
+        // Normalize circadianImpact
+        if (!parsed.circadianImpact || typeof parsed.circadianImpact !== 'string') {
+          parsed.circadianImpact = 'Balanced macronutrient profile supports stable postprandial glucose within the daylight metabolic window.';
         }
 
         if (parsed.hasCompletePortions) {

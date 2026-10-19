@@ -35,19 +35,24 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyath.space';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
+    default: 'Cyath · AI Chronobiology & Preventative Metabolic Health Engine',
     template: '%s · Cyath',
   },
   description:
-    'Frictionless 30-second daily habit tracking, whole-food high-protein recipes, circadian protocols, and statistical energy pattern insights.',
+    'Multimodal AI engine for circadian-metabolic health. Detects subclinical fatigue biomarkers, predicts glycemic risk from natural language meal input, and automatically paces daily routines to prevent metabolic burnout.',
   keywords: [
-    'habit tracker',
-    'metabolic health',
-    'high protein recipes',
-    'whole food nutrition',
-    'energy tracking',
-    'circadian rhythm',
-    'gamified habits',
+    'AI chronobiology',
+    'metabolic health AI',
+    'circadian rhythm tracking',
+    'glycemic risk detection',
+    'allostatic load',
+    'preventative healthcare AI',
+    'postprandial glucose',
+    'subclinical fatigue detection',
+    'chrononutrition',
+    'adaptive pacing',
+    'Gemini AI health',
+    'human health AI',
   ],
   authors: [{ name: 'Cyath Health', url: SITE_URL }],
   creator: 'Cyath',
@@ -56,9 +61,9 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
+    title: 'Cyath · AI Chronobiology & Preventative Metabolic Health Engine',
     description:
-      'Track daily habits in 30 seconds, calibrate whole-food protein targets, and uncover what drives your best energy days.',
+      'Multimodal AI that detects subclinical fatigue, maps circadian biomarkers to metabolic outcomes, and automatically paces daily routines for chronic fatigue and burnout prevention.',
     url: SITE_URL,
     siteName: 'Cyath',
     locale: 'en_US',
@@ -66,8 +71,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cyath · Science-Backed Daily Habit & Nutrition Engine',
-    description: 'Track daily habits, hit protein goals, and discover what fuels your good days.',
+    title: 'Cyath · AI Chronobiology & Preventative Metabolic Health Engine',
+    description: 'Gemini-powered AI that maps circadian biomarkers, predicts glycemic risk, and paces routines to prevent chronic fatigue.',
     creator: '@CyathHealth',
   },
   robots: {

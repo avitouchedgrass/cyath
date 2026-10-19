@@ -19,6 +19,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
     habits,
     userProfile,
     isLedgerSealedByDate,
+    getSlumpEssentials,
   } = useHabitStore();
 
   const [isCeremonyOpen, setIsCeremonyOpen] = useState(false);
@@ -27,11 +28,16 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
   const isAlreadySealed = !!isLedgerSealedByDate[currentDate];
   const pinnedCount = Object.values(isLedgerSealedByDate).filter(Boolean).length;
 
+  const slumpData = getSlumpEssentials(currentDate);
+  const isSlumpActive = slumpData.isSlumpActive;
+  const slumpDone = isSlumpActive && slumpData.config.requireOnlyEssentialsForSeal && slumpData.allEssentialsMet;
+
   const wakeTime = userProfile?.wakeTime || '07:30';
   const bedTime = userProfile?.bedTime || '23:30';
 
-  // Check if habits are complete or evening window is reached
-  const habitsDone = habits.length > 0 && habits.every((h) => !!currentLog.habitsCompleted[h.id]);
+  // Check if habits are complete (or slump essentials met) or evening window is reached
+  const standardHabitsDone = habits.length > 0 && habits.every((h) => !!currentLog.habitsCompleted[h.id]);
+  const habitsDone = isSlumpActive ? slumpDone : standardHabitsDone;
 
   const isEveningWindow = useMemo(() => {
     const now = new Date();
@@ -48,7 +54,7 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
     return currentMinutes >= windowStart;
   }, [bedTime]);
 
-  const isEligible = habitsDone || isEveningWindow;
+  const isEligible = habitsDone || isEveningWindow || slumpDone;
 
   const handleStartCeremony = () => {
     if (isAlreadySealed) {
@@ -92,6 +98,8 @@ export function EveningSealButton({ onOpenReceipt, onOpenCorkboard, onRequireAut
           <span>
             {isAlreadySealed
               ? `Daily Log Saved (${pinnedCount} of 30)`
+              : isSlumpActive
+              ? 'Daily Check-in · Slump Seal (+50 XP)'
               : 'Daily Check-in (+50 XP)'}
           </span>
         </button>

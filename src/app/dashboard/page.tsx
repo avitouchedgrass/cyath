@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { HeaderNav } from '@/components/landing/HeaderNav';
 import { useHabitStore } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
@@ -14,12 +14,14 @@ import { SpecimenVaultSubfloor } from '@/components/dashboard/SpecimenVaultSubfl
 import { ItemGetBanner } from '@/components/dashboard/ItemGetBanner';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { IslandBiomeGalleryModal } from '@/components/progression/IslandBiomeGalleryModal';
+import { WeeklyDossierModal } from '@/components/dashboard/WeeklyDossierModal';
 import { calculateLevel } from '@/lib/progression/engine';
 import { supabase } from '@/lib/supabase';
 import { PixelVolume, PixelVolumeMute } from '@/components/common/PixelIcons';
 
 function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -28,6 +30,7 @@ function DashboardContent() {
   const [isSealDrawerOpen, setIsSealDrawerOpen] = useState(false);
   const [isLedgerDrawerOpen, setIsLedgerDrawerOpen] = useState(false);
   const [isBiomeGalleryOpen, setIsBiomeGalleryOpen] = useState(false);
+  const [isDossierOpen, setIsDossierOpen] = useState(false);
 
   const {
     currentDate,
@@ -65,19 +68,11 @@ function DashboardContent() {
       }
       if (e.key === 's' || e.key === 'S') {
         e.preventDefault();
-        if (!isAuthenticated) {
-          setIsAuthModalOpen(true);
-          return;
-        }
         setIsSealDrawerOpen((prev) => !prev);
         setIsLedgerDrawerOpen(false);
       }
       if (e.key === 'l' || e.key === 'L') {
         e.preventDefault();
-        if (!isAuthenticated) {
-          setIsAuthModalOpen(true);
-          return;
-        }
         setIsLedgerDrawerOpen((prev) => !prev);
         setIsSealDrawerOpen(false);
       }
@@ -87,6 +82,10 @@ function DashboardContent() {
     const today = formatLocalDate();
     if (currentDate !== today) {
       setDate(today);
+    }
+
+    if (searchParams.get('tab') === 'dossier') {
+      setIsDossierOpen(true);
     }
 
     const verifyOnboarding = async () => {
@@ -202,6 +201,12 @@ function DashboardContent() {
         onClose={() => setIsBiomeGalleryOpen(false)}
         currentLevel={progress.level}
         totalXp={totalXp}
+      />
+
+      {/* Weekly Energy & Clinical Biomarker Dossier Modal */}
+      <WeeklyDossierModal
+        isOpen={isDossierOpen}
+        onClose={() => setIsDossierOpen(false)}
       />
 
       {/* Authentication Modal */}

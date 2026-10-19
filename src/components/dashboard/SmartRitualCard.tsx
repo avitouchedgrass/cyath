@@ -7,8 +7,15 @@ import { xpParticleEmitter } from '@/lib/particleEmitter';
 import { PixelCheck, PixelBolt } from '@/components/common/PixelIcons';
 
 export function SmartRitualCard() {
-  const { currentDate, deskRitualsByDate, completeMorningBoot, completeEveningWrap, getDailyLog, setIsDownscaled } =
-    useHabitStore();
+  const {
+    currentDate,
+    deskRitualsByDate,
+    completeMorningBoot,
+    completeEveningWrap,
+    getDailyLog,
+    setIsDownscaled,
+    setIsSlumpRoutine,
+  } = useHabitStore();
 
   const currentLog = getDailyLog(currentDate);
   const ritual = deskRitualsByDate[currentDate] || {};
@@ -51,6 +58,9 @@ export function SmartRitualCard() {
       wholeFoodRating: 8,
       afternoonSlumpScore: slumpScore,
     }, currentDate);
+    if (slumpScore <= 3) {
+      setIsSlumpRoutine(currentDate, true);
+    }
   };
 
   // 1. Morning View (before 12:00 PM or if morning boot incomplete)
@@ -154,13 +164,15 @@ export function SmartRitualCard() {
 
   // 2. Evening View (after 5:00 PM and wrap not yet completed)
   if (isEvening && !ritual.eveningWrapCompleted) {
+    const isSlumpActive = !!currentLog.isSlumpRoutine;
+
     return (
       <div className="w-full rounded-2xl border-2 border-[#1A3629] bg-[#FAF8F5] p-4 sm:p-5 shadow-[4px_4px_0px_#1A3629]">
         <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#1A3629]/15">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" />
+            <span className={`w-2 h-2 rounded-full ${isSlumpActive ? 'bg-[#D97706]' : 'bg-[#D97706]'} animate-pulse`} />
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1A3629]">
-              EVENING CHECK-IN
+              {isSlumpActive ? 'SLUMP CHECK-IN · ESSENTIALS ONLY' : 'EVENING CHECK-IN'}
             </span>
           </div>
           <span className="font-mono text-xs font-bold text-[#1A3629] bg-[#EAE3D2] px-2 py-0.5 rounded">
@@ -168,48 +180,70 @@ export function SmartRitualCard() {
           </span>
         </div>
 
-        <form onSubmit={handleEveningSubmit} className="flex flex-col gap-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            {/* Afternoon Slump Score */}
-            <div className="flex flex-col gap-1">
-              <label className="font-mono font-bold text-[11px] text-[#1A3629]">
-                Afternoon Slump Severity: {slumpScore}/10
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={slumpScore}
-                onChange={(e) => setSlumpScore(Number(e.target.value))}
-                className="w-full accent-[#1A3629] cursor-pointer mt-1"
-              />
-              <span className="font-mono text-[10px] text-[#4A5D4E]">
-                {slumpScore <= 3 ? 'Minimal / Clear focus' : slumpScore <= 6 ? 'Moderate dip' : 'Severe brain fog'}
-              </span>
-            </div>
-
-            {/* Screen Cutoff */}
-            <div className="flex items-center gap-2 sm:pt-4 cursor-pointer" onClick={() => setScreenCutoff(!screenCutoff)}>
-              <div
-                className={`w-4 h-4 rounded border-2 border-[#1A3629] flex items-center justify-center transition-colors ${
-                  screenCutoff ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9]'
-                }`}
-              >
-                {screenCutoff && <PixelCheck size={10} color="#FFFDF9" />}
+        {isSlumpActive ? (
+          <div className="flex flex-col gap-3">
+            <div className="p-3 rounded-xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-mono text-[#92400E]">
+                <PixelBolt size={14} color="#B45309" />
+                <span className="font-bold">Heavy Evening Markers Bypassed</span>
               </div>
-              <span className="font-cabinet text-xs font-bold text-[#1A3629] select-none">
-                Screen shutdown 60m before bed
-              </span>
+              <span className="text-[10px] font-mono text-[#92400E]/80">Rest Mode</span>
             </div>
+            <p className="text-xs font-sans text-[#4A5D4E] leading-relaxed">
+              You are running on empty. Screen curfew requirements and dietary logs are cleared tonight. Rest and recharge.
+            </p>
+            <button
+              type="button"
+              onClick={handleEveningSubmit}
+              className="w-full py-2.5 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer text-center mt-1"
+            >
+              Save &amp; Rest (+50 XP) →
+            </button>
           </div>
+        ) : (
+          <form onSubmit={handleEveningSubmit} className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              {/* Afternoon Slump Score */}
+              <div className="flex flex-col gap-1">
+                <label className="font-mono font-bold text-[11px] text-[#1A3629]">
+                  Afternoon Slump Severity: {slumpScore}/10
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={slumpScore}
+                  onChange={(e) => setSlumpScore(Number(e.target.value))}
+                  className="w-full accent-[#1A3629] cursor-pointer mt-1"
+                />
+                <span className="font-mono text-[10px] text-[#4A5D4E]">
+                  {slumpScore <= 3 ? 'Minimal / Clear focus' : slumpScore <= 6 ? 'Moderate dip' : 'Severe brain fog'}
+                </span>
+              </div>
 
-          <button
-            type="submit"
-            className="w-full py-2 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer text-center mt-1"
-          >
-            Save Evening Check-in (+50 XP) →
-          </button>
-        </form>
+              {/* Screen Cutoff */}
+              <div className="flex items-center gap-2 sm:pt-4 cursor-pointer" onClick={() => setScreenCutoff(!screenCutoff)}>
+                <div
+                  className={`w-4 h-4 rounded border-2 border-[#1A3629] flex items-center justify-center transition-colors ${
+                    screenCutoff ? 'bg-[#1A3629] text-[#FFFDF9]' : 'bg-[#FFFDF9]'
+                  }`}
+                >
+                  {screenCutoff && <PixelCheck size={10} color="#FFFDF9" />}
+                </div>
+                <span className="font-cabinet text-xs font-bold text-[#1A3629] select-none">
+                  Screen shutdown 60m before bed
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2 px-4 rounded-xl border-2 border-[#1A3629] bg-[#1A3629] text-[#FFFDF9] font-mono text-xs font-bold shadow-[2px_2px_0px_#3A6B52] hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer text-center mt-1"
+            >
+              Save Evening Check-in (+50 XP) →
+            </button>
+          </form>
+        )}
       </div>
     );
   }

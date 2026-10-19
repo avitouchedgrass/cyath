@@ -39,6 +39,7 @@ export function EveningSealCeremonyModal({
     userProfile,
     userSession,
     sealDailyLedger,
+    getSlumpEssentials,
   } = useHabitStore();
 
   const [stage, setStage] = useState<CeremonyStage>('ROLLING');
@@ -59,6 +60,10 @@ export function EveningSealCeremonyModal({
   const isSunlightDone = !!currentLog.habitsCompleted?.['sunlight'];
   const proteinLogged = currentLog.totalProteinLogged || 0;
   const hydrationLogged = (currentLog.hydrationLiters || 0).toFixed(1);
+
+  const slumpData = getSlumpEssentials(targetDate);
+  const isSlumpActive = slumpData.isSlumpActive;
+  const slumpConfig = slumpData.config;
 
   // Initialize stage and trigger paper feed audio
   useEffect(() => {
@@ -242,10 +247,10 @@ export function EveningSealCeremonyModal({
           {/* Dot-matrix Register Header */}
           <div className="flex flex-col items-center text-center font-mono w-full">
             <span className="text-[11px] font-black tracking-widest text-[#2B1F17] uppercase">
-              *** CYATH DAILY SUMMARY ***
+              {isSlumpActive ? '*** SLUMP ROUTINE SUMMARY ***' : '*** CYATH DAILY SUMMARY ***'}
             </span>
             <span className="text-[9.5px] text-[#2B1F17]/70 mt-0.5">
-              DAILY SUMMARY RECORD
+              {isSlumpActive ? 'ESSENTIALS SEALED · STREAK SAVED' : 'DAILY SUMMARY RECORD'}
             </span>
             <div className="flex items-center justify-between w-full text-[10px] text-[#2B1F17]/80 mt-2 pt-1 border-t border-[#2B1F17]/25 font-bold">
               <span>{targetDate}</span>
@@ -258,22 +263,50 @@ export function EveningSealCeremonyModal({
 
           {/* Telemetry Line Items */}
           <div className="w-full flex flex-col gap-1.5 font-mono text-[11px] text-left my-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">01. MORNING SUNLIGHT</span>
-              <span className="font-bold">{isSunlightDone ? 'DONE (+15M)' : 'PENDING'}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">02. DAILY PROTEIN</span>
-              <span className="font-bold">{proteinLogged}g / {targetProtein}g</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">03. WATER INTAKE</span>
-              <span className="font-bold">{hydrationLogged} L</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[#2B1F17]/75">04. DAILY STREAK</span>
-              <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(RESTARTED)' : ''}</span>
-            </div>
+            {isSlumpActive ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">01. MORNING LIGHT</span>
+                  <span className="font-bold">{isSunlightDone ? 'DONE (+15M)' : 'PENDING'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">02. WATER ESSENTIAL</span>
+                  <span className="font-bold">
+                    {hydrationLogged}L / {slumpConfig.hydrationTargetLiters}L{' '}
+                    {Number(hydrationLogged) >= slumpConfig.hydrationTargetLiters ? '(MET)' : '(PENDING)'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">03. SLUMP STATUS</span>
+                  <span className="font-bold text-amber-900">
+                    {slumpData.allEssentialsMet ? 'ESSENTIALS MET · STREAK KEPT' : 'ACTIVE · ESSENTIALS ONLY'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">04. DAILY STREAK</span>
+                  <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(RESTARTED)' : ''}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">01. MORNING SUNLIGHT</span>
+                  <span className="font-bold">{isSunlightDone ? 'DONE (+15M)' : 'PENDING'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">02. DAILY PROTEIN</span>
+                  <span className="font-bold">{proteinLogged}g / {targetProtein}g</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">03. WATER INTAKE</span>
+                  <span className="font-bold">{hydrationLogged} L</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#2B1F17]/75">04. DAILY STREAK</span>
+                  <span className="font-bold">{streakCount} DAYS {isForgedStreak ? '(RESTARTED)' : ''}</span>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="w-full font-mono text-[9px] text-[#2B1F17]/50 tracking-tighter truncate my-1">

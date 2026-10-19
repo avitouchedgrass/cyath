@@ -187,7 +187,7 @@ export default function FuelPage() {
               Meals &amp; Nutrition
             </h1>
             <p className="font-sans text-xs sm:text-sm text-[#4A5D4E] mt-0.5">
-              Smart Dinner Rebalancer, instant food calculator, and 31+ healthy recipes.
+              Chrono-metabolic meal analysis, adaptive protein rebalancing, and curated whole-food recipes.
             </p>
           </div>
 
@@ -222,9 +222,13 @@ export default function FuelPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629]" />
               <h2 className="font-cabinet font-extrabold text-xl text-[#1A3629] tracking-tight">
-                Instant Food &amp; Macro Calculator
+                AI Chrononutrition Analyzer
               </h2>
             </div>
+            <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[10px] font-bold text-[#4A5D4E] uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Gemini Clinical AI
+            </span>
           </div>
 
           <form onSubmit={handleAnalyzeText} className="flex flex-col sm:flex-row gap-3">
@@ -232,7 +236,7 @@ export default function FuelPage() {
               type="text"
               value={mealInput}
               onChange={(e) => setMealInput(e.target.value)}
-              placeholder="e.g. 3 scrambled eggs with 1 slice sourdough and half an avocado..."
+              placeholder="e.g. 150g grilled chicken breast, 1 cup jasmine rice, steamed broccoli..."
               className="flex-1 h-12 px-4 rounded-2xl border-2 border-[#1A3629] bg-[#FAF8F5] text-xs sm:text-sm font-cabinet font-bold text-[#1A3629] focus:outline-none focus:bg-[#FFFDF9] transition-all"
             />
             <button
@@ -304,6 +308,78 @@ export default function FuelPage() {
                   ))}
                 </div>
               )}
+
+              {/* Clinical Biomarker Card — rendered whenever meal analysis completes */}
+              {parsedResult && (() => {
+                const glycemicRisk = parsedResult.glycemicRisk || (parsedResult.protein >= 30 ? 'Low' : 'Moderate');
+                const allostaticScore = typeof parsedResult.allostaticScore === 'number' ? parsedResult.allostaticScore : (parsedResult.protein >= 30 ? 2 : 3);
+                const circadianImpact = parsedResult.circadianImpact || 'Balanced macronutrient profile supports stable postprandial glucose within the daylight metabolic window.';
+
+                const riskMap = {
+                  'Low':        { label: 'Low', fill: 'w-1/3', barColor: 'bg-emerald-500', textColor: 'text-emerald-800', bg: 'bg-emerald-50 border-emerald-200' },
+                  'Moderate':   { label: 'Moderate', fill: 'w-2/3', barColor: 'bg-amber-400', textColor: 'text-amber-800', bg: 'bg-amber-50 border-amber-200' },
+                  'Spike Risk': { label: 'Spike Risk', fill: 'w-full', barColor: 'bg-rose-500', textColor: 'text-rose-800', bg: 'bg-rose-50 border-rose-200' },
+                } as const;
+                const risk = riskMap[glycemicRisk as keyof typeof riskMap] ?? riskMap['Moderate'];
+                const scoreLabel = allostaticScore <= 1 ? 'Minimal' : allostaticScore === 2 ? 'Low' : allostaticScore === 3 ? 'Moderate' : allostaticScore === 4 ? 'High' : 'Max';
+                const scoreBg = allostaticScore <= 2 ? 'bg-emerald-50 border-emerald-200' : allostaticScore === 3 ? 'bg-amber-50 border-amber-200' : 'bg-rose-50 border-rose-200';
+                const scoreText = allostaticScore <= 2 ? 'text-emerald-800' : allostaticScore === 3 ? 'text-amber-800' : 'text-rose-800';
+                const pipActive = allostaticScore <= 2 ? 'bg-emerald-500' : allostaticScore === 3 ? 'bg-amber-400' : 'bg-rose-500';
+
+                return (
+                  <div className="rounded-2xl border border-[#1A3629]/20 bg-[#1A3629]/[0.03] overflow-hidden animate-in fade-in duration-300">
+                    {/* Header */}
+                    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#1A3629]/10 bg-[#1A3629]/[0.04]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#1A3629] animate-pulse" />
+                      <span className="font-mono text-[10px] font-bold text-[#1A3629] uppercase tracking-widest">
+                        Chrono-Metabolic Assessment
+                      </span>
+                    </div>
+
+                    <div className="p-4 flex flex-col gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Glycemic Risk */}
+                        <div className={`p-3 rounded-xl border ${risk.bg} flex flex-col gap-2`}>
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[10px] font-bold text-[#1A3629]/70 uppercase tracking-wider">Glycemic Risk</span>
+                            <span className={`font-mono text-[11px] font-black ${risk.textColor}`}>{risk.label}</span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
+                            <div className={`h-full ${risk.fill} ${risk.barColor} rounded-full transition-all duration-500`} />
+                          </div>
+                        </div>
+
+                        {/* Allostatic Load Score */}
+                        <div className={`p-3 rounded-xl border ${scoreBg} flex flex-col gap-2`}>
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[10px] font-bold text-[#1A3629]/70 uppercase tracking-wider">Allostatic Load</span>
+                            <span className={`font-mono text-[11px] font-black ${scoreText}`}>{allostaticScore} / 5 — {scoreLabel}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <div
+                                key={i}
+                                className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${i < allostaticScore ? pipActive : 'bg-black/10'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Circadian Impact Statement */}
+                      <div className="flex items-start gap-3 p-3 rounded-xl border border-[#1A3629]/10 bg-[#FFFDF9]">
+                        <div className="shrink-0 w-5 h-5 rounded-full bg-[#1A3629]/8 border border-[#1A3629]/15 flex items-center justify-center mt-0.5">
+                          <span className="text-[9px] font-mono font-black text-[#1A3629]">⊕</span>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#4A5D4E]">Circadian Impact</span>
+                          <p className="font-sans text-xs text-[#1A3629] leading-relaxed">{circadianImpact}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Meal Slot Destination Selection: Breakfast, Lunch, Dinner */}
               <div className="pt-3 border-t border-[#1A3629]/15 flex flex-col gap-2">

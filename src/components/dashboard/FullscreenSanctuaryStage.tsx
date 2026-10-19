@@ -117,20 +117,12 @@ export function FullscreenSanctuaryStage({
   };
 
   const handleSealClick = () => {
-    if (!isAuthenticated) {
-      if (onRequireAuth) onRequireAuth();
-      return;
-    }
     retroAudio.playInspectConfirm();
     haptics.heavy();
     onOpenSeal();
   };
 
   const handleLedgerClick = () => {
-    if (!isAuthenticated) {
-      if (onRequireAuth) onRequireAuth();
-      return;
-    }
     retroAudio.playPaperRustle();
     haptics.tap();
     onOpenLedger();

@@ -5,8 +5,9 @@ import { useHabitStore, CUSTOM_HABITS_LIBRARY } from '@/store/useHabitStore';
 import { retroAudio } from '@/lib/retroAudio';
 import { haptics } from '@/lib/haptics';
 import { xpParticleEmitter } from '@/lib/particleEmitter';
-import { PixelCheck, PixelBatteryLow, PixelBatteryMedium, PixelBatteryFull } from '@/components/common/PixelIcons';
+import { PixelCheck, PixelBatteryLow, PixelBatteryMedium, PixelBatteryFull, PixelBolt } from '@/components/common/PixelIcons';
 import { PwaInstallToast } from '@/components/pwa/PwaInstallToast';
+import { PersonalizeSlumpModal } from '@/components/dashboard/PersonalizeSlumpModal';
 
 export interface CoreHabitsCardProps {
   onOpenSchedule?: () => void;
@@ -23,6 +24,8 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
     completeEveningWrap,
     setCustomHabitSlot,
     habits,
+    setIsSlumpRoutine,
+    getSlumpEssentials,
   } = useHabitStore();
 
   const [isSlotPickerOpen, setIsSlotPickerOpen] = useState(false);
@@ -31,13 +34,19 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>('all');
   const [undoToast, setUndoToast] = useState<{ habitId: string; title: string; timer: ReturnType<typeof setTimeout> } | null>(null);
   const [showPwaPrompt, setShowPwaPrompt] = useState(false);
+  const [isPersonalizeSlumpOpen, setIsPersonalizeSlumpOpen] = useState(false);
 
   const currentLog = getDailyLog(currentDate);
   const ritual = deskRitualsByDate[currentDate] || {};
 
+  const slumpData = getSlumpEssentials(currentDate);
+  const isSlumpActive = slumpData.isSlumpActive;
+  const slumpConfig = slumpData.config;
+
   const targetProtein = userProfile?.weightKg ? Math.round(userProfile.weightKg * 2.0) : 140;
   const currentProtein = currentLog.totalProteinLogged || 0;
-  const isProteinMet = currentProtein >= targetProtein;
+  const effectiveProteinTarget = isSlumpActive && slumpConfig.includeProtein ? slumpConfig.proteinTargetGrams : targetProtein;
+  const isProteinMet = currentProtein >= effectiveProteinTarget;
 
   // Custom 4th habit slot definition
   const customSlotId = userProfile?.customHabitSlot;
@@ -57,8 +66,19 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
     return null;
   }, [customSlotId, habits]);
 
-  // Core 3 Keystone Habits + Optional 4th
+  // Core Habits: Stripped down to Essentials during Slump Routine
   const displayHabits = useMemo(() => {
+    if (isSlumpActive) {
+      return slumpData.essentialHabits.map((item, idx) => ({
+        id: item.id,
+        keyNumber: idx + 1,
+        title: item.title,
+        subtitle: item.subtitle,
+        isDone: item.isDone,
+        statusLabel: item.statusLabel,
+      }));
+    }
+
     const list = [
       {
         id: 'sunlight',
@@ -100,7 +120,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
     }
 
     return list;
-  }, [currentLog, currentProtein, targetProtein, isProteinMet, customDefinition]);
+  }, [isSlumpActive, slumpData.essentialHabits, currentLog, currentProtein, targetProtein, isProteinMet, customDefinition]);
 
   const completedCount = useMemo(() => {
     return displayHabits.filter((h) => h.isDone).length;
@@ -178,17 +198,23 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [displayHabits, handleToggle]);
 
-  // Fast 1-Click Afternoon Slump / Energy Level Check
+  // Fast 1-Click Afternoon Slump / Energy Level Check & Slump Routine Toggle
   const handleEnergyRating = (score: number) => {
     retroAudio.playInspectConfirm();
     haptics.tap();
-    completeEveningWrap(
-      {
-        afternoonSlumpScore: score,
-        wholeFoodRating: 8,
-      },
-      currentDate
-    );
+    if (score <= 3) {
+      // Toggle Slump Routine on / off
+      setIsSlumpRoutine(currentDate, !isSlumpActive);
+    } else {
+      setIsSlumpRoutine(currentDate, false);
+      completeEveningWrap(
+        {
+          afternoonSlumpScore: score,
+          wholeFoodRating: 8,
+        },
+        currentDate
+      );
+    }
   };
 
   return (
@@ -199,9 +225,17 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       {/* Card Header & Circadian Schedule */}
       <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#1A3629]/10">
         <div className="flex flex-col min-w-0">
-          <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
-            Daily Habits
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-cabinet font-extrabold text-base text-[#1A3629] tracking-tight">
+              Daily Habits
+            </h3>
+            {isSlumpActive && (
+              <span className="px-2 py-0.5 rounded-md bg-[#FEF3C7] border border-[#D97706]/40 text-[#92400E] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1">
+                <PixelBolt size={10} color="#B45309" />
+                <span>Slump Mode</span>
+              </span>
+            )}
+          </div>
           {onOpenSchedule ? (
             <button
               type="button"
@@ -218,9 +252,45 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
           )}
         </div>
         <span className="font-mono text-xs font-bold text-[#1A3629] shrink-0">
-          {completedCount} of {displayHabits.length} Done
+          {completedCount} of {displayHabits.length} {isSlumpActive ? 'Essentials Done' : 'Done'}
         </span>
       </div>
+
+      {/* Slump Routine Active Banner */}
+      {isSlumpActive && (
+        <div className="p-3.5 rounded-2xl border-2 border-[#D97706]/40 bg-[#FEF3C7]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in duration-200">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5 font-cabinet font-black text-xs text-[#92400E]">
+              <PixelBolt size={12} color="#B45309" />
+              <span>Slump Routine Active · Stripped Down to Essentials</span>
+            </div>
+            <span className="font-sans text-[11px] text-[#92400E]/90 leading-tight">
+              {slumpData.allEssentialsMet
+                ? '✦ All essentials completed! Today’s daily seal is ready.'
+                : `Seal stripped down to ${displayHabits.length} essentials to protect your streak without burnout.`}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsPersonalizeSlumpOpen(true)}
+              className="px-2.5 py-1 rounded-lg border border-[#D97706]/50 bg-[#FFFDF9] text-[#92400E] font-mono text-[10px] font-bold hover:bg-[#FEF3C7] transition-colors cursor-pointer"
+              title="Personalize which habits count as your slump essentials"
+            >
+              Personalize
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSlumpRoutine(currentDate, false)}
+              className="px-2.5 py-1 rounded-lg border border-[#1A3629]/20 bg-[#FAF8F5] text-[#1A3629] font-mono text-[10px] font-bold hover:bg-[#FAF6EE] transition-colors cursor-pointer"
+              title="Restore full standard targets"
+            >
+              Restore Full Day
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tactile Habit Rows */}
       <div className="flex flex-col divide-y divide-[#1A3629]/10">
@@ -498,26 +568,36 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
             <span className="font-cabinet font-bold text-[#1A3629]">
               Energy Levels
             </span>
-            {ritual.afternoonSlumpScore && (
-              <span className="font-mono text-xs text-[#065F46] font-bold">
-                {ritual.afternoonSlumpScore}/10
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsPersonalizeSlumpOpen(true)}
+                className="font-mono text-[10px] text-[#4A5D4E] hover:text-[#1A3629] hover:underline cursor-pointer"
+                title="Personalize which habits count during a slump routine"
+              >
+                Personalize Slump
+              </button>
+              {ritual.afternoonSlumpScore && (
+                <span className="font-mono text-xs text-[#065F46] font-bold">
+                  {ritual.afternoonSlumpScore}/10
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-1.5 pt-1">
             <button
               type="button"
-              title="Low energy: feeling slow, foggy, or dragging"
+              title={isSlumpActive ? 'Slump Routine active (strips down seal to essentials). Click to turn off.' : 'Low energy? Click to activate Slump Routine (strips down seal to essentials)'}
               onClick={() => handleEnergyRating(2)}
               className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
-                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore <= 3
-                  ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
+                isSlumpActive
+                  ? 'border-[#D97706] bg-[#FEF3C7] text-[#92400E] ring-2 ring-[#D97706]/50 shadow-xs'
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
             >
-              <PixelBatteryLow size={14} color="#DC2626" />
-              <span>Slump</span>
+              <PixelBatteryLow size={14} color={isSlumpActive ? '#B45309' : '#DC2626'} />
+              <span>{isSlumpActive ? 'Slump (Active)' : 'Slump'}</span>
             </button>
 
             <button
@@ -525,7 +605,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               title="Steady energy: manageable, no crash"
               onClick={() => handleEnergyRating(6)}
               className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
-                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
+                !isSlumpActive && ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 3 && ritual.afternoonSlumpScore <= 7
                   ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
@@ -539,7 +619,7 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
               title="Peak energy: sharp, strong, firing on all cylinders"
               onClick={() => handleEnergyRating(9)}
               className={`py-1.5 px-1 rounded-xl border text-[11px] font-cabinet font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-98 ${
-                ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
+                !isSlumpActive && ritual.afternoonSlumpScore && ritual.afternoonSlumpScore > 7
                   ? 'border-[#1A3629] bg-[#1A3629] text-[#FFFDF9]'
                   : 'border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#1A3629] hover:text-[#FFFDF9]'
               }`}
@@ -556,6 +636,12 @@ export function CoreHabitsCard({ onOpenSchedule }: CoreHabitsCardProps = {}) {
       <PwaInstallToast
         forceShow={showPwaPrompt}
         onDismiss={() => setShowPwaPrompt(false)}
+      />
+
+      {/* Personalize Slump Routine Modal */}
+      <PersonalizeSlumpModal
+        isOpen={isPersonalizeSlumpOpen}
+        onClose={() => setIsPersonalizeSlumpOpen(false)}
       />
     </div>
   );

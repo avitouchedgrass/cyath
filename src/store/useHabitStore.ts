@@ -57,6 +57,7 @@ export interface DailyLogData {
   loggedRecipeIds: string[];
   loggedMeals?: LoggedMealEntry[];
   isDownscaled?: boolean;
+  isSlumpRoutine?: boolean;
   quickPlateType?: string | null;
   retentionCohortDay?: number;
   isForgedReentry?: boolean;
@@ -111,7 +112,26 @@ export interface UserProfile {
   archetype?: 'circadian' | 'iron' | 'focus';
   selectedIslandSuite?: 'circadian' | 'iron' | 'focus';
   circadianScheduleXpClaimed?: boolean;
+  slumpRoutineConfig?: SlumpRoutineConfig;
 }
+
+export interface SlumpRoutineConfig {
+  essentialHabitIds: string[];
+  hydrationTargetLiters: number;
+  includeProtein: boolean;
+  proteinTargetGrams: number;
+  requireOnlyEssentialsForSeal: boolean;
+  stripSleepMarkers?: boolean;
+}
+
+export const DEFAULT_SLUMP_ROUTINE_CONFIG: SlumpRoutineConfig = {
+  essentialHabitIds: ['sunlight', 'hydration'],
+  hydrationTargetLiters: 1.0,
+  includeProtein: false,
+  proteinTargetGrams: 40,
+  requireOnlyEssentialsForSeal: true,
+  stripSleepMarkers: true,
+};
 
 export interface CustomHabitDefinition {
   id: string;
@@ -555,6 +575,20 @@ export interface HabitStoreState {
   logWeight: (weightKg: number, note?: string, date?: string) => { success: boolean; deltaKg: number; trend: 'down' | 'up' | 'stable'; xpAwarded: number };
   claimSocialFollow: (platform: 'linkedin' | 'instagram', handle: string) => { success: boolean; message: string; xpAwarded: number };
   setIsDownscaled: (date: string, isDownscaled: boolean) => void;
+  setIsSlumpRoutine: (date: string, isSlump: boolean) => void;
+  updateSlumpRoutineConfig: (config: Partial<SlumpRoutineConfig>) => void;
+  getSlumpEssentials: (date?: string) => {
+    isSlumpActive: boolean;
+    config: SlumpRoutineConfig;
+    essentialHabits: Array<{
+      id: string;
+      title: string;
+      isDone: boolean;
+      statusLabel: string;
+      subtitle: string;
+    }>;
+    allEssentialsMet: boolean;
+  };
   unlockDecoration: (decorationId: string) => void;
   setKeystoneProtocol: (protocolId: string) => void;
 
@@ -642,6 +676,7 @@ const createEmptyDailyLog = (): DailyLogData => ({
   loggedRecipeIds: [],
   loggedMeals: [],
   isDownscaled: false,
+  isSlumpRoutine: false,
   quickPlateType: null,
   retentionCohortDay: 0,
 });
@@ -2768,6 +2803,125 @@ export const useHabitStore = create<HabitStoreState>()(
             },
           },
         }));
+      },
+
+      setIsSlumpRoutine: (date: string, isSlump: boolean) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().logsByDate[targetDate] || createEmptyDailyLog();
+        const existingRitual = get().deskRitualsByDate[targetDate] || {};
+        set((state) => ({
+          logsByDate: {
+            ...state.logsByDate,
+            [targetDate]: {
+              ...currentLog,
+              isSlumpRoutine: isSlump,
+              isDownscaled: isSlump ? true : currentLog.isDownscaled,
+            },
+          },
+          deskRitualsByDate: {
+            ...state.deskRitualsByDate,
+            [targetDate]: {
+              ...existingRitual,
+              afternoonSlumpScore: isSlump ? 2 : (existingRitual.afternoonSlumpScore ?? 6),
+            },
+          },
+        }));
+      },
+
+      updateSlumpRoutineConfig: (config: Partial<SlumpRoutineConfig>) => {
+        const currentProfile = get().userProfile;
+        if (!currentProfile) return;
+        const existingConfig = currentProfile.slumpRoutineConfig || DEFAULT_SLUMP_ROUTINE_CONFIG;
+        const updatedConfig: SlumpRoutineConfig = {
+          ...existingConfig,
+          ...config,
+        };
+        get().updateUserProfile({
+          ...currentProfile,
+          slumpRoutineConfig: updatedConfig,
+        });
+      },
+
+      getSlumpEssentials: (date?: string) => {
+        const targetDate = date || get().currentDate;
+        const currentLog = get().getDailyLog(targetDate);
+        const ritual = get().deskRitualsByDate[targetDate] || {};
+        const profile = get().userProfile;
+        const config = profile?.slumpRoutineConfig || DEFAULT_SLUMP_ROUTINE_CONFIG;
+        const isSlumpActive = !!currentLog.isSlumpRoutine || (!!currentLog.isDownscaled && typeof ritual.afternoonSlumpScore === 'number' && ritual.afternoonSlumpScore <= 3);
+
+        const essentialHabits: Array<{
+          id: string;
+          title: string;
+          isDone: boolean;
+          statusLabel: string;
+          subtitle: string;
+        }> = [];
+
+        const habitLibraryLookup = new Map<string, string>([
+          ['sunlight', 'Morning Light'],
+          ['hydration', 'Hydration Target'],
+          ['protein_target', 'Whole-Food Protein'],
+          ['movement', 'Restorative Movement'],
+          ['digital_sunset', 'Digital Sunset'],
+          ['mobility', 'Spine Mobility'],
+        ]);
+
+        for (const habitId of config.essentialHabitIds) {
+          if (habitId === 'hydration') {
+            const hydrationLiters = currentLog.hydrationLiters || 0;
+            const target = config.hydrationTargetLiters;
+            const isDone = hydrationLiters >= target || !!currentLog.habitsCompleted?.['hydration'];
+            essentialHabits.push({
+              id: 'hydration',
+              title: 'Hydration Target',
+              subtitle: `${hydrationLiters.toFixed(1)}L of ${target.toFixed(1)}L logged (essential baseline)`,
+              isDone,
+              statusLabel: isDone ? 'Completed' : 'Pending',
+            });
+          } else if (habitId === 'protein_target') {
+            const currentProtein = currentLog.totalProteinLogged || 0;
+            const target = config.proteinTargetGrams;
+            const isDone = currentProtein >= target || !!currentLog.habitsCompleted?.['protein_target'];
+            essentialHabits.push({
+              id: 'protein_target',
+              title: 'Whole-Food Fuel',
+              subtitle: `${currentProtein}g of ${target}g logged (gentle fuel)`,
+              isDone,
+              statusLabel: isDone ? 'Completed' : 'Pending',
+            });
+          } else if (habitId === 'sunlight') {
+            const isDone = !!currentLog.habitsCompleted?.['sunlight'];
+            essentialHabits.push({
+              id: 'sunlight',
+              title: 'Morning Light',
+              subtitle: '10 mins outdoor light (gentle wake-up signal)',
+              isDone,
+              statusLabel: isDone ? 'Completed' : 'Pending',
+            });
+          } else {
+            const customMatch = CUSTOM_HABITS_LIBRARY.find((c) => c.id === habitId);
+            const standardMatch = get().habits.find((h) => h.id === habitId);
+            const title = customMatch?.title || standardMatch?.title || habitLibraryLookup.get(habitId) || habitId;
+            const isDone = !!currentLog.habitsCompleted?.[habitId];
+            essentialHabits.push({
+              id: habitId,
+              title,
+              subtitle: 'Essential slump habit',
+              isDone,
+              statusLabel: isDone ? 'Completed' : 'Pending',
+            });
+          }
+        }
+
+        const allEssentialsMet = essentialHabits.length > 0 && essentialHabits.every((h) => h.isDone);
+
+        return {
+          isSlumpActive,
+          config,
+          essentialHabits,
+          allEssentialsMet,
+        };
       },
 
       unlockDecoration: (decorationId: string) => {

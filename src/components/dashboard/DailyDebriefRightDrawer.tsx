@@ -237,6 +237,7 @@ export function DailyDebriefRightDrawer({
     pendingTrophyUnlock,
     dismissPendingTrophy,
     setIsDownscaled,
+    getSlumpEssentials,
   } = useHabitStore();
 
   const isAuthenticated = !!userSession && !userSession.id.startsWith('guest_');
@@ -325,9 +326,9 @@ export function DailyDebriefRightDrawer({
     return () => window.removeEventListener('cyath-close-drawers', handleCloseDrawers);
   }, [onClose]);
 
-  const enabledQuestions = useMemo(() => {
-    return questions.filter((q) => q.enabled);
-  }, [questions]);
+  const slumpData = getSlumpEssentials(currentDate);
+  const isSlumpActive = slumpData.isSlumpActive;
+  const slumpConfig = slumpData.config;
 
   const isTodaySealed = !!isLedgerSealedByDate[currentDate];
 
@@ -362,9 +363,44 @@ export function DailyDebriefRightDrawer({
 
   const isRecoveryActive = useMemo(() => {
     if (manualDownscaled !== null) return manualDownscaled;
+    if (isSlumpActive) return true;
+    if (typeof currentLog?.isSlumpRoutine === 'boolean' && currentLog.isSlumpRoutine) return true;
     if (typeof currentLog?.isDownscaled === 'boolean') return currentLog.isDownscaled;
     return calculatedSleepDuration < 5.5 || morningRestedRating <= 2;
-  }, [manualDownscaled, currentLog?.isDownscaled, calculatedSleepDuration, morningRestedRating]);
+  }, [manualDownscaled, isSlumpActive, currentLog?.isSlumpRoutine, currentLog?.isDownscaled, calculatedSleepDuration, morningRestedRating]);
+
+  const enabledQuestions = useMemo(() => {
+    const base = questions.filter((q) => q.enabled);
+    if (!isSlumpActive || slumpConfig.stripSleepMarkers === false) {
+      return base;
+    }
+
+    return base.filter((q) => {
+      // Circadian sleep & wake anchor always kept
+      if (q.id === 'sleep_wake') return true;
+
+      // Keep sunlight only if designated as an essential slump habit
+      if (q.id === 'sunlight') {
+        return slumpConfig.essentialHabitIds.includes('sunlight');
+      }
+
+      // Strip heavy meal inputs when exhausted (keep single breakfast prompt only if explicitly configured)
+      if (['breakfast_protein', 'lunch_protein', 'dinner_protein'].includes(q.id)) {
+        if (slumpConfig.includeProtein && q.id === 'breakfast_protein') {
+          return true;
+        }
+        return false;
+      }
+
+      // Cut off caffeine prompt when exhausted
+      if (q.id === 'caffeine_cutoff') {
+        return false;
+      }
+
+      // Any custom question is only kept if designated as an essential slump habit
+      return slumpConfig.essentialHabitIds.includes(q.id);
+    });
+  }, [questions, isSlumpActive, slumpConfig]);
 
   const handleUpdateQuestions = (updated: DebriefQuestion[]) => {
     setQuestions(updated);
@@ -413,7 +449,9 @@ export function DailyDebriefRightDrawer({
     }
   };
 
-  const isPendingMeals = lunchDone === 'not_yet' || dinnerDone === 'not_yet';
+  const isPendingMeals =
+    (!isSlumpActive || slumpConfig.stripSleepMarkers === false) &&
+    (lunchDone === 'not_yet' || dinnerDone === 'not_yet');
   const isPartiallySealed =
     !!isLedgerPartiallySealedByDate?.[currentDate] ||
     (isTodaySealed && (lunchDone === 'not_yet' || dinnerDone === 'not_yet'));
@@ -493,13 +531,17 @@ export function DailyDebriefRightDrawer({
       ...(biometricXp.morningRestedXp > 0 ? [{ amount: biometricXp.morningRestedXp, reason: `Morning Rested Score (${morningRestedRating}/10)`, suite: 'circadian' as const }] : []),
       ...(biometricXp.wakeConsistencyXp > 0 ? [{ amount: biometricXp.wakeConsistencyXp, reason: 'Wake Time On Schedule', suite: 'circadian' as const }] : []),
       ...(sunlightDone ? [{ amount: biometricXp.sunlightXp, reason: `Morning Sunlight (${sunlightMinutes}m)`, suite: 'circadian' as const }] : []),
-      ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'High-Protein Breakfast (30g+)', suite: 'iron' as const }] : []),
-      ...(breakfastDone === 'not_yet' ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Fasting Window Logged', suite: 'iron' as const }] : []),
-      ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'High-Protein Lunch (40g+)', suite: 'iron' as const }] : []),
-      ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Pending', suite: 'iron' as const }] : []),
-      ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'High-Protein Dinner (35g+)', suite: 'iron' as const }] : []),
-      ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Pending', suite: 'iron' as const }] : []),
-      ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Caffeine Cutoff Kept (${caffeineTime})`, suite: 'focus' as const }] : []),
+      ...(!isSlumpActive || slumpConfig.stripSleepMarkers === false ? [
+        ...(breakfastDone === true ? [{ amount: biometricXp.breakfastXp, reason: 'High-Protein Breakfast (30g+)', suite: 'iron' as const }] : []),
+        ...(breakfastDone === 'not_yet' ? [{ amount: biometricXp.breakfastXp, reason: 'Breakfast Fasting Window Logged', suite: 'iron' as const }] : []),
+        ...(lunchDone === true ? [{ amount: biometricXp.lunchXp, reason: 'High-Protein Lunch (40g+)', suite: 'iron' as const }] : []),
+        ...(lunchDone === 'not_yet' ? [{ amount: biometricXp.lunchXp, reason: 'Lunch Pending', suite: 'iron' as const }] : []),
+        ...(dinnerDone === true ? [{ amount: biometricXp.dinnerXp, reason: 'High-Protein Dinner (35g+)', suite: 'iron' as const }] : []),
+        ...(dinnerDone === 'not_yet' ? [{ amount: biometricXp.dinnerXp, reason: 'Dinner Pending', suite: 'iron' as const }] : []),
+        ...(caffeineDone ? [{ amount: biometricXp.caffeineXp, reason: `Caffeine Cutoff Kept (${caffeineTime})`, suite: 'focus' as const }] : []),
+      ] : [
+        { amount: 50, reason: 'Slump Essentials Saved (Rest Mode)', suite: 'circadian' as const },
+      ]),
       ...(biometricXp.customHabitsXp > 0 ? [{ amount: biometricXp.customHabitsXp, reason: 'Custom Habits Completed', suite: 'focus' as const }] : []),
       { amount: biometricXp.baseSealXp, reason: shouldBePartial ? 'Daily Log Saved (Pending Meals)' : 'Daily Log Saved', suite: (userProfile?.selectedIslandSuite || userProfile?.archetype || 'circadian') as any },
     ];
@@ -1181,46 +1223,58 @@ export function DailyDebriefRightDrawer({
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#4A5D4E]">Breakfast Fuel</span>
-                    <span className="font-bold flex items-center gap-1.5 text-right">
-                      <span className="truncate max-w-[140px]" title={breakfastFuel || undefined}>
-                        {breakfastFuel ? breakfastFuel : (breakfastDone === true ? 'Hit (30g+)' : breakfastDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
+                  {isSlumpActive && slumpConfig.stripSleepMarkers !== false ? (
+                    <div className="flex justify-between items-center bg-[#FAF6EE] px-2.5 py-1.5 rounded-lg border border-[#1A3629]/10">
+                      <span className="text-[#92400E] font-cabinet font-bold text-xs flex items-center gap-1.5">
+                        <PixelBolt size={12} color="#B45309" />
+                        <span>Slump Essentials</span>
                       </span>
-                      <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.breakfastXp} XP</span>
-                    </span>
-                  </div>
+                      <span className="text-[#92400E] font-mono text-[10px] font-bold">Fuel &amp; Caffeine Bypassed</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#4A5D4E]">Breakfast Fuel</span>
+                        <span className="font-bold flex items-center gap-1.5 text-right">
+                          <span className="truncate max-w-[140px]" title={breakfastFuel || undefined}>
+                            {breakfastFuel ? breakfastFuel : (breakfastDone === true ? 'Hit (30g+)' : breakfastDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
+                          </span>
+                          <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.breakfastXp} XP</span>
+                        </span>
+                      </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#4A5D4E]">Lunch Fuel</span>
-                    <span className="font-bold flex items-center gap-1.5 text-right">
-                      <span className="truncate max-w-[140px]" title={lunchFuel || undefined}>
-                        {lunchFuel ? lunchFuel : (lunchDone === true ? 'Hit (40g+)' : lunchDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
-                      </span>
-                      <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.lunchXp} XP</span>
-                    </span>
-                  </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#4A5D4E]">Lunch Fuel</span>
+                        <span className="font-bold flex items-center gap-1.5 text-right">
+                          <span className="truncate max-w-[140px]" title={lunchFuel || undefined}>
+                            {lunchFuel ? lunchFuel : (lunchDone === true ? 'Hit (40g+)' : lunchDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
+                          </span>
+                          <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.lunchXp} XP</span>
+                        </span>
+                      </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#4A5D4E]">Dinner Fuel</span>
-                    <span className="font-bold flex items-center gap-1.5 text-right">
-                      <span className="truncate max-w-[140px]" title={dinnerFuel || undefined}>
-                        {dinnerFuel ? dinnerFuel : (dinnerDone === true ? 'Hit (35g+)' : dinnerDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
-                      </span>
-                      <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.dinnerXp} XP</span>
-                    </span>
-                  </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#4A5D4E]">Dinner Fuel</span>
+                        <span className="font-bold flex items-center gap-1.5 text-right">
+                          <span className="truncate max-w-[140px]" title={dinnerFuel || undefined}>
+                            {dinnerFuel ? dinnerFuel : (dinnerDone === true ? 'Hit (35g+)' : dinnerDone === 'not_yet' ? 'Haven\'t Eaten Yet' : 'Light / Skip')}
+                          </span>
+                          <span className="text-[#B8862D] font-mono text-[10px] shrink-0">+{biometricXp.dinnerXp} XP</span>
+                        </span>
+                      </div>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#4A5D4E]">Caffeine Air-Lock</span>
-                    <span className="font-bold flex items-center gap-1.5">
-                      <span className={caffeineDone ? 'text-emerald-700 flex items-center gap-1' : 'text-[#4A5D4E]'}>
-                        {caffeineDone && <PixelCheck size={11} color="#047857" />}
-                        <span>{caffeineDone ? 'Respected' : 'Past cutoff'}</span>
-                      </span>
-                      <span className="text-[#B8862D] font-mono text-[10px]">+{biometricXp.caffeineXp} XP</span>
-                    </span>
-                  </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#4A5D4E]">Caffeine Air-Lock</span>
+                        <span className="font-bold flex items-center gap-1.5">
+                          <span className={caffeineDone ? 'text-emerald-700 flex items-center gap-1' : 'text-[#4A5D4E]'}>
+                            {caffeineDone && <PixelCheck size={11} color="#047857" />}
+                            <span>{caffeineDone ? 'Respected' : 'Past cutoff'}</span>
+                          </span>
+                          <span className="text-[#B8862D] font-mono text-[10px]">+{biometricXp.caffeineXp} XP</span>
+                        </span>
+                      </div>
+                    </>
+                  )}
 
                   <div className="flex justify-between items-center">
                     <span className="text-[#4A5D4E]">Daily Wrap &amp; Seal</span>
@@ -1421,6 +1475,16 @@ export function DailyDebriefRightDrawer({
                   +{currentQ?.xpReward || 35} XP
                 </span>
               </div>
+
+              {isSlumpActive && slumpConfig.stripSleepMarkers !== false && (
+                <div className="p-3 rounded-2xl bg-[#FEF3C7] border border-[#D97706]/30 flex items-center justify-between text-xs font-mono animate-in fade-in duration-150">
+                  <div className="flex items-center gap-2">
+                    <PixelBolt size={13} color="#B45309" />
+                    <span className="font-bold text-[#92400E]">SLUMP ESSENTIALS MODE</span>
+                  </div>
+                  <span className="text-[#92400E]/80 text-[10px]">Caffeine &amp; Meal Inputs Stripped</span>
+                </div>
+              )}
 
               {/* CARD 1: SLEEP & WAKE */}
               {currentQ?.id === 'sleep_wake' && (
@@ -2314,46 +2378,58 @@ export function DailyDebriefRightDrawer({
                           +{sunlightDone ? biometricXp.sunlightXp : 0} XP
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#4A5D4E] flex items-center gap-1.5">
-                          <PixelEgg size={13} />
-                          <span>Breakfast Protein</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
-                        </span>
-                        <span className={`font-bold ${breakfastDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
-                          +{breakfastDone === true ? biometricXp.breakfastXp : 0} XP
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#4A5D4E] flex items-center gap-1.5">
-                          <PixelSteak size={13} color="#DC2626" />
-                          <span>Lunch Protein</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
-                        </span>
-                        <span className={`font-bold ${lunchDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
-                          +{lunchDone === true ? biometricXp.lunchXp : 0} XP
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#4A5D4E] flex items-center gap-1.5">
-                          <PixelFish size={13} color="#0284C7" />
-                          <span>Dinner Protein</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
-                        </span>
-                        <span className={`font-bold ${dinnerDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
-                          +{dinnerDone === true ? biometricXp.dinnerXp : 0} XP
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#4A5D4E] flex items-center gap-1.5">
-                          <PixelStopwatch size={13} color="#D97706" />
-                          <span>Caffeine Cutoff</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 font-mono font-bold">Deep Worker</span>
-                        </span>
-                        <span className={`font-bold ${caffeineDone ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
-                          +{caffeineDone ? biometricXp.caffeineXp : 0} XP
-                        </span>
-                      </div>
+                      {isSlumpActive && slumpConfig.stripSleepMarkers !== false ? (
+                        <div className="flex items-center justify-between py-1 px-2 rounded-lg bg-[#FAF6EE] border border-[#1A3629]/10">
+                          <span className="text-[#92400E] flex items-center gap-1.5 font-bold">
+                            <PixelBolt size={12} color="#B45309" />
+                            <span>Slump Essentials Shield (Rest Mode)</span>
+                          </span>
+                          <span className="font-bold text-[#1A3629]">+50 XP</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#4A5D4E] flex items-center gap-1.5">
+                              <PixelEgg size={13} />
+                              <span>Breakfast Protein</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
+                            </span>
+                            <span className={`font-bold ${breakfastDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
+                              +{breakfastDone === true ? biometricXp.breakfastXp : 0} XP
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#4A5D4E] flex items-center gap-1.5">
+                              <PixelSteak size={13} color="#DC2626" />
+                              <span>Lunch Protein</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
+                            </span>
+                            <span className={`font-bold ${lunchDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
+                              +{lunchDone === true ? biometricXp.lunchXp : 0} XP
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#4A5D4E] flex items-center gap-1.5">
+                              <PixelFish size={13} color="#0284C7" />
+                              <span>Dinner Protein</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-800 font-mono font-bold">Iron</span>
+                            </span>
+                            <span className={`font-bold ${dinnerDone === true ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
+                              +{dinnerDone === true ? biometricXp.dinnerXp : 0} XP
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#4A5D4E] flex items-center gap-1.5">
+                              <PixelStopwatch size={13} color="#D97706" />
+                              <span>Caffeine Cutoff</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 font-mono font-bold">Deep Worker</span>
+                            </span>
+                            <span className={`font-bold ${caffeineDone ? 'text-[#1A3629]' : 'text-neutral-400'}`}>
+                              +{caffeineDone ? biometricXp.caffeineXp : 0} XP
+                            </span>
+                          </div>
+                        </>
+                      )}
                       <div className="flex items-center justify-between">
                         <span className="text-[#4A5D4E] flex items-center gap-1.5">
                           <PixelPin size={13} color="#EF4444" />

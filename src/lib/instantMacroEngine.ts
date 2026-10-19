@@ -40,6 +40,50 @@ export interface ParsedMealResult {
   clarificationQuestion?: string;
   isNotFood?: boolean;
   error?: string;
+  // Chrononutrition & clinical biomarker fields
+  glycemicRisk?: 'Low' | 'Moderate' | 'Spike Risk';
+  circadianImpact?: string;
+  allostaticScore?: number;
+}
+
+export function deriveChrononutritionBiomarkers(
+  text: string,
+  protein: number,
+  carbs: number,
+  fats: number
+): {
+  glycemicRisk: 'Low' | 'Moderate' | 'Spike Risk';
+  circadianImpact: string;
+  allostaticScore: number;
+} {
+  const lower = text.toLowerCase();
+  const hasRefinedCarbs = /bread|toast|pasta|pastry|juice|cereal|sugar|cake|cookie|bun|noodle/i.test(lower);
+  const hasWholeCarbs = /oats|quinoa|rice|potato|sweet potato|roti|grain|lentil|beans/i.test(lower);
+  const isHighProtein = protein >= 30;
+  const isHighFiber = /broccoli|spinach|salad|vegetable|greens|lentil|bean|chickpea|oats|avocado/i.test(lower);
+
+  let glycemicRisk: 'Low' | 'Moderate' | 'Spike Risk' = 'Moderate';
+  if (isHighProtein && !hasRefinedCarbs) {
+    glycemicRisk = 'Low';
+  } else if (hasRefinedCarbs && !isHighProtein && !isHighFiber) {
+    glycemicRisk = 'Spike Risk';
+  }
+
+  let circadianImpact = 'Balanced macronutrient profile supports stable postprandial glucose within the daylight metabolic window.';
+  if (glycemicRisk === 'Low' && isHighProtein) {
+    circadianImpact = 'High bioavailable protein activates mTOR synthesis; optimal within 6-hour post-wake peripheral insulin sensitivity window.';
+  } else if (glycemicRisk === 'Spike Risk') {
+    circadianImpact = 'Rapid glycemic elevation risks early adenosine crash; pair with fibrous greens to blunt insulin spike.';
+  } else if ((hasWholeCarbs || carbs >= 35) && isHighProtein) {
+    circadianImpact = 'Clean complex carbs paired with protein sustain postprandial glucose and maintain steady daylight alertness.';
+  }
+
+  let allostaticScore = 3;
+  if (glycemicRisk === 'Low' && isHighProtein && isHighFiber) allostaticScore = 1;
+  else if (glycemicRisk === 'Low' && isHighProtein) allostaticScore = 2;
+  else if (glycemicRisk === 'Spike Risk') allostaticScore = 4;
+
+  return { glycemicRisk, circadianImpact, allostaticScore };
 }
 
 interface FoodEntry {
@@ -885,6 +929,7 @@ export function parseInstantMeal(
       const calories = explicitMacros.calories || (computedCalories > 0 ? computedCalories : 200);
 
       const category: ParsedMealResult['category'] = protein >= 30 ? 'High Protein' : carbs >= 45 ? 'Steady Carbs' : 'Quick Fuel';
+      const biomarkers = deriveChrononutritionBiomarkers(trimmed, protein, carbs, fats);
 
       return {
         hasCompletePortions: true,
@@ -900,6 +945,7 @@ export function parseInstantMeal(
         suggestedSprite: pickBestFoodSprite(trimmed),
         notes: `Calibrated directly from your explicit macros: ${protein}g protein, ${calories} kcal.`,
         source: 'instant_engine',
+        ...biomarkers,
       };
     }
     return null;
@@ -1013,6 +1059,8 @@ export function parseInstantMeal(
       ].filter(Boolean).join(', ')}).`
     : `Calculated instantly via whole-food macro engine from ${ingredientsList.length} verified ingredients.`;
 
+  const biomarkers = deriveChrononutritionBiomarkers(trimmed, finalProtein, finalCarbs, finalFats);
+
   return {
     hasCompletePortions: true,
     mealName,
@@ -1027,5 +1075,6 @@ export function parseInstantMeal(
     suggestedSprite: pickBestFoodSprite(trimmed),
     notes,
     source: 'instant_engine',
+    ...biomarkers,
   };
 }

@@ -31,8 +31,8 @@ const DEFAULT_POINTS: MatrixDataPoint[] = [
 
 export function InteractiveCorrelationMatrix({
   initialPoints = DEFAULT_POINTS,
-  xLabel = 'Protein Fuel',
-  yLabel = 'Focus Score',
+  xLabel = 'Postprandial Amino-Acid Floor',
+  yLabel = 'Vitality Index',
   xUnit = 'g',
   className = '',
   onForecastChange,
@@ -246,7 +246,7 @@ export function InteractiveCorrelationMatrix({
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#1A3629] animate-pulse" />
           <span className="font-mono text-xs font-bold text-[#1A3629] uppercase tracking-wider">
-            Live Physics Correlation Engine
+            Chrono-Metabolic Biostatistics Engine
           </span>
         </div>
 
@@ -267,11 +267,11 @@ export function InteractiveCorrelationMatrix({
       {/* Interactive Helper Banner / Drag Reminder */}
       <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#FAF6EE] border border-[#1A3629]/15 text-[#1A3629] text-[11px] font-mono font-bold shadow-2xs">
         <span className="flex items-center gap-2">
-          <span className="font-bold text-[#10B981]">[TIP]</span>
-          <span>Click and drag any data circle to test live biometric responses</span>
+          <span className="font-bold text-[#10B981]">[SIM]</span>
+          <span>Drag biomarker nodes to model circadian metabolic outcomes in real-time</span>
         </span>
         <span className="hidden sm:inline-block text-[10px] text-[#4A5D4E] uppercase tracking-wider font-bold">
-          Interactive Scatter
+          Pearson r² Matrix
         </span>
       </div>
 
@@ -377,7 +377,7 @@ export function InteractiveCorrelationMatrix({
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1.5">
             <span className="font-mono text-xs font-bold text-[#1A3629] uppercase tracking-wider">
-              Simulate Target {xLabel}:
+              Simulate Biomarker Input — {xLabel}:
             </span>
             <span className="font-mono text-sm font-black text-[#1A3629] tabular-nums">
               {simulatedX} {xUnit}

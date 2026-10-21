@@ -57,7 +57,7 @@ export function FullscreenSanctuaryStage({
   }, [currentIsland.tier, activeTiers]);
 
   const currentLog = getDailyLog(currentDate);
-  const isTodaySealed = isAuthenticated ? !!isLedgerSealedByDate[currentDate] : false;
+  const isTodaySealed = !!isLedgerSealedByDate[currentDate];
 
   const hasLoggedToday = isTodaySealed ||
     Object.values(currentLog.habitsCompleted ?? {}).some(Boolean) ||
@@ -67,10 +67,9 @@ export function FullscreenSanctuaryStage({
     (currentLog.loggedRecipeIds?.length ?? 0) > 0 ||
     (currentLog.loggedMeals?.length ?? 0) > 0;
 
-  const isFlameForged = isAuthenticated && isForgedStreak && !hasLoggedToday;
+  const isFlameForged = isForgedStreak && !hasLoggedToday;
 
   const hasHistoricalActivity = useMemo(() => {
-    if (!isAuthenticated) return false;
     const sealedDates = Object.keys(isLedgerSealedByDate || {}).filter((d) => isLedgerSealedByDate[d]);
     if (sealedDates.length > 0) return true;
 
@@ -84,10 +83,10 @@ export function FullscreenSanctuaryStage({
         (log.sleepHours ?? 0) > 0
       );
     });
-  }, [isAuthenticated, isLedgerSealedByDate, logsByDate, currentDate]);
+  }, [isLedgerSealedByDate, logsByDate, currentDate]);
 
   const isReentryEligible =
-    isAuthenticated && streakCount === 0 && hasHistoricalActivity && !isForgedStreak && !isTodaySealed;
+    streakCount === 0 && hasHistoricalActivity && !isForgedStreak && !isTodaySealed;
 
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
 
@@ -107,10 +106,6 @@ export function FullscreenSanctuaryStage({
   }, []);
 
   const handleReentry = () => {
-    if (!isAuthenticated) {
-      if (onRequireAuth) onRequireAuth();
-      return;
-    }
     retroAudio.playTierUpgrade();
     haptics.heavy();
     activateReentryProtocol();
@@ -181,17 +176,13 @@ export function FullscreenSanctuaryStage({
         <div className="flex items-center gap-2 flex-wrap">
           {/* Streak Flame Badge */}
           <div
-            onClick={() => {
-              if (!isAuthenticated && onRequireAuth) onRequireAuth();
-            }}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm ${
-              !isAuthenticated ? 'cursor-pointer hover:border-[#1A3629]' : ''
-            }`}
-            title={isAuthenticated ? (isFlameForged ? `${streakCount} Day Protected Streak (Log today to keep your streak)` : `${streakCount} Day Streak`) : 'Sign in to record daily streak'}
+            onClick={() => onOpenBiomeGallery?.()}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm cursor-pointer hover:border-[#1A3629] transition-all"
+            title={isFlameForged ? `${streakCount} Day Protected Streak (Log today to keep your streak)` : `${streakCount} Day Streak`}
           >
             <PixelStreakFlame isForged={isFlameForged} size={20} />
             <span className="font-cabinet font-extrabold text-xs sm:text-sm text-[#1A3629]">
-              {isAuthenticated ? `${streakCount} ${streakCount === 1 ? 'Day Streak' : 'Days Streak'}` : 'Guest Explorer'}
+              {streakCount > 0 ? `${streakCount} ${streakCount === 1 ? 'Day Streak' : 'Days Streak'}` : 'Start Streak'}
             </span>
             {isTodaySealed && (
               <span className="flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
@@ -214,13 +205,7 @@ export function FullscreenSanctuaryStage({
 
         {/* Biome Name & Level Pill */}
         <div
-          onClick={() => {
-            if (!isAuthenticated && onRequireAuth) {
-              onRequireAuth();
-              return;
-            }
-            onOpenBiomeGallery?.();
-          }}
+          onClick={() => onOpenBiomeGallery?.()}
           className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#FFFDF9]/90 backdrop-blur-md border border-[#1A3629]/15 shadow-sm font-mono text-xs cursor-pointer hover:border-[#1A3629] hover:shadow-md transition-all group"
           title="Click to explore Island Themes and Levels"
         >
@@ -229,7 +214,7 @@ export function FullscreenSanctuaryStage({
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-[#1A3629]/30" />
           <span className="font-bold text-[#4A5D4E]">
-            Lvl {isAuthenticated ? progress.level : 1} ({isAuthenticated ? progress.progressPercent : 0}%)
+            Lvl {progress.level} ({progress.progressPercent}%)
           </span>
           <span className="text-[10px] text-[#B8862D] font-bold font-cabinet flex items-center gap-1">
             <PixelSparkles size={11} color="#B8862D" />
@@ -257,13 +242,7 @@ export function FullscreenSanctuaryStage({
         )}
 
         <div
-          onClick={() => {
-            if (!isAuthenticated && onRequireAuth) {
-              onRequireAuth();
-              return;
-            }
-            onOpenBiomeGallery?.();
-          }}
+          onClick={() => onOpenBiomeGallery?.()}
           className="relative z-10 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] md:w-[540px] md:h-[540px] lg:w-[620px] lg:h-[620px] xl:w-[700px] xl:h-[700px] max-w-full flex items-center justify-center motion-safe:animate-[islandFloat_8s_ease-in-out_infinite] motion-reduce:animate-none transition-all duration-300 cursor-pointer"
           title="Click to view Island Themes & Levels"
         >

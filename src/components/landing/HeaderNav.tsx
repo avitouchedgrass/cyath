@@ -176,6 +176,7 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
 
   // Public visitor navigation items
   const publicNavItems: NavItem[] = [
+    { name: "Live Demo", href: "/demo" },
     { name: "Playbook", href: "/playbook" },
     { name: "Methodology", href: "/#methodology" },
   ];
@@ -240,12 +241,20 @@ export function HeaderNav({ onOpenAuth, theme = 'light' }: HeaderNavProps) {
                 <span>Profile</span>
               </Link>
             ) : (
-              <Link
-                href="/login"
-                className="border border-[#1A3629]/25 bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all flex items-center justify-center cursor-pointer h-9"
-              >
-                <span>Log In</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/demo"
+                  className="border border-[#1A3629]/20 bg-[#FFFDF9] text-[#1A3629] hover:bg-[#FAF6EE] px-3.5 rounded-full font-cabinet font-bold text-xs shadow-2xs transition-all hidden sm:flex items-center justify-center cursor-pointer h-9"
+                >
+                  <span>Guest Demo</span>
+                </Link>
+                <Link
+                  href="/login"
+                  className="border border-[#1A3629]/25 bg-[#1A3629] text-[#FFFDF9] hover:bg-[#2C4A3B] px-4 rounded-full font-cabinet font-bold text-xs shadow-xs transition-all flex items-center justify-center cursor-pointer h-9"
+                >
+                  <span>Log In</span>
+                </Link>
+              </div>
             )}
 
             {/* Mobile Menu Hamburger (<768px) */}

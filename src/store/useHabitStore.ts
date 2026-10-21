@@ -17,7 +17,7 @@ import { progressionEvents } from '@/lib/progression/events';
 import { retroAudio } from '@/lib/retroAudio';
 import { Recipe, RECIPES } from '@/lib/recipes';
 import { validateReferralCodeInput, KNOWN_SEED_CODES, extractReferralCode } from '@/lib/referralUtils';
-import { formatLocalDate, getLocalWeekKey } from '@/lib/dateUtils';
+import { formatLocalDate, getLocalWeekKey, parseLocalDate, getRelativeLocalDate } from '@/lib/dateUtils';
 import { XP_MATRIX } from '@/lib/constants/xpMatrix';
 
 export interface HabitItem {
@@ -2473,48 +2473,257 @@ export const useHabitStore = create<HabitStoreState>()(
 
       initDemoSession: () => {
         const today = getTodayString();
+        const baseDate = parseLocalDate(today);
+
+        const demoLogs: Record<string, DailyLogData> = {};
+        const demoRituals: Record<string, DeskRitualData> = {};
+        const demoProtocolsAccepted: Record<string, boolean> = {};
+        const demoProtocolsCompleted: Record<string, boolean> = {};
+        const demoSealedDates: Record<string, boolean> = {};
+
+        const proteinFloorByDay = [148, 155, 142, 160, 150, 145, 158, 152, 146, 162, 150, 148, 156, 152];
+        const sleepHoursByDay = [7.9, 8.2, 8.0, 7.8, 8.4, 8.1, 8.0, 7.9, 8.3, 8.0, 8.1, 7.9, 8.2, 8.1];
+
+        // Populate 14 prior days of consistent habit telemetry
+        for (let i = 14; i >= 1; i--) {
+          const dateStr = getRelativeLocalDate(-i, baseDate);
+          const pIndex = 14 - i;
+          const protein = proteinFloorByDay[pIndex];
+          const sleep = sleepHoursByDay[pIndex];
+
+          demoLogs[dateStr] = {
+            habitsCompleted: {
+              sunlight: true,
+              protein_target: true,
+              movement: true,
+              hydration: true,
+              digital_sunset: true,
+              mobility: true,
+            },
+            totalProteinLogged: protein,
+            totalCaloriesLogged: Math.round(protein * 4 + 1450),
+            hydrationLiters: 2.8,
+            sleepHours: sleep,
+            energyLevel: 8 + (pIndex % 2),
+            moodScore: 8 + (pIndex % 2),
+            notes: 'Steady focus sustained throughout the afternoon. Zero postprandial slump.',
+            loggedRecipeIds: ['herb-grilled-chicken', 'salmon-avocado-bowl'],
+            loggedMeals: [
+              {
+                id: `demo_meal_lunch_${dateStr}`,
+                name: 'Herb Grilled Chicken Breast & Greens',
+                protein: 48,
+                calories: 520,
+                carbs: 12,
+                fats: 14,
+                dietType: 'omnivore',
+                category: 'High Protein',
+                ingredients: [
+                  { item: 'Free-range chicken breast', amount: '220g' },
+                  { item: 'Baby spinach', amount: '100g' },
+                  { item: 'Extra virgin olive oil', amount: '15ml' },
+                ],
+                suggestedSprite: '/assets/food/grilled-chicken.png',
+                mealSlot: 'lunch',
+                loggedAt: `${dateStr}T13:00:00.000Z`,
+              },
+              {
+                id: `demo_meal_dinner_${dateStr}`,
+                name: 'Wild Salmon, Quinoa & Avocado Bowl',
+                protein: 44,
+                calories: 610,
+                carbs: 45,
+                fats: 22,
+                dietType: 'pescatarian',
+                category: 'Steady Carbs',
+                ingredients: [
+                  { item: 'Wild sockeye salmon', amount: '180g' },
+                  { item: 'Organic quinoa', amount: '120g' },
+                  { item: 'Hass avocado', amount: '0.5' },
+                ],
+                suggestedSprite: '/assets/food/salmon-bowl.png',
+                mealSlot: 'dinner',
+                loggedAt: `${dateStr}T19:30:00.000Z`,
+              },
+            ],
+          };
+
+          demoRituals[dateStr] = {
+            morningBootCompleted: true,
+            eveningWrapCompleted: true,
+            afternoonSlumpScore: 2,
+            caffeineCutoffRespected: true,
+            caffeineStatus: 'before_cutoff',
+            wholeFoodRating: 9,
+          };
+
+          demoProtocolsAccepted[dateStr] = true;
+          demoProtocolsCompleted[dateStr] = true;
+          demoSealedDates[dateStr] = true;
+        }
+
+        // Today's log: active session with morning habits and meals logged, ready to check in and seal
+        demoLogs[today] = {
+          habitsCompleted: {
+            sunlight: true,
+            protein_target: false,
+            movement: true,
+            hydration: false,
+            digital_sunset: false,
+            mobility: false,
+          },
+          totalProteinLogged: 65,
+          totalCaloriesLogged: 820,
+          hydrationLiters: 1.5,
+          sleepHours: 8.0,
+          energyLevel: 8,
+          moodScore: 8,
+          notes: 'Clear-headed start to the day. 20-min morning light walk completed.',
+          loggedRecipeIds: ['herb-grilled-chicken'],
+          loggedMeals: [
+            {
+              id: `demo_meal_breakfast_${today}`,
+              name: 'Poached Pasture Eggs, Sourdough & Avocado',
+              protein: 32,
+              calories: 480,
+              carbs: 34,
+              fats: 20,
+              dietType: 'eggetarian',
+              category: 'Quick Fuel',
+              ingredients: [
+                { item: 'Pasture-raised eggs', amount: '3 eggs' },
+                { item: 'Artisan sourdough', amount: '2 slices' },
+                { item: 'Hass avocado', amount: '0.5' },
+              ],
+              suggestedSprite: '/assets/food/generic-plate.png',
+              mealSlot: 'breakfast',
+              loggedAt: `${today}T08:30:00.000Z`,
+            },
+            {
+              id: `demo_meal_lunch_${today}`,
+              name: 'Greek Yogurt & Wild Berry Parfait',
+              protein: 33,
+              calories: 340,
+              carbs: 28,
+              fats: 6,
+              dietType: 'vegetarian',
+              category: 'High Protein',
+              ingredients: [
+                { item: 'Greek yogurt (0%)', amount: '250g' },
+                { item: 'Organic blueberries', amount: '80g' },
+                { item: 'Raw honey', amount: '10g' },
+              ],
+              suggestedSprite: '/assets/food/generic-plate.png',
+              mealSlot: 'lunch',
+              loggedAt: `${today}T12:45:00.000Z`,
+            },
+          ],
+        };
+
+        demoRituals[today] = {
+          morningBootCompleted: true,
+          eveningWrapCompleted: false,
+          afternoonSlumpScore: 2,
+          caffeineCutoffRespected: true,
+          caffeineStatus: 'before_cutoff',
+          wholeFoodRating: 9,
+        };
+
+        demoProtocolsAccepted[today] = true;
+        demoProtocolsCompleted[today] = false;
+        demoSealedDates[today] = false;
+
         set({
-          userSession: { id: `guest_${Date.now()}`, email: 'demo.user@cyath.health' },
+          userSession: { id: `guest_${Date.now()}`, email: 'demo.explorer@cyath.app' },
           userProfile: {
-            fullName: 'demo-user',
-            age: 19,
+            fullName: 'Demo Explorer',
+            age: 26,
             sex: 'male',
             heightCm: 178,
-            weightKg: 70,
+            weightKg: 74,
+            targetProteinGrams: 148,
+            bedTime: '23:00',
+            wakeTime: '07:00',
             primaryGoal: 'focus',
             allergies: [],
             dietaryRestrictions: ['High-Protein Omnivore'],
+            selectedIslandSuite: 'circadian',
+            archetype: 'circadian',
             onboardingCompleted: true,
           },
           habits: DEFAULT_HABITS,
-          totalXp: 0,
-          streakCount: 0,
-          streakFreezeStock: 0,
-          claimedMilestones: [],
-          completedQuestIdsByDate: {},
-          xpHistory: [],
-          activeProtocolIds: ['morning-activation', 'deep-rem-sleep'],
-          logsByDate: {
-            [today]: {
-              habitsCompleted: {
-                sunlight: true,
-                protein_target: false,
-                movement: true,
-                hydration: false,
-                digital_sunset: false,
-                mobility: false,
-              },
-              totalProteinLogged: 45,
-              totalCaloriesLogged: 620,
-              hydrationLiters: 1.2,
-              sleepHours: 8.0,
-              energyLevel: 8,
-              moodScore: 8,
-              notes: 'Demo sandbox session initialized.',
-              loggedRecipeIds: ['herb-grilled-chicken'],
-            },
+          totalXp: 520,
+          suiteXp: {
+            circadian: 280,
+            iron: 140,
+            focus: 100,
           },
+          streakCount: 14,
+          isForgedStreak: true,
+          streakFreezeStock: 2,
+          claimedMilestones: [1, 2, 3, 4, 5, 6, 7],
+          completedQuestIdsByDate: {},
+          xpHistory: [
+            { id: 'h1', amount: 50, reason: 'Evening Brass Seal Check-in', timestamp: `${getRelativeLocalDate(-1, baseDate)}T21:00:00.000Z` },
+            { id: 'h2', amount: 20, reason: 'Protein Anchor Hit', timestamp: `${getRelativeLocalDate(-1, baseDate)}T19:30:00.000Z` },
+          ],
+          activeProtocolIds: ['morning-activation', 'deep-rem-sleep', 'protein-anchoring'],
+          logsByDate: demoLogs,
+          deskRitualsByDate: demoRituals,
+          dailyProtocolsAcceptedByDate: demoProtocolsAccepted,
+          dailyProtocolsCompletedByDate: demoProtocolsCompleted,
+          isLedgerSealedByDate: demoSealedDates,
+          unlockedTrophies: [
+            'island_sprout',
+            'island_cabin',
+            'first_seal',
+            'seal_streak_7',
+            'first_light',
+            'solar_vanguard',
+            'flawless_biometrics',
+            'thermal_receipt',
+          ],
+          trophyCounts: {
+            island_sprout: 1,
+            island_cabin: 1,
+            first_seal: 14,
+            seal_streak_7: 2,
+            first_light: 14,
+            solar_vanguard: 4,
+            flawless_biometrics: 6,
+            thermal_receipt: 3,
+          },
+          weightHistory: [
+            {
+              id: 'demo_w_1',
+              date: getRelativeLocalDate(-14, baseDate),
+              timestamp: Date.now() - 14 * 86400000,
+              weightKg: 75.4,
+              trend: 'stable',
+              deltaKg: 0,
+              note: 'Initial baseline',
+            },
+            {
+              id: 'demo_w_2',
+              date: getRelativeLocalDate(-7, baseDate),
+              timestamp: Date.now() - 7 * 86400000,
+              weightKg: 74.6,
+              trend: 'down',
+              deltaKg: -0.8,
+              note: 'Week 1 calibration',
+            },
+            {
+              id: 'demo_w_3',
+              date: getRelativeLocalDate(-1, baseDate),
+              timestamp: Date.now() - 1 * 86400000,
+              weightKg: 74.0,
+              trend: 'down',
+              deltaKg: -0.6,
+              note: 'Steady target weight',
+            },
+          ],
           pendingAction: null,
+          pendingTrophyUnlock: null,
         });
       },
 
@@ -3451,6 +3660,9 @@ export const useHabitStore = create<HabitStoreState>()(
             socialQuests: state.socialQuests,
             isForgedStreak: state.isForgedStreak,
             isLedgerSealedByDate: state.isLedgerSealedByDate,
+            deskRitualsByDate: state.deskRitualsByDate,
+            dailyProtocolsAcceptedByDate: state.dailyProtocolsAcceptedByDate,
+            dailyProtocolsCompletedByDate: state.dailyProtocolsCompletedByDate,
             unlockedTrophies: state.unlockedTrophies,
             trophyCounts: state.trophyCounts,
             suiteXp: state.suiteXp,

@@ -122,12 +122,12 @@ export default function Home() {
 
               {/* Primary & Secondary Refined CTAs with Tactile Weight */}
               <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
+                <Link href={isLoggedIn ? "/dashboard" : "/demo"} className="w-full sm:w-auto">
                   <button
                     type="button"
                     className="w-full sm:w-auto font-cabinet font-bold text-base px-8 h-[52px] rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-[0_2px_8px_rgba(26,54,41,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#224736] hover:shadow-[0_4px_16px_rgba(26,54,41,0.22)] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center whitespace-nowrap"
                   >
-                    {isLoggedIn ? "Visit Your Dashboard" : "Begin Calibration"}
+                    {isLoggedIn ? "Visit Your Dashboard" : "Launch Live Demo"}
                   </button>
                 </Link>
 
@@ -671,12 +671,12 @@ export default function Home() {
             </p>
 
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={isLoggedIn ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
+              <Link href={isLoggedIn ? "/dashboard" : "/demo"} className="w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto font-cabinet font-bold text-base sm:text-lg px-8 py-4 rounded-full bg-[#1A3629] text-[#FFFDF9] border border-[#1A3629] shadow-xs hover:bg-[#234535] active:scale-[0.99] transition-all cursor-pointer inline-flex items-center justify-center"
                 >
-                  {isLoggedIn ? "Visit Your Dashboard" : "Begin Calibration"}
+                  {isLoggedIn ? "Visit Your Dashboard" : "Try Interactive Demo"}
                 </button>
               </Link>
 

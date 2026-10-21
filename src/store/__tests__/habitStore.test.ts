@@ -535,5 +535,37 @@ describe('useHabitStore session, profile, and custom recipe persistence', () => 
     expect(repeatIg.success).toBe(false);
     expect(repeatIg.xpAwarded).toBe(0);
   });
+
+  it('initializes genuine full-featured guest demo session with 14-day history, Level 7 progression, and trophies', () => {
+    useHabitStore.getState().initDemoSession();
+
+    const state = useHabitStore.getState();
+
+    // 1. Guest session identity
+    expect(state.userSession).toBeDefined();
+    expect(state.userSession?.id.startsWith('guest_')).toBe(true);
+    expect(state.userProfile?.fullName).toBe('Demo Explorer');
+    expect(state.userProfile?.onboardingCompleted).toBe(true);
+
+    // 2. Meaningful progression (Level 7 Tier 3)
+    expect(state.totalXp).toBe(520);
+    expect(state.streakCount).toBe(14);
+    expect(state.isForgedStreak).toBe(true);
+    expect(state.streakFreezeStock).toBe(2);
+
+    // 3. Unlocked trophies & mastery
+    expect(state.unlockedTrophies).toContain('island_cabin');
+    expect(state.unlockedTrophies).toContain('first_seal');
+    expect(state.trophyCounts.first_seal).toBe(14);
+
+    // 4. Historical telemetry populated for 14 prior days
+    const logDates = Object.keys(state.logsByDate);
+    expect(logDates.length).toBeGreaterThanOrEqual(15); // 14 past days + today
+
+    // 5. Today is unsealed and ready for user check-in
+    const today = state.currentDate;
+    expect(state.isLedgerSealedByDate[today]).toBe(false);
+    expect(state.logsByDate[today]?.loggedMeals?.length).toBeGreaterThan(0);
+  });
 });
 

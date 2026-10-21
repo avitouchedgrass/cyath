@@ -84,6 +84,10 @@ function DashboardContent() {
       setDate(today);
     }
 
+    if (!userSession) {
+      useHabitStore.getState().initDemoSession();
+    }
+
     if (searchParams.get('tab') === 'dossier') {
       setIsDossierOpen(true);
     }

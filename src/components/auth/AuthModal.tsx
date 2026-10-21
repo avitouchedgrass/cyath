@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PixelX, PixelSpinner } from '@/components/common/PixelIcons';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useHabitStore } from '@/store/useHabitStore';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -90,6 +91,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModal
   };
 
   const handleDemoAccess = () => {
+    useHabitStore.getState().initDemoSession();
     onClose();
     router.push('/dashboard');
   };
